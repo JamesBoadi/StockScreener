@@ -20,12 +20,15 @@ namespace StockScreener.Controllers
 
         Stocks stocks = new Stocks();
 
-        // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/generics/ Use this for typr casting
+        // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/generics/ Use this for type casting
 
         public ChannelReader<string[]> Counter(
         string[] arr,
        CancellationToken cancellationToken)
         {
+
+             // Trigger a background thread that does the sending
+
 
             if (init_called == false)
             {
@@ -42,9 +45,6 @@ namespace StockScreener.Controllers
         }
 
 
-
-
-
         private async Task WriteItemsAsync(
             ChannelWriter<string[]> writer,
             string[] arr,
@@ -55,30 +55,12 @@ namespace StockScreener.Controllers
             {
                 int request_Calls = Int32.Parse(arr[0]);
                 int delay = Int32.Parse(arr[1]);
+                
+                initialise_cache();
 
-                int start = 0;
-                int end = 19;
-
-                for (int pointer = 0; pointer <= stocks.MAX_CALLS; pointer++)
-                {
-                    if (pointer == stocks.MAX_CALLS)
-                    {
-                        stockArray = stocks.getAllRealTimePrices(start, start + stocks.Mod);
-                        Console.WriteLine("Called");
-                        break;
-                    }
-
-                    stockArray = stocks.getAllRealTimePrices(start, end);
-                    stocks.Request_Calls = pointer;
-
-                    start += 20;
-                    end += 20;
-                    Console.WriteLine(start + " " + end);
-                    await writer.WriteAsync(stockArray, cancellationToken);
-                    await Task.Delay(delay, cancellationToken);
-                }
-
+                
             }
+
             catch (Exception ex)
             {
                 if (ex is ArgumentNullException || ex is NullReferenceException ||
@@ -125,9 +107,55 @@ namespace StockScreener.Controllers
             // stockArray = stocks.getAllRealTimePrices(0);
             stockArray[5] = stocks.Request_Calls.ToString();
             //   stockArray[6] = stocks.MAX_CALLS.ToString();
-
             await Clients.All.SendAsync("ScanResponse", stockArray, request_arr);
         }
+
+
+        private async void initialise_cache()
+        {
+            int start = 0;
+            int end = 19;
+
+            for (int pointer = 0; pointer <= stocks.MAX_CALLS; pointer++)
+            {
+                if (pointer == stocks.MAX_CALLS)
+                {
+                    stocks.getAllRealTimePrices(start, start + stocks.Mod);
+                    Console.WriteLine("Called");
+                    break;
+                }
+
+                stocks.getAllRealTimePrices(start, end);
+                stocks.Request_Calls = pointer;
+
+                start += 20;
+                end += 20;
+                Console.WriteLine(start + " " + end);
+              
+                // await Task.Delay(delay, cancellationToken);
+            }
+        }
+
+
+
+        private void init_backgroundWorker()
+        {
+
+
+
+        }
+
+
+        // Return data from cache
+        private async void getData(ChannelWriter<string[]> writer, CancellationToken cancellationToken)
+        {
+            for (int pointer = 0; pointer < Stocks.StocksCode.Value.Length; pointer++)
+            {
+                  await writer.WriteAsync(Stocks.cache.Get(pointer), cancellationToken);
+            }
+        }
+
+
 
         /* public IActionResult Index()
          {

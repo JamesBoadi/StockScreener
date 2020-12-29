@@ -13,22 +13,24 @@ namespace StockScreener
     public class Cache<T>
     {
 
-        Dictionary<int, T[]> hash = new Dictionary<int, T[]>();
+        static Dictionary<int, T[]> hash = new Dictionary<int, T[]>();
         T[] arr = new T[7];
 
-        private static int counter = -1;
+        private static int counter = 0;
 
         public int Counter
         {
             get { return counter; }
             set
             {
-                if (counter < 7)
+                if (counter < 6)
+                {
                     counter = value;
+                }
                 else
                 {
-                    hash.Add(Stocks.Pointer, arr);
-                    counter = -1;
+                    hash.Add(++Stocks.Pointer, arr);
+                    counter = 0;
                 }
             }
         }
@@ -37,14 +39,27 @@ namespace StockScreener
         public void Add(T data)
         {
             Console.WriteLine(data);
-            arr[++Counter] = data;
+            arr[Counter++] = data;
         }
 
+        /// <summary>Updates an item or several items in the collection</summary>
+        public void Update(int position, int TIndex, T data)
+        {
+            T[] arr_ = hash[position];
+            T cachedData = arr_[TIndex];
 
+            if (!data.Equals(cachedData))
+            {
+                arr_[TIndex] = data;
+                hash[position] = arr_;
+            }
+        }
 
-
-
-
+        /// <summary>Return the item from the collection</summary>
+        public T[] Get(int position)
+        {
+            return hash[position];
+        }
 
     }
 

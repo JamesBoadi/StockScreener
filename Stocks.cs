@@ -118,13 +118,11 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
         static string[] manualScanStocks = new string[7 * 20];
 
-        
-
         static string[] arr;
 
         List<RealTimePrice> data;
 
-        Cache<Type> mad = new Cache<Type>();
+        public static Cache<String> cache = new Cache<String>();
 
         private void copy(int start, int end)
         {
@@ -137,10 +135,11 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             }
         }
 
-        public static int Pointer {get; set;}
 
+        private static int pointer = -1;
+        public static int Pointer { get { return pointer; } set { pointer = value; } }
 
-        public string[] getAllRealTimePrices(int start, int end)
+        public void getAllRealTimePrices(int start, int end)
         {
             try
             {
@@ -149,31 +148,17 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 int pointer = 0;
                 int code = start;
 
- 
-
                 foreach (RealTimePrice data_ in data)
                 {
-
-/*
-                    typeArr[pointer] = data_.Open;
-                    typeArr[pointer + 1] = StocksCode.Value[code];
-                    typeArr[pointer + 2] = data_.Change;
-                    typeArr[pointer + 3] = data_.ChangeP;
-                    typeArr[pointer + 4] = data_.Volume;
-                    typeArr[pointer + 5] = Request_Calls;
-                    typeArr[pointer + 6] = MAX_CALLS;*/
-
-
-                    manualScanStocks[pointer] = data_.Open.ToString();
-                    manualScanStocks[pointer + 1] = StocksCode.Value[code].ToString();
-                    manualScanStocks[pointer + 2] = data_.Change.ToString();
-                    manualScanStocks[pointer + 3] = data_.ChangeP.ToString();
-                    manualScanStocks[pointer + 4] = data_.Volume.ToString();
-                    manualScanStocks[pointer + 5] = Request_Calls.ToString();
-                    manualScanStocks[pointer + 6] = MAX_CALLS.ToString();
-
-                    pointer += 7;
-                    code++;
+                    cache.Add(data_.Open.ToString());
+                    cache.Add(StocksCode.Value[code].ToString());
+                    cache.Add(data_.Change.ToString());
+                    cache.Add(data_.ChangeP.ToString());
+                    cache.Add(data_.Volume.ToString());
+                    cache.Add(Request_Calls.ToString());
+                    cache.Add(MAX_CALLS.ToString());
+                /*    pointer += 7;
+                    code++;*/
                 }
             }
 
@@ -186,8 +171,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                   || ex is OverflowException || ex is System.Threading.Tasks.TaskCanceledException)
                     Console.WriteLine("exception " + ex); // Redirect also if timeout
             }
-
-            return manualScanStocks;
         }
 
 
