@@ -6,9 +6,15 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
 using System.IO;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 using System.Threading;
+
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
 
 namespace StockScreener
 {
@@ -29,8 +35,6 @@ namespace StockScreener
                 .Build();
 
             host.Run();
-
-         
             // CreateHostBuilder(args).Build().Run();
         }
 
@@ -39,6 +43,9 @@ namespace StockScreener
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                }).ConfigureServices(services =>
+                {
+                services.AddHostedService<BackgroundServiceWorker>();
                 });
 
 

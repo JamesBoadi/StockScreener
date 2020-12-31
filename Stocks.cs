@@ -164,7 +164,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
             catch (Exception ex)
             {
-                if (ex is ArgumentNullException || ex is NullReferenceException || ex is ArgumentException ||
+                if (ex is StackOverflowException || ex is ArgumentNullException || ex is NullReferenceException || ex is ArgumentException ||
                   ex is IndexOutOfRangeException ||
                   ex is Newtonsoft.Json.JsonSerializationException
                   || ex is MissingMemberException

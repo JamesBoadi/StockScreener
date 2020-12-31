@@ -39,7 +39,7 @@ namespace StockScreener
         public void Add(T data)
         {
             Console.WriteLine(data);
-            arr[Counter++] = data;
+            arr[Counter++] = data;            
         }
 
         /// <summary>Updates an item or several items in the collection</summary>

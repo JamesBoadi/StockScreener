@@ -150,10 +150,9 @@ export class FetchData extends Component {
 
   // https://www.codetinkerer.com/2018/06/05/aspnet-core-websockets.html
 
-
+  
   render() {
     //  FetchData.sendRequest("I have a message", "of glory");
-
 
     let obj = [
       { date: 'Welcome to learning React!' },];
