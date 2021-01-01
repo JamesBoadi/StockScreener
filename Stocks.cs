@@ -7,9 +7,8 @@ using System.Net;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Threading.Channels;
 using CsvHelper;
-
-
 
 namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_server For the database (https://gist.github.com/kevinswiber/1390198)
 {
@@ -135,30 +134,46 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             }
         }
 
-
         private static int pointer = -1;
         public static int Pointer { get { return pointer; } set { pointer = value; } }
 
-        public void getAllRealTimePrices(int start, int end)
+
+        private CancellationToken cancellationToken;
+        public CancellationToken CancellationToken
+        {
+            get { return cancellationToken; }
+            set {cancellationToken = value; }
+        }
+        
+
+        public void getAllRealTimePrices(int start, int end, int pointer)
         {
             try
             {
                 copy(start, end);
-                data = client.GetRealTimePrices(arr);
-                int pointer = 0;
+              //  data = client.GetRealTimePrices(arr);
+              //  int pointer = 0;
                 int code = start;
 
-                foreach (RealTimePrice data_ in data)
+               for(int i = 0; i < arr.Length; i++ ) //    foreach (RealTimePrice data_ in data)
                 {
-                    cache.Add(data_.Open.ToString());
-                    cache.Add(StocksCode.Value[code].ToString());
+               /*     cache.Add(data_.Open.ToString());
+                   cache.Add(StocksCode.Value[code].ToString());
                     cache.Add(data_.Change.ToString());
                     cache.Add(data_.ChangeP.ToString());
                     cache.Add(data_.Volume.ToString());
                     cache.Add(Request_Calls.ToString());
-                    cache.Add(MAX_CALLS.ToString());
+                    cache.Add(MAX_CALLS.ToString());*/
                 /*    pointer += 7;
                     code++;*/
+
+                     cache.Add(pointer.ToString());
+                     cache.Add((pointer+1).ToString());
+                     cache.Add((pointer+2).ToString());
+                     cache.Add((pointer+3).ToString());
+                     cache.Add((pointer+4).ToString());
+                     cache.Add((pointer+5).ToString());
+                     cache.Add((pointer+6).ToString());
                 }
             }
 
@@ -173,11 +188,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             }
         }
 
-
-
-
-
-
         /*  public void getRealTimePrice(String code)
           {
               EODHistoricalDataClient client = new EODHistoricalDataClient(API_TOKEN, true);
@@ -185,6 +195,8 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
               //if() // Perform a refresh if fail (like restart thread or put on seperate thread)
               List<RealTimePrice> prices = client.GetRealTimePrices(StocksCode.Value); // enumeration
           }*/
+
+          
 
         public List<Database> readDatabase()
         {
