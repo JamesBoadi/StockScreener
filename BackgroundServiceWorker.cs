@@ -75,7 +75,10 @@ namespace StockScreener
 
 
 
-        private bool convertTime(int session, TimeSpan currentTime)
+
+
+
+        public bool convertTime(int session, TimeSpan currentTime)
         {
             string sessionPeriod = tradingHours[session];
 
@@ -135,6 +138,7 @@ namespace StockScreener
                     await WriterOne.WriteAsync(Stocks.cache.Get(pointer), CancellationToken);
                 }
             }
+
             catch (Exception ex)
             {
                 if (ex is StackOverflowException || ex is ArgumentNullException || ex is NullReferenceException || ex is ArgumentException ||
@@ -143,10 +147,12 @@ namespace StockScreener
                 || ex is MissingMemberException
                 || ex is OverflowException || ex is System.Threading.Tasks.TaskCanceledException || ex is System.Threading.Channels.ChannelClosedException)
 
-                    // Redirect?      
-                    Console.WriteLine("exception " + ex);
+                // Redirect?      
+                Console.WriteLine("exception " + ex);
             }
         }
+
+
         /*
                 private void DoWork(object state)
                 {
