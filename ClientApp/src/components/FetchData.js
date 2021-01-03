@@ -99,7 +99,7 @@ export class FetchData extends Component {
   sendRequest = () => {
     // Set the state of this column counter
     //this.setState({ column_counter: this.state.column_counter + 1 });
-
+    
     var arr = [];
     arr.push(this.state.column_counter.toString());
     arr.push("500");
@@ -109,10 +109,10 @@ export class FetchData extends Component {
 
         next: (stockArray) => {
           var i = 0;
+          
           for (i = 0; i < stockArray.length; i++) {
               console.log("next " + stockArray[i]);
           }
-
 
      /*     const request_Calls = parseInt(stockArray[5]);
           const max_Calls = parseInt(stockArray[6]);
@@ -130,13 +130,25 @@ export class FetchData extends Component {
 
        //   console.log("Array " + stockArray);
         },
-
         complete: () => {
           // render table
           console.log('complete');
         },
         error: (err) => {
+          console.log('err ' + err);
+        }
+      });
 
+      var streamTwo_ = this.state.hubConnection.stream("LockStream", arr)
+      .subscribe({
+        next: (lock) => {
+          this.setState({lock: lock});
+        },
+        complete: () => {
+          // render table
+          console.log('complete');
+        },
+        error: (err) => {
           console.log('err ' + err);
         }
       });

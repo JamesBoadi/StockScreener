@@ -24,21 +24,27 @@ namespace StockScreener
         private readonly ILogger<BackgroundServiceWorker> _logger;
         private Timer _timer;
 
-        private string[] tradingHours =
-        {"9:00am-12:30pm","2:30pm-4:45pm","4:50pm-5:00pm"};
+        private string[] tradingHours = { "09:00am,12:30pm", "02:30pm,04:45pm", "04:50pm,05:00pm" };
 
         DateTime malaysiaTime = DateTime.UtcNow;
 
         const string easternZoneId = "Malaysia Time";
 
-        private ChannelWriter<string[]> writer;
+        private ChannelWriter<string[]> writerOne;
 
-        public ChannelWriter<string[]> Writer
+        public ChannelWriter<string[]> WriterOne
         {
-            get { return writer; }
-            set { writer = value; }
+            get { return writerOne; }
+            set { writerOne = value; }
         }
 
+        private ChannelWriter<bool> writerTwo;
+
+        public ChannelWriter<bool> WriterTwo
+        {
+            get { return writerTwo; }
+            set { writerTwo = value; }
+        }
 
         public BackgroundServiceWorker()//ILogger<BackgroundServiceWorker> logger)
         {
@@ -46,15 +52,14 @@ namespace StockScreener
         }
 
         public CancellationToken CancellationToken { get; set; }
+
         // Type task for asyc operations
         public Task StartAsync(CancellationToken stoppingToken)
         {
-            var channel = Channel.CreateUnbounded<string[]>();
-
             try
             {
                 // _logger.LogInformation("Timed Hosted Service running.");
-                _timer = new Timer(getData, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(30));
+                _timer = new Timer(getDataFromCache, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(30));
             }
             catch (Exception ex)
             {
@@ -68,22 +73,67 @@ namespace StockScreener
             return Task.CompletedTask;
         }
 
-        public async void getData(object current_state)
+
+
+        private bool convertTime(int session, TimeSpan currentTime)
+        {
+            string sessionPeriod = tradingHours[session];
+
+            String lowerBound = sessionPeriod.Substring(0, 5);
+            String upperBound = sessionPeriod.Substring(7, 13);
+
+            String lowerBound_meridian = lowerBound.Substring(3, 5);
+            String upperBound_meridian = upperBound.Substring(3, 5);
+
+            String lb_hours = (lowerBound.Substring(0, 1) != "0") ? lowerBound.Substring(0, 2) : lowerBound.Substring(0, 1);
+            String lb_minutes = (lowerBound.Substring(0, 1) != "0") ? lowerBound.Substring(3, 4) : lowerBound.Substring(2, 4);
+
+            String ub_hours = (upperBound.Substring(0, 1) != "0") ? upperBound.Substring(0, 2) : upperBound.Substring(0, 1);
+            String ub_minutes = (upperBound.Substring(0, 1) != "0") ? upperBound.Substring(3, 4) : upperBound.Substring(2, 4);
+
+            int _lb_hours = Int32.Parse(lb_hours);
+            int _lb_minutes = Int32.Parse(lb_minutes);
+
+            int _ub_hours = Int32.Parse(ub_hours);
+            int _ub_minutes = Int32.Parse(ub_minutes);
+
+            DateTime time = DateTime.Today.Add(currentTime);
+
+            string _currentTime = time.ToString("hh:mm tt");
+
+            int _currentTime_hours = 0;//Int32.Parse(lb_hours);
+            int _currentTime_minutes = 0;
+            String _currentTime_meridian = _currentTime.Substring(3, 5);
+
+            if (_currentTime_hours > _lb_hours && _currentTime_hours < _ub_hours
+                && !(_currentTime_meridian.Equals(upperBound_meridian)))
+                return true;
+            else
+                return false;
+            //            return displayTime;
+        }
+
+        public async void getDataFromCache(object current_state)
         {
             await Task.Delay(100);
             Console.WriteLine("Execution count ");
-
             try
             {
+                TimeSpan time = ReturnTime();
+
+                bool sessionOneTime = convertTime(0, time);
+                bool sessionTwoTime = convertTime(1, time);
+                bool sessionThreeTime = convertTime(2, time);
+
+                if (!(sessionOneTime && sessionTwoTime && sessionThreeTime))
+                    await WriterTwo.WriteAsync(false, CancellationToken);
+                else
+                    await WriterTwo.WriteAsync(true, CancellationToken);
+
                 for (int pointer = 0; pointer < Stocks.StocksCode.Value.Length; pointer++)
                 {
-                    await Writer.WriteAsync(Stocks.cache.Get(pointer), CancellationToken);
+                    await WriterOne.WriteAsync(Stocks.cache.Get(pointer), CancellationToken);
                 }
-
-                
-
-
-
             }
             catch (Exception ex)
             {
@@ -92,11 +142,10 @@ namespace StockScreener
                 ex is Newtonsoft.Json.JsonSerializationException
                 || ex is MissingMemberException
                 || ex is OverflowException || ex is System.Threading.Tasks.TaskCanceledException || ex is System.Threading.Channels.ChannelClosedException)
+
+                    // Redirect?      
                     Console.WriteLine("exception " + ex);
             }
-
-
-
         }
         /*
                 private void DoWork(object state)

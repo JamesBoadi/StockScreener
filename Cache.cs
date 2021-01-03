@@ -14,7 +14,7 @@ namespace StockScreener
     {
 
         static Dictionary<int, T[]> hash = new Dictionary<int, T[]>();
-        T[] arr = new T[8];
+        T[] arr = new T[7];
 
         private static int counter = 0;
 
@@ -23,7 +23,7 @@ namespace StockScreener
             get { return counter; }
             set
             {
-                if (counter < 7)
+                if (counter < 6)
                 {
                     counter = value;
                 }
@@ -58,7 +58,7 @@ namespace StockScreener
         /// <summary>Return the item from the collection</summary>
         public T[] Get(int position)
         {
-            //Console.WriteLine("The position is " + position);
+         //  Console.WriteLine("The position is " + position);
             return hash[position];
         }
 

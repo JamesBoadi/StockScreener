@@ -33,15 +33,10 @@ namespace StockScreener.Controllers
 
         BackgroundServiceWorker serviceWorker = new BackgroundServiceWorker();
 
-
-
         // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/generics/ Use this for type casting
 
-        public ChannelReader<string[]> Counter(
-        string[] arr,
-       CancellationToken cancellationToken)
+        public ChannelReader<string[]> Counter(string[] arr, CancellationToken cancellationToken)
         {
-            var channelOne = Channel.CreateUnbounded<string[]>();
             var channelTwo = Channel.CreateUnbounded<string[]>();
 
             // Trigger a background thread that does the sending
@@ -54,17 +49,23 @@ namespace StockScreener.Controllers
             if (_init_work == false)
             {
                 _ = initialise_cache();
-                _ = init_work(channelTwo.Writer, cancellationToken);
-                // serviceWorker.Writer = writer;
+                _ = init_workOne(channelTwo.Writer, cancellationToken);
                 _init_work = !_init_work;
             }
-            //  Console.WriteLine(Stocks.MAX_CALLS);
-
             // _ = WriteItemsAsync(channelTwo.Writer, arr, cancellationToken);
-
+           
             _ = serviceWorker.StartAsync(cancellationToken);
 
             return channelTwo.Reader;
+        }
+
+        public ChannelReader<bool> LockStream(bool var, CancellationToken cancellationToken)
+        {            
+            var channelOne = Channel.CreateUnbounded<bool>();
+
+            _ = init_workTwo(channelOne.Writer, cancellationToken); 
+
+            return channelOne.Reader;
         }
 
         /*   private async Task WriteItemsAsync(
@@ -129,25 +130,26 @@ namespace StockScreener.Controllers
                 // await Task.Delay(delay, cancellationToken);
             }
 
-
             Console.WriteLine("Finished ");
         }
 
-        private async Task init_work(ChannelWriter<string[]> writer, CancellationToken cancellationToken)
+        private async Task init_workOne(ChannelWriter<string[]> writer, CancellationToken cancellationToken)
         {
             await Task.Delay(100);
 
-            serviceWorker.Writer = writer;
+            serviceWorker.WriterOne = writer;
 
             serviceWorker.CancellationToken = cancellationToken;
         }
 
-        private void init_backgroundWorker()
+        private async Task init_workTwo(ChannelWriter<bool> writer, CancellationToken cancellationToken)
         {
+            await Task.Delay(100);
 
+            serviceWorker.WriterTwo = writer;
+
+            serviceWorker.CancellationToken = cancellationToken;
         }
-
-
 
         // The logger factory! With priority queue!
         public async Task ScanRequest(string request_Calls)

@@ -96,11 +96,11 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             set { isBearish = value; }
         }
 
+        // Replace blocking operation with await tasks and loading bar
         public void init()
         {
-            init_StockList(); // Replace blocking operation with await tasks
+            init_StockList(); 
             init_StockCode();
-            Console.WriteLine("First call " + MAX_CALLS);
         }
 
         public void init_StockList()
@@ -142,38 +142,39 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         public CancellationToken CancellationToken
         {
             get { return cancellationToken; }
-            set {cancellationToken = value; }
+            set { cancellationToken = value; }
         }
-        
+
 
         public void getAllRealTimePrices(int start, int end, int pointer)
         {
             try
             {
                 copy(start, end);
-              //  data = client.GetRealTimePrices(arr);
-              //  int pointer = 0;
+                //  data = client.GetRealTimePrices(arr);
+                //  int pointer = 0;
+
                 int code = start;
 
-               for(int i = 0; i < arr.Length; i++ ) //    foreach (RealTimePrice data_ in data)
+                for (int i = 0; i < arr.Length; i++) //    foreach (RealTimePrice data_ in data)
                 {
-               /*     cache.Add(data_.Open.ToString());
-                   cache.Add(StocksCode.Value[code].ToString());
-                    cache.Add(data_.Change.ToString());
-                    cache.Add(data_.ChangeP.ToString());
-                    cache.Add(data_.Volume.ToString());
-                    cache.Add(Request_Calls.ToString());
-                    cache.Add(MAX_CALLS.ToString());*/
-                /*    pointer += 7;
-                    code++;*/
-
-                     cache.Add(pointer.ToString());
-                     cache.Add((pointer+1).ToString());
-                     cache.Add((pointer+2).ToString());
-                     cache.Add((pointer+3).ToString());
-                     cache.Add((pointer+4).ToString());
-                     cache.Add((pointer+5).ToString());
-                     cache.Add((pointer+6).ToString());
+                    /*     cache.Add(data_.Open.ToString());
+                        cache.Add(StocksCode.Value[code].ToString());
+                         cache.Add(data_.Change.ToString());
+                         cache.Add(data_.ChangeP.ToString());
+                         cache.Add(data_.Volume.ToString());
+                         cache.Add(Request_Calls.ToString());
+                         cache.Add(MAX_CALLS.ToString());*/
+                    /*    pointer += 7;
+                        code++;*/
+                        
+                    cache.Add(pointer.ToString());
+                    cache.Add((pointer + 1).ToString());
+                    cache.Add((pointer + 2).ToString());
+                    cache.Add((pointer + 3).ToString());
+                    cache.Add((pointer + 4).ToString());
+                    cache.Add((pointer + 5).ToString());
+                    cache.Add((pointer + 6).ToString());
                 }
             }
 
@@ -195,8 +196,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
               //if() // Perform a refresh if fail (like restart thread or put on seperate thread)
               List<RealTimePrice> prices = client.GetRealTimePrices(StocksCode.Value); // enumeration
           }*/
-
-          
 
         public List<Database> readDatabase()
         {
