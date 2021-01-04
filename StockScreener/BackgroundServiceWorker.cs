@@ -46,6 +46,43 @@ namespace StockScreener
             set { writerTwo = value; }
         }
 
+        bool sessionOneBool = false;
+        bool sessionTwoBool = false;
+
+        bool sessionThreeBool = false;
+        private object[] setSession;
+        public object[] SetSession
+        {
+            set
+            {
+                setSession = value;
+                int session = (int)setSession[0];
+                bool state = (bool)setSession[1];
+
+                if (session == 0)
+                {
+                    sessionOneBool = state;
+                }
+                else if (session == 1)
+                {
+                    sessionTwoBool = state;
+                }
+                else if (session == 2)
+                {
+
+                    sessionThreeBool = state;
+                }
+                else
+                {
+                    sessionOneBool = false;
+                    sessionTwoBool = false;
+                    sessionThreeBool = false;
+                }
+            }
+        }
+
+
+
         public BackgroundServiceWorker()//ILogger<BackgroundServiceWorker> logger)
         {
             // _logger = logger;
@@ -74,24 +111,7 @@ namespace StockScreener
         }
 
 
-        private bool checkTimeRange(int session, TimeSpan currentTime)
-        {
-            String sessionPeriod = tradingHours[session];
 
-
-            int[] arr = returnTimeArray(currentTime);
-            int currentTime_hours = arr[0];
-            int currentTime_minutes = arr[1];
-
-            switch(session)
-            {
-                case 0:
-                    if(currentTime_hours > )
-                    {
-
-                    }
-            }
-        }
 
 
         private int[] returnTimeArray(TimeSpan currentTime)
@@ -107,16 +127,16 @@ namespace StockScreener
             int _currentTime_hours_ = Int32.Parse(_currentTime_hours);
             int _currentTime_minutes_ = Int32.Parse(_currentTime_minutes);
 
-            return new int[] {_currentTime_hours_, _currentTime_minutes_};
+            return new int[] { _currentTime_hours_, _currentTime_minutes_ };
         }
 
 
-
+        object[] array = new object[2];
 
         public void convertTime(int session, TimeSpan currentTime)
         {
             String sessionPeriod = tradingHours[session];
-           
+
             String lowerBound = sessionPeriod.Substring(0, 5);
             String upperBound = sessionPeriod.Substring(8, 5);
 
@@ -135,26 +155,86 @@ namespace StockScreener
             int _ub_hours = Int32.Parse(ub_hours);
             int _ub_minutes = Int32.Parse(ub_minutes);
 
+            DateTime time = DateTime.Today.Add(currentTime);
+            string _currentTime = time.ToString("HH:mmtt");
 
+            String _currentTime_meridian = _currentTime.Substring(5, 2).ToLower();
+
+            int[] arr = returnTimeArray(currentTime);
+            int currentTime_hours = arr[0];
+            int currentTime_minutes = arr[1];
+
+            switch (session)
+            {
+                case 0:
+                    if (currentTime_hours > _lb_hours && currentTime_hours < _ub_hours
+                        && _currentTime_meridian != upperBound_meridian)
+                    {
+                        array[0] = 0;
+                        array[1] = true;
+                    }
+                    else
+                    {
+                        array[0] = 0;
+                        array[1] = false;
+                    }
+                    break;
+
+                case 1:
+                    if (currentTime_hours > _lb_hours && currentTime_hours < _ub_hours
+                        && _currentTime_meridian != upperBound_meridian)
+                    {
+                        array[0] = 1;
+                        array[1] = true;
+                    }
+                    else
+                    {
+                        array[0] = 1;
+                        array[1] = false;
+                    }
+                    break;
+
+                case 2:
+                    if (currentTime_hours > _lb_hours && currentTime_hours < _ub_hours
+                        && _currentTime_meridian != upperBound_meridian)
+                    {
+                        array[0] = 2;
+                        array[1] = true;
+                    }
+                    else
+                    {
+                        array[0] = 2;
+                        array[1] = false;
+
+                    }
+                    break;
+
+                default:
+                    array[0] = -1;
+                    array[1] = false;
+                    break;
+            }
+
+            SetSession = array;
         }
 
         public async void getDataFromCache(object current_state)
         {
             await Task.Delay(100);
-            
+
             Console.WriteLine("Execution count ");
             try
             {
                 TimeSpan time = ReturnTime();
                 int count = -1;
 
-                while(count < 2)
+                while (count < 2)
                     convertTime(++count, time);
-
+/*
                 if (!(sessionOneTime && sessionTwoTime && sessionThreeTime))
                     await WriterTwo.WriteAsync(false, CancellationToken);
                 else
-                    await WriterTwo.WriteAsync(true, CancellationToken);
+                    await WriterTwo.WriteAsync(true, CancellationToken);*/
 
                 for (int pointer = 0; pointer < Stocks.StocksCode.Value.Length; pointer++)
                 {
