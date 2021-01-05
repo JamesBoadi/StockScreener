@@ -50,12 +50,20 @@ namespace StockScreener
         bool sessionTwoBool = false;
 
         bool sessionThreeBool = false;
+        
         private object[] setSession;
+
         public object[] SetSession
         {
+            get
+            {
+                return setSession;
+            }
+
             set
             {
                 setSession = value;
+
                 int session = (int)setSession[0];
                 bool state = (bool)setSession[1];
 
@@ -69,18 +77,17 @@ namespace StockScreener
                 }
                 else if (session == 2)
                 {
-
                     sessionThreeBool = state;
                 }
-                else
+
+                if(!(sessionOneBool && sessionTwoBool && sessionThreeBool))
                 {
-                    sessionOneBool = false;
-                    sessionTwoBool = false;
-                    sessionThreeBool = false;
+                    setSession[0] = -1;
+                    setSession[1] = null;
+                    setSession = value;
                 }
             }
         }
-
 
 
         public BackgroundServiceWorker()//ILogger<BackgroundServiceWorker> logger)
@@ -110,10 +117,6 @@ namespace StockScreener
             return Task.CompletedTask;
         }
 
-
-
-
-
         private int[] returnTimeArray(TimeSpan currentTime)
         {
             DateTime time = DateTime.Today.Add(currentTime);
@@ -131,7 +134,7 @@ namespace StockScreener
         }
 
 
-        object[] array = new object[2];
+        object[] sessionProperties = new object[2];
 
         public void convertTime(int session, TimeSpan currentTime)
         {
@@ -164,19 +167,21 @@ namespace StockScreener
             int currentTime_hours = arr[0];
             int currentTime_minutes = arr[1];
 
+        
+
             switch (session)
             {
                 case 0:
                     if (currentTime_hours > _lb_hours && currentTime_hours < _ub_hours
                         && _currentTime_meridian != upperBound_meridian)
                     {
-                        array[0] = 0;
-                        array[1] = true;
+                        sessionProperties[0] = 0;
+                        sessionProperties[1] = true;
                     }
                     else
                     {
-                        array[0] = 0;
-                        array[1] = false;
+                        sessionProperties[0] = 0;
+                        sessionProperties[1] = false;
                     }
                     break;
 
@@ -184,13 +189,13 @@ namespace StockScreener
                     if (currentTime_hours > _lb_hours && currentTime_hours < _ub_hours
                         && _currentTime_meridian != upperBound_meridian)
                     {
-                        array[0] = 1;
-                        array[1] = true;
+                        sessionProperties[0] = 1;
+                        sessionProperties[1] = true;
                     }
                     else
                     {
-                        array[0] = 1;
-                        array[1] = false;
+                        sessionProperties[0] = 1;
+                        sessionProperties[1] = false;
                     }
                     break;
 
@@ -198,25 +203,22 @@ namespace StockScreener
                     if (currentTime_hours > _lb_hours && currentTime_hours < _ub_hours
                         && _currentTime_meridian != upperBound_meridian)
                     {
-                        array[0] = 2;
-                        array[1] = true;
+                        sessionProperties[0] = 2;
+                        sessionProperties[1] = true;
                     }
                     else
                     {
-                        array[0] = 2;
-                        array[1] = false;
+                        sessionProperties[0] = 2;
+                        sessionProperties[1] = false;
 
                     }
                     break;
-
-                default:
-                    array[0] = -1;
-                    array[1] = false;
-                    break;
             }
 
-            SetSession = array;
+            SetSession = sessionProperties;
         }
+
+
 
         public async void getDataFromCache(object current_state)
         {
@@ -230,11 +232,16 @@ namespace StockScreener
 
                 while (count < 2)
                     convertTime(++count, time);
-/*
-                if (!(sessionOneTime && sessionTwoTime && sessionThreeTime))
+
+            
+
+
+                if (!(sessionOneBool && sessionTwoBool && sessionThreeBool))
                     await WriterTwo.WriteAsync(false, CancellationToken);
-                else
-                    await WriterTwo.WriteAsync(true, CancellationToken);*/
+                else 
+                    
+                                
+                await WriterTwo.WriteAsync(true, CancellationToken); 
 
                 for (int pointer = 0; pointer < Stocks.StocksCode.Value.Length; pointer++)
                 {
