@@ -3,10 +3,11 @@ using System;
 
 namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_server For the database (https://gist.github.com/kevinswiber/1390198)
 {
-
     // Utility functions
     public class Utility : UtilityFunctions
     {
+        private readonly int T_Days = TDays;
+
         public override double calculateMomentum(double latest, double close, int x)
         {
             return (latest - (close * x));
