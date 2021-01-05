@@ -1,5 +1,5 @@
 using System;
-
+using System.Collections.Generic;
 
 namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_server For the database (https://gist.github.com/kevinswiber/1390198)
 {
@@ -8,9 +8,19 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
     {
         private readonly int T_Days = TDays;
 
+        static Dictionary<int, string> hash = new Dictionary<int, string>();
+
         public override double calculateMomentum(double latest, double close, int x)
         {
             return (latest - (close * x));
+        }
+
+        public override void breakOut()
+        {
+            
+
+
+            throw new NotImplementedException();
         }
 
         public override void reversal(bool downtrend, double open_1, double close_1, double open_2, double close_2)
@@ -31,6 +41,8 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 Stocks.IsBullish = false;
             }
         }
+
+
 
         
 
