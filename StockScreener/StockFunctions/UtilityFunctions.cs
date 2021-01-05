@@ -10,6 +10,7 @@ namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebS
 
 
 
+
         private static int dayMove = 1;
         public static int DayMove
         {
@@ -29,7 +30,7 @@ namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebS
 
         public abstract void reversal(bool downtrend, double open_1, double close_1, double open_2, double close_2);
 
-        public abstract void breakOut(int previous, int current);
+        public abstract void breakOut();
 
         //  public abstract int GetArea();
 

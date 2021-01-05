@@ -13,6 +13,8 @@ namespace StockScreener
     public class Cache<T>
     {
 
+
+        // Replace T[] with data structure similar to database file
         static Dictionary<int, T[]> hash = new Dictionary<int, T[]>();
         T[] arr = new T[7];
 
@@ -38,6 +40,8 @@ namespace StockScreener
         /// <summary>Adds an item to the collection</summary>
         public void Add(T data)
         {
+
+
          //   Console.WriteLine(data);
             arr[Counter++] = data;            
         }

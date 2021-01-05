@@ -12,16 +12,33 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
         static Dictionary<int, string> hash = new Dictionary<int, string>();
 
+        Stock stock = new Stock();
+
         public override double calculateMomentum(double latest, double close, int x)
         {
             return (latest - (close * x));
         }
 
-        public override void breakOut(int previous, int current)
+        public override void breakOut()
         {
+            
             // T-1 to T-10 Based on highest periods over a 10 day period
-            
-            
+            if(stock.Open_2 < stock.High_1)
+            {
+                // No Day Move
+            }
+            else if(stock.Open_2 > stock.High_1)
+            {
+                // Day Move
+            }
+            else if()
+            {
+
+                
+            }
+        
+
+
 
 
             
