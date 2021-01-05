@@ -59,13 +59,19 @@ namespace StockScreener.Controllers
             return channelTwo.Reader;
         }
 
-        public ChannelReader<object[]> LockStream(object[] session, CancellationToken cancellationToken)
+        public ChannelReader<object[]> LockStream(object[] state, CancellationToken cancellationToken)
         {            
             var channelOne = Channel.CreateUnbounded<object[]>();
+            bool _state = (bool) state[0];
 
             _ = init_workTwo(channelOne.Writer, cancellationToken); 
 
-            // Stop the stream if stopasync is called
+            if(!_state){}
+                // Stop the stream if stopasync is called
+            else
+            {
+                // Restart the stream if not already called
+            }
 
             return channelOne.Reader;
         }

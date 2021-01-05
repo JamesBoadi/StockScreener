@@ -253,6 +253,9 @@ namespace StockScreener
         /*
                 private void DoWork(object state)
                 {
+
+                    // Use this for testing
+                    
                     var count = Interlocked.Increment(ref executionCount);
 
                     _logger.LogInformation(

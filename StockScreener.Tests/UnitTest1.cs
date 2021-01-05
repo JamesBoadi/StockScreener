@@ -7,8 +7,6 @@ namespace StockScreener.Tests
 {
     public class UnitTest1
     {
-
-
         private readonly ITestOutputHelper output;
 
         public UnitTest1(ITestOutputHelper output)
