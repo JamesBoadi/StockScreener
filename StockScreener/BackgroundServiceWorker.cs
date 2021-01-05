@@ -24,7 +24,7 @@ namespace StockScreener
         private readonly ILogger<BackgroundServiceWorker> _logger;
         private Timer _timer;
 
-        private string[] tradingHours = { "09:00am,12:30pm", "02:30pm,04:45pm", "04:50pm,05:00pm" };
+        private string[] tradingHours = { "09:00am-12:30pm", "02:30pm-05:00pm" };
 
         DateTime malaysiaTime = DateTime.UtcNow;
 
@@ -255,7 +255,7 @@ namespace StockScreener
                 {
 
                     // Use this for testing
-                    
+
                     var count = Interlocked.Increment(ref executionCount);
 
                     _logger.LogInformation(

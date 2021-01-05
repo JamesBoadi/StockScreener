@@ -17,13 +17,10 @@ namespace StockScreener.Tests
         [Fact]
         public void Test1()
         {
-
             BackgroundServiceWorker service = new BackgroundServiceWorker();
             TimeSpan time = service.ReturnTime();
             
             service.convertTime(0, time);
-
-         
 
            // output.WriteLine(  );
             Assert.Equal(1, 1);

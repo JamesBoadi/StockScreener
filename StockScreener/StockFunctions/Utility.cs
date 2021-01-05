@@ -6,7 +6,9 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
     // Utility functions
     public class Utility : UtilityFunctions
     {
-        private readonly int T_Days = TDays;
+        private static readonly int dayMove = DayMove;
+
+        private static readonly int T_Days = TDays;
 
         static Dictionary<int, string> hash = new Dictionary<int, string>();
 
@@ -15,9 +17,12 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             return (latest - (close * x));
         }
 
-        public override void breakOut()
+        public override void breakOut(int previous, int current)
         {
+            // T-1 to T-10 Based on highest periods over a 10 day period
+
             
+
 
 
             throw new NotImplementedException();

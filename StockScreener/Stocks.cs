@@ -82,8 +82,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
         private static bool isBullish = false;
 
-        
-
         public static bool IsBullish
         {
             get { return isBullish; }
@@ -168,7 +166,8 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                          cache.Add(MAX_CALLS.ToString());*/
                     /*    pointer += 7;
                         code++;*/
-                        
+                
+
                     cache.Add(pointer.ToString());
                     cache.Add((pointer + 1).ToString());
                     cache.Add((pointer + 2).ToString());
