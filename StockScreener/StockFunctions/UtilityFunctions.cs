@@ -1,12 +1,15 @@
 using System;
 
 
-namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_server For the database (https://gist.github.com/kevinswiber/1390198)
+namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_server For the database (https://gist.github.com/kevinswiber/1390198)
 {
 
     // Utility functions
     public abstract class UtilityFunctions
     {
+
+
+
         private static int dayMove = 1;
         public static int DayMove
         {

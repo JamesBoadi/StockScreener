@@ -20,8 +20,13 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         public override void breakOut(int previous, int current)
         {
             // T-1 to T-10 Based on highest periods over a 10 day period
+            
+            
+
 
             
+
+
 
 
 
