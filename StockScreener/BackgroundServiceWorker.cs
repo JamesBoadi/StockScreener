@@ -38,9 +38,9 @@ namespace StockScreener
             set { writerOne = value; }
         }
 
-        private ChannelWriter<bool> writerTwo;
+        private ChannelWriter<object[]> writerTwo;
 
-        public ChannelWriter<bool> WriterTwo
+        public ChannelWriter<object[]> WriterTwo
         {
             get { return writerTwo; }
             set { writerTwo = value; }
@@ -117,7 +117,7 @@ namespace StockScreener
             return Task.CompletedTask;
         }
 
-        private int[] returnTimeArray(TimeSpan currentTime)
+        private int[] returnCurrentTime(TimeSpan currentTime)
         {
             DateTime time = DateTime.Today.Add(currentTime);
             string _currentTime = time.ToString("HH:mmtt");
@@ -163,11 +163,9 @@ namespace StockScreener
 
             String _currentTime_meridian = _currentTime.Substring(5, 2).ToLower();
 
-            int[] arr = returnTimeArray(currentTime);
+            int[] arr = returnCurrentTime(currentTime);
             int currentTime_hours = arr[0];
             int currentTime_minutes = arr[1];
-
-        
 
             switch (session)
             {
@@ -218,8 +216,6 @@ namespace StockScreener
             SetSession = sessionProperties;
         }
 
-
-
         public async void getDataFromCache(object current_state)
         {
             await Task.Delay(100);
@@ -232,16 +228,8 @@ namespace StockScreener
 
                 while (count < 2)
                     convertTime(++count, time);
-
-            
-
-
-                if (!(sessionOneBool && sessionTwoBool && sessionThreeBool))
-                    await WriterTwo.WriteAsync(false, CancellationToken);
-                else 
-                    
-                                
-                await WriterTwo.WriteAsync(true, CancellationToken); 
+          
+                await WriterTwo.WriteAsync(SetSession, CancellationToken); 
 
                 for (int pointer = 0; pointer < Stocks.StocksCode.Value.Length; pointer++)
                 {
@@ -261,7 +249,6 @@ namespace StockScreener
                     Console.WriteLine("exception " + ex);
             }
         }
-
 
         /*
                 private void DoWork(object state)

@@ -141,8 +141,17 @@ export class FetchData extends Component {
 
       var streamTwo_ = this.state.hubConnection.stream("LockStream", arr)
       .subscribe({
-        next: (lock) => {
-          this.setState({lock: lock});
+        next: (sessionProperties) => {
+          const session = parseInt(sessionProperties[0]); // Get the session to display time
+          const state = Boolean(sessionProperties[1]);
+
+          if(state === -1)
+            this.setState({lock: true});
+          else
+          {
+            if(this.state.lock !== false)
+              this.setState({lock: false});
+          }
         },
         complete: () => {
           // render table

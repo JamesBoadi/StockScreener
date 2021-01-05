@@ -59,11 +59,13 @@ namespace StockScreener.Controllers
             return channelTwo.Reader;
         }
 
-        public ChannelReader<bool> LockStream(bool var, CancellationToken cancellationToken)
+        public ChannelReader<object[]> LockStream(object[] session, CancellationToken cancellationToken)
         {            
-            var channelOne = Channel.CreateUnbounded<bool>();
+            var channelOne = Channel.CreateUnbounded<object[]>();
 
             _ = init_workTwo(channelOne.Writer, cancellationToken); 
+
+            // Stop the stream if stopasync is called
 
             return channelOne.Reader;
         }
@@ -142,7 +144,7 @@ namespace StockScreener.Controllers
             serviceWorker.CancellationToken = cancellationToken;
         }
 
-        private async Task init_workTwo(ChannelWriter<bool> writer, CancellationToken cancellationToken)
+        private async Task init_workTwo(ChannelWriter<object[]> writer, CancellationToken cancellationToken)
         {
             await Task.Delay(100);
 

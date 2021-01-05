@@ -82,6 +82,8 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
         private static bool isBullish = false;
 
+        
+
         public static bool IsBullish
         {
             get { return isBullish; }
@@ -136,7 +138,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
         private static int pointer = -1;
         public static int Pointer { get { return pointer; } set { pointer = value; } }
-
 
         private CancellationToken cancellationToken;
         public CancellationToken CancellationToken
