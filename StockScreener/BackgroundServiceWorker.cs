@@ -88,8 +88,7 @@ namespace StockScreener
                 }
             }
         }
-
-
+        
         public BackgroundServiceWorker()//ILogger<BackgroundServiceWorker> logger)
         {
             // _logger = logger;
@@ -208,7 +207,6 @@ namespace StockScreener
                     {
                         sessionProperties[0] = 2;
                         sessionProperties[1] = false;
-
                     }
                     break;
             }

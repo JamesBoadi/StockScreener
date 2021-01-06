@@ -15,19 +15,28 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
     public class Stock
     {
 
-        public int High_1 { get; set; }
-        public int Open_1 { get; set; }
-        public int Close_1 { get; set; }
-        public int Low_1 { get; set; }
-        public int High_2 { get; set; }
-        public int Open_2 { get; set; }
-        public int Close_2 { get; set; }
-        public int Low_2 { get; set; }
+          // Stock Name
+        public String StockCode {get; set;}
 
+        public double Change {get; set;}
 
+        public double ChangeP {get; set;}
 
+        public double Volume {get; set;}
 
+        public double Request_Calls {get; set;}   
+                 
+        // The value for the previous day
+        public double High_1 { get; set; }
+        public double Open_1 { get; set; }
+        public double Close_1 { get; set; }
+        public double Low_1 { get; set; }
 
+        // The values for the next day (current day)
+        public double High_2 { get; set; }
+        public double Open_2 { get; set; }
+        public double Close_2 { get; set; }
+        public double Low_2 { get; set; }
 
     }
 }

@@ -16,6 +16,8 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
     {
         internal static readonly String API_TOKEN = ConfigurationManager.AppSettings["API_TOKEN"];
         internal static EODHistoricalDataClient client = new EODHistoricalDataClient(API_TOKEN, true);
+
+
         /*
                 static List<Database> stockList { get; set; }//= new List<Database>()  
                 static public List<Database> StockList { get { return stockList; } set { stockList = value; } }
@@ -99,7 +101,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         // Replace blocking operation with await tasks and loading bar
         public void init()
         {
-            init_StockList(); 
+            init_StockList();
             init_StockCode();
         }
 
@@ -121,7 +123,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
         List<RealTimePrice> data;
 
-        public static Cache<String> cache = new Cache<String>();
+        public static Cache<Stock> cache = new Cache<Stock>();
 
         private void copy(int start, int end)
         {
@@ -143,6 +145,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             get { return cancellationToken; }
             set { cancellationToken = value; }
         }
+        Stock stock = new Stock();
 
 
         public void getAllRealTimePrices(int start, int end, int pointer)
@@ -154,9 +157,36 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 //  int pointer = 0;
 
                 int code = start;
-
                 for (int i = 0; i < arr.Length; i++) //    foreach (RealTimePrice data_ in data)
                 {
+                    stock.StockCode = StocksCode.Value[code];
+                    stock.Change = pointer + 2;
+                    stock.ChangeP = pointer + 3;
+                    stock.Volume = pointer + 4;
+                    stock.Request_Calls = pointer + 5;
+
+                    if (Utility.Tick == 0)
+                    {
+                        stock.High_1 = 0;
+                        stock.Low_1 = 0;
+                        stock.Open_1 = 0;
+                        stock.Close_1 = 0;
+
+                        UtilityFunctions.Tick = 1;
+                    }
+                    else{
+                        stock.High_2 = 0;
+                        stock.Low_2 = 0;
+                        stock.Open_2 = 0;
+                        stock.Close_2 = 0;
+                    }
+
+                    cache.Add(stock);
+                    stock = new Stock();
+
+
+
+
                     /*     cache.Add(data_.Open.ToString());
                         cache.Add(StocksCode.Value[code].ToString());
                          cache.Add(data_.Change.ToString());
@@ -166,15 +196,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                          cache.Add(MAX_CALLS.ToString());*/
                     /*    pointer += 7;
                         code++;*/
-                
-
-                    cache.Add(pointer.ToString());
-                    cache.Add((pointer + 1).ToString());
-                    cache.Add((pointer + 2).ToString());
-                    cache.Add((pointer + 3).ToString());
-                    cache.Add((pointer + 4).ToString());
-                    cache.Add((pointer + 5).ToString());
-                    cache.Add((pointer + 6).ToString());
                 }
             }
 
@@ -202,6 +223,9 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             Database Record = new Database();
             List<Database> stockList = new List<Database>();
 
+
+
+
             using (TextReader reader = File.OpenText("database.csv"))
             using (var parser = new CsvParser(reader, System.Globalization.CultureInfo.CurrentCulture))
             using (var csvReader = new CsvReader(parser))
@@ -209,6 +233,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 while (csvReader.Read())
                 {
                     Record = csvReader.GetRecord<Database>();
+
                     stockList.Add(Record);
                 }
             }
