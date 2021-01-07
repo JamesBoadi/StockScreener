@@ -147,13 +147,14 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         }
         Stock stock = new Stock();
 
-
-        public void getAllRealTimePrices(int start, int end, int pointer)
+        // Get stocks from the cache
+        public void get(int start, int end, int pointer)
         {
             try
             {
                 copy(start, end);
-                //  data = client.GetRealTimePrices(arr);
+                //   data = client.GetRealTimePrices(arr);
+
                 //  int pointer = 0;
 
                 int code = start;
@@ -174,7 +175,8 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
                         UtilityFunctions.Tick = 1;
                     }
-                    else{
+                    else
+                    {
                         stock.High_2 = 0;
                         stock.Low_2 = 0;
                         stock.Open_2 = 0;
@@ -183,9 +185,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
                     cache.Add(stock);
                     stock = new Stock();
-
-
-
 
                     /*     cache.Add(data_.Open.ToString());
                         cache.Add(StocksCode.Value[code].ToString());
@@ -209,6 +208,38 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     Console.WriteLine("exception " + ex); // Redirect also if timeout
             }
         }
+
+        public void update(int pointer)
+        {
+            Stock stock = cache.Get(pointer);
+
+            stock.alertStatus();
+
+            if (Utility.Tick == 0)
+            {
+                stock.High_1 = 0;
+                stock.Low_1 = 0;
+                stock.Open_1 = 0;
+                stock.Close_1 = 0;
+
+                UtilityFunctions.Tick = 1;
+            }
+            else
+            {
+                stock.High_2 = 0;
+                stock.Low_2 = 0;
+                stock.Open_2 = 0;
+                stock.Close_2 = 0;
+            }
+
+            //  Update this stock
+
+            // cache.Update(stock) 
+        }
+
+
+
+
 
         /*  public void getRealTimePrice(String code)
           {

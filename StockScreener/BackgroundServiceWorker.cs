@@ -46,6 +46,9 @@ namespace StockScreener
             set { writerTwo = value; }
         }
 
+
+        private static int[] timeArray = new int[2]; 
+
         bool sessionOneBool = false;
         bool sessionTwoBool = false;
 
@@ -166,6 +169,8 @@ namespace StockScreener
             int currentTime_hours = arr[0];
             int currentTime_minutes = arr[1];
 
+
+            // Return a session based on a number
             switch (session)
             {
                 case 0:
@@ -211,6 +216,10 @@ namespace StockScreener
                     break;
             }
 
+            // Reset the day move to zero (next day)
+            if(currentTime_hours == 0 && currentTime_minutes == 0)
+                UtilityFunctions.DayMove = 0;
+
             SetSession = sessionProperties;
         }
 
@@ -226,12 +235,15 @@ namespace StockScreener
 
                 while (count < 2)
                     convertTime(++count, time);
+
+                
+
           
                 await WriterTwo.WriteAsync(SetSession, CancellationToken); 
 
                 for (int pointer = 0; pointer < Stocks.StocksCode.Value.Length; pointer++)
                 {
-                    await WriterOne.WriteAsync(Stocks.cache.Get(pointer), CancellationToken);
+                    //await WriterOne.WriteAsync(Stocks.cache.Get(pointer), CancellationToken);
                 }
             }
 

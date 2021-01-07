@@ -10,8 +10,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
         private static readonly int T_Days = TDays;
 
-        // private static readonly int 
-
         public static readonly int tick = Tick;
 
         static Dictionary<int, string> hash = new Dictionary<int, string>();
@@ -19,36 +17,15 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         Stock stock = new Stock();
 
 
-        private bool checkDayMove()
-        {
-            // Update the day move if and only if current price is exceeded
-
-
-
-
-
-
-
-
-
-
-
-        }
-
 
         public override double calculateMomentum(double latest, double close, int x)
         {
             return (latest - (close * x));
         }
 
-        public override void breakOut()
+        public override bool breakOut()
         {
             // T-1 to T-10 Based on highest periods over a 10 day period
-            
-
-
-
-
             if(stock.Open_2 < stock.High_1)
             {
                 // No Day Move

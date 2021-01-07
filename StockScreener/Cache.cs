@@ -12,15 +12,12 @@ namespace StockScreener
 {
     public class Cache<T>
     {
-
-
         // Replace T[] with data structure similar to database file
         static Dictionary<int, T> hash = new Dictionary<int, T>();
 
         T[] arr = new T[7];
 
         List<Stock> list = new List<Stock>();
-
 
         Stock stock = new Stock();
         /*  private static int counter = 0;
@@ -36,9 +33,6 @@ namespace StockScreener
                   }
                   else
                   {
-                    
-
-
                       list.Add();
 
                       hash.Add(++Stocks.Pointer, arr);

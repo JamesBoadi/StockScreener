@@ -124,12 +124,12 @@ namespace StockScreener.Controllers
             {
                 if (pointer == stocks.MAX_CALLS)
                 {
-                    stocks.getAllRealTimePrices(start, start + stocks.Mod, 500 + pointer);
+                    stocks.get(start, start + stocks.Mod, 500 + pointer);
                     Console.WriteLine("Called ");
                     break;
                 }
 
-                stocks.getAllRealTimePrices(start, end, 500 + pointer);
+                stocks.get(start, end, 500 + pointer);
                 stocks.Request_Calls = pointer;
 
                 start += 20;
@@ -187,7 +187,7 @@ namespace StockScreener.Controllers
                     Console.WriteLine("exception first " + ex); // Redirect also if timeout
             }
 
-            // stockArray = stocks.getAllRealTimePrices(0);
+            // stockArray = stocks.get(0);
             stockArray[5] = stocks.Request_Calls.ToString();
             //   stockArray[6] = stocks.MAX_CALLS.ToString();
             await Clients.All.SendAsync("ScanResponse", stockArray, request_arr);

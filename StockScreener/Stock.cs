@@ -14,8 +14,23 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 {
     public class Stock
     {
+        private double currentPrice = 0;
+        public double CurrentPrice
+        {
+            get 
+            { 
+                return currentPrice; 
+            }
+            set 
+            { 
+                currentPrice = (currentPrice >= Open_2) ? currentPrice : Open_2;
 
-          // Stock Name
+                // Update the day move if and only if current price is exceeded
+                UtilityFunctions.DayMove += (currentPrice >= Open_2 && UtilityFunctions.DayMove < 3) ? 1 : 0;
+            }
+        }
+        
+        // Stock Name
         public String StockCode {get; set;}
 
         public double Change {get; set;}
@@ -37,6 +52,55 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         public double Open_2 { get; set; }
         public double Close_2 { get; set; }
         public double Low_2 { get; set; }
+        
+        // Default alert status
+        private string _alertStatus = "1D";
+        public string AlertStatus
+        {
+            get { return _alertStatus; }
+            set { _alertStatus = value; }
+        }
+
+         // override object.Equals
+        public override bool Equals(object obj)
+        {
+            //
+            // See the full list of guidelines at
+            //   http://go.microsoft.com/fwlink/?LinkID=85237
+            // and also the guidance for operator== at
+            //   http://go.microsoft.com/fwlink/?LinkId=85238
+            //
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+            
+            // TODO: write your implementation of Equals() here
+
+
+         //   throw new System.NotImplementedException();
+
+            return base.Equals (obj);
+        }
+        
+        // override object.GetHashCode
+        public override int GetHashCode()
+        {
+            // TODO: write your implementation of GetHashCode() here
+          //  throw new System.NotImplementedException();
+            return base.GetHashCode();
+        } 
+        
+        // Call when updating cache
+        public void alertStatus() 
+        {
+            // Mathmatical functions
+
+
+
+
+        )
+
 
     }
 }

@@ -6,7 +6,9 @@ namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebS
     // Utility functions
     public abstract class UtilityFunctions
     {
-        private static int dayMove = 1;
+
+        // 1D, 2D, 2D~
+        private static int dayMove = 0;
         public static int DayMove
         {
             get { return dayMove; }
