@@ -49,6 +49,8 @@ namespace StockScreener
 
         private static int[] timeArray = new int[2]; 
 
+
+
         bool sessionOneBool = false;
         bool sessionTwoBool = false;
 
@@ -119,7 +121,7 @@ namespace StockScreener
             return Task.CompletedTask;
         }
 
-        private int[] returnCurrentTime(TimeSpan currentTime)
+        public static int[] returnCurrentTime(TimeSpan currentTime)
         {
             DateTime time = DateTime.Today.Add(currentTime);
             string _currentTime = time.ToString("HH:mmtt");
@@ -220,7 +222,7 @@ namespace StockScreener
             if(currentTime_hours == 0 && currentTime_minutes == 0)
              {
                 UtilityFunctions.DayMove = 0;
-                UtilityFunctions.TDays = (UtilityFunctions.TDays < 10) ? UtilityFunctions.TDays += 1 : 0;
+                UtilityFunctions.TDays = (UtilityFunctions.TDays < 10) ? UtilityFunctions.TDays += 1 : 1;
              }   
 
             SetSession = sessionProperties;

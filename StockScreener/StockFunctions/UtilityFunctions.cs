@@ -16,7 +16,7 @@ namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebS
         }
 
         // Price for today (T-1 to T-10)
-        private static int tDays = 1;
+        private static int tDays = 0;
         public static int TDays
         {
             get { return tDays; }
@@ -31,11 +31,39 @@ namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebS
             set { tick = value; }
         }
 
-        private static double highestPrice = Int32.MinValue;
-        public static double HighestPrice
+        // Reccuring period of 10 days
+        private static double[] highestPrice = new double[11];
+        public static double[] HighestPrice
         {
             get { return highestPrice; }
-            set { highestPrice = value; }
+            set
+            {
+                int pointer = 0;
+
+                while (pointer < 11)
+                {
+                    lowerPrice[pointer++] = Int32.MinValue;
+                }
+
+                highestPrice = value;
+            }
+        }
+
+        private static double[] lowerPrice = new double[11];
+        public static double[] LowerPrice
+        {
+            get { return lowerPrice; }
+            set
+            {
+                int pointer = 0;
+
+                while (pointer < 11)
+                {
+                    lowerPrice[pointer++] = Int32.MaxValue;
+                }
+
+                lowerPrice = value;
+            }
         }
 
 
