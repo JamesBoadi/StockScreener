@@ -12,6 +12,9 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
         public static readonly int tick = Tick;
 
+
+        private static readonly double highestPrice = HighestPrice; 
+
         static Dictionary<int, string> hash = new Dictionary<int, string>();
 
         Stock stock = new Stock();
@@ -23,42 +26,39 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             return (latest - (close * x));
         }
 
-        public override bool breakOut()
+        public override bool breakOut(double currentPrice, double high_1, double high_2)
         {
+            bool isBreakOut = false;
+            
             // T-1 to T-10 Based on highest periods over a 10 day period
-            if(stock.Open_2 < stock.High_1)
+            if(currentPrice < high_1)
             {
                 // No Day Move
-                
-
-
+                isBreakOut = false;
             }
-            else if(stock.Open_2 >= stock.High_1)
+            else if(currentPrice >= high_1)
             {
                 // Day Move
-
-
-
-
-
-            }
-            else if(stock.Open_2 < stock.High_1)
-            {
-                // Possible reversal
-
-
-
-
-            }
-            else if(stock.Open_2 < stock.Low_1)
-            {
-                // Reversal
-
-
+                isBreakOut = true;
             }
 
-            throw new NotImplementedException();
+
+            return isBreakOut;
         }
+
+
+        public override void trendMonitor()
+        {
+            
+            
+
+
+
+
+        }
+
+
+
 
         public override void reversal(bool downtrend, double open_1, double close_1, double open_2, double close_2)
         {

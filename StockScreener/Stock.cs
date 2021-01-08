@@ -14,33 +14,35 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 {
     public class Stock
     {
+
+        Utility utiltiy = new Utility();
         private double currentPrice = 0;
         public double CurrentPrice
         {
-            get 
-            { 
-                return currentPrice; 
+            get
+            {
+                return currentPrice;
             }
-            set 
-            { 
+            set
+            {
                 currentPrice = (currentPrice >= Open_2) ? currentPrice : Open_2;
 
                 // Update the day move if and only if current price is exceeded
                 UtilityFunctions.DayMove += (currentPrice >= Open_2 && UtilityFunctions.DayMove < 3) ? 1 : 0;
             }
         }
-        
+
         // Stock Name
-        public String StockCode {get; set;}
+        public String StockCode { get; set; }
 
-        public double Change {get; set;}
+        public double Change { get; set; }
 
-        public double ChangeP {get; set;}
+        public double ChangeP { get; set; }
 
-        public double Volume {get; set;}
+        public double Volume { get; set; }
 
-        public double Request_Calls {get; set;}   
-                 
+        public double Request_Calls { get; set; }
+
         // The value for the previous day
         public double High_1 { get; set; }
         public double Open_1 { get; set; }
@@ -52,7 +54,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         public double Open_2 { get; set; }
         public double Close_2 { get; set; }
         public double Low_2 { get; set; }
-        
+
         // Default alert status
         private string _alertStatus = "1D";
         public string AlertStatus
@@ -61,7 +63,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             set { _alertStatus = value; }
         }
 
-         // override object.Equals
+        // override object.Equals
         public override bool Equals(object obj)
         {
             //
@@ -74,33 +76,47 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             {
                 return false;
             }
-            
+
             // TODO: write your implementation of Equals() here
 
 
-         //   throw new System.NotImplementedException();
+            //   throw new System.NotImplementedException();
 
-            return base.Equals (obj);
+            return base.Equals(obj);
         }
-        
+
         // override object.GetHashCode
         public override int GetHashCode()
         {
             // TODO: write your implementation of GetHashCode() here
-          //  throw new System.NotImplementedException();
+            //  throw new System.NotImplementedException();
             return base.GetHashCode();
-        } 
-        
+        }
+
         // Call when updating cache
-        public void alertStatus() 
+
+
+        public void alertStatus()
         {
             // Mathmatical functions
+            bool isBreakOut = utiltiy.breakOut(CurrentPrice, High_1, High_2);
+            string tday = UtilityFunctions.TDays.ToString();
+
+            if(isBreakOut)
+            {
+                _alertStatus += "BO " + "T-" + tday;
+            }
+            
+        
+
+
+
+        
 
 
 
 
-        )
-
-
+        }
     }
+
 }

@@ -218,7 +218,10 @@ namespace StockScreener
 
             // Reset the day move to zero (next day)
             if(currentTime_hours == 0 && currentTime_minutes == 0)
+             {
                 UtilityFunctions.DayMove = 0;
+                UtilityFunctions.TDays = (UtilityFunctions.TDays < 10) ? UtilityFunctions.TDays += 1 : 0;
+             }   
 
             SetSession = sessionProperties;
         }
