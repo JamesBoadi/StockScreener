@@ -49,35 +49,12 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             return isBreakOut;
         }
 
-
+        Dictionary<int, double> map = new Dictionary<int, double>();
         public override void trendMonitor(double currentPrice, int hours, int minutes, int high, int low)
         {
-            int weightOne = 0;
-            int weightTwo = 0;
-            var map = new Dictionary<int, double>();
-
             // Update array every midnight
             HighestPrice[T_Days] = high;
             LowerPrice[T_Days] = low;
-
-            int pointer = T_Days;
-
-            if (pointer == 0)
-                pointer = 1;
-            else if (pointer == 11)
-                pointer = 12;
-
-            // Confirm which trend we are moving in
-            if (currentPrice > HighestPrice[pointer - 1])
-            {
-                // Possible uptrend
-                weightOne = 1;
-            }
-            else if (currentPrice < LowerPrice[pointer - 1])
-            {
-                // Possible downtrend
-                weightOne = -1;
-            }
 
             // Check the resistance and support lines
             double[] resistancePair = new double[2];
@@ -162,7 +139,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 supportArr[1, counter] = supportPair[1];
             }
 
-
             double resistanceGradient = 0;
 
             // Calculate the resistanceGradient
@@ -194,19 +170,12 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 UtilityFunctions.UpTrend = false;
                 UtilityFunctions.DownTrend = false;
             }
-            else if (    )
+            else if (supportLine < 0)
             {
-
+                UtilityFunctions.UpTrend = false;
+                UtilityFunctions.DownTrend = true;
             }
-
-
-
-
-            // LowerPrice[pointer - 1] = currentPrice;
         }
-
-
-
 
         public override void reversal(bool downtrend, double open_1, double close_1, double open_2, double close_2)
         {

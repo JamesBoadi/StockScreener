@@ -102,11 +102,18 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             bool isBreakOut = utiltiy.breakOut(CurrentPrice, High_1, High_2);
             string tday = UtilityFunctions.TDays.ToString();
 
-            if(isBreakOut)
+
+            if(Utility.UpTrend && !Utility.DownTrend)
             {
                 _alertStatus += "BO " + "T-" + tday;
             }
-            
+            else if(!(Utility.UpTrend && Utility.DownTrend))
+            {
+                _alertStatus += "BO " + "T-" + tday;
+            }
+            else if(!Utility.UpTrend && Utility.DownTrend)
+            {
+            }
         
 
 

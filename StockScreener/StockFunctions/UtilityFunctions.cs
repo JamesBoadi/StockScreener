@@ -81,14 +81,13 @@ namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebS
             }
         }
 
-
         public abstract double calculateMomentum(double latest, double close, int x);
 
         public abstract void reversal(bool downtrend, double open_1, double close_1, double open_2, double close_2);
 
         public abstract bool breakOut(double currentPrice, double high_1, double high_2);
 
-        public abstract void trendMonitor();
+        public abstract void trendMonitor(double currentPrice, int hours, int minutes, int high, int low);
         //  public abstract int GetArea();
     }
 
