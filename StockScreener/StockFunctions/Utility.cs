@@ -16,6 +16,10 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
         private static readonly double[] lowerPrice = LowerPrice;
 
+        private static readonly bool upTrend = UpTrend;
+
+        private static readonly bool downTrend = DownTrend;
+
         static Dictionary<int, string> hash = new Dictionary<int, string>();
 
         Stock stock = new Stock();
@@ -76,32 +80,129 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             }
 
             // Check the resistance and support lines
-            double[] pair = new double[2];
-            double[,] pairArr = new double[2, 10];
+            double[] resistancePair = new double[2];
+            double[,] resistanceArr = new double[2, 10];
 
-            for (int counter = 0; counter < 11; counter++)
+            // Fill with zeros
+            int row = resistanceArr.GetLength(0);
+            int col = resistanceArr.GetLength(1);
+
+            for (int i = 0; i < row * col; i++)
+            {
+                resistanceArr[i / col, i % col] = 0;
+            }
+
+            int jump = 0;
+
+            for (int counter = jump; counter < 10; counter++)
             {
                 double _high = HighestPrice[counter];
+                resistancePair[0] = _high; // Set the resistancePair to add
+                resistancePair[1] = Int32.MaxValue;
 
+                double current = map[counter];// The current value we are evaluating
 
-                for (int key = counter; key < map.Count; ++key)
+                // If second to last value, just do a subtraction
+                if (counter == 9)
                 {
-                    double value = map[key];
-
-
+                    resistanceArr[0, 10] = resistancePair[0];
+                    resistanceArr[1, 10] = resistancePair[1];
                 }
 
-                pairArr[0, counter] = pair[0];
-                pairArr[1, counter] = pair[1];
+                for (int key = counter + 1; key < map.Count; ++key)
+                {
+                    double value = map[key];
+                    // Get the smallest range of all the pairs in order)
+                    resistancePair[1] = (Math.Abs(value - current) < resistancePair[1]) ? value : resistancePair[1];
+                    jump = (Math.Abs(value - current) < resistancePair[1]) ? key : counter + 1;
+                }
+
+                resistanceArr[0, counter] = resistancePair[0];
+                resistanceArr[1, counter] = resistancePair[1];
+            }
+
+            double[] supportPair = new double[2];
+            double[,] supportArr = new double[2, 10];
+
+            // Fill with zeros
+            int _row = supportArr.GetLength(0);
+            int _col = supportArr.GetLength(1);
+
+            for (int i = 0; i < _row * _col; i++)
+            {
+                supportArr[i / _col, i % _col] = 0;
+            }
+
+            int _jump = 0;
+
+            for (int counter = _jump; counter < 10; counter++)
+            {
+                double _high = LowerPrice[counter];
+                supportPair[0] = _high; // Set the resistancePair to add
+                supportPair[1] = Int32.MaxValue;
+
+                double current = map[counter];// The current value we are evaluating
+
+                // If second to last value, just do a subtraction
+                if (counter == 9)
+                {
+                    supportArr[0, 10] = resistancePair[0];
+                    supportArr[1, 10] = resistancePair[1];
+                }
+
+                for (int key = counter + 1; key < map.Count; ++key)
+                {
+                    double value = map[key];
+                    // Get the smallest range of all the pairs in order)
+                    supportPair[1] = (Math.Abs(value - current) < supportPair[1]) ? value : supportPair[1];
+                    jump = (Math.Abs(value - current) < supportPair[1]) ? key : counter + 1;
+                }
+
+                supportArr[0, counter] = supportPair[0];
+                supportArr[1, counter] = supportPair[1];
+            }
+
+
+            double resistanceGradient = 0;
+
+            // Calculate the resistanceGradient
+            for (int i = 0; i < resistanceArr.Length; i++)
+            {
+                resistanceGradient += (Math.Abs(resistanceArr[0, i] - resistanceArr[1, i]) / 2);
+            }
+
+            double supportGradient = 0;
+
+            // Calculate the resistanceGradient
+            for (int i = 0; i < resistanceArr.Length; i++)
+            {
+                supportGradient += (Math.Abs(supportArr[0, i] - supportArr[1, i]) / 2);
+            }
+
+            double resistanceLine = (currentPrice + 10) / resistanceGradient;
+            double supportLine = (currentPrice + 10) / supportGradient;
+
+            // Breakout
+            if (resistanceLine > 10)
+            {
+                UtilityFunctions.UpTrend = true;
+                UtilityFunctions.DownTrend = false;
+            }
+            else if (resistanceLine < 10 && supportLine > 10)
+            {
+                // Under the resistance line and inbetween the support line, we change BO is false
+                UtilityFunctions.UpTrend = false;
+                UtilityFunctions.DownTrend = false;
+            }
+            else if (    )
+            {
+
             }
 
 
 
+
             // LowerPrice[pointer - 1] = currentPrice;
-
-
-
-
         }
 
 

@@ -6,6 +6,21 @@ namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebS
     // Utility functions
     public abstract class UtilityFunctions
     {
+        private static bool upTrend = false;
+        
+        public static bool UpTrend
+        {
+            get { return upTrend; }
+            set { upTrend = value; }
+        } 
+        private static bool downTrend = false;
+        
+        public static bool DownTrend
+        {
+            get { return downTrend; }
+            set { downTrend = value; }
+        }
+        
 
         // 1D, 2D, 2D~
         private static int dayMove = 0;
