@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Channels;
 using CsvHelper;
 
-namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_server For the database (https://gist.github.com/kevinswiber/1390198)
+namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_server For the database (https://gist.github.com/kevinswiber/1390198)
 {
     public class Stock
     {
@@ -113,6 +113,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             }
             else if(!Utility.UpTrend && Utility.DownTrend)
             {
+                
             }
         
 
