@@ -113,17 +113,12 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
             }
             else if(!Utility.UpTrend && Utility.DownTrend)
             {
-                
+                _alertStatus += "BS2";
             }
-        
 
 
 
-        
-
-
-
-
+            
         }
     }
 

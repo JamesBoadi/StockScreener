@@ -6,21 +6,29 @@ namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebS
     // Utility functions
     public abstract class UtilityFunctions
     {
+        private static bool _reversal = false;
+
+        public static bool Reversal
+        {
+            get { return _reversal; }
+            set { _reversal = value; }
+        }
+
         private static bool upTrend = false;
-        
+
         public static bool UpTrend
         {
             get { return upTrend; }
             set { upTrend = value; }
-        } 
+        }
         private static bool downTrend = false;
-        
+
         public static bool DownTrend
         {
             get { return downTrend; }
             set { downTrend = value; }
         }
-        
+
 
         // 1D, 2D, 2D~
         private static int dayMove = 0;
@@ -83,7 +91,7 @@ namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebS
 
         public abstract double calculateMomentum(double latest, double close, int x);
 
-        public abstract void reversal(bool downtrend, double open_1, double close_1, double open_2, double close_2);
+       // public abstract void reversal(bool downtrend, double open_1, double close_1, double open_2, double close_2);
 
         public abstract bool breakOut(double currentPrice, double high_1, double high_2);
 

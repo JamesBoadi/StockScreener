@@ -20,6 +20,8 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
         private static readonly bool downTrend = DownTrend;
 
+        private static readonly bool _reversal = Reversal;
+
         static Dictionary<int, string> hash = new Dictionary<int, string>();
 
         Stock stock = new Stock();
@@ -50,24 +52,28 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         }
 
         Dictionary<int, double> map = new Dictionary<int, double>();
+
+        static double resistanceLine1 = 0;
+        static double supportLine1 = 0;
+
+        double[] resistancePair = new double[2];
+        double[,] resistanceArr = new double[2, 10];
+
+        double[] supportPair = new double[2];
+        double[,] supportArr = new double[2, 10];
+
         public override void trendMonitor(double currentPrice, int hours, int minutes, int high, int low)
         {
             // Update array every midnight
-            HighestPrice[T_Days] = high;
-            LowerPrice[T_Days] = low;
-
-            // Check the resistance and support lines
-            double[] resistancePair = new double[2];
-            double[,] resistanceArr = new double[2, 10];
+            HighestPrice[T_Days - 1] = high;
+            LowerPrice[T_Days - 1] = low;
 
             // Fill with zeros
             int row = resistanceArr.GetLength(0);
             int col = resistanceArr.GetLength(1);
 
             for (int i = 0; i < row * col; i++)
-            {
                 resistanceArr[i / col, i % col] = 0;
-            }
 
             int jump = 0;
 
@@ -77,19 +83,17 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 resistancePair[0] = _high; // Set the resistancePair to add
                 resistancePair[1] = Int32.MaxValue;
 
-                double current = map[counter];// The current value we are evaluating
-
+                double current = map[counter]; // The current value we are evaluating
                 // If second to last value, just do a subtraction
                 if (counter == 9)
                 {
                     resistanceArr[0, 10] = resistancePair[0];
                     resistanceArr[1, 10] = resistancePair[1];
                 }
-
+                // Get the smallest range of all the pairs in order)
                 for (int key = counter + 1; key < map.Count; ++key)
                 {
                     double value = map[key];
-                    // Get the smallest range of all the pairs in order)
                     resistancePair[1] = (Math.Abs(value - current) < resistancePair[1]) ? value : resistancePair[1];
                     jump = (Math.Abs(value - current) < resistancePair[1]) ? key : counter + 1;
                 }
@@ -97,9 +101,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 resistanceArr[0, counter] = resistancePair[0];
                 resistanceArr[1, counter] = resistancePair[1];
             }
-
-            double[] supportPair = new double[2];
-            double[,] supportArr = new double[2, 10];
 
             // Fill with zeros
             int _row = supportArr.GetLength(0);
@@ -139,44 +140,48 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 supportArr[1, counter] = supportPair[1];
             }
 
-            double resistanceGradient = 0;
-
-            // Calculate the resistanceGradient
+            double resistancePivot = 0;
+            // Calculate the resistancePivot
             for (int i = 0; i < resistanceArr.Length; i++)
             {
-                resistanceGradient += (Math.Abs(resistanceArr[0, i] - resistanceArr[1, i]) / 2);
+                resistancePivot += (Math.Abs(resistanceArr[0, i] - resistanceArr[1, i]) / 2);
             }
 
-            double supportGradient = 0;
-
-            // Calculate the resistanceGradient
+            double supportPivot = 0;
+            // Calculate the resistancePivot
             for (int i = 0; i < resistanceArr.Length; i++)
             {
-                supportGradient += (Math.Abs(supportArr[0, i] - supportArr[1, i]) / 2);
+                supportPivot += (Math.Abs(supportArr[0, i] - supportArr[1, i]) / 2);
             }
 
-            double resistanceLine = (currentPrice + 10) / resistanceGradient;
-            double supportLine = (currentPrice + 10) / supportGradient;
+            resistanceLine1 = (2 * resistancePivot) - LowerPrice[T_Days - 1];
+            supportLine1 = (2 * supportPivot) - HighestPrice[T_Days - 1];
+        }
 
-            // Breakout
-            if (resistanceLine > 10)
+        private void setTrend(double currentPrice)
+        {
+            if (currentPrice > resistanceLine1) // BO
             {
                 UtilityFunctions.UpTrend = true;
                 UtilityFunctions.DownTrend = false;
             }
-            else if (resistanceLine < 10 && supportLine > 10)
+            // Under the resistance line and inbetween the support line, we say we are either in reversal or no BO
+            else if (currentPrice < resistanceLine1 && currentPrice > supportLine1)
             {
-                // Under the resistance line and inbetween the support line, we change BO is false
                 UtilityFunctions.UpTrend = false;
                 UtilityFunctions.DownTrend = false;
             }
-            else if (supportLine < 0)
+            else if (currentPrice < supportLine1) // BS2
             {
                 UtilityFunctions.UpTrend = false;
                 UtilityFunctions.DownTrend = true;
             }
-        }
 
+            if(  )
+            {}
+
+        }
+/*
         public override void reversal(bool downtrend, double open_1, double close_1, double open_2, double close_2)
         {
             double range_1 = Math.Abs(open_1 - close_1);
@@ -195,7 +200,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 Stocks.IsBullish = false;
             }
         }
-
+        */
 
 
 
