@@ -6,6 +6,15 @@ namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebS
     // Utility functions
     public abstract class UtilityFunctions
     {
+
+        private static string previousTrend = "UP";
+
+        public static string PreviousTrend
+        {
+            get { return previousTrend; }
+            set { previousTrend = value; }
+        }
+
         private static bool _reversal = false;
 
         public static bool Reversal
@@ -46,7 +55,7 @@ namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebS
             set { tDays = value; }
         }
 
-        // A tick to measure if a stock has already been called
+        // A tick to measure if a stock has already been called (only called once)
         private static int tick = 0;
         public static int Tick
         {

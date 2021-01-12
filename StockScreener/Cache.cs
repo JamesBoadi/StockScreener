@@ -53,6 +53,8 @@ namespace StockScreener
         {
             // Update the stock 
 
+            
+
 
        /*     T[] arr_ = hash[position];
             T cachedData = arr_[TIndex];

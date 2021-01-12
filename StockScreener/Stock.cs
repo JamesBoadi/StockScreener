@@ -32,7 +32,7 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
             }
         }
 
-        // Stock Name
+        // Contains all the stocks information
         public String StockCode { get; set; }
 
         public double Change { get; set; }
@@ -56,12 +56,10 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         public double Low_2 { get; set; }
 
         // Default alert status
-        private string _alertStatus = "1D";
-        public string AlertStatus
-        {
-            get { return _alertStatus; }
-            set { _alertStatus = value; }
-        }
+        private string alertstatus = "1D";
+
+        // Time the stock was last updated
+        private String timestamp { get; set; }
 
         // override object.Equals
         public override bool Equals(object obj)
@@ -94,32 +92,46 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         }
 
         // Call when updating cache
-
-
         public void alertStatus()
         {
             // Mathmatical functions
             bool isBreakOut = utiltiy.breakOut(CurrentPrice, High_1, High_2);
-            string tday = UtilityFunctions.TDays.ToString();
+            string tday = Utility.TDays.ToString();
 
-
-            if(Utility.UpTrend && !Utility.DownTrend)
+            if (Utility.Reversal == true)
             {
-                _alertStatus += "BO " + "T-" + tday;
+                alertstatus = "Reversal";
             }
-            else if(!(Utility.UpTrend && Utility.DownTrend))
+            else
             {
-                _alertStatus += "BO " + "T-" + tday;
+                // No BO
+                if (Utility.DayMove == 0)
+                    alertstatus = "";
+
+                // Current price is above the BO line (configure property)
+                else if (Utility.DayMove == 1)
+                    alertstatus = "1D";
+                else if (Utility.DayMove == 2)
+                    alertstatus = "2D";
+                else if (Utility.DayMove == 3)
+                    alertstatus = "2D~";
+
+                if (!Utility.UpTrend && Utility.DownTrend)
+                {
+                    alertstatus = "BS1";
+                }
+                else if (!(Utility.UpTrend && Utility.DownTrend))
+                {
+                    // Do nothing
+                    alertstatus += "";
+                }
+                else if (Utility.UpTrend && !Utility.DownTrend)
+                {
+                    alertstatus += " BO " + "T-" + Utility.TDays.ToString();
+                }
             }
-            else if(!Utility.UpTrend && Utility.DownTrend)
-            {
-                _alertStatus += "BS2";
-            }
-
-
-
-            
         }
     }
+}
 
 }
