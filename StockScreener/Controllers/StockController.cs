@@ -53,21 +53,21 @@ namespace StockScreener.Controllers
                 _init_work = !_init_work;
             }
             // _ = WriteItemsAsync(channelTwo.Writer, arr, cancellationToken);
-           
+
             _ = serviceWorker.StartAsync(cancellationToken);
 
             return channelTwo.Reader;
         }
 
         public ChannelReader<object[]> LockStream(object[] state, CancellationToken cancellationToken)
-        {            
+        {
             var channelOne = Channel.CreateUnbounded<object[]>();
-            bool _state = (bool) state[0];
+            bool _state = (bool)state[0];
 
-            _ = init_workTwo(channelOne.Writer, cancellationToken); 
+            _ = init_workTwo(channelOne.Writer, cancellationToken);
 
-            if(!_state){}
-                // Stop the stream if stopasync is called
+            if (!_state) { }
+            // Stop the stream if stopasync is called
             else
             {
                 // Restart the stream if not already called
@@ -75,43 +75,6 @@ namespace StockScreener.Controllers
 
             return channelOne.Reader;
         }
-
-        /*   private async Task WriteItemsAsync(
-              )
-           {
-               Exception localException = null;
-               try
-               {
-                   int request_Calls = Int32.Parse(arr[0]);
-                   int delay = Int32.Parse(arr[1]);
-
-                   for (int pointer = 0; pointer < Stocks.StocksCode.Value.Length; pointer++)
-                   {
-                       await writer.WriteAsync(Stocks.cache.Get(20), Stocks.CancellationToken);
-
-                   } //   _ = serviceWorker.StartAsync(CancellationToken);
-
-                   Console.WriteLine("cancelled " + Stocks.CancellationToken.IsCancellationRequested);
-
-                   // await writer.WriteAsync(Stocks.cache.Get(20), Stocks.CancellationToken);
-                   //  await serviceWorker.StartAsync(Stocks.CancellationToken);
-               }
-
-               catch (Exception ex)
-               {
-                   if (ex is StackOverflowException || ex is ArgumentNullException || ex is NullReferenceException ||
-                   ex is IndexOutOfRangeException ||
-                   ex is Newtonsoft.Json.JsonSerializationException
-                   || ex is MissingMemberException)
-                       Console.WriteLine("exception_ " + ex);
-
-                   localException = ex;
-               }
-               finally
-               {
-                   writer.Complete(localException);
-               }
-           }*/
 
         private async Task initialise_cache()
         {
@@ -160,40 +123,43 @@ namespace StockScreener.Controllers
         }
 
         // The logger factory! With priority queue!
-        public async Task ScanRequest(string request_Calls)
 
-        {
-            if (init_called == false)
-            {
-                //init();
-                init_called = !init_called;
-            }
-            try
-            {
-                int calls = 0;
-                bool success = Int32.TryParse(request_Calls, out calls); // Set this variable
+        /*   private async Task WriteItemsAsync(
+                      )
+                   {
+                       Exception localException = null;
+                       try
+                       {
+                           int request_Calls = Int32.Parse(arr[0]);
+                           int delay = Int32.Parse(arr[1]);
 
-                if (success)
-                {
-                    stocks.Request_Calls += calls;
-                }
-                else
-                    Console.Write("fail");
+                           for (int pointer = 0; pointer < Stocks.StocksCode.Value.Length; pointer++)
+                           {
+                               await writer.WriteAsync(Stocks.cache.Get(20), Stocks.CancellationToken);
 
-            }
-            catch (Exception ex)
-            {
-                if (ex is NullReferenceException || ex is Newtonsoft.Json.JsonSerializationException || ex is MissingMemberException)
-                    Console.WriteLine("exception first " + ex); // Redirect also if timeout
-            }
+                           } //   _ = serviceWorker.StartAsync(CancellationToken);
 
-            // stockArray = stocks.get(0);
-            stockArray[5] = stocks.Request_Calls.ToString();
-            //   stockArray[6] = stocks.MAX_CALLS.ToString();
-            await Clients.All.SendAsync("ScanResponse", stockArray, request_arr);
-        }
-        // Return data from cache (use a design pattrn)
+                           Console.WriteLine("cancelled " + Stocks.CancellationToken.IsCancellationRequested);
 
+                           // await writer.WriteAsync(Stocks.cache.Get(20), Stocks.CancellationToken);
+                           //  await serviceWorker.StartAsync(Stocks.CancellationToken);
+                       }
+
+                       catch (Exception ex)
+                       {
+                           if (ex is StackOverflowException || ex is ArgumentNullException || ex is NullReferenceException ||
+                           ex is IndexOutOfRangeException ||
+                           ex is Newtonsoft.Json.JsonSerializationException
+                           || ex is MissingMemberException)
+                               Console.WriteLine("exception_ " + ex);
+
+                           localException = ex;
+                       }
+                       finally
+                       {
+                           writer.Complete(localException);
+                       }
+                   }*/
 
 
 

@@ -14,7 +14,6 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
 {
     public class Stock
     {
-
         Utility utiltiy = new Utility();
         private double currentPrice = 0;
         public double CurrentPrice
@@ -25,10 +24,10 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
             }
             set
             {
-                currentPrice = (currentPrice >= Open_2) ? currentPrice : Open_2;
+                currentPrice = (currentPrice >= Close_2) ? currentPrice : Close_2;
 
                 // Update the day move if and only if current price is exceeded
-                UtilityFunctions.DayMove += (currentPrice >= Open_2 && UtilityFunctions.DayMove < 3) ? 1 : 0;
+                UtilityFunctions.DayMove += (currentPrice >= Close_2 && UtilityFunctions.DayMove < 3) ? 1 : 0;
             }
         }
 
@@ -61,38 +60,16 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         // Default alert status
         private string alertstatus = "1D";
 
-      
-
         // override object.Equals
-        public override bool Equals(object obj)
+        public bool Equals(Stock stock)
         {
-            //
-            // See the full list of guidelines at
-            //   http://go.microsoft.com/fwlink/?LinkID=85237
-            // and also the guidance for operator== at
-            //   http://go.microsoft.com/fwlink/?LinkId=85238
-            //
-            if (obj == null || GetType() != obj.GetType())
-            {
+            // Update timestamp if price changes
+            if (stock.CurrentPrice != this.CurrentPrice)
                 return false;
-            }
-
-            // TODO: write your implementation of Equals() here
-
-
-            //   throw new System.NotImplementedException();
-
-            return base.Equals(obj);
+        
+            return true;
         }
-
-        // override object.GetHashCode
-        public override int GetHashCode()
-        {
-            // TODO: write your implementation of GetHashCode() here
-            //  throw new System.NotImplementedException();
-            return base.GetHashCode();
-        }
-
+    
         // Call when updating cache
         public void alertStatus()
         {
@@ -131,9 +108,9 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
                 {
                     alertstatus += " BO " + "T-" + Utility.TDays.ToString();
                 }
-            
+
+            }
         }
     }
-}
 
 }

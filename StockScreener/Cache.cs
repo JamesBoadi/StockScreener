@@ -10,18 +10,13 @@ using System.Threading;
 
 namespace StockScreener
 {
-    public class Cache<T>
+    public class Cache
     {
         // Replace T[] with data structure similar to database file
-        static Dictionary<int, T> hash = new Dictionary<int, T>();
-
-        T[] arr = new T[7];
-
+        static Dictionary<int, Stock> hash = new Dictionary<int, Stock>();
         List<Stock> list = new List<Stock>();
 
-        Stock stock = new Stock();
 
-        BackgroundServiceWorker service = new BackgroundServiceWorker();
 
         /*  private static int counter = 0;
 
@@ -44,7 +39,7 @@ namespace StockScreener
           }*/
 
         /// <summary>Adds an item to the collection</summary>
-        public void Add(T data)
+        public void Add(Stock data)
         {
             hash.Add(++Stocks.Pointer, data);
             //   Console.WriteLine(data);
@@ -52,49 +47,13 @@ namespace StockScreener
         }
 
         /// <summary>Updates an item or several items in the collection</summary>
-        public void Update(int position, T data)
+        public void Update(int position, Stock data)
         {
-            // Update the stock 
-            stock.High_2 = 0;
-            stock.Low_2 = 0;
-            stock.Open_2 = 0;
-            stock.Close_2 = 0;
-            
-            // Update timestamp if price changes
-            if (stock.CurrentPrice != stock.Close_2)
-            {
-                DateTime time = DateTime.Today.Add(service.ReturnTime());
-                
-                string _currentTime = time.ToString("HH:mmttss");
-                stock.timestamp = _currentTime;
-
-
-
-            
-            
-            
-            
-            
-            
-            
-            
-            }
-
-
-
-
-            /*     T[] arr_ = hash[position];
-                 T cachedData = arr_[TIndex];
-
-                 if (!data.Equals(cachedData))
-                 {
-                     arr_[TIndex] = data;
-                     hash[position] = arr_;
-                 }*/
+            hash[position] = data;
         }
 
         /// <summary>Return the item from the collection</summary>
-        public T Get(int position)
+        public Stock Get(int position)
         {
             //  Console.WriteLine("The position is " + position);
             return hash[position];

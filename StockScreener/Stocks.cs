@@ -123,7 +123,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
         List<RealTimePrice> data;
 
-        public static Cache<Stock> cache = new Cache<Stock>();
+        public static Cache cache = new Cache();
 
         private void copy(int start, int end)
         {
@@ -146,6 +146,8 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             set { cancellationToken = value; }
         }
         Stock stock = new Stock();
+
+        BackgroundServiceWorker service = new BackgroundServiceWorker();
 
         // Get stocks from the cache
         public void get(int start, int end, int pointer)
@@ -210,11 +212,10 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             }
         }
 
-        
         public void update(int pointer)
         {
-            Stock stock = cache.Get(pointer);
-            stock.alertStatus();
+            // Check for any changes
+            bool isEqual = cache.Get(pointer).Equals(stock);
 
             // Previous Day
             if (Utility.Tick == 0)
@@ -227,7 +228,22 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 UtilityFunctions.Tick = 1;
             }
             //  Update this stock
-            // cache.Update(pointer) 
+            if (isEqual)
+            {
+                stock.High_2 = 0;
+                stock.Low_2 = 0;
+                stock.Open_2 = 0;
+                stock.Close_2 = 0;
+
+                DateTime time = DateTime.Today.Add(service.ReturnTime());
+                string _currentTime = time.ToString("HH:mmttss");
+
+                stock.timestamp = _currentTime;
+
+                cache.Update(pointer, stock);
+            }
+
+            stock.alertStatus();
         }
 
 
