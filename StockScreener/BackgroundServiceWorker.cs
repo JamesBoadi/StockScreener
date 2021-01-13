@@ -241,7 +241,6 @@ namespace StockScreener
                 while (count < 2)
                     convertTime(++count, time);
 
-            
                 await WriterTwo.WriteAsync(SetSession, CancellationToken); 
 
                 for (int pointer = 0; pointer < Stocks.StocksCode.Value.Length; pointer++)

@@ -55,11 +55,13 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         public double Close_2 { get; set; }
         public double Low_2 { get; set; }
 
+        // Time the stock was last updated
+        public String timestamp { get; set; }
+
         // Default alert status
         private string alertstatus = "1D";
 
-        // Time the stock was last updated
-        private String timestamp { get; set; }
+      
 
         // override object.Equals
         public override bool Equals(object obj)
@@ -129,7 +131,7 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
                 {
                     alertstatus += " BO " + "T-" + Utility.TDays.ToString();
                 }
-            }
+            
         }
     }
 }

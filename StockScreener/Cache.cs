@@ -20,6 +20,9 @@ namespace StockScreener
         List<Stock> list = new List<Stock>();
 
         Stock stock = new Stock();
+
+        BackgroundServiceWorker service = new BackgroundServiceWorker();
+
         /*  private static int counter = 0;
 
           public int Counter
@@ -53,17 +56,42 @@ namespace StockScreener
         {
             // Update the stock 
 
-            
+            stock.High_2 = 0;
+            stock.Low_2 = 0;
+            stock.Open_2 = 0;
+            stock.Close_2 = 0;
 
-
-       /*     T[] arr_ = hash[position];
-            T cachedData = arr_[TIndex];
-
-            if (!data.Equals(cachedData))
+            // Update timestamp if price changes
+            if (stock.CurrentPrice != stock.Close_2)
             {
-                arr_[TIndex] = data;
-                hash[position] = arr_;
-            }*/
+                DateTime time = DateTime.Today.Add(service.ReturnTime());
+                
+                string _currentTime = time.ToString("HH:mmttss");
+                stock.timestamp = _currentTime;
+
+
+
+            
+            
+            
+            
+            
+            
+            
+            
+            }
+
+
+
+
+            /*     T[] arr_ = hash[position];
+                 T cachedData = arr_[TIndex];
+
+                 if (!data.Equals(cachedData))
+                 {
+                     arr_[TIndex] = data;
+                     hash[position] = arr_;
+                 }*/
         }
 
         /// <summary>Return the item from the collection</summary>

@@ -210,10 +210,10 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             }
         }
 
+        
         public void update(int pointer)
         {
             Stock stock = cache.Get(pointer);
-
             stock.alertStatus();
 
             // Previous Day
@@ -226,23 +226,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
                 UtilityFunctions.Tick = 1;
             }
-            // Current Day
-            else
-            {
-                stock.High_2 = 0;
-                stock.Low_2 = 0;
-                stock.Open_2 = 0;
-                stock.Close_2 = 0;
-
-                // Update timestamp
-                if(stock.CurrentPrice != stock.Close_2)
-                {
-                    
-                }
-            }
-
             //  Update this stock
-
             // cache.Update(stock) 
         }
 
@@ -262,9 +246,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         {
             Database Record = new Database();
             List<Database> stockList = new List<Database>();
-
-
-
 
             using (TextReader reader = File.OpenText("database.csv"))
             using (var parser = new CsvParser(reader, System.Globalization.CultureInfo.CurrentCulture))
