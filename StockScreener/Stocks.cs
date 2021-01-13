@@ -216,6 +216,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
             stock.alertStatus();
 
+            // Previous Day
             if (Utility.Tick == 0)
             {
                 stock.High_1 = 0;
@@ -225,12 +226,19 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
                 UtilityFunctions.Tick = 1;
             }
+            // Current Day
             else
             {
                 stock.High_2 = 0;
                 stock.Low_2 = 0;
                 stock.Open_2 = 0;
                 stock.Close_2 = 0;
+
+                // Update timestamp
+                if(stock.CurrentPrice != stock.Close_2)
+                {
+                    
+                }
             }
 
             //  Update this stock
