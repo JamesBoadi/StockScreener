@@ -52,15 +52,14 @@ namespace StockScreener
         }
 
         /// <summary>Updates an item or several items in the collection</summary>
-        public void Update(int position, int TIndex, T data)
+        public void Update(int position, T data)
         {
             // Update the stock 
-
             stock.High_2 = 0;
             stock.Low_2 = 0;
             stock.Open_2 = 0;
             stock.Close_2 = 0;
-
+            
             // Update timestamp if price changes
             if (stock.CurrentPrice != stock.Close_2)
             {

@@ -227,7 +227,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 UtilityFunctions.Tick = 1;
             }
             //  Update this stock
-            // cache.Update(stock) 
+            // cache.Update(pointer) 
         }
 
 
