@@ -26,16 +26,14 @@ namespace StockScreener.Controllers
         static ChannelWriter<string[]> Writer { get; set; }
 
         static CancellationToken CancellationToken { get; set; }
-
-        string[] Arr;
-
+        
         static ILogger<BackgroundServiceWorker> logger;// = new ILogger<BackgroundServiceWorker>();
 
         BackgroundServiceWorker serviceWorker = new BackgroundServiceWorker();
 
         // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/generics/ Use this for type casting
 
-        public ChannelReader<string[]> Counter(string[] arr, CancellationToken cancellationToken)
+        public ChannelReader<string[]> RequestData(string[] arr, CancellationToken cancellationToken)
         {
             var channelTwo = Channel.CreateUnbounded<string[]>();
 

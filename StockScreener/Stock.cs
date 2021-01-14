@@ -26,7 +26,7 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
             {
                 currentPrice = (currentPrice >= Close_2) ? currentPrice : Close_2;
 
-                // Update the day move if and only if current price is exceeded
+                // Update the day move if and only if current price is exceeded (Once every day)
                 UtilityFunctions.DayMove += (currentPrice >= Close_2 && UtilityFunctions.DayMove < 3) ? 1 : 0;
             }
         }
@@ -60,6 +60,10 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         // Default alert status
         private string alertstatus = "1D";
 
+        public String alertStatusColor = "RED";
+
+        public String scalpStatusColor = "GREEN";
+
         // override object.Equals
         public bool Equals(Stock stock)
         {
@@ -74,7 +78,6 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         public void alertStatus()
         {
             // Mathmatical functions
-            bool isBreakOut = utiltiy.breakOut(CurrentPrice, High_1, High_2);
             string tday = Utility.TDays.ToString();
 
             if (Utility.Reversal == true)
@@ -106,7 +109,7 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
                 }
                 else if (Utility.UpTrend && !Utility.DownTrend)
                 {
-                    alertstatus += " BO " + "T-" + Utility.TDays.ToString();
+                    alertstatus += " BO " + "T-" + tday;
                 }
 
             }

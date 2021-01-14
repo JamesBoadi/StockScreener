@@ -99,12 +99,11 @@ export class FetchData extends Component {
   sendRequest = () => {
     // Set the state of this column counter
     //this.setState({ column_counter: this.state.column_counter + 1 });
-    
     var arr = [];
     arr.push(this.state.column_counter.toString());
     arr.push("500");
 
-    var stream_ = this.state.hubConnection.stream("Counter", arr)
+    var stream_ = this.state.hubConnection.stream("RequestData", arr)
       .subscribe({
 
         next: (stockArray) => {

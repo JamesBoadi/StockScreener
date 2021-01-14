@@ -246,18 +246,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             stock.alertStatus();
         }
 
-
-
-
-
-        /*  public void getRealTimePrice(String code)
-          {
-              EODHistoricalDataClient client = new EODHistoricalDataClient(API_TOKEN, true);
-
-              //if() // Perform a refresh if fail (like restart thread or put on seperate thread)
-              List<RealTimePrice> prices = client.GetRealTimePrices(StocksCode.Value); // enumeration
-          }*/
-
         public List<Database> readDatabase()
         {
             Database Record = new Database();
@@ -320,6 +308,15 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                             return stockCode;
                         }
                 */
+
+
+        /*  public void getRealTimePrice(String code)
+          {
+              EODHistoricalDataClient client = new EODHistoricalDataClient(API_TOKEN, true);
+
+              //if() // Perform a refresh if fail (like restart thread or put on seperate thread)
+              List<RealTimePrice> prices = client.GetRealTimePrices(StocksCode.Value); // enumeration
+          }*/
 
     }
 }
