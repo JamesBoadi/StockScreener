@@ -1,8 +1,5 @@
 import React, { Component, useState, useContext } from 'react';
-import { Components } from './Components';
-import MousePosition from './MousePosition';
 import { Box } from '@chakra-ui/core';
-import { OrderForm, CardContext } from './OrderForm';
 import './StockScreener.css';
 
 
@@ -25,6 +22,19 @@ const StockTable = props => {
     // Drop Zone
     return (
         <div>
+            <Box
+                bg="rgb(60,60,60)"
+                style={{ position: "absolute", top: 0 }}
+                boxShadow='sm'
+                textAlign='center'
+                height='20rem'
+                width='52rem'
+                rounded="lg"
+                borderWidth="1px"
+                color='white'>
+                <h3>Active Orders</h3>
+                {table}
+            </Box>
         </div>
     );
 };

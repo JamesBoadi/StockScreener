@@ -7,9 +7,7 @@ const connection = new HubConnectionBuilder()
   .withUrl('https://localhost:44362/requestData')
   .withAutomaticReconnect()
   .build(); */
-
-
-
+  
 export class FetchData extends Component {
   static displayName = FetchData.name;
   static rowBuffer = [];
