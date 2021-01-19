@@ -1,7 +1,6 @@
 import React, { Component, useState, useContext } from 'react';
 import { Button, ButtonGroup } from "@chakra-ui/react";
 import { Redirect } from "react-router-dom";
-import { DashboardOne } from './Dashboard/DashboardOne';
 import { DashboardMenu } from './Dashboard/DashboardMenu';
 import { Router, Route, Switch } from 'react-router';
 import './StockScreener.css';
@@ -38,8 +37,9 @@ export class DashboardInterface extends Component {
         return (
             <div class="App">
                 <div class="App-header">
-                <DashboardMenu redirect={() => this.redirect(1)} />
 
+                <DashboardMenu redirect={() => this.redirect(1)} />
+                
                 {redirect}
                 </div>
             </div>

@@ -7,22 +7,17 @@ import { Box } from '@chakra-ui/react';
 const StockTable = props => {
 
     const tableOne = <table class="stockTableOne" aria-labelledby="tabelLabel">
-        <tr>
-            <th>Time</th>
-            <th>Stock Name</th>
-            <th>Detect Price</th>
-            <th>Last Price</th>
-            <th>Scalp Status</th>
-            <th>Vol Diff (x100)</th>
-        </tr>
-        <tr>
-            <td>Berglunds snabbköp</td>
-            <td>Christina Berglund</td>
-            <td>Sweden</td>
-            <td>Christina Berglund</td>
-            <td>Sweden</td>
-            <td>Sweden</td>
-        </tr>
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Stock Name</th>
+                <th>Detect Price</th>
+                <th>Last Price</th>
+                <th>Scalp Status</th>
+                <th>Vol Diff (x100)</th>
+            </tr>
+        </thead>
+        <tbody>
         <tr>
             <td>Berglunds snabbköp</td>
             <td>Christina Berglund</td>
@@ -39,6 +34,15 @@ const StockTable = props => {
             <td>Sweden</td>
             <td>Sweden</td>
         </tr>
+        <tr>
+            <td>Berglunds snabbköp</td>
+            <td>Christina Berglund</td>
+            <td>Sweden</td>
+            <td>Christina Berglund</td>
+            <td>Sweden</td>
+            <td>Sweden</td>
+        </tr>
+        </tbody>
     </table>;
 
     const tableTwo = <table class="stockTableTwo" aria-labelledby="tabelLabel">
@@ -60,6 +64,7 @@ const StockTable = props => {
                 <th>Sector</th>
             </tr>
         </thead>
+        <tbody>
         <tr>
             <td>Berglunds snabbköp</td>
             <td>Christina Berglund</td>
@@ -76,6 +81,7 @@ const StockTable = props => {
             <td>Sweden</td>
             <td>Christina Berglund</td>
         </tr>
+        </tbody>
     </table>;
 
     // Drop Zone

@@ -1,7 +1,7 @@
 import React, { Component, useState, useContext } from 'react';
 import { Button, ButtonGroup } from "@chakra-ui/react";
 import { FetchData } from './FetchData.js';
-import './Dashboard/Dashboard.css';
+import '../Dashboard.css';
 
 export class DashboardOne extends Component {
 
