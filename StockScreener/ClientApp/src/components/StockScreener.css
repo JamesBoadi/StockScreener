@@ -1,3 +1,10 @@
+body
+{
+  background-color: rgb(30, 30, 30) !important;
+}
+
+
+
 a.navbar-brand {
   white-space: normal;
   text-align: center;
@@ -26,13 +33,14 @@ html {
 .App {
   text-align: center;
   overflow-x: visible;
+  background-color: rgb(60,60,60);
+  color:  rgb(60,60,60);
 }
 
 .App-logo {
   height: 40vmin;
   pointer-events: none;
 }
-
 
 
 /**************** App ******************/
@@ -224,22 +232,6 @@ nav > div a.nav-item.nav-link.active
   height: 28rem;
   transform: translate(350px, -448px);
 }
-
-/************** Stock Table ******************/
-/***************************************/
-
-.stock table {
-  position: relative;
-  border-collapse: collapse;
-  width: 100%;
-  font-family: sans-serif;
-}
-
-.stock table, th, td{
-  padding: 2.5px;
-}
-
-.stock tr:hover { background-color: rgb(50,50,50) }
 
 
 @media screen and (max-width: 800px) { 

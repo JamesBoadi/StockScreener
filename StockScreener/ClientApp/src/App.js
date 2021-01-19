@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
-import { Route } from 'react-router';
+import { Button, ButtonGroup } from "@chakra-ui/react";
 import { Layout } from './components/Layout';
+import { Redirect } from "react-router-dom";
+import { DashboardOne } from './components/Dashboard/DashboardOne/DashboardOne';
 import { DashboardInterface } from './components/DashboardInterface';
-import { FetchData } from './components/FetchData';
+import { Router, Route, Switch } from 'react-router';
+import { FetchData } from './components/Dashboard/FetchData';
 import { Counter } from './components/Counter';
 
 import './custom.css'
@@ -11,13 +14,31 @@ export default class App extends Component {
 
   static displayName = App.name;
 
-  render () {
+  componentDidMount()
+  {
+    <Redirect to='/' />;
+  }
+
+
+  render() {
+    /*
+            <Route exact path='/' component={DashboardInterface} />
+            <Route path='/counter' component={Counter} />
+            <Route path='/fetch-data' component={FetchData} />
+            <Route path='/DashboardOne' component={DashboardOne} />
+     */
+
     return (
-      <Layout>
-        <Route exact path='/' component={DashboardInterface} />
-        <Route path='/counter' component={Counter} />
-        <Route path='/fetch-data' component={FetchData} />
-      </Layout>
+
+      <div>
+        <Switch>
+          <Route exact path='/' component={DashboardOne} />
+          <Route path='/DashboardOne' component={DashboardOne} />
+        </Switch>
+      </div>
+
+
+
     );
   }
 }

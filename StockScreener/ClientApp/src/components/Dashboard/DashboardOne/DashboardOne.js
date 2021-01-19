@@ -1,12 +1,9 @@
 import React, { Component, useState, useContext } from 'react';
-import { Box } from '@chakra-ui/core';
-import './StockScreener.css';
-import StockTable from './StockTable';
-
+import { Button, ButtonGroup } from "@chakra-ui/react";
+import { FetchData } from './FetchData.js';
+import './Dashboard/Dashboard.css';
 
 export class DashboardOne extends Component {
-    static displayName = FetchData.name;
-    static rowBuffer = [];
 
     constructor(props) {
         super(props);
@@ -29,19 +26,13 @@ export class DashboardOne extends Component {
 
     render() {
         //  FetchData.sendRequest("I have a message", "of glory");
-        this.redirect(this.state.redirect);
-
         return (
             <div>
-                <div className="App">
-                    <div class="container">
 
-                        <header className="App-header"></header>
-                        <StockTable> </StockTable>
+                <header className="App-header">
+                    <FetchData />
+                </header>
 
-
-                    </div>
-                </div>
             </div>
         );
     }

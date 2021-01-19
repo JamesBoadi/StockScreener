@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import { sendRequest } from '@microsoft/signalr/dist/esm/Utils';
+import StockTable from '../StockTable';
+import { DashboardNavbar } from '../DashboardNavbar';
 
 /*
 const connection = new HubConnectionBuilder()
   .withUrl('https://localhost:44362/requestData')
   .withAutomaticReconnect()
   .build(); */
-  
+
 export class FetchData extends Component {
   static displayName = FetchData.name;
   static rowBuffer = [];
@@ -17,6 +19,7 @@ export class FetchData extends Component {
     this.cache = new Map();
 
     this.state = {
+      isStreaming: false,
       lock: false,
       forecasts: [], loading: true, connection: HubConnectionBuilder(),
       nick: '',
@@ -29,8 +32,6 @@ export class FetchData extends Component {
   }
 
   // Create a utility hook class
-
-
 
   // Render the Table
   renderTable = (forecasts) => {
@@ -63,7 +64,7 @@ export class FetchData extends Component {
   }
 
   componentDidMount = () => {
-    const hubConnection = new HubConnectionBuilder()
+  /*  const hubConnection = new HubConnectionBuilder()
       .withUrl('https://localhost:44362/requestScan')
       .withAutomaticReconnect()
       .build();
@@ -90,14 +91,14 @@ export class FetchData extends Component {
    
              if (this.state.lock == false)
                this.sendRequest(); // Send message again
-           });*/
-    });
+           });
+    }); */
   }
 
   sendRequest = () => {
     // Set the state of this column counter
     //this.setState({ column_counter: this.state.column_counter + 1 });
-    var arr = [];
+  /*  var arr = [];
     arr.push(this.state.column_counter.toString());
     arr.push("500");
 
@@ -106,26 +107,26 @@ export class FetchData extends Component {
 
         next: (stockArray) => {
           var i = 0;
-          
+
           for (i = 0; i < stockArray.length; i++) {
-              console.log("next " + stockArray[i]);
+            console.log("next " + stockArray[i]);
           }
 
-     /*     const request_Calls = parseInt(stockArray[5]);
-          const max_Calls = parseInt(stockArray[6]);
+          /*     const request_Calls = parseInt(stockArray[5]);
+               const max_Calls = parseInt(stockArray[6]);
+     
+               this.setState({ column_counter: request_Calls });
+     
+               if (this.state.MAX_CALLS == null || this.state.MAX_CALLS != max_Calls)
+                 this.setState({ MAX_CALLS: max_Calls });
+     
+               if (this.state.column_counter == this.state.MAX_CALLS) {
+                 this.setState({ lock: true })
+               }
 
-          this.setState({ column_counter: request_Calls });
+          //   console.log(stockArray + " " + request_Calls + " " + max_Calls);
 
-          if (this.state.MAX_CALLS == null || this.state.MAX_CALLS != max_Calls)
-            this.setState({ MAX_CALLS: max_Calls });
-
-          if (this.state.column_counter == this.state.MAX_CALLS) {
-            this.setState({ lock: true })
-          }*/
-
-       //   console.log(stockArray + " " + request_Calls + " " + max_Calls);
-
-       //   console.log("Array " + stockArray);
+          //   console.log("Array " + stockArray);
         },
         complete: () => {
           // render table
@@ -136,18 +137,17 @@ export class FetchData extends Component {
         }
       });
 
-      var streamTwo_ = this.state.hubConnection.stream("LockStream", arr)
+    var streamTwo_ = this.state.hubConnection.stream("LockStream", arr)
       .subscribe({
         next: (sessionProperties) => {
           const session = parseInt(sessionProperties[0]); // Get the session to display time
           const state = Boolean(sessionProperties[1]);
 
-          if(state === -1)
-            this.setState({lock: true});
-          else
-          {
-            if(this.state.lock !== false)
-              this.setState({lock: false});
+          if (state === -1)
+            this.setState({ lock: true });
+          else {
+            if (this.state.lock !== false)
+              this.setState({ lock: false });
           }
         },
         complete: () => {
@@ -159,25 +159,20 @@ export class FetchData extends Component {
         }
       });
 
-    if (this.state.lock){
+    if (this.state.lock) {
       console.log('ERASED');
       stream_.dispose(); // Dispose stream if lock is true
-
-    }
+    }*/
   }
 
   // https://www.codetinkerer.com/2018/06/05/aspnet-core-websockets.html
 
-  
+
   render() {
     //  FetchData.sendRequest("I have a message", "of glory");
 
-    let obj = [
-      { date: 'Welcome to learning React!' },];
-
-    return (
-      <div>
-        <br />
+    /*
+      <br />
         <input
           type="text"
           value={this.state.message}
@@ -195,6 +190,18 @@ export class FetchData extends Component {
 
         {this.renderTable(obj)}
 
+    
+    
+    */
+
+    // Create multiple fetch datas for each dashboard
+    //Dashboard
+    return (
+      <div>
+          
+          <DashboardNavbar                                                  />
+          <StockTable isStreaming={() => { return this.state.isStreaming }} />
+      
       </div>
     );
   }

@@ -1,15 +1,17 @@
 import React, { Component, useState, useContext } from 'react';
 import { Button, ButtonGroup } from "@chakra-ui/react";
 import { Redirect } from "react-router-dom";
-import { dashboardOne } from './components/DashboardInterface';
+import { DashboardOne } from './Dashboard/DashboardOne';
+import { DashboardMenu } from './Dashboard/DashboardMenu';
+import { Router, Route, Switch } from 'react-router';
 import './StockScreener.css';
-
+import App from '../App';
 
 export class DashboardInterface extends Component {
     constructor(props) {
         super(props);
         this.cache = new Map();
-        this.redirect.bind(this);
+        this.redirect = this.redirect.bind(this);
 
         this.state = {
             lock: false,
@@ -17,29 +19,29 @@ export class DashboardInterface extends Component {
         };
     }
 
-    // Create a utility hook class
-    redirect = (dashboardNum) => {
-        console.log("ok");
-        switch (dashboardNum) {
-            case 1:
-                <Redirect to='Dashboard/dashboardOne' />
-                break;
-        }
+    redirect = (num) => {
+        console.log(num + " " + "aaak");
+        this.setState({ redirect: num })
     }
 
+
+    /* https://www.pluralsight.com/guides/how-to-set-react-router-default-route-redirect-to-home
+<Route render={() => (<h1>404 Not Found</h1>)} /> Important if there is a timeout or error
+    */
     render() {
-        //  FetchData.sendRequest("I have a message", "of glory");    https://www.pluralsight.com/guides/how-to-set-react-router-default-route-redirect-to-home"
-// <Route render={() => (<h1>404 Not Found</h1>)} />
+        let redirect;
+
+        // switch
+        if (this.state.redirect == 1)
+            redirect = <Redirect to='/DashboardOne' />;
 
         return (
-            <div>
-                <Route path="/dashboardOne"component={DashboardInterface} />
-                <Route path="/dashboardTwo" component={DashboardInterface} />
-                
-                <Button id="dashboardOne" colorScheme="blue" onClick={this.redirect(1)}>Button</Button>
-                <Button id="dashboardTwo" colorScheme="blue">Button</Button>
-                <Button id="dashboardTwelve" colorScheme="blue">Button</Button>
-                <Button id="dashboardIdss" colorScheme="blue">Button</Button>
+            <div class="App">
+                <div class="App-header">
+                <DashboardMenu redirect={() => this.redirect(1)} />
+
+                {redirect}
+                </div>
             </div>
         );
     }
