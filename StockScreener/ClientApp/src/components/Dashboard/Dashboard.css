@@ -9,13 +9,15 @@
   /***************************************/
 
   @media screen and (max-width: 320px) { 
+    .side-bar 
+    {
+      min-height: 100%;
+      margin:auto;
+    }
+    
     .App-header {
-      display: inline-block;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+     
    
-      
       /*  font-size: calc(10px + 2vmin); background-color: rgb(60,60,60) !important;
       
          width: 100%;
@@ -84,7 +86,6 @@
 
   /************** Stock Table ******************/
   /*********************************************/
-  
 
   .stockTableOne {
     position: absolute;
@@ -93,7 +94,7 @@
     font-size: 14px;
     width: 25rem;
     left: 30px;
-    top: 50px;
+    top: 65px;
     overflow-y: visible;
   }
   
@@ -114,7 +115,7 @@
     font-size: 14px;
     width: 25rem;
     right: -475px;
-    top: 50px;
+    top: 65px;
     overflow-y: visible;
   }
   
@@ -132,27 +133,180 @@
 /************** DashboardNavbar ***************/
 /*********************************************/
 
- .DashboardNavbar #dashboard
+  .DashboardNavbar #dashboard
+    {
+      position: absolute;
+      font-weight: bold;
+      font-family: 'sans-serif';  
+      left: 60px;
+    }
+
+  .DashboardNavbar #index
   {
     position: absolute;
-    font-weight: bold;
+    font-weight: lighter;
+    font-size: 20px;
     font-family: 'sans-serif';  
-    left: 60px;
+    left: 300px;
+    top: 0px;
   }
 
- .DashboardNavbar #index
- {
-   position: absolute;
-   font-weight: lighter;
-   font-size: 20px;
-   font-family: 'sans-serif';  
-   left: 300px;
-   top: 0px;
- }
+  
+  .DashboardNavbar #msCap
+  {
+    position: absolute;
+    font-weight: lighter;
+    font-size: 20px;
+    font-family: 'sans-serif';  
+    left: 600px;
+    top: 0px;
+  }
+
+
+  .DashboardNavbar #startScan
+  {
+    position: absolute;
+    font-weight: lighter;
+    font-size: 17px;
+    font-family: 'sans-serif';  
+    left: 60px;
+    top: 30px;
+  }
+
+  .DashboardNavbar #lastScan
+  {
+    position: absolute;
+    font-weight: lighter;
+    font-size: 17px;
+    font-family: 'sans-serif';  
+    left: 300px;
+    top: 30px;
+  }
+
+  .DashboardNavbar #Ace
+  {
+    position: absolute;
+    font-weight: lighter;
+    font-size: 17px;
+    font-family: 'sans-serif';  
+    left: 600px;
+    top: 30px;
+  }
+
+  .side-bar 
+  {
+    min-height: 100%;
+    margin:auto;
+  }
+
+  #home_
+  {
+    position: absolute;
+    background: url("./Home.jpeg") no-repeat scroll 0 0 transparent;
+    color: #000000;
+    cursor: pointer;
+    font-weight: bold;
+    height: 50px;
+    width: 50px;
+    
+    top: 70px;
+    left: 0px;
+  }
+
+
+  #startScan_
+  {
+    position: absolute;
+    background: url("./startScan.jpeg") no-repeat scroll 0 0 transparent;
+    color: #000000;
+    cursor: pointer;
+    font-weight: bold;
+    height: 50px;
+    width: 50px;
+    
+    top: 140px;
+    left: 0px;
+  }
+
+  #stopScan_
+  {
+    position: absolute;
+    background: url("./stopScan.jpeg") no-repeat scroll 0 0 transparent;
+    color: #000000;
+    cursor: pointer;
+    font-weight: bold;
+    height: 50px;
+    width: 50px;
+    
+    top: 210px;
+    left: 0px;
+  }
+
+
+  #settings_
+  {
+    position: absolute;
+    background: url("./settings.jpeg") no-repeat scroll 0 0 transparent;
+    color: #000000;
+    cursor: pointer;
+    font-weight: bold;
+    height: 50px;
+    width: 50px;
+    
+    top: 280px;
+    left: 0px;
+  }
+
+  
+  #report_
+  {
+    position: absolute;
+    background: url("./report.jpeg") no-repeat scroll 0 0 transparent;
+    color: #000000;
+    cursor: pointer;
+    font-weight: bold;
+    height: 50px;
+    width: 50px;
+    
+    top: 350px;
+    left: 0px;
+  }
+
+  
+  #ndsa_
+  {
+    position: absolute;
+    background: url("./ndsa.jpeg") no-repeat scroll 0 0 transparent;
+    cursor: pointer;
+    font-weight: bold;
+    height: 53px;
+    width: 50px;
+    
+    top: 420px;
+    left: 0px;
+  }
+
+  
+  #exit_
+  {
+    position: absolute;
+    background: url("./exit.jpeg") no-repeat scroll 0 0 transparent;
+    cursor: pointer;
+    font-weight: bold;
+    height: 53px;
+    width: 50px;
+    
+    top: 490px;
+    left: 0px;
+  }
 
 
 
   @media screen and (max-width: 800px) { 
-    
+    .side-bar 
+    {
+      min-height: 100%;
+      margin:auto;
+    }
   }
   

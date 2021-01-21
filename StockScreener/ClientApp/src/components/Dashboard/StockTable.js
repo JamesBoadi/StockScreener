@@ -90,7 +90,7 @@ const StockTable = props => {
             <div class="grid-container">
                 <div class="grid-item">
                     <Box
-                        style={{ position: 'absolute', left: '30px' }}
+                        style={{ position: 'absolute', top: '30px', left: '30px' }}
                         bg={(props.isStreaming) ? "rgb(60,60,60)" : "rgb(30,30,30)"}
                         boxShadow='sm'
                         textAlign='center'
@@ -106,7 +106,7 @@ const StockTable = props => {
                 <div class="grid-item">
 
                     <Box
-                        style={{ position: 'relative', right: '-475px' }}
+                        style={{ position: 'absolute',  top: '30px', left: '475px' }  /* right: -475px */}
                         bg={(props.isStreaming) ? "rgb(60,60,60)" : "rgb(30,30,30)"}
                         boxShadow='sm'
                         textAlign='center'

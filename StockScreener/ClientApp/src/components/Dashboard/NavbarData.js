@@ -1,13 +1,12 @@
-export default {
-    
-    navbar: [
+export const NavBarData = {
+    navBar: [
         {
             dashboardNum: 1,
             indexValue: 0,
             indexPercentage: 20,
             startScan: 53,
             lastScan: 2,
-            msCap:29,
+            msCap: 29,
             msCapPercentage: 12,
             ACE: 4,
             ACEpercentage: 11

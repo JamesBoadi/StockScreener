@@ -3,7 +3,8 @@ import { HubConnectionBuilder } from '@microsoft/signalr';
 import { sendRequest } from '@microsoft/signalr/dist/esm/Utils';
 import StockTable from '../StockTable';
 import { DashboardNavbar } from '../DashboardNavbar';
-import {NavBarData }from '../NavbarData.js';
+import { NavBarData }from '../NavbarData.js';
+import { SideBar } from '../SideBar';
 import Nav from 'reactstrap/lib/Nav';
 
 /*
@@ -20,6 +21,7 @@ export class FetchData extends Component {
   constructor(props) {
     super(props);
     this.cache = new Map();
+    this.readNavBarData = this.readNavBarData.bind(this);
 
     this.state = {
       isStreaming: false,
@@ -55,32 +57,27 @@ export class FetchData extends Component {
   }
 
 
-  readNavBarData = () => {
-    var NavBar = NavBarData;
-    var currentData = this.state.data[0];
+  readNavBarData = (num) => {
+    var NavBar = NavBarData.navBar;
+    var currentData = this.state.data;
 
-    currentData.dashboardNum = NavBar.dashboardNum;
-    currentData.indexValue = NavBar.indexValue;
-    currentData.indexPercentage = NavBar.indexPercentage;
-    currentData.startScan = NavBar.startScan;
-    currentData.lastScan = NavBar.lastScan;
-    currentData.msCap = NavBar.msCap;
-    currentData.msCapPercentage = NavBar.msCapPercentage;
-    currentData.ACE = NavBar.ACE;
-    currentData.ACEpercentage = NavBar.ACEpercentage;
+    currentData[0].dashboardNum = NavBar[num].dashboardNum;
+    currentData[0].indexValue = NavBar[num].indexValue;
+    currentData[0].indexPercentage = NavBar[num].indexPercentage;
+    currentData[0].startScan = NavBar[num].startScan;
+    currentData[0].lastScan = NavBar[num].lastScan;
+    currentData[0].msCap = NavBar[num].msCap;
+    currentData[0].msCapPercentage = NavBar[num].msCapPercentage;
+    currentData[0].ACE = NavBar[num].ACE;
+    currentData[0].ACEpercentage = NavBar[num].ACEpercentage;
 
-    this.state.data[0] = currentData;
+    this.state.data = currentData;
   }
-
-
 
   /*
     setInterval(() => {
-      
-    }, interval);
-    
+    }, interval);    
     */
-
 
   // Render the Table
   renderTable = (forecasts) => {
@@ -214,13 +211,13 @@ export class FetchData extends Component {
       }*/
   }
 
-
-
-
   // https://www.codetinkerer.com/2018/06/05/aspnet-core-websockets.html
 
-
   render() {
+
+    this.readNavBarData(0);
+
+
     //  FetchData.sendRequest("I have a message", "of glory");
 
     /*
@@ -241,17 +238,20 @@ export class FetchData extends Component {
         </div>
 
         {this.renderTable(obj)}
-
-    
-    
     */
 
     // Create multiple fetch datas for each dashboard
     //Dashboard
     return (
+      
+
       <div>
+        <SideBar
+            isStreaming={() => { return this.state.isStreaming }}
+        />
+
         <DashboardNavbar
-          Data={() => { return this.state.data[0] }}
+          Data={() => { return this.state.data }}
         />
         <StockTable
           isStreaming={() => { return this.state.isStreaming }}
