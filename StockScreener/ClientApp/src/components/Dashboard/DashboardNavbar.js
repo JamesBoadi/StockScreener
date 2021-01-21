@@ -4,12 +4,12 @@ import './Dashboard.css';
 
 export const DashboardNavbar = props => {
 
-    const Dashboard = <h4 id="dashboard">{"Dashboard "}{props.Data.dashboardNum}</h4>
-    const Index = <h4 id="index">{"KLCI"}{props.Data.indexValue}{'( ' + props.Data.indexPercentage + '%)'}</h4>
-    const startScan = <h3 id="startScan">{"Start Scan: "}{props.Data.startScan}</h3>
-    const lastScan = <h3 id="lastScan">{"Last Scan "}{props.Data.lastScan}</h3>
-    const MSCap = <h3 id="msCap">{"MSCap: "}{props.Data.MSCap}{'( ' + props.Data.MSCapPercentage + '%)'}</h3>
-    const Ace = <h3 id="Ace">{"ACE"}{props.Data.ACE}{'( ' + props.Data.ACEpercentage + '%)'}</h3>
+    const Dashboard = <h4 id="dashboard">{"Dashboard: "}{props.Data[0].dashboardNum}</h4>
+    const Index = <h4 id="index">{"KLCI: "}{props.Data[0].indexValue}{' ( ' + props.Data[0].indexPercentage + ' )'}</h4>
+    const startScan = <h3 id="startScan">{"Start Scan: "}{props.Data[0].startScan}</h3>
+    const lastScan = <h3 id="lastScan">{"Last Scan: "}{props.Data[0].lastScan}</h3>
+    const MSCap = <h3 id="msCap">{"MSCap: "}{props.Data[0].msCap}{' ( ' + props.Data[0].msCapPercentage + ' )'}</h3>
+    const Ace = <h3 id="Ace">{"ACE: "}{props.Data[0].ACE}{' ( ' + props.Data[0].ACEpercentage + ' )'}</h3>
 
     // Return NavBar
     return (
@@ -25,7 +25,7 @@ export const DashboardNavbar = props => {
                 borderWidth="1px"
                 color='white'>
                 
-                {Dashboard/*, startScan, lastScan, MSCap, Ace*/}
+                {Dashboard}
                 {Index}
                 {MSCap}
                 {startScan}

@@ -7,6 +7,9 @@ import { NavBarData }from '../NavbarData.js';
 import { SideBar } from '../SideBar';
 import Nav from 'reactstrap/lib/Nav';
 
+
+import {StockTableOne} from './StockTableOne';
+import {StockTableTwo} from './StockTableTwo';
 /*
 const connection = new HubConnectionBuilder()
   .withUrl('https://localhost:44362/requestData')
@@ -48,14 +51,11 @@ export class FetchData extends Component {
         }
 
         /* , stockData = [
-
         ] {stock data from other json file} (set Interval)
-        
         */
       ]
     };
   }
-
 
   readNavBarData = (num) => {
     var NavBar = NavBarData.navBar;
@@ -244,14 +244,13 @@ export class FetchData extends Component {
     //Dashboard
     return (
       
-
       <div>
         <SideBar
             isStreaming={() => { return this.state.isStreaming }}
         />
 
         <DashboardNavbar
-          Data={() => { return this.state.data }}
+          Data={this.state.data }
         />
         <StockTable
           isStreaming={() => { return this.state.isStreaming }}
