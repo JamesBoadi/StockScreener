@@ -1,27 +1,7 @@
 import React from 'react';
+import { render } from 'react-dom';
 
 export let StockTableTwo = props => {
-
-
-    // Add the Row
-    addRow = () => {
-
-        let i;
-        for (i = 0; i < 20; i++) {
-            tableOne.push(<tbody>
-
-                <tr>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                </tr>
-
-            </tbody>)
-        }
-    }
 
     return (
         <table class="stockTableTwo" aria-labelledby="tabelLabel">

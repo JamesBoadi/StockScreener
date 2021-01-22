@@ -1,41 +1,61 @@
 import React from 'react';
 
+export const StockTableOne = props => {
 
-export let StockTableOne = <table class="stockTableOne" aria-labelledby="tabelLabel">
-    <thead>
-        <tr>
-            <th>Time</th>
-            <th>Stock Name</th>
-            <th>Detect Price</th>
-            <th>Last Price</th>
-            <th>Scalp Status</th>
-            <th>Vol Diff (x100)</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Berglunds snabbköp</td>
-            <td>Christina Berglund</td>
-            <td>Sweden</td>
-            <td>Christina Berglund</td>
-            <td>Sweden</td>
-            <td>Sweden</td>
-        </tr>
-        <tr>
-            <td>Berglunds snabbköp</td>
-            <td>Christina Berglund</td>
-            <td>Sweden</td>
-            <td>Christina Berglund</td>
-            <td>Sweden</td>
-            <td>Sweden</td>
-        </tr>
-        <tr>
-            <td>Berglunds snabbköp</td>
-            <td>Christina Berglund</td>
-            <td>Sweden</td>
-            <td>Christina Berglund</td>
-            <td>Sweden</td>
-            <td>Sweden</td>
-        </tr>
-    </tbody>
-</table>;
+    let table = [];
+
+    let tableOne = <div id="table-wrapper">
+        <div id="table-scroll">
+            <table class="stockTableOne" aria-labelledby="tabelLabel">
+           
+                <thead>
+                   
+                </thead>
+                <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                </tr>
+                    {table}
+                </tbody>
+            </table>
+        </div>
+    </div>;
+
+/**
+ 
+
+ */
+
+
+
+
+    // Add the Row
+    function addRow() {
+        let i;
+        for (i = 0; i < 305; i++) {
+            table.push(
+                <tr>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                </tr>
+            )
+        }
+    }
+
+    addRow();
+
+    return (
+
+
+        tableOne 
+    );
+}

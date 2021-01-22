@@ -8,8 +8,6 @@ import { SideBar } from '../SideBar';
 import Nav from 'reactstrap/lib/Nav';
 
 
-import {StockTableOne} from './StockTableOne';
-import {StockTableTwo} from './StockTableTwo';
 /*
 const connection = new HubConnectionBuilder()
   .withUrl('https://localhost:44362/requestData')
