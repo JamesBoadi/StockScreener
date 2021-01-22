@@ -53,9 +53,5 @@ export const StockTableOne = props => {
 
     addRow();
 
-    return (
-
-
-        tableOne 
-    );
+    return tableOne;
 }

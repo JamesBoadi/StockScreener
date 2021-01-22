@@ -124,7 +124,7 @@
 
   .stockTableOne tr:nth-child(even){background-color: rgb(40,40,40);}
 
-  .stockTableTwo * {
+  .stockTableTwo  {
     position: absolute;
     border-collapse: collapse;
     font-family: sans-serif;
