@@ -11,11 +11,13 @@ export const DashboardNavbar = props => {
     const MSCap = <h3 id="msCap">{"MSCap: "}{props.Data[0].msCap}{' ( ' + props.Data[0].msCapPercentage + ' )'}</h3>
     const Ace = <h3 id="Ace">{"ACE: "}{props.Data[0].ACE}{' ( ' + props.Data[0].ACEpercentage + ' )'}</h3>
 
+
+
     // Return NavBar
     return (
         <div class="DashboardNavbar">
             <Box
-                style={{ position: 'absolute', top: '0px',  zIndex: -1 }}
+                style={{ position: 'absolute', top: '0px',  zIndex: -999 }}
                 bg='rgb(40,40,40)'
                 boxShadow='sm'
                 textAlign='center'

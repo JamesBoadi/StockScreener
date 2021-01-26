@@ -16,8 +16,10 @@
     }
     
     .App-header {
-     
-   
+      display: grid;
+      margin-left:auto;
+      margin-right:auto;
+
       /*  font-size: calc(10px + 2vmin); background-color: rgb(60,60,60) !important;
       
          width: 100%;
@@ -26,12 +28,22 @@
       */
    
     }
+
+    #ox
+    {
+      min-width: 70rem;
+
+      margin: auto;
+    }
   }
 
   
   .grid-container {
-    display: inline-grid;
-    grid-column-gap: 50px;
+    display: grid;
+    margin-left:auto;
+    margin-right:auto;
+    width: 100%;
+    
   }
   
  .DashboardOneClass {
@@ -87,18 +99,30 @@
   /************** Stock Table ******************/
   /*********************************************/
 
-    
+  #tableContainer
+  {
+    position: absolute;
+    display: block;
+    margin-top: '0px';
+    margin-bottom: '0px';
+    margin-right: '0px';
+    margin-left: '0px';
+    float: none;
+  }
+
   .stockTableOneHeader   
     {  
       position: absolute;
       table-layout: fixed;
       border-collapse: collapse;
       font-family: sans-serif;
+      
       font-size: 14px;
       width: 25rem;
       left: 0px;
       top: 0px;
       background-color: rgb(40, 40, 40);
+      z-index: -999;
     }
 
    .stockTableOne 
@@ -112,6 +136,7 @@
     width: 25rem;
     left: 0px;
     top: 50px;
+   
   }
  
   .stockTableOne, th, td{
@@ -124,14 +149,31 @@
 
   .stockTableOne tr:nth-child(even){background-color: rgb(40,40,40);}
 
-  .stockTableTwo  {
+  .stockTableTwoHeader   
+  {  
     position: absolute;
+    table-layout: fixed;
     border-collapse: collapse;
     font-family: sans-serif;
     font-size: 14px;
-    width: 25rem;
-    right: -475px;
-    top: 65px;
+    min-height: 1200px;
+    width: 70rem;
+    left: 0px;
+    top: 0px;
+    background-color: rgb(40, 40, 40);
+    z-index: -1;
+  }
+
+  .stockTableTwo  {
+    position: absolute;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-family: sans-serif;
+    font-size: 14px;
+    min-height: 1200px;
+    width: 70rem;
+    left: 0px;
+    top: 50px;
   }
   
  .stockTableTwo, th, td{
@@ -140,7 +182,7 @@
     color:	rgb(255,250,250);
   }
 
-  .stockTableTwo th:hover { background-color: rgb(15, 223, 132); }
+  .stockTableTwoHeader th:hover { background-color: rgb(15, 223, 132); }
 
   .stockTableTwo tr:nth-child(even){background-color: rgb(40,40,40);}
 
@@ -166,7 +208,6 @@
     top: 0px;
   }
 
-  
   .DashboardNavbar #msCap
   {
     position: absolute;
@@ -176,7 +217,6 @@
     left: 600px;
     top: 0px;
   }
-
 
   .DashboardNavbar #startScan
   {
@@ -311,11 +351,91 @@
     left: 0px;
   }
 
+
+
+
+/************** DashboardOneSettings table ***************/
+/*********************************************************/
+
+  .containerDiv {
+    border: 1px solid #3697f6;
+    width: 30rem; display:table
+  }
+
+  .rowDivHeader {
+    border: 1px solid #668db6;
+    background-color: #336799;
+    color: white;
+    font-weight: bold; display:table-row
+  }
+
+  .rowDiv {
+    border: 1px solid #668db6;
+    background-color: #cee6fe;
+
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    display:table-row
+  }
+
+  .cellDivHeader {
+    border-right: 1px solid white;
+    display: table-cell;
+    width:12%;
+    padding: 1px;
+    text-align: center; 
+  }
+
+  .cellDiv {
+    border-right: 2px solid white;
+    display: table-cell;
+    width:10%;
+    padding-right: 4px;
+    text-align: center;
+    border-bottom: none;
+  }
+
+  .containerDiv .rowDiv input {
+    justify-content: center;
+
+  }
+
+  .containerDiv:hover .rowDiv input ~ .checkmark {
+    background-color: #ccc;
+  }
+
+
+
+  .container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+
   @media screen and (max-width: 800px) { 
     .side-bar 
     {
       min-height: 100%;
       margin:auto;
+    }
+
+    #ox
+    {
+      min-width: 70rem;
+      min-height: auto;
+      margin: auto;
     }
   }
   

@@ -1,5 +1,5 @@
 import React, { Component, useState, useContext } from 'react';
-import { Box } from '@chakra-ui/react';
+import { Box, Grid, GridItem } from '@chakra-ui/react';
 import { StockTableOne } from './StockTableOne';
 import { StockTableTwo } from './StockTableTwo';
 
@@ -35,7 +35,7 @@ const StockTable = props => {
         </thead>
     </table>;
 
-    let stockTableTwoHeader = <table class="stockTableOneHeader" aria-labelledby="tabelLabel">
+    let stockTableTwoHeader = <table class="stockTableTwoHeader" aria-labelledby="tabelLabel">
         <thead>
             <tr>
                 <th>Stock Name</th>
@@ -58,81 +58,68 @@ const StockTable = props => {
 
     return (
         <div>
-            <div class="grid-container">
-                <div class="grid-item">
+            <Box
+                style={{ position: 'absolute', top: '85px', left: '60px' }}
+                bg='rgb(40,40,40)'
+                boxShadow='sm'
+                textAlign='center'
+                height='45px'
+                width='23rem'
+                rounded="lg"
+                margin='auto'
+                zIndex='500'
+                color='white'>
+                {stockTableOneHeader}
+                <Box
+                    style={{
+                        position: 'absolute',
+                        overflowY: 'auto'
+                    }}
+                    bg='rgb(30,30,30)'
+                    boxShadow='sm'
+                    textAlign='center'
+                    height='1110px'
+                    width='26.3rem'
+                    rounded="lg"
+                    margin='auto'
+                    color='white'
+                    zIndex='0'>
+
+                    <StockTableOne />
+                </Box>
+            </Box>
+
+            <div id="tableContainer">
+                <Box
+                    style={{ position: 'absolute', top: '85px', left: '495px' }}
+                    bg='rgb(90,40,40)'
+                    boxShadow='sm'
+                    textAlign='center'
+                    height='45px'
+                    width='70rem'
+                    rounded="lg"
+                    margin='auto'
+                    zIndex='999'
+                    color='white'>
+                    {stockTableTwoHeader}
                     <Box
-                        style={{ position: 'absolute', top: '85px', left: '60px' }}
-                        bg='rgb(40,40,40)'
+                        style={{
+                            position: 'absolute',
+                            overflowY: 'auto'
+                        }}
+                        bg='rgb(30,30,30)'
                         boxShadow='sm'
                         textAlign='center'
-                        height='45px'
-                        width='25rem'
+                        height='1110px'
+                        width='72rem'
                         rounded="lg"
-                        margin='auto'
-                        zIndex='-999'
-                        color='white'>
+                        color='white'
+                        zIndex='-999'>
 
-                        {stockTableOneHeader}
 
-                        <Box
-                            style={{
-                                position: 'relative',
-                                overflowY: 'auto'
-                            }}
-                            bg='rgb(30,30,30)'
-                            boxShadow='sm'
-                            textAlign='center'
-                            height='1110px'
-                            width='26.3rem'
-                            rounded="lg"
-                            margin='auto'
-                            color='white'
-                            zIndex='-999'>
-
-                            <StockTableOne />
-                        </Box>
+                        <StockTableTwo />
                     </Box>
-                </div>
-
-                {/*  style={{ position: 'absolute', top: '30px', left: '475px' }  /* right: -475px */}
-                <div class="grid-item">
-
-                    <Box
-                        style={{ position: 'absolute', top: '30px', left: '475px' }}
-                        bg='rgb(40,40,40)'
-                        boxShadow='sm'
-                        textAlign='center'
-                        height='45px'
-                        width='25rem'
-                        rounded="lg"
-                        margin='auto'
-                        zIndex='-999'
-                        color='white'>
-
-                        {stockTableTwoHeader}
-
-                        <Box
-                            style={{
-                                position: 'relative',
-                                overflowY: 'auto'
-                            }}
-                            bg='rgb(30,30,30)'
-                            boxShadow='sm'
-                            textAlign='center'
-                            height='1110px'
-                            width='26.3rem'
-                            rounded="lg"
-                            margin='auto'
-                            color='white'
-                            zIndex='-999'>
-
-                            <StockTableTwo />
-                        </Box>
-                    </Box>
-                </div>
-
-
-
+                </Box>
             </div>
         </div>
     );

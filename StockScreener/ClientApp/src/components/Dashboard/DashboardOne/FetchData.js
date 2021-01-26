@@ -3,8 +3,9 @@ import { HubConnectionBuilder } from '@microsoft/signalr';
 import { sendRequest } from '@microsoft/signalr/dist/esm/Utils';
 import StockTable from '../StockTable';
 import { DashboardNavbar } from '../DashboardNavbar';
-import { NavBarData }from '../NavbarData.js';
+import { NavBarData } from '../NavbarData.js';
 import { SideBar } from '../SideBar';
+import { Box } from '@chakra-ui/react';
 import Nav from 'reactstrap/lib/Nav';
 
 
@@ -211,10 +212,12 @@ export class FetchData extends Component {
 
   // https://www.codetinkerer.com/2018/06/05/aspnet-core-websockets.html
 
+
   render() {
 
     this.readNavBarData(0);
 
+   
 
     //  FetchData.sendRequest("I have a message", "of glory");
 
@@ -241,19 +244,21 @@ export class FetchData extends Component {
     // Create multiple fetch datas for each dashboard
     //Dashboard
     return (
-      
+
       <div>
         <SideBar
-            isStreaming={() => { return this.state.isStreaming }}
+          isStreaming={() => { return this.state.isStreaming }}
         />
 
         <DashboardNavbar
-          Data={this.state.data }
+          Data={this.state.data}
         />
+
         <StockTable
           isStreaming={() => { return this.state.isStreaming }}
           Data={() => { return this.state.data[1] }}
         />
+
       </div>
     );
   }

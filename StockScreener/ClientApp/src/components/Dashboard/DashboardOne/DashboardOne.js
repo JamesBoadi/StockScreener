@@ -8,7 +8,7 @@ export class DashboardOne extends Component {
     constructor(props) {
         super(props);
         this.cache = new Map();
-        this.redirect.bind(this);
+        this.redirect = this.redirect.bind(this);
 
         this.state = {
             lock: false,
@@ -16,10 +16,10 @@ export class DashboardOne extends Component {
         };
     }
 
-    redirect = (dashboardNum) => {
-        switch (dashboardNum) {
-            case 1:
-                <Redirect to="/dashboardOne" />
+    redirect = (num) => {
+        switch (num) {
+            case 6:
+                <Redirect to="/dashboardOneSettings" />
                 break;
         }
     }
@@ -29,7 +29,7 @@ export class DashboardOne extends Component {
         return (
             <div>
 
-                <header className="App-header">
+                <header class="App-header">
                     <FetchData />
                 </header>
 
