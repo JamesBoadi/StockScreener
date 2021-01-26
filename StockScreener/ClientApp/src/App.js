@@ -35,10 +35,12 @@ export default class App extends Component {
     return (
 
       <div>
+
         <Switch>
-          <Route exact path='/' component={DashboardOneSettings} />
+          <Route exact path='/' component={DashboardOne} />
           <Route path='/DashboardOne' component={DashboardOne} />
         </Switch>
+
       </div>
 
 

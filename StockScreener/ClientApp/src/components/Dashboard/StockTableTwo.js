@@ -4,13 +4,23 @@ import { render } from 'react-dom';
 export let StockTableTwo = props => {
     let table = [];
     
+
+    function selectCell()
+    {
+        console.log("Lover s");
+    }
+
+
+    
+
+
     // Add the Row
     function addRow() {
         let i;
         for (i = 0; i < 305; i++) {
             table.push(
-                <tr>
-                    <td>1</td>
+                <tr id="" >
+                    <td onClick={selectCell}>2</td>
                     <td>1</td>
                     <td>1</td>
                     <td>1</td>

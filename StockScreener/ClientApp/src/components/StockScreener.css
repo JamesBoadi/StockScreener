@@ -1,9 +1,7 @@
 body
 {
- /* background-color: rgb(30, 30, 30) !important;*/
+  background-color: rgb(30, 30, 30) !important;
 }
-
-
 
 a.navbar-brand {
   white-space: normal;
@@ -14,10 +12,6 @@ a.navbar-brand {
 html {
   font-size: 14px;
 }
-
-
-
-
 
 @media (min-width: 768px) {
   html {

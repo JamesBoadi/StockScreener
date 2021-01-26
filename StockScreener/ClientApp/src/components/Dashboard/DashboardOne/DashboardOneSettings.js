@@ -159,24 +159,42 @@ export class DashboardOneSettings extends Component {
                 </div>;
                     <input type="checkbox">Bullish</input>
                     <input type="checkbox">Highl Bullish</input>
-                */
 
-        return (
-            <div>
-            
-                    <label class="container">Bullish
-                        <input type="checkbox" />
-                        
-                    </label>
-
+                    
                     <label class="container">Highly Bullish
                         <input type="checkbox" />
                        
                     </label>
+                */
 
+        return (
+            <div>
 
+                <div class="checkBoxContainer">
 
-                {/*hideColumns*/}
+                    <label class="containerOne">Bullish
+                    <input type="checkbox" />
+                    </label>
+
+                    <label class="containerTwo">Highly Bullish
+                    <input type="checkbox" />
+                    </label>
+
+                    <label class="containerTwo">Reversal Signal
+                    <input type="checkbox" />
+                    </label>
+
+                    <label class="containerTwo">High Momentum Stocks
+                    <input type="checkbox" />
+                    </label>
+
+                    <label class="containerTwo">Show My Stocks
+                    <input type="checkbox" />
+                    </label>
+
+                </div>
+
+                {hideColumns}
 
             </div>
         );

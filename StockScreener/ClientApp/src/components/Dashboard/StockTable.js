@@ -57,6 +57,7 @@ const StockTable = props => {
     </table>;
 
     return (
+
         <div>
             <Box
                 style={{ position: 'absolute', top: '85px', left: '60px' }}
@@ -122,6 +123,7 @@ const StockTable = props => {
                 </Box>
             </div>
         </div>
+        
     );
 };
 
