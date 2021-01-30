@@ -7,6 +7,7 @@ import { NavBarData } from '../NavbarData.js';
 import { SideBar } from '../SideBar';
 import { Box } from '@chakra-ui/react';
 import Nav from 'reactstrap/lib/Nav';
+import { StockTableTwo } from '../StockTableTwo';
 
 
 /*
@@ -258,6 +259,8 @@ export class FetchData extends Component {
           isStreaming={() => { return this.state.isStreaming }}
           Data={() => { return this.state.data[1] }}
         />
+
+
 
       </div>
     );

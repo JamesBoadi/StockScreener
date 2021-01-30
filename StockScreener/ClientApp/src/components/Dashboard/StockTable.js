@@ -19,9 +19,16 @@ const StockTable = props => {
                     <td>1</td>
                 </tr>
             </tbody>)
-        }*/
+        }
     // Drop Zone
-
+    
+    if(count === 0)
+    {
+        console.log("Ok sonny");
+        setStockTable(table);
+        setCount(1);
+    }
+*/
     let stockTableOneHeader = <table class="stockTableOneHeader" aria-labelledby="tabelLabel">
         <thead>
             <tr>
@@ -31,22 +38,6 @@ const StockTable = props => {
                 <th>Last Price</th>
                 <th>Scalp Status</th>
                 <th>Vol Diff (x100)</th>
-            </tr>
-        </thead>
-    </table>;
-
-    let stockTableTwoHeader = <table class="stockTableTwoHeader" aria-labelledby="tabelLabel">
-        <thead>
-            <tr>
-                <th>Stock Name</th>
-                <th>WL</th>
-                <th>Detect Time</th>
-                <th>Detect Price</th>
-                <th>High Price</th>
-                <th>Last Price</th>
-                <th>Gain</th>
-                <th>Gain %</th>
-                <th>Volume</th>
                 <th>Scalp Status</th>
                 <th>TP price</th>
                 <th>Alert Status</th>
@@ -56,10 +47,24 @@ const StockTable = props => {
         </thead>
     </table>;
 
-    return (
+    let stockTableTwoHeader = <table class="stockTableTwoHeader" aria-labelledby="tabelLabel">
+        <thead>
+            <tr>
+                <th>Stock Name</th>
+                <th>Time</th>
+                <th>Price</th>
+                <th>High</th>
+                <th>Low</th>
+                <th>P/L</th>
+                <th>P/L %</th>
+                <th>Volume</th>  
+            </tr>
+        </thead>
+    </table>;
 
+    return (
         <div>
-            <Box
+           {/* <Box
                 style={{ position: 'absolute', top: '85px', left: '60px' }}
                 bg='rgb(40,40,40)'
                 boxShadow='sm'
@@ -88,11 +93,11 @@ const StockTable = props => {
 
                     <StockTableOne />
                 </Box>
-            </Box>
+                </Box> --> */}
 
             <div id="tableContainer">
                 <Box
-                    style={{ position: 'absolute', top: '85px', left: '495px' }}
+                    style={{ position: 'absolute', top: '85px', left: '60px' }}
                     bg='rgb(90,40,40)'
                     boxShadow='sm'
                     textAlign='center'
@@ -108,17 +113,18 @@ const StockTable = props => {
                             position: 'absolute',
                             overflowY: 'auto'
                         }}
+
                         bg='rgb(30,30,30)'
                         boxShadow='sm'
                         textAlign='center'
-                        height='1110px'
+                        height='550px'
                         width='72rem'
                         rounded="lg"
                         color='white'
                         zIndex='-999'>
 
-
-                        <StockTableTwo />
+                        <StockTableTwo/>
+                        
                     </Box>
                 </Box>
             </div>

@@ -1,75 +1,154 @@
-import React from 'react';
+
+import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import { render } from 'react-dom';
+import { FetchData } from './DashboardOne/FetchData';
 
-export let StockTableTwo = props => {
-    let table = [];
-    
+// Fetch data for dash board one
+export class StockTableTwo extends Component {
 
-    function selectCell()
-    {
-        console.log("Lover s");
+    constructor(props) {
+        super(props);
+        this.selectCell = this.selectCell.bind(this);
+        this.addRow = this.addRow.bind(this);
+        this.updateTable = this.updateTable.bind(this);
+
+
+        let style = { color: "white;" }
+        this.state = {
+            table: [],
+            tableTwo: [],
+            count: 0,
+            
+            numberOfClicks: []
+        };
     }
 
+    updateTable() {
+        let t = <div>
+            <div id="table-wrapper">
+                <div id="table-scroll">
+                    <table class="stockTableTwo" aria-labelledby="tabelLabel">
+                        <thead>
+                        </thead>
 
-    
+                        <tbody>
+                            <tr>
+                                <td>4</td>
+                                <td>4</td>
+                                <td>4</td>
+                                <td>1</td>
+                                <td>4</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>1</td>
+                            </tr>
+                        </tbody>
+                        {this.state.table}
+                    </table>
+                </div>
+            </div>
+        </div>;
 
+        this.setState({ tableTwo: t });
+    }
 
-    // Add the Row
-    function addRow() {
-        let i;
-        for (i = 0; i < 305; i++) {
-            table.push(
-                <tr id="" >
-                    <td onClick={selectCell}>2</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                </tr>
-            )
+    componentDidUpdate() {
+        if (this.state.count === 1) {
+            this.updateTable();
+            this.setState({ count: 0 });
         }
     }
 
-    addRow();
+    componentDidMount() {
+        this.addRow();
+        this.updateTable();
+    }
 
-    let tableTwo = <div id="table-wrapper">
-        <div id="table-scroll">
-            <table class="stockTableTwo" aria-labelledby="tabelLabel">
+    selectCell(e) {
+        var table = [];
+        var target = new Number(e.target.id);
+        var style = {};
 
-                <thead>
+//        this.setState({ numberOfClicks: this.state.numberOfClicks + 1 });
 
-                </thead>
+        let id;
+        for (id = 0; id < 305; id++) {
+            if (id == target)
+                style = { backgroundColor: "rgb(15, 223, 132)" };
+            else
+                style = {}
+
+            table.push(
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>1</td>
+                    <tr key={id} style={style}>
+                        {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
+                        <td id={id} onClick={this.selectCell}>4</td>
+                        <td id={id} onClick={this.selectCell}>4</td>
+                        <td id={id} onClick={this.selectCell}>5</td>
+                        <td id={id} onClick={this.selectCell}>6</td>
+                        <td id={id} onClick={this.selectCell}>7</td>
+                        <td id={id} onClick={this.selectCell}>8</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>4</td>
                     </tr>
-                    {table}
                 </tbody>
-            </table>
-        </div>
-    </div>;
+            )
+        }
 
-    return tableTwo;
+        this.setState({ table: table });
+        this.setState({ count: 1 });
+    }
+
+    addRow() {
+        let id;
+        for (id = 0; id < 305; id++) {
+            this.state.table.push(
+                <tbody>
+                    <tr key={id}     >
+                        {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>4</td>
+                    </tr>
+                </tbody>
+            )
+        }
+
+
+    }
+
+    render() {
+        return (
+            <div>
+                {this.state.tableTwo}
+            </div>
+
+
+        );
+    }
+
 }

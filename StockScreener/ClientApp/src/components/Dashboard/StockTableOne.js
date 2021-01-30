@@ -6,7 +6,7 @@ export const StockTableOne = props => {
 
     let tableOne = <div id="table-wrapper">
         <div id="table-scroll">
-            <table class="stockTableOne" aria-labelledby="tabelLabel">
+            <table key={0} class="stockTableOne" aria-labelledby="tabelLabel">
            
                 <thead>
                    
@@ -20,8 +20,9 @@ export const StockTableOne = props => {
                     <td>1</td>
                     <td>1</td>
                 </tr>
-                    {table}
                 </tbody>
+                    {table}
+               
             </table>
         </div>
     </div>;
@@ -39,7 +40,8 @@ export const StockTableOne = props => {
         let i;
         for (i = 0; i < 305; i++) {
             table.push(
-                <tr>
+                <tbody>
+                <tr key={i}>
                     <td>1</td>
                     <td>1</td>
                     <td>1</td>
@@ -47,6 +49,7 @@ export const StockTableOne = props => {
                     <td>1</td>
                     <td>1</td>
                 </tr>
+                 </tbody>
             )
         }
     }
