@@ -12,7 +12,7 @@
     .side-bar 
     {
       min-height: 100%;
-      margin:auto;
+     
     }
     
     .App-header {
@@ -157,7 +157,7 @@
     font-family: sans-serif;
     font-size: 14px;
     min-height: 1200px;
-    width: 70rem;
+    width: 60rem;
     left: 0px;
     top: 0px;
     background-color: rgba(27, 209, 130, 0.897); 
@@ -171,9 +171,9 @@
     font-family: sans-serif;
     font-size: 14px;
     min-height: 1200px;
-    width: 70rem;
+    width: 60rem;
     left: 0px;
-    top: 50px;
+    top: 35px;
   }
   
  .stockTableTwo, th, td{
@@ -184,7 +184,7 @@
 
   .stockTableTwoHeader th:hover { background-color: rgb(40,40,40); }
 
-  .stockTableTwo tr:nth-child(even){background-color: rgba(27, 209, 130, 0.986); }
+  .stockTableTwo tr:nth-child(even){background-color: rgba(23, 187, 116, 0.842); }
 
 
 /************** DashboardNavbar ***************/
@@ -267,6 +267,29 @@
     top: 70px;
     left: 0px;
   }
+
+  #GreenArrow
+  {
+    position: absolute;
+    background: url("./GreenArrowUp.png") no-repeat scroll 0 0 transparent;
+    color: #000000;
+    cursor: pointer;
+    font-weight: bold;
+    height: 150px;
+    width: 100px;
+  }
+
+  #RedArrow
+  {
+    position: absolute;
+    background: url("./redArrowDown.png") no-repeat scroll 0 0 transparent;
+    color: #000000;
+    cursor: pointer;
+    font-weight: bold;
+    height: 150px;
+    width: 100px;
+  }
+
 
 
   #startScan_
@@ -459,7 +482,7 @@
     .side-bar 
     {
       min-height: 100%;
-      margin:auto;
+  
     }
 
     #ox

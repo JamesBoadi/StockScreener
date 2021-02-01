@@ -38,15 +38,10 @@ export class StockTableTwo extends Component {
                                 <td>4</td>
                                 <td>4</td>
                                 <td>1</td>
+
                                 <td>4</td>
-                                <td>1</td>
-                                <td>1</td>
-                                <td>1</td>
-                                <td>1</td>
-                                <td>1</td>
-                                <td>1</td>
-                                <td>1</td>
-                                <td>1</td>
+                                <td>4</td>
+                                <td>4</td>
                                 <td>1</td>
                             </tr>
                         </tbody>
@@ -81,7 +76,7 @@ export class StockTableTwo extends Component {
         let id;
         for (id = 0; id < 305; id++) {
             if (id == target)
-                style = { backgroundColor: "rgb(15, 223, 132)" };
+                style = { backgroundColor: "rgb(0,11,34)" };
             else
                 style = {}
 
@@ -89,20 +84,14 @@ export class StockTableTwo extends Component {
                 <tbody>
                     <tr key={id} style={style}>
                         {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
+                        <td id={id} onClick={this.selectCell}>400</td>
+                        <td id={id} onClick={this.selectCell}>4</td>
+                        <td id={id} onClick={this.selectCell}>5</td>
+                        <td id={id} onClick={this.selectCell}>6</td>
                         <td id={id} onClick={this.selectCell}>4</td>
                         <td id={id} onClick={this.selectCell}>4</td>
                         <td id={id} onClick={this.selectCell}>5</td>
                         <td id={id} onClick={this.selectCell}>6</td>
-                        <td id={id} onClick={this.selectCell}>7</td>
-                        <td id={id} onClick={this.selectCell}>8</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>4</td>
                     </tr>
                 </tbody>
             )
@@ -123,16 +112,11 @@ export class StockTableTwo extends Component {
                         <td id={id} onClick={this.selectCell}>3</td>
                         <td id={id} onClick={this.selectCell}>3</td>
                         <td id={id} onClick={this.selectCell}>3</td>
+                       
                         <td id={id} onClick={this.selectCell}>3</td>
                         <td id={id} onClick={this.selectCell}>3</td>
                         <td id={id} onClick={this.selectCell}>3</td>
                         <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>4</td>
                     </tr>
                 </tbody>
             )

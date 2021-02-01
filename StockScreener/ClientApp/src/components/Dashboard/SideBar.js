@@ -36,7 +36,7 @@ export const SideBar = props => {
                 borderWidth="1px"
                 color='white'>
 
-                {/* <h4>{"D"}{props.Data.dashboardNum}</h4>*/}
+                {/* <h4>{"D"}{props.Data.dashboardNum}</h4>
 
                 <Button id="home_" colorScheme="blue" />
                 <Button id="startScan_" colorScheme="blue" />
@@ -44,7 +44,7 @@ export const SideBar = props => {
                 <Button id="settings_" colorScheme="blue" onClick={direct} />
                 <Button id="report_" colorScheme="blue" />
                 <Button id="ndsa_" colorScheme="blue" />
-                <Button id="exit_" colorScheme="blue" />
+                <Button id="exit_" colorScheme="blue" />*/}
                 {redirect }
                 { /* <Button id="run" colorScheme="blue" >Button</Button>
                     <Button id="stop" colorScheme="blue" >Button</Button>
