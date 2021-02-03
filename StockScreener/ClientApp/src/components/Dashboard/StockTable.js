@@ -6,6 +6,7 @@ import {
 } from '@chakra-ui/react';
 import { StockTableOne } from './StockTableOne';
 import { StockTableTwo } from './StockTableTwo';
+import { AlertTable } from './AlertTable';
 
 // https://packagecontrol.io/packages/CSS%20Format
 const StockTable = props => {
@@ -13,29 +14,12 @@ const StockTable = props => {
     const [red, setRed] = useState(true);
     const [priceChangeUp, setPriceChangeUp] = useState(false);
 
-    /*  // Add the Row
-        addRow = () => {
-            tableOne.push(<tbody>
-    
-                <tr>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                </tr>
-            </tbody>)
-        }
-    // Drop Zone
-    
-    if(count === 0)
-    {
-        console.log("Ok sonny");
-        setStockTable(table);
-        setCount(1);
-    }
-*/
+    setInterval(() => {
+        window.location.reload();
+    }, 23000);
+
+
+
     let stockTableOneHeader = <table class="stockTableOneHeader" aria-labelledby="tabelLabel">
         <thead>
             <tr>
@@ -70,39 +54,20 @@ const StockTable = props => {
     </table>;
 
 
+    let alertTableHeader = <table class="alertTableHeader" aria-labelledby="tabelLabel">
+        <thead>
+            <tr>
+                <th>Stock <br/> Name</th>
+                <th>Alert <br/> Time</th>
+                <th>Price</th>
+                <th>P / L</th>
+                <th>Volume</th>
+            </tr>
+        </thead>
+    </table>;
+
     return (
         <div>
-            {/* <Box
-                style={{ position: 'absolute', top: '85px', left: '60px' }}
-                bg='rgb(40,40,40)'
-                boxShadow='sm'
-                textAlign='center'
-                height='45px'
-                width='23rem'
-                rounded="lg"
-                margin='auto'
-                zIndex='500'
-                color='white'>
-                {stockTableOneHeader}
-                <Box
-                    style={{
-                        position: 'absolute',
-                        overflowY: 'auto'
-                    }}
-                    bg='rgb(30,30,30)'
-                    boxShadow='sm'
-                    textAlign='center'
-                    height='1110px'
-                    width='26.3rem'
-                    rounded="lg"
-                    margin='auto'
-                    color='white'
-                    zIndex='0'>
-
-                    <StockTableOne />
-                </Box>
-                </Box> --> */}
-
             <div id="tableContainer">
                 <Box
                     style={{ position: 'absolute', top: '85px', left: '60px' }}
@@ -112,26 +77,28 @@ const StockTable = props => {
                     width='62rem'
                     rounded="lg"
                     margin='auto'
-                    color='white'
                     zIndex='0'>
-
-                    <h1 style={{ position: 'relative', textAlign: 'center' }}>AAPL (Apple Inc)</h1>
-                    <h3 style={{ position: 'relative', textAlign: 'center' }}>Price: 286.7</h3>
-                    <h4 style={{ position: 'relative', top: '30px', left: '0px' }}>Sector: Technology</h4>
-                    <h4 style={{ position: 'relative', top: '30px', left: '0px' }}>Message: Possible Reversal</h4>
+                
+                    <h1 style={{ position: 'relative', textAlign: 'center', color: 'white' }}>AAPL (Apple Inc)</h1>
+                    <h3 style={{ position: 'relative', textAlign: 'center', color: 'white' }}>Price: 286.7</h3>
+                    <h4 style={{ position: 'relative', top: '30px', left: '0px', color: 'white' }}>Sector: Technology</h4>
+                    <h4 style={{ position: 'relative', top: '30px', left: '0px', color: 'white' }}>Message: Possible Reversal</h4>
 
                     {/* Entry: Largest gap in either shorts or calls (Calculate in c#) */}
-                    <h4 style={{ position: 'relative', top: '30px', left: '0px' }}>Possible Entry: 230.6
-                 
-                    </h4>
-                    <NumberInput maxW="100px" mr="2rem" defaultValue={15} min={10} max={20}>
-                            <NumberInputField  />
-                            <NumberInputStepper>
-                                <NumberIncrementStepper  bg="black"/>
-                                <NumberDecrementStepper />
-                            </NumberInputStepper>
-                        </NumberInput>
-                    <h4 style={{ position: 'relative', top: '30px', left: '0px' }}>Take Profit: 270.6</h4>
+                    <h4 style={{ position: 'relative', top: '35px', left: '0px', color: 'white' }}>Possible Entry:
+                        </h4>
+
+                    <NumberInput
+                        style={{ left: '170px' }}
+                        size="md" maxW={70} defaultValue={15} min={10} max={20}>
+                        <NumberInputField />
+                        <NumberInputStepper >
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                        </NumberInputStepper>
+                    </NumberInput>
+
+                    <h4 style={{ position: 'relative', top: '10px', left: '0px', color: 'white' }}>Take Profit: 270.6</h4>
 
                     <Button id="GreenArrow" style={{
                         position: 'absolute', top: '60px', right: '180px'
@@ -144,11 +111,12 @@ const StockTable = props => {
                     }} colorScheme="blue" />
 
                     <Button style={{ position: 'absolute', bottom: '0px', right: '90px' }}>Add to Alerts</Button>
-
                 </Box>
+
+
                 <Box
                     style={{ position: 'absolute', top: '400px', left: '60px' }}
-                    bg='rgb(90,40,40)'
+                    bg='rgb(30,30,30)'
                     boxShadow='sm'
                     textAlign='center'
                     height='45px'
@@ -157,13 +125,16 @@ const StockTable = props => {
                     margin='auto'
                     zIndex='999'
                     color='white'>
+                    
+                    <img id="searchIcon"></img>
                     {stockTableTwoHeader}
+
                     <Box
                         style={{
                             position: 'absolute',
                             overflowY: 'auto'
                         }}
-
+                        overflowX='hidden'
                         bg='rgb(30,30,30)'
                         boxShadow='sm'
                         textAlign='center'
@@ -174,9 +145,48 @@ const StockTable = props => {
                         zIndex='-999'>
 
                         <StockTableTwo />
+                    </Box>
+                </Box>
+                
+                <Box
+                    style={{ position: 'absolute', top: '85px', left: '1070px' }}
+               //     bg='rgb(30,30,30)'
+                    boxShadow='sm'
+                    textAlign='center'
+                    height='45px'
+                    width='50rem'
+                    rounded="lg"
+                    margin='auto'
+                    color='white'
+                    zIndex='999'>
+
+                
+                    {alertTableHeader}
+
+
+                    <Box
+                        style={{
+                            position: 'absolute',
+                            overflowY: 'auto'
+
+                        }}
+                        
+                        overflowX='hidden'
+                      //  bg='rgb(30,30,30)'
+                        boxShadow='sm'
+                        textAlign='center'
+                        height='1110px'
+                        width='52rem'
+                        rounded="lg"
+                        margin='auto'
+                        color='white'
+                        zIndex='-999'>
+
+                        <AlertTable />
 
                     </Box>
                 </Box>
+
             </div>
         </div>
 
