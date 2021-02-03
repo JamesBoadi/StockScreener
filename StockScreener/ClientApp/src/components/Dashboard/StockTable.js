@@ -2,7 +2,8 @@ import React, { Component, useState, useContext } from 'react';
 import {
     Box, Button, NumberInput,
     NumberInputField, NumberInputStepper,
-    NumberIncrementStepper, NumberDecrementStepper
+    NumberIncrementStepper, NumberDecrementStepper,
+    Input, InputGroup, InputRightElement, InputLeftElement
 } from '@chakra-ui/react';
 import { StockTableOne } from './StockTableOne';
 import { StockTableTwo } from './StockTableTwo';
@@ -57,8 +58,8 @@ const StockTable = props => {
     let alertTableHeader = <table class="alertTableHeader" aria-labelledby="tabelLabel">
         <thead>
             <tr>
-                <th>Stock <br/> Name</th>
-                <th>Alert <br/> Time</th>
+                <th>Stock <br /> Name</th>
+                <th>Alert <br /> Time</th>
                 <th>Price</th>
                 <th>P / L</th>
                 <th>Volume</th>
@@ -78,7 +79,7 @@ const StockTable = props => {
                     rounded="lg"
                     margin='auto'
                     zIndex='0'>
-                
+
                     <h1 style={{ position: 'relative', textAlign: 'center', color: 'white' }}>AAPL (Apple Inc)</h1>
                     <h3 style={{ position: 'relative', textAlign: 'center', color: 'white' }}>Price: 286.7</h3>
                     <h4 style={{ position: 'relative', top: '30px', left: '0px', color: 'white' }}>Sector: Technology</h4>
@@ -125,14 +126,20 @@ const StockTable = props => {
                     margin='auto'
                     zIndex='999'
                     color='white'>
-                    
-                    <img id="searchIcon"></img>
+
+                    <InputGroup>
+                        <Input style={{ position: 'absolute', top: '0px', right: '16.5px', height: '29px'}}
+                         placeholder="Search " />
+                        <InputRightElement children={<img id="searchIcon" />} />
+                    </InputGroup>
+
                     {stockTableTwoHeader}
 
                     <Box
                         style={{
                             position: 'absolute',
-                            overflowY: 'auto'
+                            overflowY: 'auto',
+                            top: '45px'
                         }}
                         overflowX='hidden'
                         bg='rgb(30,30,30)'
@@ -147,10 +154,10 @@ const StockTable = props => {
                         <StockTableTwo />
                     </Box>
                 </Box>
-                
+
                 <Box
                     style={{ position: 'absolute', top: '85px', left: '1070px' }}
-               //     bg='rgb(30,30,30)'
+                    //     bg='rgb(30,30,30)'
                     boxShadow='sm'
                     textAlign='center'
                     height='45px'
@@ -160,9 +167,7 @@ const StockTable = props => {
                     color='white'
                     zIndex='999'>
 
-                
                     {alertTableHeader}
-
 
                     <Box
                         style={{
@@ -170,9 +175,9 @@ const StockTable = props => {
                             overflowY: 'auto'
 
                         }}
-                        
+
                         overflowX='hidden'
-                      //  bg='rgb(30,30,30)'
+                        //  bg='rgb(30,30,30)'
                         boxShadow='sm'
                         textAlign='center'
                         height='1110px'

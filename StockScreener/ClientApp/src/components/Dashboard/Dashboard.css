@@ -196,7 +196,7 @@
     min-height: 1200px;
     width: 60rem;
     left: 0px;
-    top: 35px;
+    top: 45px;
     background-color: rgb(40,40,40);
     z-index: 888;
     
@@ -217,20 +217,19 @@
     min-height: 1200px;
     width: 60rem;
     left: 0px;
-    top: 75px;
+    top: 55px;
   }
 
   #searchIcon
   {
     position: absolute;
-    background: url("./Search.jpeg") no-repeat scroll 0 0 transparent;
+    background: url("./SearchIcon.jpeg") no-repeat scroll 0 0 transparent;
     color: #000000;
     cursor: pointer;
     font-weight: bold;
-    height: 40px;
-    width: 40px;
+    height: 29px;
+    width: 30px;
     top: 0px;
-    left: 0px;
     /*
     top: 70px;
     left: 0px;*/
