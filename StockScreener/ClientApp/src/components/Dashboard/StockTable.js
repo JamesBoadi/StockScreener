@@ -3,7 +3,9 @@ import {
     Box, Button, NumberInput,
     NumberInputField, NumberInputStepper,
     NumberIncrementStepper, NumberDecrementStepper,
-    Input, InputGroup, InputRightElement, InputLeftElement
+    Input, InputGroup, InputRightElement, InputLeftElement,
+    Menu, MenuButton, MenuList, MenuItem, MenuItemOption,
+    MenuGroup, MenuOptionGroup, MenuIcon, MenuCommand, MenuDivider
 } from '@chakra-ui/react';
 import { StockTableOne } from './StockTableOne';
 import { StockTableTwo } from './StockTableTwo';
@@ -14,6 +16,23 @@ const StockTable = props => {
     const [green, setGreen] = useState(false);
     const [red, setRed] = useState(true);
     const [priceChangeUp, setPriceChangeUp] = useState(false);
+
+    const [validInput, setValidInput] = useState(true);
+    const [display, setDisplay] = useState({ display: 'block' });
+
+    function searchDatabase(e) {
+
+        let input = e.target.id;
+        // Communicate with c# controller
+        
+        let result = 'null';
+        // If the input does not exist
+        if (result.equals('null'))
+            setValidInput(false);
+        else
+            setValidInput(true);
+
+    }
 
     setInterval(() => {
         window.location.reload();
@@ -114,7 +133,6 @@ const StockTable = props => {
                     <Button style={{ position: 'absolute', bottom: '0px', right: '90px' }}>Add to Alerts</Button>
                 </Box>
 
-
                 <Box
                     style={{ position: 'absolute', top: '400px', left: '60px' }}
                     bg='rgb(30,30,30)'
@@ -127,12 +145,32 @@ const StockTable = props => {
                     zIndex='999'
                     color='white'>
 
-                    <InputGroup>
-                        <Input style={{ position: 'absolute', top: '0px', right: '16.5px', height: '29px'}}
-                         placeholder="Search " />
-                        <InputRightElement children={<img id="searchIcon" />} />
-                    </InputGroup>
+                    <div class="stockTableTwoMenu">
+                        <div class="dropdown">
 
+                            <InputGroup>
+                                <Input
+                                    style={{
+                                        position: 'absolute', top: '0px',
+                                        right: '16.5px', height: '29px',
+                                        minWidth: '12.25rem'
+                                    }}
+
+                                    onInput={searchDatabase}
+                                    placeholder="Search "
+                                />
+
+                                <InputRightElement children={<img id="searchIcon" />} />
+                            </InputGroup>
+
+                            <div class="dropdown-content">
+                                <p style={{ color: 'black' }}>Hello World!</p>
+                            </div>
+
+                        </div>
+
+
+                    </div>
                     {stockTableTwoHeader}
 
                     <Box
@@ -167,13 +205,20 @@ const StockTable = props => {
                     color='white'
                     zIndex='999'>
 
+
+                    <InputGroup>
+                        <Input style={{ position: 'absolute', top: '0px', right: '16.5px', height: '29px' }}
+                            placeholder="Search " />
+                        <InputRightElement children={<img id="searchIcon" />} />
+                    </InputGroup>
+
                     {alertTableHeader}
 
                     <Box
                         style={{
                             position: 'absolute',
-                            overflowY: 'auto'
-
+                            overflowY: 'auto',
+                            top: '45px'
                         }}
 
                         overflowX='hidden'
