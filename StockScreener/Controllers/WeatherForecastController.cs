@@ -38,28 +38,36 @@ namespace StockScreener.Controllers
         {
             List<Database> stockList = user.readDatabase();
             List<String> list = new List<String>();
-            String char_ = "";
+            
+            string char_ = "";
+            int preCounter = 0;
 
-            for (int pointer = 1; pointer <= query.Length; pointer++)
+            for (int pointer = 0; pointer <= query.Length; pointer++)
             {
-                char_ += query.Substring(0, pointer);
+              
+                char_ += query.Substring(preCounter, pointer).ToLower();
+                 Console.WriteLine("char "  +char_);
 
                 for (int i = 0; i < stockList.Count; i++)
                 {
                     string name = stockList[i].Name.ToLower();
-
                     string trimmed = String.Concat(name.Where(c => !Char.IsWhiteSpace(c)));
+                    
+                   
 
-                    if (trimmed.Substring(0, pointer).Equals(char_))
+                    if (trimmed.Substring(preCounter, pointer).Equals(char_))
                     {
-                            //  Console.WriteLine(stockList[i].Code);
-                        if (!list.Contains(stockList[i].Name))
-                            list.Add(stockList[i].Name);
+                            //  
+                        if (!list.Contains(name)){
+                        //    Console.WriteLine(name);    
+
+                            list.Add(name);
+                        }
                     }
                 }
+
+                  preCounter++;
             }
-
-
 
             return list.ToArray();
         }

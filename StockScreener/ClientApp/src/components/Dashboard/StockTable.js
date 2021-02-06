@@ -24,12 +24,19 @@ const StockTable = props => {
 
         let input = new String(e.target.value);
         console.log(input)
-        // Communicate with c# controller
-        let response = await fetch('test/'.concat(input))
-         /*  .then(response => response.text())
-           .then(data =>
 
-            console.log(data));
+        // Communicate with c# controller
+        await fetch('test/'.concat(input))
+            .then(response => response.text())
+            .then(data =>
+
+                console.log(data)
+
+
+                
+
+
+                );
 
         // console.log("response "+response.message);
 
@@ -167,7 +174,6 @@ const StockTable = props => {
                                         minWidth: '12.25rem'
                                     }}
 
-
                                     onInput={searchDatabase}
                                     display={display}
                                     placeholder="Search "
@@ -181,8 +187,6 @@ const StockTable = props => {
                             </div>
 
                         </div>
-
-
                     </div>
                     {stockTableTwoHeader}
 
