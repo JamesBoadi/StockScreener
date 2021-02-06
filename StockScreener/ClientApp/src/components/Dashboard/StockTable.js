@@ -22,27 +22,16 @@ const StockTable = props => {
 
     async function searchDatabase(e) {
 
-        let input = e.target.id;
+        let input = new String(e.target.value);
+        console.log(input)
         // Communicate with c# controller
-
-
-        let response = await fetch('test', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'text/html;charset=utf-8'
-            },
-            body: "qe"
-            })
-            .then(response => response.text())
-            .then(data =>
-
-
+        let response = await fetch('test/'.concat(input))
+         /*  .then(response => response.text())
+           .then(data =>
 
             console.log(data));
 
-
         // console.log("response "+response.message);
-
 
         /*   let result = 'null';
            // If the input does not exist

@@ -33,8 +33,8 @@ namespace StockScreener.Controllers
 
 
         // Return stock names in order of subsequence
-        [Route("test")]   // Attribute route   
-        public String[] transmitData(String query)
+        [Route("test/{query?}")]   // Attribute route   
+        public String[] transmitData(string query)
         {
             List<Database> stockList = user.readDatabase();
             List<String> list = new List<String>();
@@ -46,17 +46,20 @@ namespace StockScreener.Controllers
 
                 for (int i = 0; i < stockList.Count; i++)
                 {
-                    Console.WriteLine(stockList[i].Code);
+                    string name = stockList[i].Name.ToLower();
 
-                    if (stockList[i].Name.Substring(0, pointer).Equals(char_))
+                    string trimmed = String.Concat(name.Where(c => !Char.IsWhiteSpace(c)));
+
+                    if (trimmed.Substring(0, pointer).Equals(char_))
                     {
+                            //  Console.WriteLine(stockList[i].Code);
                         if (!list.Contains(stockList[i].Name))
                             list.Add(stockList[i].Name);
                     }
                 }
             }
 
-            
+
 
             return list.ToArray();
         }
