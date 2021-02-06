@@ -7,6 +7,12 @@ using Microsoft.Extensions.Logging;
 using System.Configuration;
 using Microsoft.AspNetCore.Http;
 using System.Net.WebSockets;
+using System.IO;
+using CsvHelper;
+
+
+
+
 
 namespace StockScreener.Controllers
 {
@@ -18,18 +24,44 @@ namespace StockScreener.Controllers
         // At compile time
         private readonly ILogger<WeatherForecastController> _logger;
 
+        User user = new User();
+
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
         }
 
+
+        // Return stock names in order of subsequence
         [Route("test")]   // Attribute route   
-        public void transmitData(int id)
+        public String[] transmitData(String query)
         {
-            /*Stocks stocks = new Stocks();
-            byte[] bytearray = stocks.getRealTimePrices();
-            return bytearray;*/
+            List<Database> stockList = user.readDatabase();
+            List<String> list = new List<String>();
+            String char_ = "";
+
+            for (int pointer = 1; pointer <= query.Length; pointer++)
+            {
+                char_ += query.Substring(0, pointer);
+
+                for (int i = 0; i < stockList.Count; i++)
+                {
+                    Console.WriteLine(stockList[i].Code);
+
+                    if (stockList[i].Name.Substring(0, pointer).Equals(char_))
+                    {
+                        if (!list.Contains(stockList[i].Name))
+                            list.Add(stockList[i].Name);
+                    }
+                }
+            }
+
+            
+
+            return list.ToArray();
         }
+
+
 
 
         [HttpGet("{page}")] // Conventional route (For pages that do not exist)
@@ -57,12 +89,16 @@ namespace StockScreener.Controllers
          }*/
 
 
+        /*Stocks stocks = new Stocks();
+        byte[] bytearray = stocks.getRealTimePrices();
+        return bytearray;*/
+
 
         /* Cancellation token cancels the event if outside time zone (or if not connected, redirect to something went wrong) */
 
         public static async Task getRealTimePrices(HttpContext context, WebSocket webSocket)
         {
-          
+
             var buffer = new byte[1024 * 4];
 
             Console.WriteLine("May i did");

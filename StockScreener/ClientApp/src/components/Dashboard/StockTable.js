@@ -20,18 +20,40 @@ const StockTable = props => {
     const [validInput, setValidInput] = useState(true);
     const [display, setDisplay] = useState({ display: 'block' });
 
-    function searchDatabase(e) {
+    async function searchDatabase(e) {
 
         let input = e.target.id;
         // Communicate with c# controller
-        
-        let result = 'null';
-        // If the input does not exist
-        if (result.equals('null'))
-            setValidInput(false);
-        else
-            setValidInput(true);
 
+
+        let response = await fetch('test', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/html;charset=utf-8'
+            },
+            body: "qe"
+            })
+            .then(response => response.text())
+            .then(data =>
+
+
+
+            console.log(data));
+
+
+        // console.log("response "+response.message);
+
+
+        /*   let result = 'null';
+           // If the input does not exist
+           if (result.equals('null')) {
+               setValidInput(false);
+               setDisplay({ display: 'none' });
+           }
+           else {
+               setValidInput(true);
+               setDisplay({ display: 'block' });
+           }*/
     }
 
     setInterval(() => {
@@ -156,7 +178,9 @@ const StockTable = props => {
                                         minWidth: '12.25rem'
                                     }}
 
+
                                     onInput={searchDatabase}
+                                    display={display}
                                     placeholder="Search "
                                 />
 

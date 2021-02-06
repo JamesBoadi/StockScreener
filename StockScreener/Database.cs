@@ -10,7 +10,11 @@ namespace StockScreener // For the database
        public String Exchange {get; set;}
        public String Currency {get; set;}
        public String Type {get; set;}
+    
+      
+    
     }
+
 
 
 }

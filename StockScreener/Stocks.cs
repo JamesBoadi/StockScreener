@@ -167,8 +167,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     stock.Volume = pointer + 4;
                     stock.Request_Calls = pointer + 5;
 
-
-                    // 
                     if (Utility.Tick == 0)
                     {
                         stock.High_1 = 0;
