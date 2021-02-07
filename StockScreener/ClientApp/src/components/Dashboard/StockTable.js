@@ -20,24 +20,22 @@ const StockTable = props => {
     const [validInput, setValidInput] = useState(true);
     const [display, setDisplay] = useState({ display: 'block' });
 
+    const [query, setQuery] = useState([]);
+
+    // Communicate with c# controller https://stackoverflow.com/questions/46946380/fetch-api-request-timeout
     async function searchDatabase(e) {
 
         let input = new String(e.target.value);
-        console.log(input)
-
-        // Communicate with c# controller
-        await fetch('test/'.concat(input))
-            .then(response => response.text())
-            .then(data =>
-
-                console.log(data)
 
 
-                
-
-
+        if (!(!input || /^\s*$/.test(input))) {
+            await fetch('test/'.concat(input))
+                .then(response => response.text())
+                .then(data =>
+                    setQuery(data),
+                    console.log("true " + query)
                 );
-
+        }
         // console.log("response "+response.message);
 
         /*   let result = 'null';
@@ -52,29 +50,26 @@ const StockTable = props => {
            }*/
     }
 
+
     setInterval(() => {
         window.location.reload();
-    }, 23000);
+    }, 20000000);
+
+
+    function createRecords()
+    {
+        let linebreak = <br/>;
+        let string = "";
+
+        let id;
+        if(display)
+            for (id = 0; id < query.length; id++) 
+                string.concat(query[id] + linebreak);
+    }
 
 
 
-    let stockTableOneHeader = <table class="stockTableOneHeader" aria-labelledby="tabelLabel">
-        <thead>
-            <tr>
-                <th>Time</th>
-                <th>Stock Name</th>
-                <th>Detect Price</th>
-                <th>Last Price</th>
-                <th>Scalp Status</th>
-                <th>Vol Diff (x100)</th>
-                <th>Scalp Status</th>
-                <th>TP price</th>
-                <th>Alert Status</th>
-                <th>Catalyst</th>
-                <th>Sector</th>
-            </tr>
-        </thead>
-    </table>;
+   
 
     let stockTableTwoHeader = <table class="stockTableTwoHeader" aria-labelledby="tabelLabel">
         <thead>
@@ -174,6 +169,7 @@ const StockTable = props => {
                                         minWidth: '12.25rem'
                                     }}
 
+
                                     onInput={searchDatabase}
                                     display={display}
                                     placeholder="Search "
@@ -183,7 +179,21 @@ const StockTable = props => {
                             </InputGroup>
 
                             <div class="dropdown-content">
-                                <p style={{ color: 'black' }}>Hello World!</p>
+                                <Box
+                                    min-width='12.26rem'
+                                    width='12.266rem'
+                                    height='80px'
+                                    overflowY='auto'
+                                    bg='#f9f9f9'
+                                    top='0px'>
+
+                                    <p style={{ color: 'black' }}>
+                                        Hello World!<br/>
+                                        Hello World!<br/>l<br/>aww
+                                    </p>
+                                    
+                                </Box>
+
                             </div>
 
                         </div>

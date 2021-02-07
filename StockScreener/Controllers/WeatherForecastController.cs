@@ -38,42 +38,30 @@ namespace StockScreener.Controllers
         {
             List<Database> stockList = user.readDatabase();
             List<String> list = new List<String>();
-            
+
             string char_ = "";
-            int preCounter = 0;
+            char_ = query;
 
-            for (int pointer = 0; pointer <= query.Length; pointer++)
+            Console.WriteLine(char_);
+
+            for (int i = 0; i < stockList.Count; i++)
             {
-              
-                char_ += query.Substring(preCounter, pointer).ToLower();
-                 Console.WriteLine("char "  +char_);
-
-                for (int i = 0; i < stockList.Count; i++)
+                string name = stockList[i].Name.ToLower();
+                string trimmed = String.Concat(name.Where(c => !Char.IsWhiteSpace(c)));
+               // Console.WriteLine(trimmed.Substring(0,char_.Length));
+                if (trimmed.Substring(0,char_.Length).Equals(char_))
                 {
-                    string name = stockList[i].Name.ToLower();
-                    string trimmed = String.Concat(name.Where(c => !Char.IsWhiteSpace(c)));
-                    
-                   
-
-                    if (trimmed.Substring(preCounter, pointer).Equals(char_))
+                    if (!list.Contains(name))
                     {
-                            //  
-                        if (!list.Contains(name)){
-                        //    Console.WriteLine(name);    
+                         Console.WriteLine(name);
 
-                            list.Add(name);
-                        }
+                        list.Add(name);
                     }
                 }
-
-                  preCounter++;
             }
 
             return list.ToArray();
         }
-
-
-
 
         [HttpGet("{page}")] // Conventional route (For pages that do not exist)
         public ContentResult DummyOne(int page)
