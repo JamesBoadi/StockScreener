@@ -17,25 +17,33 @@ const StockTable = props => {
     const [red, setRed] = useState(true);
     const [priceChangeUp, setPriceChangeUp] = useState(false);
 
-    const [validInput, setValidInput] = useState(true);
-    const [display, setDisplay] = useState({ display: 'block' });
+    const [validInput, setValidInput] = useState(false);
+    const [display, setDisplay] = useState([]);
+    const [stockRecord , setStockRecord] = useState(-1);
 
-    const [query, setQuery] = useState([]);
+    const [query, setQuery] = useState({});
+
 
     // Communicate with c# controller https://stackoverflow.com/questions/46946380/fetch-api-request-timeout
     async function searchDatabase(e) {
-
         let input = new String(e.target.value);
 
+        if (input.length < 1)
+            setDisplay("No Stocks Found")
 
+        // Buggy, fix nulls
         if (!(!input || /^\s*$/.test(input))) {
             await fetch('test/'.concat(input))
                 .then(response => response.text())
                 .then(data =>
-                    setQuery(data),
-                    console.log("true " + query)
+                    setQuery(JSON.parse(data)),
+                    setValidInput(true),
+                    createRecords()
+                ).catch(error =>
+                    setValidInput(false)
                 );
         }
+
         // console.log("response "+response.message);
 
         /*   let result = 'null';
@@ -50,26 +58,47 @@ const StockTable = props => {
            }*/
     }
 
-
     setInterval(() => {
         window.location.reload();
     }, 20000000);
 
+    function selectRecords(e) {
+        var arr = query.StockCode;
+        var id = new String(e.target.id);
 
-    function createRecords()
-    {
-        let linebreak = <br/>;
-        let string = "";
+        var style = {};
 
-        let id;
-        if(display)
-            for (id = 0; id < query.length; id++) 
-                string.concat(query[id] + linebreak);
+        
+        
+    
+       // setStockRecord(id);
     }
 
+    function createRecords() {
+        let string = [];
+        let arr = query.StockCode;
 
+        if (arr !== undefined && validInput) {
+            let id;
+            for (id = 0; id < arr.length; id++) {
+               // console.log(arr[id])
+                let s = arr[id].toString();
+                string.push(
+                    <div 
+                    id={id}
+                    class="record"
+                    onClick={selectRecords}>
+                        {s}
+                        <br />
+                    </div>
+                );
+            }
+        }
+        else
+            string.push("No Stocks Found");
 
-   
+        setDisplay(string);
+    }
 
     let stockTableTwoHeader = <table class="stockTableTwoHeader" aria-labelledby="tabelLabel">
         <thead>
@@ -85,7 +114,6 @@ const StockTable = props => {
             </tr>
         </thead>
     </table>;
-
 
     let alertTableHeader = <table class="alertTableHeader" aria-labelledby="tabelLabel">
         <thead>
@@ -169,9 +197,8 @@ const StockTable = props => {
                                         minWidth: '12.25rem'
                                     }}
 
-
                                     onInput={searchDatabase}
-                                    display={display}
+                                    //   display={display}
                                     placeholder="Search "
                                 />
 
@@ -180,22 +207,18 @@ const StockTable = props => {
 
                             <div class="dropdown-content">
                                 <Box
-                                    min-width='12.26rem'
-                                    width='12.266rem'
+                                    min-width='17.26rem'
+                                    width='17.26rem'
                                     height='80px'
                                     overflowY='auto'
                                     bg='#f9f9f9'
                                     top='0px'>
 
                                     <p style={{ color: 'black' }}>
-                                        Hello World!<br/>
-                                        Hello World!<br/>l<br/>aww
+                                        {display}
                                     </p>
-                                    
                                 </Box>
-
                             </div>
-
                         </div>
                     </div>
                     {stockTableTwoHeader}
@@ -216,7 +239,7 @@ const StockTable = props => {
                         color='white'
                         zIndex='-999'>
 
-                        <StockTableTwo />
+                        <StockTableTwo findRecord={() => { return this.state.isStreaming }}/>
                     </Box>
                 </Box>
 

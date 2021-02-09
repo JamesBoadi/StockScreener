@@ -12,14 +12,12 @@ export class StockTableTwo extends Component {
         this.selectCell = this.selectCell.bind(this);
         this.addRow = this.addRow.bind(this);
         this.updateTable = this.updateTable.bind(this);
-
-
+        
         let style = { color: "white;" }
         this.state = {
             table: [],
             tableTwo: [],
             count: 0,
-            
             numberOfClicks: []
         };
     }

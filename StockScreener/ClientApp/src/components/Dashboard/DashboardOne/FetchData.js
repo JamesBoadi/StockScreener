@@ -259,9 +259,7 @@ export class FetchData extends Component {
           isStreaming={() => { return this.state.isStreaming }}
           Data={() => { return this.state.data[1] }}
         />
-
-
-
+        
       </div>
     );
   }

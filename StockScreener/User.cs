@@ -15,6 +15,8 @@ namespace StockScreener // For the database
     public class User
     {
 
+        public String[] StockCode { get; set; }
+
         /*
 
         public User(String name, String password) {

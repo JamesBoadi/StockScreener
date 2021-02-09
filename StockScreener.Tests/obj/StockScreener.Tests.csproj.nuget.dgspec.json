@@ -124,6 +124,10 @@
               "target": "Package",
               "version": "[18.0.0, )"
             },
+            "Microsoft.AspNet.WebPages": {
+              "target": "Package",
+              "version": "[3.2.6, )"
+            },
             "Microsoft.AspNetCore.Authentication.Certificate": {
               "target": "Package",
               "version": "[5.0.1, )"

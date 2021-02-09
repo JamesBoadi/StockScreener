@@ -216,3 +216,9 @@ c:\Users\Peek\Music\StockScreener\StockScreener\StockScreener.Tests\obj\Debug\ne
 c:\Users\Peek\Music\StockScreener\StockScreener\StockScreener.Tests\obj\Debug\net5.0\StockScreener.Tests.dll
 c:\Users\Peek\Music\StockScreener\StockScreener\StockScreener.Tests\obj\Debug\net5.0\ref\StockScreener.Tests.dll
 c:\Users\Peek\Music\StockScreener\StockScreener\StockScreener.Tests\obj\Debug\net5.0\StockScreener.Tests.pdb
+c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.Web.Razor.dll
+c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.Web.Helpers.dll
+c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.Web.WebPages.Deployment.dll
+c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.Web.WebPages.Razor.dll
+c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.Web.WebPages.dll
+c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.Web.Infrastructure.dll

@@ -9,8 +9,12 @@ using Microsoft.AspNetCore.Http;
 using System.Net.WebSockets;
 using System.IO;
 using CsvHelper;
+using System.Text.Json;
+using Newtonsoft.Json.Linq;
+using System.Net.Http;
 
 
+using System.Web.Helpers;
 
 
 
@@ -31,36 +35,39 @@ namespace StockScreener.Controllers
             _logger = logger;
         }
 
-
         // Return stock names in order of subsequence
-        [Route("test/{query?}")]   // Attribute route   
-        public String[] transmitData(string query)
+        [Route("test/{query?}")]   // Attribute route   HttpResponseMessage 
+        public string transmitData(string query) // convert to json
         {
+            User user = new User();
+
             List<Database> stockList = user.readDatabase();
             List<String> list = new List<String>();
+            string res = "";
 
-            string char_ = "";
-            char_ = query;
-
-            Console.WriteLine(char_);
+            Console.WriteLine(query);
 
             for (int i = 0; i < stockList.Count; i++)
             {
                 string name = stockList[i].Name.ToLower();
-                string trimmed = String.Concat(name.Where(c => !Char.IsWhiteSpace(c)));
-               // Console.WriteLine(trimmed.Substring(0,char_.Length));
-                if (trimmed.Substring(0,char_.Length).Equals(char_))
+                string trimmed = String.Concat(
+
+                name.Where(c => !Char.IsWhiteSpace(c))
+                    //.Where(c => !Char.IsLetter('-') || !Char.IsLetter('&'))
+                );
+
+                 Console.WriteLine(trimmed);
+                if (trimmed.Contains(query))
                 {
                     if (!list.Contains(name))
-                    {
-                         Console.WriteLine(name);
-
                         list.Add(name);
-                    }
                 }
             }
 
-            return list.ToArray();
+            user.StockCode = list.ToArray();
+            string data = JsonSerializer.Serialize(user);
+
+            return data;
         }
 
         [HttpGet("{page}")] // Conventional route (For pages that do not exist)
@@ -91,6 +98,14 @@ namespace StockScreener.Controllers
         /*Stocks stocks = new Stocks();
         byte[] bytearray = stocks.getRealTimePrices();
         return bytearray;*/
+
+
+        /*
+            HttpRequestMessage requestMessage = new HttpRequestMessage();
+            requestMessage.Content = new StringContent(res, UTF8Encoding.UTF8);
+            requestMessage.RequestUri = new Uri("https://localhost:44362/test/" + query);
+            HttpClient httpClient = new HttpClient();
+            await httpClient.SendAsync(requestMessage);*/
 
 
         /* Cancellation token cancels the event if outside time zone (or if not connected, redirect to something went wrong) */
