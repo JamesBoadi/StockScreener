@@ -44,8 +44,7 @@ export class StockTable extends Component {
         let input = new String(e.target.value);
 
         if (input.length < 1) {
-            this.setState({ display: "No Stocks Found" })
-
+            this.setState({ display: "No Stocks Found" });
         }
         // Buggy, fix nulls
         if (!(!input || /^\s*$/.test(input))) {
@@ -53,7 +52,7 @@ export class StockTable extends Component {
                 .then(response => response.text())
                 .then(data =>
                     this.setState({ query: JSON.parse(data) }),
-                   
+
                     this.searchRecords()
                 ).catch(error =>
                     console.log("error " + error),
@@ -66,10 +65,9 @@ export class StockTable extends Component {
         }
     }
 
-    componentDidUpdate() 
-    {
+    componentDidUpdate() {
         if (this.state.validInput === true) {
-            this.textInput.current.scrollTop = 800;
+            this.textInput.current.scrollTop = this.scrollBy();
             this.setState({ validInput: false })
         }
     }
@@ -84,7 +82,7 @@ export class StockTable extends Component {
     selectRecords(e) {
         var id = new Number(e.target.id);
         this.setState({ stockRecord: id });
-        this.setState({ validInput: true });   
+        this.setState({ validInput: true });
     }
 
     // create searchable records from dropdown list
@@ -111,7 +109,7 @@ export class StockTable extends Component {
                 );
             }
         }
-        else{
+        else {
             string.push("No Stocks Found");
             this.setState({ validInput: false });
         }
@@ -122,14 +120,16 @@ export class StockTable extends Component {
     // Units to scroll by to find record in search stocks
     scrollBy() {
         const height = 800;
-        const scroll = 30;
+        const scroll = 33;
 
-        let count = 0;
-        let heightUnits = (height / scroll);
-        let scrollHeight = this.props.id / scroll;
+        const stockRecord = this.state.stockRecord;
 
-        count = scrollHeight * heightUnits;
-      
+        console.log(stockRecord)
+
+        let heightUnits = (stockRecord / scroll);
+
+        let count = height * heightUnits;
+
         return count;
     }
 

@@ -12,7 +12,7 @@ export class StockTableTwo extends Component {
         this.selectCell = this.selectCell.bind(this);
         this.addRow = this.addRow.bind(this);
         this.updateTable = this.updateTable.bind(this);
-        this.scrollBy = this.scrollBy.bind(this);
+        this.highlightRow = this.highlightRow.bind(this);
 
         let style = { color: "white;" }
         this.state = {
@@ -71,9 +71,8 @@ export class StockTableTwo extends Component {
         var style = {};
 
         //        this.setState({ numberOfClicks: this.state.numberOfClicks + 1 });
-
         let id;
-        for (id = 0; id < 305; id++) {
+        for (id = 0; id < 897; id++) {
             if (id == target)
                 style = { backgroundColor: "rgb(0,11,34)" };
             else
@@ -103,7 +102,7 @@ export class StockTableTwo extends Component {
     addRow() {
         let id;
         let mod = 0;
-        for (id = 0; id < 305; id++) {
+        for (id = 0; id < 897; id++) {
             this.state.table.push(
                 <tbody>
                     <tr key={id}     >
@@ -123,26 +122,47 @@ export class StockTableTwo extends Component {
         }
     }
 
-    scrollBy() {
-        const height = 800;
-        const scroll = 30;
+    highlightRow() {
+        var table = [];
+        var target = this.props.id;
+        var style = {};
 
-        let count = 0;
-        let heightUnits = (height / scroll);
-        let scrollHeight = this.props.id / scroll;
-   
-        count = scrollHeight * heightUnits; 
-        console.log("fight " + this.props.id + " " + count);
+        let id;
+        for (id = 0; id < 897; id++) {
+            if (id == target)
+                style = { backgroundColor: "rgb(0,11,34)" };
+            else
+                style = {}
 
-        window.scrollBy(0, count);
+            table.push(
+                <tbody>
+                    <tr key={id} style={style}>
+                        {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
+                        <td id={id} onClick={this.selectCell}>400</td>
+                        <td id={id} onClick={this.selectCell}>4</td>
+                        <td id={id} onClick={this.selectCell}>5</td>
+                        <td id={id} onClick={this.selectCell}>6</td>
+                        <td id={id} onClick={this.selectCell}>4</td>
+                        <td id={id} onClick={this.selectCell}>4</td>
+                        <td id={id} onClick={this.selectCell}>5</td>
+                        <td id={id} onClick={this.selectCell}>6</td>
+                    </tr>
+                </tbody>
+            )
+        }
 
-
+        this.setState({ table: table });
+        this.setState({ count: 1 });
     }
+
+
+
+
 
     render() {
         // Scroll to position of record
-      /*  if (this.props.findRecord)
-            this.scrollBy()*/
+      if (this.props.findRecord)
+            this.highlightRow();
 
         return (
             <div>
