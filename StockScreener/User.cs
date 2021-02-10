@@ -15,17 +15,19 @@ namespace StockScreener // For the database
     public class User
     {
 
-        public String[] StockCode { get; set; }
+      
+
+        public int id {get; set;}
+
+        public String value {get; set;}
+
 
         /*
-
         public User(String name, String password) {
-
-
         }*/
 
         
-        public  List<Database> readDatabase()
+        public List<Database> readDatabase()
         {
             Database Record = new Database();
             List<Database> stockList = new List<Database>();

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import { sendRequest } from '@microsoft/signalr/dist/esm/Utils';
-import StockTable from '../StockTable';
+import { StockTable } from '../StockTable';
 import { DashboardNavbar } from '../DashboardNavbar';
 import { NavBarData } from '../NavbarData.js';
 import { SideBar } from '../SideBar';
@@ -218,7 +218,7 @@ export class FetchData extends Component {
 
     this.readNavBarData(0);
 
-   
+
 
     //  FetchData.sendRequest("I have a message", "of glory");
 
@@ -259,7 +259,7 @@ export class FetchData extends Component {
           isStreaming={() => { return this.state.isStreaming }}
           Data={() => { return this.state.data[1] }}
         />
-        
+
       </div>
     );
   }

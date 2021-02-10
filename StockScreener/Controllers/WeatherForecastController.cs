@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Collections.Specialized;
 using System.Configuration;
 using Microsoft.AspNetCore.Http;
 using System.Net.WebSockets;
@@ -12,11 +14,9 @@ using CsvHelper;
 using System.Text.Json;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
-
-
 using System.Web.Helpers;
 
-
+// https://stackoverflow.com/questions/54815199/newtonsoft-json-serialize-deserialize-nested-property
 
 namespace StockScreener.Controllers
 {
@@ -40,12 +40,10 @@ namespace StockScreener.Controllers
         public string transmitData(string query) // convert to json
         {
             User user = new User();
-
+            StockCode stockCode = new StockCode();
             List<Database> stockList = user.readDatabase();
             List<String> list = new List<String>();
-            string res = "";
-
-            Console.WriteLine(query);
+            OrderedDictionary dict = new OrderedDictionary();
 
             for (int i = 0; i < stockList.Count; i++)
             {
@@ -53,19 +51,50 @@ namespace StockScreener.Controllers
                 string trimmed = String.Concat(
 
                 name.Where(c => !Char.IsWhiteSpace(c))
-                    //.Where(c => !Char.IsLetter('-') || !Char.IsLetter('&'))
+                //.Where(c => !Char.IsLetter('-') || !Char.IsLetter('&'))
                 );
 
-                 Console.WriteLine(trimmed);
+                // Console.WriteLine(trimmed);
+
                 if (trimmed.Contains(query))
                 {
                     if (!list.Contains(name))
+                    {
                         list.Add(name);
+                        dict.Add(i, name);
+                    }
                 }
             }
 
-            user.StockCode = list.ToArray();
-            string data = JsonSerializer.Serialize(user);
+            /*  object[] json = new object[list.Count];
+              /* Format
+
+                 array = [ {id, array}....
+                 ]
+              */
+            int pointer = 0;
+            string res = "";
+            string[] arr = new string[dict.Count];
+
+            foreach (DictionaryEntry de in dict)
+            {
+                res += ((int)de.Key).ToString();
+                res += ",";
+                res += (string)de.Value;
+
+                arr[pointer] = res;
+                res = "";
+                pointer++;
+            }
+
+            Console.WriteLine("Get Away ");
+
+            stockCode.stockCode = arr;
+            string data = JsonSerializer.Serialize(stockCode);
+
+
+
+
 
             return data;
         }

@@ -12,7 +12,8 @@ export class StockTableTwo extends Component {
         this.selectCell = this.selectCell.bind(this);
         this.addRow = this.addRow.bind(this);
         this.updateTable = this.updateTable.bind(this);
-        
+        this.scrollBy = this.scrollBy.bind(this);
+
         let style = { color: "white;" }
         this.state = {
             table: [],
@@ -32,15 +33,15 @@ export class StockTableTwo extends Component {
 
                         <tbody>
                             <tr>
-                                <td>4</td>
-                                <td>4</td>
-                                <td>4</td>
                                 <td>1</td>
+                                <td>2</td>
+                                <td>3</td>
+                                <td>4</td>
 
-                                <td>4</td>
-                                <td>4</td>
-                                <td>4</td>
-                                <td>1</td>
+                                <td>5</td>
+                                <td>6</td>
+                                <td>7</td>
+                                <td>8</td>
                             </tr>
                         </tbody>
                         {this.state.table}
@@ -69,7 +70,7 @@ export class StockTableTwo extends Component {
         var target = new Number(e.target.id);
         var style = {};
 
-//        this.setState({ numberOfClicks: this.state.numberOfClicks + 1 });
+        //        this.setState({ numberOfClicks: this.state.numberOfClicks + 1 });
 
         let id;
         for (id = 0; id < 305; id++) {
@@ -101,36 +102,52 @@ export class StockTableTwo extends Component {
 
     addRow() {
         let id;
+        let mod = 0;
         for (id = 0; id < 305; id++) {
             this.state.table.push(
                 <tbody>
                     <tr key={id}     >
                         {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
-                       
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
-                        <td id={id} onClick={this.selectCell}>3</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
                     </tr>
                 </tbody>
             )
         }
+    }
+
+    scrollBy() {
+        const height = 800;
+        const scroll = 30;
+
+        let count = 0;
+        let heightUnits = (height / scroll);
+        let scrollHeight = this.props.id / scroll;
+   
+        count = scrollHeight * heightUnits; 
+        console.log("fight " + this.props.id + " " + count);
+
+        window.scrollBy(0, count);
 
 
     }
 
     render() {
+        // Scroll to position of record
+      /*  if (this.props.findRecord)
+            this.scrollBy()*/
+
         return (
             <div>
                 {this.state.tableTwo}
             </div>
-
-
         );
     }
-
 }
