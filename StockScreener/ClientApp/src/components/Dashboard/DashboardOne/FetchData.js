@@ -1,20 +1,17 @@
 import React, { Component } from 'react';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import { sendRequest } from '@microsoft/signalr/dist/esm/Utils';
+
 import { StockTable } from '../StockTable';
 import { DashboardNavbar } from '../DashboardNavbar';
 import { NavBarData } from '../NavbarData.js';
+import { TopNavbar } from '../TopNavbar.js';
+
 import { SideBar } from '../SideBar';
 import { Box } from '@chakra-ui/react';
+import { DashboardSettings } from '../DashboardSettings';
 import Nav from 'reactstrap/lib/Nav';
 import { StockTableTwo } from '../StockTableTwo';
-
-
-/*
-const connection = new HubConnectionBuilder()
-  .withUrl('https://localhost:44362/requestData')
-  .withAutomaticReconnect()
-  .build(); */
 
 // Fetch data for dash board one
 export class FetchData extends Component {
@@ -56,6 +53,12 @@ export class FetchData extends Component {
       ]
     };
   }
+
+  /*
+const connection = new HubConnectionBuilder()
+  .withUrl('https://localhost:44362/requestData')
+  .withAutomaticReconnect()
+  .build(); */
 
   readNavBarData = (num) => {
     var NavBar = NavBarData.navBar;
@@ -215,10 +218,7 @@ export class FetchData extends Component {
 
 
   render() {
-
     this.readNavBarData(0);
-
-
 
     //  FetchData.sendRequest("I have a message", "of glory");
 
@@ -247,19 +247,23 @@ export class FetchData extends Component {
     return (
 
       <div>
-        <SideBar
+        {/* <SideBar
           isStreaming={() => { return this.state.isStreaming }}
-        />
+       /> */}
+
+        <TopNavbar
+         Data={this.state.data}
+         />
 
         <DashboardNavbar
           Data={this.state.data}
         />
 
-        <StockTable
+      {  <StockTable
           isStreaming={() => { return this.state.isStreaming }}
           Data={() => { return this.state.data[1] }}
-        />
-
+      /> }
+        
       </div>
     );
   }

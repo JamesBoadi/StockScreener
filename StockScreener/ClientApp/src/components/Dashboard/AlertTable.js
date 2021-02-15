@@ -53,6 +53,20 @@ export class AlertTable extends Component {
         }
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (this.state.count === 1) {
+            this.updateTable();
+            this.setState({ count: 0 });
+            return true;
+        }
+        if (this.props.findRecord) {
+            this.highlightRow();
+            return true;
+        }
+
+        return false;
+    }
+
     componentDidMount() {
         this.addRow();
         this.updateTable();
@@ -64,11 +78,9 @@ export class AlertTable extends Component {
         var style = {};
         
         // this.setState({ numberOfClicks: this.state.numberOfClicks + 1 })
-
         
-
         let id;
-        for (id = 0; id < 305; id++) {
+        for (id = 0; id < 30; id++) {
             if (id == target)
                 style = { backgroundColor: "rgb(0,11,34)" };
             else

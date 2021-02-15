@@ -8,8 +8,9 @@
   /**************** App ******************/
   /***************************************/
 
-  @media screen and (max-width: 600px) {
-    #tableContainer
+
+  /*
+   #tableContainer
     {
       position: absolute;
       display: block;
@@ -20,10 +21,35 @@
       float: right;
     }
 
+ #tableContainer
+    {
+      position: absolute;
+      display: flex;
+      margin-top: 50%;
+      margin-bottom: 50%;
+      margin-right: 50%;
+      margin-left: 50%;
+      justify-content: center;
+    }
+
+     .grid-container {
+    display: grid;
+    margin-left:auto;
+    margin-right:auto;
+    width: 100%;
+    
+  }
+
+  */
+
+  @media screen and (max-width: 600px) { /* min width */
+   
+
 
   }
 
   @media screen and (max-width: 320px) { 
+    
     .side-bar 
     {
       min-height: 100%;
@@ -52,28 +78,13 @@
       */
    
     }
-    #tableContainer
-    {
-      position: absolute;
-      display: flex;
-      margin-top: 50%;
-      margin-bottom: 50%;
-      margin-right: 50%;
-      margin-left: 50%;
-      justify-content: center;
-    }
+   
 
   
   }
 
   
-  .grid-container {
-    display: grid;
-    margin-left:auto;
-    margin-right:auto;
-    width: 100%;
-    
-  }
+ 
   
  .DashboardOneClass {
     background-size: cover;
@@ -131,13 +142,13 @@
   #tableContainer
   {
     position: absolute;
-    display: block;
-   
-    margin-top: '0px';
-    margin-bottom: '0px';
-    margin-right: '0px';
-    margin-left: '0px';
     float: none;
+    top: 150px;
+
+
+
+
+
   }
 
   
@@ -383,6 +394,20 @@
     top: 30px;
   }
 
+/************** TopNavbar ********************/
+/*********************************************/
+
+  #stockScreener
+  {
+    position: absolute;
+    font-weight: lighter;
+    font-family: 'sans-serif';  
+    left: 60px;
+    
+  }
+
+
+
   .side-bar 
   {
     min-height: 100%;
@@ -609,6 +634,13 @@
 
 
   @media screen and (max-width: 800px) { 
+    #tableContainer
+    {
+      position: absolute;
+      display: flex;
+      left: 0;
+    }
+
     .side-bar 
     {
       min-height: 100%;

@@ -1,5 +1,5 @@
-
 import React, { Component } from 'react';
+import { createTableMultiSort, Column, Table } from 'react-virtualized';
 import ReactDOM from 'react-dom';
 import { render } from 'react-dom';
 import { FetchData } from './DashboardOne/FetchData';
@@ -10,100 +10,120 @@ export class StockTableTwo extends Component {
     constructor(props) {
         super(props);
         this.selectCell = this.selectCell.bind(this);
-        this.addRow = this.addRow.bind(this);
+        this.createTable = this.createTable.bind(this);
         this.updateTable = this.updateTable.bind(this);
         this.highlightRow = this.highlightRow.bind(this);
 
-        let style = { color: "white;" }
+        this.scrollPosition = this.scrollPosition.bind(this);
+
+
         this.state = {
-            table: [],
-            tableTwo: [],
-            count: 0,
+            stack: [], // Render 100 elements per scroll
+            count: 1,
             numberOfClicks: []
         };
     }
 
     updateTable() {
-        let t = <div>
-            <div id="table-wrapper">
-                <div id="table-scroll">
-                    <table class="stockTableTwo" aria-labelledby="tabelLabel">
-                        <thead>
-                        </thead>
-
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>2</td>
-                                <td>3</td>
-                                <td>4</td>
-
-                                <td>5</td>
-                                <td>6</td>
-                                <td>7</td>
-                                <td>8</td>
-                            </tr>
-                        </tbody>
-                        {this.state.table}
-                    </table>
-                </div>
-            </div>
-        </div>;
-
-        this.setState({ tableTwo: t });
-    }
-
-    componentDidUpdate() {
-        if (this.state.count === 1) {
-            this.updateTable();
-            this.setState({ count: 0 });
-        }
-    }
-
-    componentDidMount() {
-        this.addRow();
-        this.updateTable();
-    }
-
-    selectCell(e) {
-        var table = [];
         var target = new Number(e.target.id);
         var style = {};
 
-        //        this.setState({ numberOfClicks: this.state.numberOfClicks + 1 });
+        let mod = 0;
         let id;
-        for (id = 0; id < 897; id++) {
-            if (id == target)
+        let end = (this.props.stockRecord < 797) ?
+            this.props.stockRecord + 100 : 897;
+
+        for (id = this.props.stockRecord; id < end; id++) {
+            if (id == target) {
                 style = { backgroundColor: "rgb(0,11,34)" };
-            else
-                style = {}
 
-            table.push(
-                <tbody>
-                    <tr key={id} style={style}>
-                        {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
-                        <td id={id} onClick={this.selectCell}>400</td>
-                        <td id={id} onClick={this.selectCell}>4</td>
-                        <td id={id} onClick={this.selectCell}>5</td>
-                        <td id={id} onClick={this.selectCell}>6</td>
-                        <td id={id} onClick={this.selectCell}>4</td>
-                        <td id={id} onClick={this.selectCell}>4</td>
-                        <td id={id} onClick={this.selectCell}>5</td>
-                        <td id={id} onClick={this.selectCell}>6</td>
-                    </tr>
-                </tbody>
-            )
+                this.state.stack[id] =
+                    <tbody>
+                        <tr key={id} style={style}>
+                            {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
+                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+
+                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        </tr>
+                    </tbody>
+
+                break;
+            }
         }
-
-        this.setState({ table: table });
-        this.setState({ count: 1 });
     }
 
-    addRow() {
+
+    /*
+        shouldComponentUpdate(nextProps, nextState) {
+    
+            /*if (this.state.count === 1) {
+                this.updateTable();
+                this.setState({ count: 0 });
+                return true;
+    
+    
+            }
+            if (this.props.findRecord) {
+                this.highlightRow();
+                return true;
+            }
+    
+            if (this.state.stack !== nextState.stack) {
+                this.updateTable();
+                this.setState({ count: 1 });
+                return true;
+    
+    
+            }
+            return false;
+        }*/
+
+    selectCell(e) {
+        var target = new Number(e.target.id);
+        var style = {};
+
+        let mod = 0;
+        let id;
+        for (id = 0; id < 50; id++) {
+            if (id == target) {
+                style = { backgroundColor: "rgb(0,11,34)" };
+
+                this.state.stack[id] =
+                    <tbody>
+                        <tr key={id} style={style}>
+                            {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
+                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+
+                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        </tr>
+                    </tbody>
+
+                break;
+            }
+        }
+
+        console.log("All that coffee")
+        this.updateTable();
+    }
+
+    createTable() {
         let id;
         let mod = 0;
-        for (id = 0; id < 897; id++) {
-            this.state.table.push(
+
+        for (id = 0; id < 50; id++) {
+            this.state.stack.push(
                 <tbody>
                     <tr key={id}     >
                         {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
@@ -120,53 +140,122 @@ export class StockTableTwo extends Component {
                 </tbody>
             )
         }
+        //  this.updateTable(); 
+    }
+
+    addRow() {
+        let id;
+        let mod = 0;
+
+        for (id = 0; id < 800; id++) {
+            this.state.stack.push(
+                <tbody>
+                    <tr key={id}     >
+                        {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                    </tr>
+                </tbody>
+            )
+        }
+        //  this.updateTable(); 
     }
 
     highlightRow() {
-        var table = [];
         var target = this.props.id;
         var style = {};
 
         let id;
+        let mod = 0;
         for (id = 0; id < 897; id++) {
             if (id == target)
                 style = { backgroundColor: "rgb(0,11,34)" };
             else
                 style = {}
 
-            table.push(
+            this.state.stack[id] =
                 <tbody>
                     <tr key={id} style={style}>
                         {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
-                        <td id={id} onClick={this.selectCell}>400</td>
-                        <td id={id} onClick={this.selectCell}>4</td>
-                        <td id={id} onClick={this.selectCell}>5</td>
-                        <td id={id} onClick={this.selectCell}>6</td>
-                        <td id={id} onClick={this.selectCell}>4</td>
-                        <td id={id} onClick={this.selectCell}>4</td>
-                        <td id={id} onClick={this.selectCell}>5</td>
-                        <td id={id} onClick={this.selectCell}>6</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
                     </tr>
-                </tbody>
-            )
+                </tbody>;
+            break;
         }
-
-        this.setState({ table: table });
-        this.setState({ count: 1 });
     }
 
 
+    /*  shouldComponentUpdate() {
+  
+          if (this.state.count === 1) {
+              this.createTable();
+              this.updateTable();
+              this.setState({ count: 0 })
+              return true;
+          }
+  
+          return false;
+  
+           {this.createTable()}
+                  {this.updateTable()}
+      }*/
 
+    /*   componentDidMount() {
+           this.createTable();
+       }*/
 
 
     render() {
         // Scroll to position of record
-      if (this.props.findRecord)
-            this.highlightRow();
+
+        let t = <div>
+            <div id="stack-wrapper">
+                <div id="stack-scroll">
+                    <table class="stockTableTwo" aria-labelledby="tabelLabel">
+                        <thead>
+                            <tr>
+                                <th>1</th>
+                                <th>1</th>
+                                <th>1</th>
+                                <th>1</th>
+
+                                <th>1</th>
+                                <th>1</th>
+                                <th>1</th>
+                                <th>1</th>
+
+                            </tr>
+                        </thead>
+
+                        {this.state.stack}
+                    </table>
+                </div>
+            </div>
+        </div>;
+
+
 
         return (
             <div>
-                {this.state.tableTwo}
+                {this.createTable()}
+                {
+                    t
+                }
+
             </div>
         );
     }

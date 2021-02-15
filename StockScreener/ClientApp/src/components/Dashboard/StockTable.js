@@ -10,6 +10,7 @@ import {
 import { StockTableOne } from './StockTableOne';
 import { StockTableTwo } from './StockTableTwo';
 import { AlertTable } from './AlertTable';
+import { ConsoleLogger } from '@microsoft/signalr/dist/esm/Utils';
 
 // https://packagecontrol.io/packages/CSS%20Format
 export class StockTable extends Component {
@@ -20,6 +21,7 @@ export class StockTable extends Component {
         this.selectRecords = this.selectRecords.bind(this);
         this.searchRecords = this.searchRecords.bind(this);
         this.scrollBy = this.scrollBy.bind(this);
+        this.scrollPosition = this.scrollPosition.bind(this);
         this.textInput = React.createRef();
 
         let style = { color: "white;" };
@@ -65,6 +67,22 @@ export class StockTable extends Component {
         }
     }
 
+    scrollPosition()
+    {
+        return this.textInput.current.scrollTop;
+    }
+
+    shouldComponentUpdate(nextProps) { 
+        if (nextProps.value !== this.props.value) { 
+          
+            return true; 
+        
+        } else { 
+          return false; 
+        } 
+      } 
+  
+    // Scroll to the position in the table
     componentDidUpdate() {
         if (this.state.validInput === true) {
             this.textInput.current.scrollTop = this.scrollBy();
@@ -120,11 +138,11 @@ export class StockTable extends Component {
     // Units to scroll by to find record in search stocks
     scrollBy() {
         const height = 800;
-        const scroll = 33;
+        const scroll = 34;
 
         const stockRecord = this.state.stockRecord;
 
-        console.log(stockRecord)
+        console.log(stockRecord);
 
         let heightUnits = (stockRecord / scroll);
 
@@ -132,6 +150,8 @@ export class StockTable extends Component {
 
         return count;
     }
+
+
 
     render() {
         let stockTableTwoHeader = <table class="stockTableTwoHeader" aria-labelledby="tabelLabel">
@@ -164,8 +184,9 @@ export class StockTable extends Component {
         return (
             <div>
                 <div id="tableContainer">
+                    {/* STOCK DISPLAY */}
                     <Box
-                        style={{ position: 'absolute', top: '85px', left: '60px' }}
+                        style={{ position: 'absolute', top: '130px', left: '60px' }}
                         bg='rgb(40,40,40)'
                         boxShadow='sm'
                         height='305px'
@@ -210,14 +231,9 @@ export class StockTable extends Component {
                         <Button style={{ position: 'absolute', bottom: '0px', right: '90px' }}>Add to Alerts</Button>
                     </Box>
 
-
-
+                    {/* STOCK TABLE TWO */}
                     <Box
-                        style={{ position: 'absolute', top: '400px', left: '60px' }}
-
-
-
-
+                        style={{ position: 'absolute', top: '450px', left: '60px' }}
                         bg='rgb(30,30,30)'
                         boxShadow='sm'
                         textAlign='center'
@@ -272,10 +288,9 @@ export class StockTable extends Component {
                                 top: '45px'
                             }}
 
+                            onScroll={this.scroll}
+
                             ref={this.textInput}
-
-
-
                             overflowX='hidden'
                             bg='rgb(30,30,30)'
                             boxShadow='sm'
@@ -286,18 +301,17 @@ export class StockTable extends Component {
                             color='white'
                             zIndex='-999'>
 
-                            <StockTableTwo findRecord={this.state.validInput}
+                            <StockTableTwo 
+                                scrollPosition={this.scrollBy()}
+                                findRecord={this.state.validInput}
                                 id={this.state.stockRecord}
                             />
-
-
                         </Box>
-
                     </Box>
 
-
+                    {/* ALERT TABLE */}
                     <Box
-                        style={{ position: 'absolute', top: '85px', left: '1070px' }}
+                        style={{ position: 'absolute', top: '125px', left: '1070px' }}
                         //     bg='rgb(30,30,30)'
                         boxShadow='sm'
                         textAlign='center'
@@ -307,7 +321,6 @@ export class StockTable extends Component {
                         margin='auto'
                         color='white'
                         zIndex='999'>
-
 
                         <InputGroup>
                             <Input style={{ position: 'absolute', top: '0px', right: '16.5px', height: '29px' }}
@@ -336,7 +349,6 @@ export class StockTable extends Component {
                             zIndex='-999'>
 
                             <AlertTable />
-
                         </Box>
                     </Box>
 

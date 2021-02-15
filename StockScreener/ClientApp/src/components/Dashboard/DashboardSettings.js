@@ -1,9 +1,8 @@
 import React, { Component, useState, useContext } from 'react';
 import { Stack, HStack, Checkbox, CheckboxGroup } from "@chakra-ui/react";
-import { FetchData } from './FetchData.js';
-import '../Dashboard.css';
+//import { FetchData } from './DashboardOne/FetchData.js';
 
-export class DashboardOneSettings extends Component {
+export class DashboardSettings extends Component {
 
     constructor(props) {
         super(props);

@@ -11,7 +11,7 @@ import { DashboardInterface } from './components/DashboardInterface';
 import { Router, Route, Switch } from 'react-router';
 import { FetchData } from './components/Dashboard/DashboardOne/FetchData';
 import { Counter } from './components/Counter';
-import { DashboardOneSettings } from './components/Dashboard/DashboardOne/DashboardOneSettings'
+
 import './custom.css'
 
 export default class App extends Component {
