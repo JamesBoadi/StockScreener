@@ -9,16 +9,19 @@ export class StockTableTwo extends Component {
 
     constructor(props) {
         super(props);
-        this.selectCell = this.selectCell.bind(this);
+        this.selectRow = this.selectRow.bind(this);
         this.createTable = this.createTable.bind(this);
         this.updateTable = this.updateTable.bind(this);
         this.highlightRow = this.highlightRow.bind(this);
-
-        this.scrollPosition = this.scrollPosition.bind(this);
+        this.scrollDown = this.scrollDown.bind(this);
+      //  this.scrollPosition = this.scrollPosition.bind(this);
 
 
         this.state = {
+            scrollPosition: 2,
+            updateTable: false,
             stack: [], // Render 100 elements per scroll
+            cache: [],
             count: 1,
             numberOfClicks: []
         };
@@ -41,15 +44,15 @@ export class StockTableTwo extends Component {
                     <tbody>
                         <tr key={id} style={style}>
                             {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
-                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
 
-                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
                         </tr>
                     </tbody>
 
@@ -84,7 +87,11 @@ export class StockTableTwo extends Component {
             return false;
         }*/
 
-    selectCell(e) {
+
+    /* Select row from the table
+       Triggers re-rendering of table */
+    selectRow(e) {
+
         var target = new Number(e.target.id);
         var style = {};
 
@@ -98,49 +105,61 @@ export class StockTableTwo extends Component {
                     <tbody>
                         <tr key={id} style={style}>
                             {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
-                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
 
-                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                            <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
                         </tr>
                     </tbody>
-
-                break;
             }
         }
 
-        console.log("All that coffee")
-        this.updateTable();
+           
+    }
+
+    // Render table while scrolling down
+    scrollDown()
+    {
+        // load from cache
+        if(this.props.loadFromCache())
+        {
+            
+
+
+            this.setState({scrollPosition: this.state.scrollPosition + 1})
+        }
+
+
+
     }
 
     createTable() {
         let id;
         let mod = 0;
-
+    
         for (id = 0; id < 50; id++) {
             this.state.stack.push(
                 <tbody>
                     <tr key={id}     >
                         {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
 
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
                     </tr>
                 </tbody>
             )
         }
-        //  this.updateTable(); 
     }
 
     addRow() {
@@ -150,22 +169,21 @@ export class StockTableTwo extends Component {
         for (id = 0; id < 800; id++) {
             this.state.stack.push(
                 <tbody>
-                    <tr key={id}     >
+                    <tr key={id}>
                         {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
 
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
                     </tr>
                 </tbody>
             )
         }
-        //  this.updateTable(); 
     }
 
     highlightRow() {
@@ -184,44 +202,39 @@ export class StockTableTwo extends Component {
                 <tbody>
                     <tr key={id} style={style}>
                         {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
-                        <td id={id} onClick={this.selectCell}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
                     </tr>
                 </tbody>;
             break;
         }
     }
 
+    componentDidUpdate()
+    {  
+    }
 
-    /*  shouldComponentUpdate() {
-  
-          if (this.state.count === 1) {
-              this.createTable();
-              this.updateTable();
-              this.setState({ count: 0 })
-              return true;
-          }
-  
-          return false;
-  
-           {this.createTable()}
-                  {this.updateTable()}
-      }*/
+    shouldComponentUpdate(nextProps) {
+        console.log(nextProps.scrollPosition + " " + this.props.scrollPosition)
+        if (nextProps.scrollPosition !== this.props.scrollPosition) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-    /*   componentDidMount() {
+    /* componentDidMount() {
            this.createTable();
        }*/
 
-
     render() {
         // Scroll to position of record
-
         let t = <div>
             <div id="stack-wrapper">
                 <div id="stack-scroll">
@@ -247,6 +260,8 @@ export class StockTableTwo extends Component {
             </div>
         </div>;
 
+        
+     
 
 
         return (
@@ -255,7 +270,6 @@ export class StockTableTwo extends Component {
                 {
                     t
                 }
-
             </div>
         );
     }

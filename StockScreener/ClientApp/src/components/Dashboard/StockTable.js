@@ -21,8 +21,10 @@ export class StockTable extends Component {
         this.selectRecords = this.selectRecords.bind(this);
         this.searchRecords = this.searchRecords.bind(this);
         this.scrollBy = this.scrollBy.bind(this);
-        this.scrollPosition = this.scrollPosition.bind(this);
+        this.scroll_ = this.scroll_.bind(this);
         this.textInput = React.createRef();
+        this.loadFromCache = this.loadFromCache.bind(this);
+        this.scrollPosition = this.scrollPosition.bind(this);
 
         let style = { color: "white;" };
 
@@ -33,6 +35,7 @@ export class StockTable extends Component {
             validInput: false,
             display: [],
             stockRecord: 0,
+            scroll: 0,
             query: {}
         };
     }
@@ -67,10 +70,6 @@ export class StockTable extends Component {
         }
     }
 
-    scrollPosition()
-    {
-        return this.textInput.current.scrollTop;
-    }
 
     shouldComponentUpdate(nextProps) { 
         if (nextProps.value !== this.props.value) { 
@@ -84,8 +83,9 @@ export class StockTable extends Component {
   
     // Scroll to the position in the table
     componentDidUpdate() {
+        const scroll = this.scrollBy();
         if (this.state.validInput === true) {
-            this.textInput.current.scrollTop = this.scrollBy();
+            this.textInput.current.scrollTop = scroll;         
             this.setState({ validInput: false })
         }
     }
@@ -94,6 +94,8 @@ export class StockTable extends Component {
         setInterval(() => {
             window.location.reload();
         }, 20000000);
+
+        this.setState({scroll: this.scrollBy()})
     }
 
     // select record from dropdown list
@@ -151,7 +153,25 @@ export class StockTable extends Component {
         return count;
     }
 
+    scroll_()
+    {
+       // console.log(this.textInput.current.scrollTop);
 
+        this.setState({scroll: this.textInput.current.scrollTop})
+
+        console.log("GD " +  this.state.scroll);
+    }
+
+    loadFromCache()
+    {   
+        let units = (this.state.scroll);
+        return (units > 450); 
+    }
+
+    scrollPosition()
+    {
+        return (this.state.scroll);
+    }
 
     render() {
         let stockTableTwoHeader = <table class="stockTableTwoHeader" aria-labelledby="tabelLabel">
@@ -288,8 +308,7 @@ export class StockTable extends Component {
                                 top: '45px'
                             }}
 
-                            onScroll={this.scroll}
-
+                            onScroll={this.scroll_}
                             ref={this.textInput}
                             overflowX='hidden'
                             bg='rgb(30,30,30)'
@@ -301,8 +320,9 @@ export class StockTable extends Component {
                             color='white'
                             zIndex='-999'>
 
-                            <StockTableTwo 
-                                scrollPosition={this.scrollBy()}
+                            <StockTableTwo
+                                scrollPosition={this.scrollPosition} 
+                                loadFromCache={this.loadFromCache}
                                 findRecord={this.state.validInput}
                                 id={this.state.stockRecord}
                             />
