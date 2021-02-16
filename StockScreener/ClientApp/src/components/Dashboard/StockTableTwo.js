@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { createTableMultiSort, Column, Table } from 'react-virtualized';
 import ReactDOM from 'react-dom';
 import { render } from 'react-dom';
 import { FetchData } from './DashboardOne/FetchData';
@@ -13,11 +12,12 @@ export class StockTableTwo extends Component {
         this.createTable = this.createTable.bind(this);
         this.updateTable = this.updateTable.bind(this);
         this.highlightRow = this.highlightRow.bind(this);
-        this.scrollDown = this.scrollDown.bind(this);
-      //  this.scrollPosition = this.scrollPosition.bind(this);
+
+        //  this.scrollPosition = this.scrollPosition.bind(this);
 
 
         this.state = {
+            table: null,
             scrollPosition: 2,
             updateTable: false,
             stack: [], // Render 100 elements per scroll
@@ -61,6 +61,37 @@ export class StockTableTwo extends Component {
         }
     }
 
+    /* Select row from the table
+       Triggers re-rendering of table */
+       selectRow(e) {
+        var target = new Number(e.target.id);
+        var style = {};
+
+        let mod = 0;
+        let id;
+        for (id = 0; id < 50; id++) {
+            if (id == target) {
+                style = { backgroundColor: "rgb(0,11,34)" };
+
+                this.state.tb2_stack[id] =
+                    <tbody>
+                        <tr key={id} style={style}>
+                            {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        </tr>
+                    </tbody>
+            }
+        }
+    }
+
 
     /*
         shouldComponentUpdate(nextProps, nextState) {
@@ -87,63 +118,12 @@ export class StockTableTwo extends Component {
             return false;
         }*/
 
-
-    /* Select row from the table
-       Triggers re-rendering of table */
-    selectRow(e) {
-
-        var target = new Number(e.target.id);
-        var style = {};
-
-        let mod = 0;
-        let id;
-        for (id = 0; id < 50; id++) {
-            if (id == target) {
-                style = { backgroundColor: "rgb(0,11,34)" };
-
-                this.state.stack[id] =
-                    <tbody>
-                        <tr key={id} style={style}>
-                            {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
-                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
-
-                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                        </tr>
-                    </tbody>
-            }
-        }
-
-           
-    }
-
-    // Render table while scrolling down
-    scrollDown()
-    {
-        // load from cache
-        if(this.props.loadFromCache())
-        {
-            
-
-
-            this.setState({scrollPosition: this.state.scrollPosition + 1})
-        }
-
-
-
-    }
-
     createTable() {
         let id;
         let mod = 0;
-    
+
         for (id = 0; id < 50; id++) {
-            this.state.stack.push(
+            this.props.state.tb2_stack.push(
                 <tbody>
                     <tr key={id}     >
                         {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
@@ -160,6 +140,9 @@ export class StockTableTwo extends Component {
                 </tbody>
             )
         }
+
+      
+
     }
 
     addRow() {
@@ -216,18 +199,24 @@ export class StockTableTwo extends Component {
         }
     }
 
-    componentDidUpdate()
-    {  
+    componentDidUpdate() {
+
+       
     }
 
-    shouldComponentUpdate(nextProps) {
-        console.log(nextProps.scrollPosition + " " + this.props.scrollPosition)
-        if (nextProps.scrollPosition !== this.props.scrollPosition) {
-            return true;
-        } else {
-            return false;
-        }
+    componentDidMount() {
+        this.createTable()
+        this.props.createTable()
     }
+
+    /*   shouldComponentUpdate(nextProps) {
+           console.log(nextProps.scrollPosition + " " + this.props.scrollPosition)
+           if (nextProps.scrollPosition !== this.props.scrollPosition) {
+               return true;
+           } else {
+               return false;
+           }
+       }*/
 
     /* componentDidMount() {
            this.createTable();
@@ -235,7 +224,7 @@ export class StockTableTwo extends Component {
 
     render() {
         // Scroll to position of record
-        let t = <div>
+        let table = <div>
             <div id="stack-wrapper">
                 <div id="stack-scroll">
                     <table class="stockTableTwo" aria-labelledby="tabelLabel">
@@ -250,26 +239,22 @@ export class StockTableTwo extends Component {
                                 <th>1</th>
                                 <th>1</th>
                                 <th>1</th>
-
                             </tr>
                         </thead>
 
-                        {this.state.stack}
+                        {this.props.state.tb2_stack}
+
                     </table>
                 </div>
             </div>
         </div>;
 
-        
-     
-
-
         return (
             <div>
-                {this.createTable()}
-                {
-                    t
-                }
+               
+                
+                {this.props.state.tb2}
+                {}
             </div>
         );
     }

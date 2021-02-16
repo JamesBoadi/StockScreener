@@ -25,6 +25,9 @@ export class StockTable extends Component {
         this.textInput = React.createRef();
         this.loadFromCache = this.loadFromCache.bind(this);
         this.scrollPosition = this.scrollPosition.bind(this);
+        this.scrollDown = this.scrollDown.bind(this);
+        this.selectRow = this.selectRow.bind(this);
+        this.createTable = this.createTable.bind(this);
 
         let style = { color: "white;" };
 
@@ -36,12 +39,17 @@ export class StockTable extends Component {
             display: [],
             stockRecord: 0,
             scroll: 0,
-            query: {}
+            query: {},
+
+            tb2: null,
+            tb2_scrollPosition: 2,
+            tb2_updateTable: false,
+            tb2_stack: [], // Render 100 elements per scroll
+            tb2_cache: [],
+            tb2_count: 1,
+            tb2_numberOfClicks: []
         };
     }
-
-
-
 
     // Communicate with c# controller https://stackoverflow.com/questions/46946380/fetch-api-request-timeout
     async searchDatabase(e) {
@@ -70,22 +78,21 @@ export class StockTable extends Component {
         }
     }
 
+    shouldComponentUpdate(nextProps) {
+        if (nextProps.value !== this.props.value) {
 
-    shouldComponentUpdate(nextProps) { 
-        if (nextProps.value !== this.props.value) { 
-          
-            return true; 
-        
-        } else { 
-          return false; 
-        } 
-      } 
-  
+            return true;
+
+        } else {
+            return false;
+        }
+    }
+
     // Scroll to the position in the table
     componentDidUpdate() {
         const scroll = this.scrollBy();
         if (this.state.validInput === true) {
-            this.textInput.current.scrollTop = scroll;         
+            this.textInput.current.scrollTop = scroll;
             this.setState({ validInput: false })
         }
     }
@@ -95,7 +102,9 @@ export class StockTable extends Component {
             window.location.reload();
         }, 20000000);
 
-        this.setState({scroll: this.scrollBy()})
+        this.setState({ scroll: this.scrollBy() })
+
+        this.createTable();
     }
 
     // select record from dropdown list
@@ -153,24 +162,139 @@ export class StockTable extends Component {
         return count;
     }
 
-    scroll_()
-    {
-       // console.log(this.textInput.current.scrollTop);
-
-        this.setState({scroll: this.textInput.current.scrollTop})
-
-        console.log("GD " +  this.state.scroll);
+    scroll_() {
+        this.setState({ scroll: this.textInput.current.scrollTop })
+        this.scrollDown()
     }
 
-    loadFromCache()
-    {   
+    /*
+        units: 1 - Scroll Down
+        units: -1 Scroll Up
+        units: 0 No change
+    */
+    loadFromCache() {
         let units = (this.state.scroll);
-        return (units > 450); 
+        return (units > 450) ? 1 : (units < 4) ? -1 : 0;
     }
 
-    scrollPosition()
-    {
+    scrollPosition() {
         return (this.state.scroll);
+    }
+
+    // Render table while scrolling down
+    scrollDown() {
+        console.log(this.state.scroll)
+
+        if (this.loadFromCache() === 1) {
+            this.setState({ tb2_stack: this.state.tb2_cache });
+            // Scroll Down
+            this.setState({ scrollPosition: this.state.tb2_scrollPosition + 1 })
+
+            console.log('Render 1')
+        }
+        else if (this.loadFromCache() === -1) {
+            this.setState({ tb2_stack: this.state.tb2_cache });
+            // Scroll Up
+            this.setState({
+                tb2_scrollPosition: (this.state.tb2_scrollPosition === 1) ?
+                    1 : this.state.tb2_scrollPosition - 1
+            })
+
+            console.log('Render 2')
+        }
+        else {
+            let id;
+            let start = (this.state.tb2_scrollPosition === 1) ?
+                (this.state.tb2_scrollPosition * 50) - 50
+                : (this.state.tb2_scrollPosition * 50) - 50;
+
+            let end = (this.state.tb2_scrollPosition * 50);
+
+            this.setState({ tb2_cache: [] });
+
+            for (id = start; id < end; id++) {
+                this.state.tb2_cache.push(
+                    <tbody>
+                        <tr key={id}>
+                            <td id={id} onClick={this.selectRow}>{id}</td>
+                            <td id={id} onClick={this.selectRow}>{id}</td>
+                            <td id={id} onClick={this.selectRow}>{id}</td>
+                            <td id={id} onClick={this.selectRow}>{id}</td>
+
+                            <td id={id} onClick={this.selectRow}>{id}</td>
+                            <td id={id} onClick={this.selectRow}>{id}</td>
+                            <td id={id} onClick={this.selectRow}>{id}</td>
+                            <td id={id} onClick={this.selectRow}>{id}</td>
+                        </tr>
+                    </tbody>);
+            }
+        }
+
+        this.createTable()
+    }
+
+    createTable() {
+
+        console.log('CREATE!')
+        this.setState({
+            tb2: <div>
+                <div id="stack-wrapper">
+                    <div id="stack-scroll">
+                        <table class="stockTableTwo" aria-labelledby="tabelLabel">
+                            <thead>
+                                <tr>
+                                    <th>1</th>
+                                    <th>1</th>
+                                    <th>1</th>
+                                    <th>1</th>
+
+                                    <th>1</th>
+                                    <th>1</th>
+                                    <th>1</th>
+                                    <th>1</th>
+                                </tr>
+                            </thead>
+
+                            {this.state.tb2_stack}
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        });
+
+    }
+
+
+    /* Select row from the table
+       Triggers re-rendering of table */
+    selectRow(e) {
+        var target = new Number(e.target.id);
+        var style = {};
+
+        let mod = 0;
+        let id;
+        for (id = 0; id < 50; id++) {
+            if (id == target) {
+                style = { backgroundColor: "rgb(0,11,34)" };
+
+                this.state.tb2_stack[id] =
+                    <tbody>
+                        <tr key={id} style={style}>
+                            {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                            <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        </tr>
+                    </tbody>
+            }
+        }
     }
 
     render() {
@@ -320,15 +444,19 @@ export class StockTable extends Component {
                             color='white'
                             zIndex='-999'>
 
-                            <StockTableTwo
-                                scrollPosition={this.scrollPosition} 
+                            {this.state.tb2}
+
+
+                        </Box>
+                    </Box>
+                      
+                  {/*  <StockTableTwo
+                                {...this} // Pass all props to child
+                                scrollPosition={this.scrollPosition}
                                 loadFromCache={this.loadFromCache}
                                 findRecord={this.state.validInput}
                                 id={this.state.stockRecord}
-                            />
-                        </Box>
-                    </Box>
-
+                  />      */}
                     {/* ALERT TABLE */}
                     <Box
                         style={{ position: 'absolute', top: '125px', left: '1070px' }}
