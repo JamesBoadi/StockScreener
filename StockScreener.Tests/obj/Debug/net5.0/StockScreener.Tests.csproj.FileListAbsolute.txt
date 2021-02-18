@@ -222,3 +222,4 @@ c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.We
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.Web.WebPages.Razor.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.Web.WebPages.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.Web.Infrastructure.dll
+c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\package-lock.json

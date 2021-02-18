@@ -13,6 +13,7 @@ import { DashboardSettings } from '../DashboardSettings';
 import Nav from 'reactstrap/lib/Nav';
 import { StockTableTwo } from '../StockTableTwo';
 
+
 // Fetch data for dash board one
 export class FetchData extends Component {
   static displayName = FetchData.name;
@@ -247,22 +248,24 @@ const connection = new HubConnectionBuilder()
     return (
 
       <div>
+
         {/* <SideBar
           isStreaming={() => { return this.state.isStreaming }}
        /> */}
 
         <TopNavbar
-         Data={this.state.data}
-         />
+          Data={this.state.data}
+        />
 
         <DashboardNavbar
           Data={this.state.data}
         />
+        <div id="tableContainer">
 
-      {  <StockTable
-          isStreaming={() => { return this.state.isStreaming }}
-          Data={() => { return this.state.data[1] }}
-      /> }
+          <StockTableTwo
+
+          />
+        </div>
         
       </div>
     );

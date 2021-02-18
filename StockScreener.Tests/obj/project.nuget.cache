@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "NGDkxcRPDfFaH74KgWEWhn2zzeBjEe6kU7wNliEd4e6SR9OJ8mFQ/hmRC6J2xCQtKdyWq4hc3HyXSc6d1KS8TQ==",
+  "dgSpecHash": "9il9Dzs/er43oLtnsykObzc8lZXAJkGs5s3dGYhvRSh0QaR1UnhPNAUxSz+Ecspl0iTWd4Ks9mKZn+V3q9RXSQ==",
   "success": true,
   "projectFilePath": "c:\\Users\\Peek\\Music\\StockScreener\\StockScreener.Tests\\StockScreener.Tests.csproj",
   "expectedPackageFiles": [
@@ -8,6 +8,7 @@
     "C:\\Users\\Peek\\.nuget\\packages\\csvhelper\\18.0.0\\csvhelper.18.0.0.nupkg.sha512",
     "C:\\Users\\Peek\\.nuget\\packages\\humanizer.core\\2.2.0\\humanizer.core.2.2.0.nupkg.sha512",
     "C:\\Users\\Peek\\.nuget\\packages\\microsoft.aspnet.razor\\3.2.6\\microsoft.aspnet.razor.3.2.6.nupkg.sha512",
+    "C:\\Users\\Peek\\.nuget\\packages\\microsoft.aspnet.signalr\\2.4.1\\microsoft.aspnet.signalr.2.4.1.nupkg.sha512",
     "C:\\Users\\Peek\\.nuget\\packages\\microsoft.aspnet.webpages\\3.2.6\\microsoft.aspnet.webpages.3.2.6.nupkg.sha512",
     "C:\\Users\\Peek\\.nuget\\packages\\microsoft.aspnetcore.authentication.certificate\\5.0.1\\microsoft.aspnetcore.authentication.certificate.5.0.1.nupkg.sha512",
     "C:\\Users\\Peek\\.nuget\\packages\\microsoft.aspnetcore.connections.abstractions\\5.0.1\\microsoft.aspnetcore.connections.abstractions.5.0.1.nupkg.sha512",

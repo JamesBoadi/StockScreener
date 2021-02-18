@@ -50,6 +50,7 @@
           }
         }
       },
+      "Microsoft.AspNet.SignalR/2.4.1": {},
       "Microsoft.AspNet.WebPages/3.2.6": {
         "dependencies": {
           "Microsoft.AspNet.Razor": "3.2.6",
@@ -1844,6 +1845,7 @@
       "StockScreener/1.0.0": {
         "dependencies": {
           "CsvHelper": "18.0.0",
+          "Microsoft.AspNet.SignalR": "2.4.1",
           "Microsoft.AspNet.WebPages": "3.2.6",
           "Microsoft.AspNetCore.Authentication.Certificate": "5.0.1",
           "Microsoft.AspNetCore.SignalR.Client": "5.0.1",
@@ -1906,6 +1908,13 @@
       "sha512": "sha512-SeQP/YT8LUXLCcJxFYbzq4HbxlgasSa82QMNOJ0baulIzR/0O94SLwFx5LUPMllzEPEEYWc2RVD9MjX0kZqbHQ==",
       "path": "microsoft.aspnet.razor/3.2.6",
       "hashPath": "microsoft.aspnet.razor.3.2.6.nupkg.sha512"
+    },
+    "Microsoft.AspNet.SignalR/2.4.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-aYbLVE5toZwv/qaQ0BiIZRRwN/00WKYzGjaYUWIQuI91xZ50nnAymWD1sxCZFN9XXDRq8bevM5ET9GmAeOI/Nw==",
+      "path": "microsoft.aspnet.signalr/2.4.1",
+      "hashPath": "microsoft.aspnet.signalr.2.4.1.nupkg.sha512"
     },
     "Microsoft.AspNet.WebPages/3.2.6": {
       "type": "package",
