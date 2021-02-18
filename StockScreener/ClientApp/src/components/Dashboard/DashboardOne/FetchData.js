@@ -78,30 +78,6 @@ const connection = new HubConnectionBuilder()
     this.state.data = currentData;
   }
 
-  /*
-    setInterval(() => {
-    }, interval);    
-    */
-
-  // Render the Table
-  renderTable = (forecasts) => {
-    let table = <table className='table table-striped' aria-labelledby="tabelLabel">
-      <thead>
-        <tr>
-          <th>Open</th>
-          <th>Name</th>
-          <th>Change</th>
-          <th>ChangePercentage</th>
-          <th>Volume</th>
-        </tr>
-      </thead>
-
-      {FetchData.rowBuffer}
-    </table>;
-
-    return table;
-  }
-
   // Add the Row
   addRow = () => {
     FetchData.rowBuffer.push(<tbody>

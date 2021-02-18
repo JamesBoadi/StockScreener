@@ -46,7 +46,7 @@ export class StockTableTwo extends Component {
 
             tb2: [],
             tb2_temp: [],
-            tb2_scrollPosition: 2,
+            tb2_scrollPosition: 0,
             tb2_updateTable: false,
             tb2_stack: [], // Render 100 elements per scroll
             tb2_cache: [],
@@ -66,11 +66,15 @@ export class StockTableTwo extends Component {
         this.setState({ scroll: this.scrollBy() })
     }
 
-    componentDidUpdate() {
-        // Update position
-        if (this.state.tb2_count === 1) {
-            this.updateTable();
+    componentDidUpdate(snapshot) {
+        // Update table
+        if (this.state.tb2_count === 1 && snapshot !== null) {
+
+            this.updateTable()
+            this.textInput.current.scrollTop = 5;
+
             this.setState({ tb2_count: 0 });
+
         }
         // Scroll to the position in the table
         const scroll = this.scrollBy();
@@ -78,21 +82,28 @@ export class StockTableTwo extends Component {
             this.textInput.current.scrollTop = scroll;
             this.setState({ validInput: false })
         }
-
-
     }
 
+    getSnapshotBeforeUpdate(prevProps, prevState) {
+        if (prevState.tb2_scrollPosition !== this.state.tb2_scrollPosition) {
+            this.newTable()
+            return this.state.tb2_scrollPosition;
+        }
+    }
 
-    /*   this.setState({ tb2_count: 1 });
+    /* shouldComponentUpdate(nextProps, nextState)
+     {
+         // Prevent multiple re-renders of new table
+         // Only update if the state changes (tb2_scrollPoisition)
+      /*   if(this.state.tb2_scrollPosition !== nextState.tb2_scrollPosition)
+         {
+             this.newTable()
+           
+         }
  
-       if (this.state.tb2_count === 1) {
- 
-           this.newTable()
-           this.setState({ tb2_count: 0 });
-       }       
-   }
- 
- */
+         
+     }*/
+
 
     // Communicate with c# controller https://stackoverflow.com/questions/46946380/fetch-api-request-timeout
     async searchDatabase(e) {
@@ -121,11 +132,9 @@ export class StockTableTwo extends Component {
         }
     }
 
-
     getDisplay() {
         return this.state.display;
     }
-
 
     // select record from dropdown list
     selectRecords(e) {
@@ -180,6 +189,7 @@ export class StockTableTwo extends Component {
         return count;
     }
 
+    // Trigger scrolling event
     scroll_() {
         this.setState({ scroll: this.textInput.current.scrollTop })
         this.scrollToPosition()
@@ -192,64 +202,29 @@ export class StockTableTwo extends Component {
     */
     loadFromCache() {
         let units = (this.state.scroll);
-        return (units > 450) ? 1 : (units < 4) ? -1 : 0;
+        return (units > 454) ? 1 : (units < 3) ? -1 : 0;
     }
 
     scrollPosition() {
         return (this.state.scroll);
     }
 
-    // Render table while scrolling down
+    // Re-render table while scrolling down or scrolling up
     scrollToPosition() {
-        console.log(this.state.scroll)
-
         if (this.loadFromCache() === 1) {
-            this.setState({ tb2_stack: this.state.tb2_cache });
-
             // Scroll Down
-            this.setState({ scrollPosition: this.state.tb2_scrollPosition + 1 })
-
+            this.setState({ tb2_scrollPosition: this.state.tb2_scrollPosition + 1 });
             this.setState({ tb2_count: 1 });
-
             console.log('Render 1')
         }
         else if (this.loadFromCache() === -1) {
-            this.setState({ tb2_stack: this.state.tb2_cache });
-
             // Scroll Up
             this.setState({
                 tb2_scrollPosition: (this.state.tb2_scrollPosition <= 0) ?
                     0 : this.state.tb2_scrollPosition - 1
-            })
-
+            });
             this.setState({ tb2_count: 1 });
-
             console.log('Render 2')
-        }
-        else {
-            let id;
-
-            let start = this.state.tb2_scrollPosition * 50;
-            let end = (this.state.tb2_scrollPosition * 50) + 50;
-
-            this.setState({ tb2_cache: [] }); // Use shallow compare
-
-            for (id = start; id < end; id++) {
-                this.state.tb2_cache.push(
-                    <tbody>
-                        <tr key={id}>
-                            <td id={id} onClick={this.selectRow}>{id}</td>
-                            <td id={id} onClick={this.selectRow}>{id}</td>
-                            <td id={id} onClick={this.selectRow}>{id}</td>
-                            <td id={id} onClick={this.selectRow}>{id}</td>
-
-                            <td id={id} onClick={this.selectRow}>{id}</td>
-                            <td id={id} onClick={this.selectRow}>{id}</td>
-                            <td id={id} onClick={this.selectRow}>{id}</td>
-                            <td id={id} onClick={this.selectRow}>{id}</td>
-                        </tr>
-                    </tbody>);
-            }
         }
     }
 
@@ -323,6 +298,31 @@ export class StockTableTwo extends Component {
     }
 
     newTable() {
+        let id;
+        let start = (this.state.tb2_scrollPosition * 50);
+        let end = ((this.state.tb2_scrollPosition * 50) + 50);
+        var t = [];
+
+        console.log('start ' + start + " " + 'end ' + end);
+        // Use shallow compare
+        for (id = start; id < end; id++) {
+            t.push(
+                <tbody>
+                    <tr key={id}>
+                        <td id={id} onClick={this.selectRow}>{id}</td>
+                        <td id={id} onClick={this.selectRow}>{id}</td>
+                        <td id={id} onClick={this.selectRow}>{id}</td>
+                        <td id={id} onClick={this.selectRow}>{id}</td>
+
+                        <td id={id} onClick={this.selectRow}>{id}</td>
+                        <td id={id} onClick={this.selectRow}>{id}</td>
+                        <td id={id} onClick={this.selectRow}>{id}</td>
+                        <td id={id} onClick={this.selectRow}>{id}</td>
+                    </tr>
+                </tbody>);
+        }
+
+        this.setState({ tb2_stack: t });
     }
 
     updateTable() {
@@ -360,7 +360,7 @@ export class StockTableTwo extends Component {
         let mod = 0;
 
         for (id = 0; id < 50; id++) {
-            this.state.tb2_stack[[id]] =
+            this.state.tb2_stack[id] =
                 <tbody>
                     <tr key={id}     >
                         {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
