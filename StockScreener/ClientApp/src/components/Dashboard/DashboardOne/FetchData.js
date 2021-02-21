@@ -1,18 +1,17 @@
 import React, { Component } from 'react';
 import { HubConnectionBuilder } from '@aspnet/signalr';
 import { sendRequest } from '@microsoft/signalr/dist/esm/Utils';
-
 import { StockTable } from '../StockTable';
 import { DashboardNavbar } from '../DashboardNavbar';
 import { NavBarData } from '../NavbarData.js';
 import { TopNavbar } from '../TopNavbar.js';
-
 import { SideBar } from '../SideBar';
 import { Box } from '@chakra-ui/react';
 import { DashboardSettings } from '../DashboardSettings';
 import Nav from 'reactstrap/lib/Nav';
 import { StockTableTwo } from '../StockTableTwo';
 import * as signalR from '@aspnet/signalr';
+import * as cache from 'cache-base';
 
 /*
 const hubConnection = new HubConnectionBuilder()
@@ -34,6 +33,7 @@ export class FetchData extends Component {
     //this.startHubConnection = this.startHubConnection.bind(this);
     //this.createHubConnection = this.createHubConnection.bind(this);
     this.startStreaming = this.startStreaming.bind(this);
+    this.cache = new cache();
 
     this.state = {
       isStreaming: false,
@@ -67,38 +67,7 @@ export class FetchData extends Component {
   }
 
   componentDidMount = () => {
-
-
-    //  this.startHubConnection(this.createHubConnection());
-
-    //this.startStreaming(this.hubConnection);
-
-    this.sendRequest();
-
-
-    //this.startStreaming(this.hubConnection);
-
-
-
-    /* Returns stockarray (Data) and request array (calls and max calls) 
-  this.state.hubConnection.on('ScanResponse',
-    (stockArray, requestArray) => {
- 
-      const request_Calls = parseInt(requestArray[0]);
-      const max_Calls = parseInt(requestArray[1]);
- 
-      if (this.state.MAX_CALLS == null || this.state.MAX_CALLS != max_Calls)
-        this.setState({ MAX_CALLS: max_Calls });
- 
-      if (this.state.column_counter == this.state.MAX_CALLS)
-        this.setState({ lock: true })
- 
-      console.log(stockArray + " " + request_Calls + " " + max_Calls);
- 
-      if (this.state.lock == false)
-        this.sendRequest(); // Send message again
-    });
-});*/
+    //this.sendRequest();
   }
 
 
@@ -148,16 +117,11 @@ export class FetchData extends Component {
             try {
               console.log('HELLO' + stockArray)
 
-              var i = 0;
+              var count = 0;
 
-              for (i = 0; i < stockArray.length; i++) {
-                console.log("next " + stockArray[i]);
+              for (count = 0; count < stockArray.length; count++) {
+                console.log("next " + stockArray[count]);
               }
-
-
-
-
-
 
             }
             catch (err) {
@@ -190,46 +154,51 @@ export class FetchData extends Component {
       .then(() => console.log('Connection started!'))
       .catch(err => console.log('Error while establishing hubConnection :(')); // Redirect to 404 page
 
-      console.log("CONNECTION " + hubConnection);
+    console.log("CONNECTION " + hubConnection);
 
-      // Set the state of this column counter
-      this.setState({ column_counter: this.state.column_counter + 1 });
-      var arr = ["k"];
+    // Set the state of this column counter
+    this.setState({ column_counter: this.state.column_counter + 1 });
+    var arr = ["k"];
 
-      // arr.push(this.state.column_counter.toString());
-      // arr.push("500");
-      hubConnection.stream("RequestData", arr)
-        .subscribe({
-          next: (stockArray) => {
-            var i = 0;
+    // arr.push(this.state.column_counter.toString());
+    // arr.push("500");
+    hubConnection.stream("RequestData", arr)
+      .subscribe({
+        next: (stockArray) => {
 
-            for (i = 0; i < stockArray.length; i++) {
-              console.log("next " + stockArray[i]);
-            }
-            /*
-                        const request_Calls = parseInt(stockArray[5]);
-                        const max_Calls = parseInt(stockArray[6]);
-            
-                        this.setState({ column_counter: request_Calls });
-            
-                        if (this.state.MAX_CALLS == null || this.state.MAX_CALLS != max_Calls)
-                          this.setState({ MAX_CALLS: max_Calls });
-            
-                        if (this.state.column_counter == this.state.MAX_CALLS) {
-                          this.setState({ lock: true })
-                        }
-            
-                        //   console.log(stockArray + " " + request_Calls + " " + max_Calls);
-                        //   console.log("Array " + stockArray);*/
-          },
-          complete: () => {
-            // render table
-            console.log('complete');
-          },
-          error: (err) => {
-            console.log('err ' + err);
+          // Account for faliures in connection
+          var count = 0;
+          for (count = 0; count < stockArray.length; count++) {
+            let item = JSON.parse(stockArray[count]);
+            this.cache.set(count, item);
           }
-    });
+
+
+
+          /*
+                      const request_Calls = parseInt(stockArray[5]);
+                      const max_Calls = parseInt(stockArray[6]);
+          
+                      this.setState({ column_counter: request_Calls });
+          
+                      if (this.state.MAX_CALLS == null || this.state.MAX_CALLS != max_Calls)
+                        this.setState({ MAX_CALLS: max_Calls });
+          
+                      if (this.state.column_counter == this.state.MAX_CALLS) {
+                        this.setState({ lock: true })
+                      }
+          
+                      //   console.log(stockArray + " " + request_Calls + " " + max_Calls);
+                      //   console.log("Array " + stockArray);*/
+        },
+        complete: () => {
+          // render table
+          console.log('complete');
+        },
+        error: (err) => {
+          console.log('err ' + err);
+        }
+      });
   }
 
   onNotifReceived(res) {
@@ -246,11 +215,9 @@ export class FetchData extends Component {
     return (
 
       <div>
-
         {/* <SideBar
           isStreaming={() => { return this.state.isStreaming }}
        /> */}
-
         <TopNavbar
           Data={this.state.data}
         />
@@ -258,13 +225,12 @@ export class FetchData extends Component {
         <DashboardNavbar
           Data={this.state.data}
         />
+
         <div id="tableContainer">
-
           <StockTableTwo
-
+          {...this}
           />
         </div>
-
       </div>
     );
   }

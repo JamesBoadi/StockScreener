@@ -46,13 +46,13 @@ namespace StockScreener
             set { writerTwo = value; }
         }
 
-        private static int[] timeArray = new int[2]; 
+        private static int[] timeArray = new int[2];
 
         bool sessionOneBool = false;
         bool sessionTwoBool = false;
 
         bool sessionThreeBool = false;
-        
+
         private object[] setSession;
 
         public object[] SetSession
@@ -82,7 +82,7 @@ namespace StockScreener
                     sessionThreeBool = state;
                 }
 
-                if(!(sessionOneBool && sessionTwoBool && sessionThreeBool))
+                if (!(sessionOneBool && sessionTwoBool && sessionThreeBool))
                 {
                     setSession[0] = -1;
                     setSession[1] = null;
@@ -90,7 +90,7 @@ namespace StockScreener
                 }
             }
         }
-        
+
         public BackgroundServiceWorker()//ILogger<BackgroundServiceWorker> logger)
         {
             // _logger = logger;
@@ -106,8 +106,8 @@ namespace StockScreener
             try
             {
                 // _logger.LogInformation("Timed Hosted Service running.");
-                _timer = new Timer(getDataFromCache, null, 
-                TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(30));
+                _timer = new Timer(getDataFromCache, null,
+                TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
             }
             catch (Exception ex)
             {
@@ -142,113 +142,115 @@ namespace StockScreener
 
         public void convertTime(int session, TimeSpan currentTime)
         {
-          /*  String sessionPeriod = tradingHours[session];
+            /*  String sessionPeriod = tradingHours[session];
 
-            String lowerBound = sessionPeriod.Substring(0, 5);
-            String upperBound = sessionPeriod.Substring(8, 5);
+              String lowerBound = sessionPeriod.Substring(0, 5);
+              String upperBound = sessionPeriod.Substring(8, 5);
 
-            String lowerBound_meridian = sessionPeriod.Substring(5, 2);
-            String upperBound_meridian = sessionPeriod.Substring(13, 2);
+              String lowerBound_meridian = sessionPeriod.Substring(5, 2);
+              String upperBound_meridian = sessionPeriod.Substring(13, 2);
 
-            String lb_hours = (lowerBound.Substring(0, 1) != "0") ? lowerBound.Substring(0, 2) : lowerBound.Substring(1, 1);
-            String lb_minutes = (lowerBound.Substring(3, 1) != "0") ? lowerBound.Substring(3, 2) : lowerBound.Substring(4, 1);
+              String lb_hours = (lowerBound.Substring(0, 1) != "0") ? lowerBound.Substring(0, 2) : lowerBound.Substring(1, 1);
+              String lb_minutes = (lowerBound.Substring(3, 1) != "0") ? lowerBound.Substring(3, 2) : lowerBound.Substring(4, 1);
 
-            String ub_hours = (upperBound.Substring(0, 1) != "0") ? upperBound.Substring(0, 2) : upperBound.Substring(1, 1);
-            String ub_minutes = (upperBound.Substring(3, 1) != "0") ? upperBound.Substring(3, 2) : upperBound.Substring(3, 1);
+              String ub_hours = (upperBound.Substring(0, 1) != "0") ? upperBound.Substring(0, 2) : upperBound.Substring(1, 1);
+              String ub_minutes = (upperBound.Substring(3, 1) != "0") ? upperBound.Substring(3, 2) : upperBound.Substring(3, 1);
 
-            int _lb_hours = Int32.Parse(lb_hours);
-            int _lb_minutes = Int32.Parse(lb_minutes);
+              int _lb_hours = Int32.Parse(lb_hours);
+              int _lb_minutes = Int32.Parse(lb_minutes);
 
-            int _ub_hours = Int32.Parse(ub_hours);
-            int _ub_minutes = Int32.Parse(ub_minutes);
+              int _ub_hours = Int32.Parse(ub_hours);
+              int _ub_minutes = Int32.Parse(ub_minutes);
 
-            DateTime time = DateTime.Today.Add(currentTime);
-            string _currentTime = time.ToString("HH:mmtt");
+              DateTime time = DateTime.Today.Add(currentTime);
+              string _currentTime = time.ToString("HH:mmtt");
 
-            String _currentTime_meridian = _currentTime.Substring(5, 2).ToLower();
+              String _currentTime_meridian = _currentTime.Substring(5, 2).ToLower();
 
-            int[] arr = returnCurrentTime(currentTime);
-            int currentTime_hours = arr[0];
-            int currentTime_minutes = arr[1];
+              int[] arr = returnCurrentTime(currentTime);
+              int currentTime_hours = arr[0];
+              int currentTime_minutes = arr[1];
 
 
-            // Return a session based on a number
-            switch (session)
-            {
-                case 0:
-                    if (currentTime_hours > _lb_hours && currentTime_hours < _ub_hours
-                        && _currentTime_meridian != upperBound_meridian)
-                    {
-                        sessionProperties[0] = 0;
-                        sessionProperties[1] = true;
-                    }
-                    else
-                    {
-                        sessionProperties[0] = 0;
-                        sessionProperties[1] = false;
-                    }
-                    break;
+              // Return a session based on a number
+              switch (session)
+              {
+                  case 0:
+                      if (currentTime_hours > _lb_hours && currentTime_hours < _ub_hours
+                          && _currentTime_meridian != upperBound_meridian)
+                      {
+                          sessionProperties[0] = 0;
+                          sessionProperties[1] = true;
+                      }
+                      else
+                      {
+                          sessionProperties[0] = 0;
+                          sessionProperties[1] = false;
+                      }
+                      break;
 
-                case 1:
-                    if (currentTime_hours > _lb_hours && currentTime_hours < _ub_hours
-                        && _currentTime_meridian != upperBound_meridian)
-                    {
-                        sessionProperties[0] = 1;
-                        sessionProperties[1] = true;
-                    }
-                    else
-                    {
-                        sessionProperties[0] = 1;
-                        sessionProperties[1] = false;
-                    }
-                    break;
+                  case 1:
+                      if (currentTime_hours > _lb_hours && currentTime_hours < _ub_hours
+                          && _currentTime_meridian != upperBound_meridian)
+                      {
+                          sessionProperties[0] = 1;
+                          sessionProperties[1] = true;
+                      }
+                      else
+                      {
+                          sessionProperties[0] = 1;
+                          sessionProperties[1] = false;
+                      }
+                      break;
 
-                case 2:
-                    if (currentTime_hours > _lb_hours && currentTime_hours < _ub_hours
-                        && _currentTime_meridian != upperBound_meridian)
-                    {
-                        sessionProperties[0] = 2;
-                        sessionProperties[1] = true;
-                    }
-                    else
-                    {
-                        sessionProperties[0] = 2;
-                        sessionProperties[1] = false;
-                    }
-                    break;
-            }
+                  case 2:
+                      if (currentTime_hours > _lb_hours && currentTime_hours < _ub_hours
+                          && _currentTime_meridian != upperBound_meridian)
+                      {
+                          sessionProperties[0] = 2;
+                          sessionProperties[1] = true;
+                      }
+                      else
+                      {
+                          sessionProperties[0] = 2;
+                          sessionProperties[1] = false;
+                      }
+                      break;
+              }
 
-            // Reset the day move to zero (next day)
-            if(currentTime_hours == 0 && currentTime_minutes == 0)
-             {
-                UtilityFunctions.DayMove = 0;
-                UtilityFunctions.TDays = (UtilityFunctions.TDays < 10) ? UtilityFunctions.TDays += 1 : 1;
-             }   
+              // Reset the day move to zero (next day)
+              if(currentTime_hours == 0 && currentTime_minutes == 0)
+               {
+                  UtilityFunctions.DayMove = 0;
+                  UtilityFunctions.TDays = (UtilityFunctions.TDays < 10) ? UtilityFunctions.TDays += 1 : 1;
+               }   
 
-            SetSession = sessionProperties;*/
+              SetSession = sessionProperties;*/
         }
 
         public async void getDataFromCache(object current_state)
         {
             await Task.Delay(100);
+            int length = Stocks.StocksCode.Value.Length;
+            string[] s = new string[length];
 
-            Console.WriteLine("Execution count ");
+            Console.WriteLine("Execution count + start ");
             try
             {
-              /*  TimeSpan time = ReturnTime();
-                int count = -1;
+                /*  TimeSpan time = ReturnTime();
+                  int count = -1;
 
-                while (count < 2)
-                    convertTime(++count, time);*/
+                  while (count < 2)
+                      convertTime(++count, time);*/
 
-            
-//                await WriterTwo.WriteAsync(SetSession, CancellationToken); 
-
+                // await WriterTwo.WriteAsync(SetSession, CancellationToken); 
                 // Retrieve data from stocks
-                for (int pointer = 0; pointer < Stocks.StocksCode.Value.Length; pointer++)
+                for (int pointer = 0; pointer < length; pointer++)
                 {
-                    await WriterOne.WriteAsync(/*Stocks.cache.Get(pointer)*/ new string[]{"AH"}, CancellationToken);
+                    s[pointer] = Stocks.cache.Get(pointer);
                 }
+                
+                await WriterOne.WriteAsync(s, CancellationToken);
             }
 
             catch (Exception ex)
@@ -262,6 +264,8 @@ namespace StockScreener
                     // Redirect?      
                     Console.WriteLine("exception " + ex);
             }
+
+
         }
 
         /*

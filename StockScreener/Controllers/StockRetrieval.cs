@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Runtime.CompilerServices;
 
+
 namespace StockScreener
 {
     public class StockRetrival : Hub
@@ -38,36 +39,22 @@ namespace StockScreener
             var channelTwo = Channel.CreateUnbounded<string[]>();
             try
             {
-                      Console.WriteLine("null? Trivago " + arr[0]);
-                _ = init_workOne(channelTwo.Writer, cancellationToken);
+                // Trigger a background thread that does the sending
+                if (init_called == false)
+                {
+                    stocks.init();
+                    init_called = !init_called;
+                }
 
-                string[] s = new string[] { "AH"};
-                channelTwo.Writer.WriteAsync(s, cancellationToken);
+                if (_init_work == false)
+                {
+                    _ = initialise_cache();
+                    _ = init_workOne(channelTwo.Writer, cancellationToken);
+                    _init_work = !_init_work;
+                }
 
-                
-                //serviceWorker.WriterTwo.WriteAsync(s, cancellationToken);
-
-          
-
-              
-
-                /*     // Trigger a background thread that does the sending
-                     if (init_called == false)
-                     {
-                         stocks.init();
-                         init_called = !init_called;
-                     }
-
-                     if (_init_work == false)
-                     {
-                         _ = initialise_cache();
-                         _ = init_workOne(channelTwo.Writer, cancellationToken);
-                         _init_work = !_init_work;
-                     }
-                     //_ = WriteItemsAsync(channelTwo.Writer, arr, cancellationToken);
-
-                     _ = serviceWorker.StartAsync(cancellationToken);*/
-
+                // Start a service worker
+                _ = serviceWorker.StartAsync(cancellationToken); 
             }
             catch (Exception ex)
             {

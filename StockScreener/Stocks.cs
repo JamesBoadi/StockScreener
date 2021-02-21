@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Channels;
 using CsvHelper;
+using System.Text.Json;
 
 namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_server For the database (https://gist.github.com/kevinswiber/1390198)
 {
@@ -158,13 +159,13 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 copy(start, end);
                 //   data = client.GetRealTimePrices(arr);
                 //  int pointer = 0;
-
+                
                 int code = start;
                 for (int i = 0; i < arr.Length; i++) //    foreach (RealTimePrice data_ in data)
                 {
                     stock.StockCode = StocksCode.Value[code];
                     stock.Change = pointer + 2;
-                    stock.ChangeP = pointer + 3;
+                    stock.ChangeP = 1.7;
                     stock.Volume = pointer + 4;
                     stock.Request_Calls = pointer + 5;
 

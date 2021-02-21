@@ -7,6 +7,7 @@ using System.Net;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Text.Json;
 
 namespace StockScreener
 {
@@ -40,10 +41,8 @@ namespace StockScreener
         public void Add(Stock data)
         {
             hash.Add(++Stocks.Pointer, data);
-            //   Console.WriteLine(data);
-            // arr[Counter++] = data;
         }
-
+        
         /// <summary>Updates an item or several items in the collection</summary>
         public void Update(int position, Stock data)
         {
@@ -51,10 +50,9 @@ namespace StockScreener
         }
 
         /// <summary>Return the item from the collection</summary>
-        public Stock Get(int position)
+        public string Get(int position)
         {
-            //  Console.WriteLine("The position is " + position);
-            return hash[position];
+            return JsonSerializer.Serialize(hash[position]);
         }
 
     }

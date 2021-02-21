@@ -1,4 +1,4 @@
-import React, { Component,  PureComponent  } from 'react';
+import React, { Component, PureComponent } from 'react';
 import ReactDOM from 'react-dom';
 import { render } from 'react-dom';
 import { FetchData } from './DashboardOne/FetchData';
@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react';
 
 // Fetch data for dash board one
-export class StockTableTwo extends PureComponent  {
+export class StockTableTwo extends PureComponent {
 
     constructor(props) {
         super(props);
@@ -247,19 +247,20 @@ export class StockTableTwo extends PureComponent  {
             else
                 style = {};
 
+            let list = this.props.cache.get(id);
+
             this.state.tb2_stack.push(
                 <tbody>
                     <tr key={id} style={style}>
-                        {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
-                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{list.stockName}</td>
+                        <td id={id} onClick={this.selectRow}>{list.time}</td>
+                        <td id={id} onClick={this.selectRow}>{list.price}</td>
+                        <td id={id} onClick={this.selectRow}>{list.high}</td>
 
-                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+                        <td id={id} onClick={this.selectRow}>{list.low}</td>
+                        <td id={id} onClick={this.selectRow}>{list.profitLoss}</td>
+                        <td id={id} onClick={this.selectRow}>{list.profitLossPercen}</td>
+                        <td id={id} onClick={this.selectRow}>{list.volume}</td>
                     </tr>
                 </tbody>)
         }
