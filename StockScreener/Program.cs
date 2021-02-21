@@ -32,6 +32,11 @@ namespace StockScreener
                 .UseStartup<Startup>()
                 .UseSetting("https_port", "44362")
                 .UseUrls("https://localhost:44362", "https://localhost:5000")
+                .ConfigureLogging(logging =>
+                {
+                    logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
+                    logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Debug);
+                })
                 .Build();
 
             host.Run();
@@ -45,7 +50,7 @@ namespace StockScreener
                     webBuilder.UseStartup<Startup>();
                 }).ConfigureServices(services =>
                 {
-                services.AddHostedService<BackgroundServiceWorker>();
+                    services.AddHostedService<BackgroundServiceWorker>();
                 });
 
 

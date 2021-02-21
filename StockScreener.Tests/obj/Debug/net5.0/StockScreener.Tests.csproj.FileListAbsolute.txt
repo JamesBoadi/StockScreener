@@ -24,15 +24,7 @@ c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\StockScre
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\CsvHelper.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Humanizer.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.AspNetCore.Authentication.Certificate.dll
-c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.AspNetCore.Connections.Abstractions.dll
-c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.AspNetCore.Http.Connections.Client.dll
-c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.AspNetCore.Http.Connections.Common.dll
-c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.AspNetCore.Http.Features.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.AspNetCore.Razor.Language.dll
-c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.AspNetCore.SignalR.Client.dll
-c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.AspNetCore.SignalR.Client.Core.dll
-c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.AspNetCore.SignalR.Common.dll
-c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.AspNetCore.SignalR.Protocols.Json.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.AspNetCore.SpaServices.Extensions.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.Bcl.AsyncInterfaces.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.CodeAnalysis.dll
@@ -43,7 +35,6 @@ c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.DotNet.InternalAbstractions.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\dotnet-ef.dll
-c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.Extensions.DependencyInjection.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.TestPlatform.CoreUtilities.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.TestPlatform.CommunicationUtilities.dll
@@ -66,7 +57,6 @@ c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.Co
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.Composition.Runtime.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.Composition.TypedParts.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.Configuration.ConfigurationManager.dll
-c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.IO.Pipelines.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.Net.WebSockets.WebSocketProtocol.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.Security.Cryptography.ProtectedData.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.Xml.XPath.XmlDocument.dll
@@ -223,3 +213,7 @@ c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.We
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.Web.WebPages.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.Web.Infrastructure.dll
 c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\package-lock.json
+c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\System.Web.Cors.dll
+c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.Owin.dll
+c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Microsoft.Owin.Cors.dll
+c:\Users\Peek\Music\StockScreener\StockScreener.Tests\bin\Debug\net5.0\Owin.dll

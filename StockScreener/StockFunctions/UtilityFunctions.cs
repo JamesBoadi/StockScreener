@@ -6,8 +6,7 @@ namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebS
     // Utility functions
     public abstract class UtilityFunctions
     {
-
-        private static string previousTrend = "UP";
+    /*    private static string previousTrend = "UP";
 
         public static string PreviousTrend
         {
@@ -38,7 +37,6 @@ namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebS
             set { downTrend = value; }
         }
 
-
         // 1D, 2D, 2D~
         private static int dayMove = 0;
         public static int DayMove
@@ -55,7 +53,8 @@ namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebS
             set { tDays = value; }
         }
 
-        // A tick to measure if a stock has already been called (only called once)
+        // A tick to measure if a stock has already been called (only called once a day)
+        // Starting stock info for day
         private static int tick = 0;
         public static int Tick
         {
@@ -105,7 +104,7 @@ namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebS
         public abstract bool breakOut(double currentPrice, double high_1, double high_2);
 
         public abstract void trendMonitor(double currentPrice, int hours, int minutes, int high, int low);
-        //  public abstract int GetArea();
+        //  public abstract int GetArea();*/
     }
 
 }

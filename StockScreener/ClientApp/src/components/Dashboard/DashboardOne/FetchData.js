@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { HubConnectionBuilder } from '@microsoft/signalr';
+import { HubConnectionBuilder } from '@aspnet/signalr';
 import { sendRequest } from '@microsoft/signalr/dist/esm/Utils';
 
 import { StockTable } from '../StockTable';
@@ -12,7 +12,13 @@ import { Box } from '@chakra-ui/react';
 import { DashboardSettings } from '../DashboardSettings';
 import Nav from 'reactstrap/lib/Nav';
 import { StockTableTwo } from '../StockTableTwo';
+import * as signalR from '@aspnet/signalr';
 
+/*
+const hubConnection = new HubConnectionBuilder()
+ .withUrl('https://localhost:44362/requestData')
+ .withAutomaticReconnect()
+ .build(); */
 
 // Fetch data for dash board one
 export class FetchData extends Component {
@@ -23,11 +29,16 @@ export class FetchData extends Component {
     super(props);
     this.cache = new Map();
     this.readNavBarData = this.readNavBarData.bind(this);
+    this.onNotifReceived = this.onNotifReceived.bind(this);
+    this.hubConnection = null
+    //this.startHubConnection = this.startHubConnection.bind(this);
+    //this.createHubConnection = this.createHubConnection.bind(this);
+    this.startStreaming = this.startStreaming.bind(this);
 
     this.state = {
       isStreaming: false,
       lock: false,
-      forecasts: [], loading: true, connection: HubConnectionBuilder(),
+      forecasts: [], loading: true, hubConnection: HubConnectionBuilder(),
       nick: '',
       message: '',
       messages: [],
@@ -55,11 +66,41 @@ export class FetchData extends Component {
     };
   }
 
-  /*
-const connection = new HubConnectionBuilder()
-  .withUrl('https://localhost:44362/requestData')
-  .withAutomaticReconnect()
-  .build(); */
+  componentDidMount = () => {
+
+
+    //  this.startHubConnection(this.createHubConnection());
+
+    //this.startStreaming(this.hubConnection);
+
+    this.sendRequest();
+
+
+    //this.startStreaming(this.hubConnection);
+
+
+
+    /* Returns stockarray (Data) and request array (calls and max calls) 
+  this.state.hubConnection.on('ScanResponse',
+    (stockArray, requestArray) => {
+ 
+      const request_Calls = parseInt(requestArray[0]);
+      const max_Calls = parseInt(requestArray[1]);
+ 
+      if (this.state.MAX_CALLS == null || this.state.MAX_CALLS != max_Calls)
+        this.setState({ MAX_CALLS: max_Calls });
+ 
+      if (this.state.column_counter == this.state.MAX_CALLS)
+        this.setState({ lock: true })
+ 
+      console.log(stockArray + " " + request_Calls + " " + max_Calls);
+ 
+      if (this.state.lock == false)
+        this.sendRequest(); // Send message again
+    });
+});*/
+  }
+
 
   readNavBarData = (num) => {
     var NavBar = NavBarData.navBar;
@@ -89,70 +130,97 @@ const connection = new HubConnectionBuilder()
     </tbody>)
   }
 
-  componentDidMount = () => {
-    /*  const hubConnection = new HubConnectionBuilder()
-        .withUrl('https://localhost:44362/requestScan')
-        .withAutomaticReconnect()
-        .build();
-  
-      this.setState({ hubConnection: hubConnection }, () => {
-        this.state.hubConnection
-          .start()
-          .then(() => console.log('Connection started!'))
-          .catch(err => console.log('Error while establishing connection :(')); // Redirect to 404 page
-        /* Returns stockarray (Data) and request array (calls and max calls) */
-    /*   this.state.hubConnection.on('ScanResponse',
-         (stockArray, requestArray) => {
- 
-           const request_Calls = parseInt(requestArray[0]);
-           const max_Calls = parseInt(requestArray[1]);
- 
-           if (this.state.MAX_CALLS == null || this.state.MAX_CALLS != max_Calls)
-             this.setState({ MAX_CALLS: max_Calls });
- 
-           if (this.state.column_counter == this.state.MAX_CALLS)
-             this.setState({ lock: true })
- 
-           console.log(stockArray + " " + request_Calls + " " + max_Calls);
- 
-           if (this.state.lock == false)
-             this.sendRequest(); // Send message again
-         });
-  }); */
+  // Replace with signal R (Keep th e cache)
+  async temporaryStore() {
+    setInterval(() => {
+
+    }, 1000);
   }
 
-  sendRequest = () => {
-    // Set the state of this column counter
-    //this.setState({ column_counter: this.state.column_counter + 1 });
-    /*  var arr = [];
-      arr.push(this.state.column_counter.toString());
-      arr.push("500");
-  
-      var stream_ = this.state.hubConnection.stream("RequestData", arr)
+  async startStreaming(hubConnection) {
+    let isOK = false;
+    var t = ["ahhhhhhhhhhhhhhh"];
+    console.log(this.hubConnection)
+    try {
+      await hubConnection.stream("RequestData", t)
         .subscribe({
-  
+          next: stockArray => {
+            try {
+              console.log('HELLO' + stockArray)
+
+              var i = 0;
+
+              for (i = 0; i < stockArray.length; i++) {
+                console.log("next " + stockArray[i]);
+              }
+
+
+
+
+
+
+            }
+            catch (err) {
+              console.error('Comm: Error in hub streaming callback. ' + err);
+            }
+          },
+          complete: () => console.log('Comm: Hub streaming completed.'),
+          error: err => console.error('Comm: Error in hub streaming subscription. ' + err)
+        });
+
+      console.log('Comm: Hub streaming started.');
+      isOK = true;
+    }
+    catch (err) {
+      console.error('Comm: Error in hub startStreaming(). ' + err);
+    }
+
+    return isOK;
+  }
+
+
+  async sendRequest() {
+    const hubConnection = new signalR.HubConnectionBuilder()
+      .withUrl('https://localhost:44362/stock')
+      .configureLogging(signalR.LogLevel.Information)
+      .build();
+
+    await hubConnection
+      .start()
+      .then(() => console.log('Connection started!'))
+      .catch(err => console.log('Error while establishing hubConnection :(')); // Redirect to 404 page
+
+      console.log("CONNECTION " + hubConnection);
+
+      // Set the state of this column counter
+      this.setState({ column_counter: this.state.column_counter + 1 });
+      var arr = ["k"];
+
+      // arr.push(this.state.column_counter.toString());
+      // arr.push("500");
+      hubConnection.stream("RequestData", arr)
+        .subscribe({
           next: (stockArray) => {
             var i = 0;
-  
+
             for (i = 0; i < stockArray.length; i++) {
               console.log("next " + stockArray[i]);
             }
-  
-            /*     const request_Calls = parseInt(stockArray[5]);
-                 const max_Calls = parseInt(stockArray[6]);
-       
-                 this.setState({ column_counter: request_Calls });
-       
-                 if (this.state.MAX_CALLS == null || this.state.MAX_CALLS != max_Calls)
-                   this.setState({ MAX_CALLS: max_Calls });
-       
-                 if (this.state.column_counter == this.state.MAX_CALLS) {
-                   this.setState({ lock: true })
-                 }
-  
-            //   console.log(stockArray + " " + request_Calls + " " + max_Calls);
-  
-            //   console.log("Array " + stockArray);
+            /*
+                        const request_Calls = parseInt(stockArray[5]);
+                        const max_Calls = parseInt(stockArray[6]);
+            
+                        this.setState({ column_counter: request_Calls });
+            
+                        if (this.state.MAX_CALLS == null || this.state.MAX_CALLS != max_Calls)
+                          this.setState({ MAX_CALLS: max_Calls });
+            
+                        if (this.state.column_counter == this.state.MAX_CALLS) {
+                          this.setState({ lock: true })
+                        }
+            
+                        //   console.log(stockArray + " " + request_Calls + " " + max_Calls);
+                        //   console.log("Array " + stockArray);*/
           },
           complete: () => {
             // render table
@@ -161,63 +229,17 @@ const connection = new HubConnectionBuilder()
           error: (err) => {
             console.log('err ' + err);
           }
-        });
-  
-      var streamTwo_ = this.state.hubConnection.stream("LockStream", arr)
-        .subscribe({
-          next: (sessionProperties) => {
-            const session = parseInt(sessionProperties[0]); // Get the session to display time
-            const state = Boolean(sessionProperties[1]);
-  
-            if (state === -1)
-              this.setState({ lock: true });
-            else {
-              if (this.state.lock !== false)
-                this.setState({ lock: false });
-            }
-          },
-          complete: () => {
-            // render table
-            console.log('complete');
-          },
-          error: (err) => {
-            console.log('err ' + err);
-          }
-        });
-  
-      if (this.state.lock) {
-        console.log('ERASED');
-        stream_.dispose(); // Dispose stream if lock is true
-      }*/
+    });
+  }
+
+  onNotifReceived(res) {
+    console.info('Yayyyyy, I just received a notification!!!', res);
   }
 
   // https://www.codetinkerer.com/2018/06/05/aspnet-core-websockets.html
 
-
   render() {
     this.readNavBarData(0);
-
-    //  FetchData.sendRequest("I have a message", "of glory");
-
-    /*
-      <br />
-        <input
-          type="text"
-          value={this.state.message}
-          onChange={e => this.setState({ message: e.target.value })}
-        />
-
-        <button onClick={
-          this.sendRequest}>Send</button>
-        <div>
-
-          {this.state.messages.map((message, index) => (
-            <span style={{ display: 'block' }} key={index}> {message} </span>
-          ))}
-        </div>
-
-        {this.renderTable(obj)}
-    */
 
     // Create multiple fetch datas for each dashboard
     //Dashboard
@@ -242,24 +264,90 @@ const connection = new HubConnectionBuilder()
 
           />
         </div>
-        
+
       </div>
     );
   }
-
-  static convertFrombytes() {
-    console.log('I am running!');
-    /* writeToScreen("CONNECTED");
-    doSend("WebSocket rocks");
-    console.log("Sample application");*/
-  }
-
-
-  // Replace with signal R (Keep th e cache)
-  async temporaryStore() {
-    setInterval(() => {
-
-    }, 1000);
-  }
-
 }
+
+
+
+    //  FetchData.sendRequest("I have a message", "of glory");
+/*
+
+ static convertFrombytes() {
+console.log('I am running!');
+/* writeToScreen("CONNECTED");
+doSend("WebSocket rocks");
+console.log("Sample application");
+}
+    const protocol = new signalR.JsonHubProtocol();
+    const transport = signalR.HttpTransportType.ServerSentEvents;
+
+    const options = {
+      transport,
+      logMessageContent: true,
+      logger: signalR.LogLevel.Trace,
+      //accessTokenFactory: () => this.props.accessToken,
+    };
+
+    // create the hubConnection instance
+    this.hubConnection = new signalR.HubConnectionBuilder()
+      .withUrl('https://localhost:44362/stock')
+      .build();
+
+    //  this.hubConnection.on('RequestData', this.onNotifReceived);
+    //this.hubConnection.on('DownloadSession', this.onNotifReceived);
+    //this.hubConnection.on('UploadSession', this.onNotifReceived);
+
+    this.hubConnection.start()
+      .then(() => console.info('SignalR Connected'))
+      .catch(err => console.error('SignalR Connection Error: ', err));
+
+
+
+  <br />
+    <input
+      type="text"
+      value={this.state.message}
+      onChange={e => this.setState({ message: e.target.value })}
+    />
+
+    <button onClick={
+      this.sendRequest}>Send</button>
+    <div>
+
+      {this.state.messages.map((message, index) => (
+        <span style={{ display: 'block' }} key={index}> {message} </span>
+      ))}
+    </div>
+
+    {this.renderTable(obj)}
+*/
+
+/*   var streamTwo_ = this.state.hubConnection.stream("LockStream", arr)
+              .subscribe({
+                next: (sessionProperties) => {
+                 const session = parseInt(sessionProperties[0]); // Get the session to display time
+                  const state = Boolean(sessionProperties[1]);
+
+                  if (state === -1)
+                    this.setState({ lock: true });
+                  else {
+                    if (this.state.lock !== false)
+                      this.setState({ lock: false });
+                  }
+                },
+                complete: () => {
+                  // render table
+                  console.log('complete');
+                },
+                error: (err) => {
+                  console.log('err ' + err);
+                }
+              });
+
+          /*  if (this.state.lock) {
+              console.log('ERASED');
+              stream_.dispose(); // Dispose stream if lock is true
+            }*/

@@ -46,10 +46,7 @@ namespace StockScreener
             set { writerTwo = value; }
         }
 
-
         private static int[] timeArray = new int[2]; 
-
-
 
         bool sessionOneBool = false;
         bool sessionTwoBool = false;
@@ -102,12 +99,15 @@ namespace StockScreener
         public CancellationToken CancellationToken { get; set; }
 
         // Type task for asyc operations
+
+        // Start operation for retreving stocks every 30 seconds
         public Task StartAsync(CancellationToken stoppingToken)
         {
             try
             {
                 // _logger.LogInformation("Timed Hosted Service running.");
-                _timer = new Timer(getDataFromCache, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(30));
+                _timer = new Timer(getDataFromCache, null, 
+                TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(30));
             }
             catch (Exception ex)
             {
@@ -142,7 +142,7 @@ namespace StockScreener
 
         public void convertTime(int session, TimeSpan currentTime)
         {
-            String sessionPeriod = tradingHours[session];
+          /*  String sessionPeriod = tradingHours[session];
 
             String lowerBound = sessionPeriod.Substring(0, 5);
             String upperBound = sessionPeriod.Substring(8, 5);
@@ -225,7 +225,7 @@ namespace StockScreener
                 UtilityFunctions.TDays = (UtilityFunctions.TDays < 10) ? UtilityFunctions.TDays += 1 : 1;
              }   
 
-            SetSession = sessionProperties;
+            SetSession = sessionProperties;*/
         }
 
         public async void getDataFromCache(object current_state)
@@ -235,17 +235,19 @@ namespace StockScreener
             Console.WriteLine("Execution count ");
             try
             {
-                TimeSpan time = ReturnTime();
+              /*  TimeSpan time = ReturnTime();
                 int count = -1;
 
                 while (count < 2)
-                    convertTime(++count, time);
+                    convertTime(++count, time);*/
 
-                await WriterTwo.WriteAsync(SetSession, CancellationToken); 
+            
+//                await WriterTwo.WriteAsync(SetSession, CancellationToken); 
 
+                // Retrieve data from stocks
                 for (int pointer = 0; pointer < Stocks.StocksCode.Value.Length; pointer++)
                 {
-                    //await WriterOne.WriteAsync(Stocks.cache.Get(pointer), CancellationToken);
+                    await WriterOne.WriteAsync(/*Stocks.cache.Get(pointer)*/ new string[]{"AH"}, CancellationToken);
                 }
             }
 
@@ -292,6 +294,7 @@ namespace StockScreener
             return TimeZoneInfo.ConvertTimeToUtc(malaysiaTime, easternZone).DayOfWeek;
         }
 
+        // Stop the timer
         public Task StopAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Timed Hosted Service is stopping.");

@@ -16,8 +16,6 @@ namespace StockScreener
         static Dictionary<int, Stock> hash = new Dictionary<int, Stock>();
         List<Stock> list = new List<Stock>();
 
-
-
         /*  private static int counter = 0;
 
           public int Counter

@@ -136,10 +136,6 @@
               "target": "Package",
               "version": "[5.0.1, )"
             },
-            "Microsoft.AspNetCore.SignalR.Client": {
-              "target": "Package",
-              "version": "[5.0.1, )"
-            },
             "Microsoft.AspNetCore.SpaServices.Extensions": {
               "target": "Package",
               "version": "[5.0.0, )"
@@ -161,6 +157,10 @@
             "Microsoft.Extensions.Hosting": {
               "target": "Package",
               "version": "[5.0.0, )"
+            },
+            "Microsoft.Owin.Cors": {
+              "target": "Package",
+              "version": "[4.1.1, )"
             },
             "Microsoft.TestPlatform.TestHost": {
               "target": "Package",

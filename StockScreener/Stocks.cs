@@ -99,6 +99,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         }
 
         // Replace blocking operation with await tasks and loading bar
+        // Initialise StockList and StockCode
         public void init()
         {
             init_StockList();
@@ -167,13 +168,13 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     stock.Volume = pointer + 4;
                     stock.Request_Calls = pointer + 5;
 
-                    if (Utility.Tick == 0)
+               /*     if (Utility.Tick == 0)
                     {
-                        stock.High_1 = 0;
+                        stock.High_1 = 0; 
                         stock.Low_1 = 0;
                         stock.Open_1 = 0;
                         stock.Close_1 = 0;
-
+                        
                         UtilityFunctions.Tick = 1;
                     }
                     else
@@ -182,10 +183,10 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                         stock.Low_2 = 0;
                         stock.Open_2 = 0;
                         stock.Close_2 = 0;
-                    }
+                    }*/
 
                     cache.Add(stock);
-                    stock = new Stock();
+//                    stock = new Stock();
 
                     /*     cache.Add(data_.Open.ToString());
                         cache.Add(StocksCode.Value[code].ToString());
@@ -210,7 +211,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             }
         }
 
-        public void update(int pointer)
+    /*    public void update(int pointer)
         {
             // Check for any changes
             bool isEqual = cache.Get(pointer).Equals(stock);
@@ -241,8 +242,8 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 cache.Update(pointer, stock);
             }
 
-            stock.alertStatus();
-        }
+            // stock.alertStatus();
+        }*/
 
         public List<Database> readDatabase()
         {

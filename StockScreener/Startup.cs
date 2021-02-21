@@ -10,6 +10,7 @@ using System.Net.WebSockets;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using StockScreener.Controllers;
+using Microsoft.Owin.Cors;
 
 namespace StockScreener
 {
@@ -19,7 +20,7 @@ namespace StockScreener
         {
             Configuration = configuration;
         }
-
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -42,13 +43,29 @@ namespace StockScreener
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.AddCors(options =>
+        {
+            options.AddPolicy(MyAllowSpecificOrigins,
+                              builder =>
+                              {
+                                  builder.WithOrigins("https://localhost:5000",
+                                                      "https://localhost:44362")
+                                                      .SetIsOriginAllowedToAllowWildcardSubdomains()
+                                                      .AllowAnyHeader();
+
+                              });
+        });
+
             services.AddHttpsRedirection(options =>
             {
                 options.HttpsPort = 44362;
             });
 
+
+
             services.AddSignalR();
             services.AddSignalRCore();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,12 +80,16 @@ namespace StockScreener
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             }
-          
+
+            
+
+            //CorsOptions.AllowAll
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseHsts();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+            app.UseWebSockets();
             app.UseRouting();
             app.UseCors(builder =>
             {
@@ -76,7 +97,9 @@ namespace StockScreener
                 .AllowAnyHeader().AllowAnyMethod().AllowCredentials();
             });
             app.UseCookiePolicy();
-          
+            app.UseCors("CorsPolicy");
+
+
             // For controllers and views only
             app.UseEndpoints(endpoints =>
             {
@@ -84,7 +107,7 @@ namespace StockScreener
                     name: "default",
                     pattern: "{controller=Home}/{action=DummyOne}/{page}");
                 endpoints.MapControllers();
-                endpoints.MapHub<StockController>("/requestScan");
+                endpoints.MapHub<StockRetrival>("stock");
 
                 /* endpoints.MapContr endpoints.MapRazorPages();ollerRoute(
                      name: "",

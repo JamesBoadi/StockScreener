@@ -9,9 +9,9 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Runtime.CompilerServices;
 
-namespace StockScreener.Controllers
+namespace StockScreener
 {
-    public class StockController : Hub
+    public class StockRetrival : Hub
     {
         static string[] request_arr = new string[2];
 
@@ -26,7 +26,7 @@ namespace StockScreener.Controllers
         static ChannelWriter<string[]> Writer { get; set; }
 
         static CancellationToken CancellationToken { get; set; }
-        
+
         static ILogger<BackgroundServiceWorker> logger;// = new ILogger<BackgroundServiceWorker>();
 
         BackgroundServiceWorker serviceWorker = new BackgroundServiceWorker();
@@ -36,23 +36,48 @@ namespace StockScreener.Controllers
         public ChannelReader<string[]> RequestData(string[] arr, CancellationToken cancellationToken)
         {
             var channelTwo = Channel.CreateUnbounded<string[]>();
-
-            // Trigger a background thread that does the sending
-            if (init_called == false)
+            try
             {
-                stocks.init();
-                init_called = !init_called;
-            }
-
-            if (_init_work == false)
-            {
-                _ = initialise_cache();
+                      Console.WriteLine("null? Trivago " + arr[0]);
                 _ = init_workOne(channelTwo.Writer, cancellationToken);
-                _init_work = !_init_work;
-            }
-            // _ = WriteItemsAsync(channelTwo.Writer, arr, cancellationToken);
 
-            _ = serviceWorker.StartAsync(cancellationToken);
+                string[] s = new string[] { "AH"};
+                channelTwo.Writer.WriteAsync(s, cancellationToken);
+
+                
+                //serviceWorker.WriterTwo.WriteAsync(s, cancellationToken);
+
+          
+
+              
+
+                /*     // Trigger a background thread that does the sending
+                     if (init_called == false)
+                     {
+                         stocks.init();
+                         init_called = !init_called;
+                     }
+
+                     if (_init_work == false)
+                     {
+                         _ = initialise_cache();
+                         _ = init_workOne(channelTwo.Writer, cancellationToken);
+                         _init_work = !_init_work;
+                     }
+                     //_ = WriteItemsAsync(channelTwo.Writer, arr, cancellationToken);
+
+                     _ = serviceWorker.StartAsync(cancellationToken);*/
+
+            }
+            catch (Exception ex)
+            {
+                if (ex is StackOverflowException || ex is ArgumentNullException || ex is NullReferenceException || ex is ArgumentException ||
+                  ex is IndexOutOfRangeException ||
+                  ex is Newtonsoft.Json.JsonSerializationException
+                  || ex is MissingMemberException
+                  || ex is OverflowException || ex is System.Threading.Tasks.TaskCanceledException)
+                    Console.WriteLine("exception " + ex); // Redirect also if timeout
+            }
 
             return channelTwo.Reader;
         }
@@ -86,7 +111,7 @@ namespace StockScreener.Controllers
                 if (pointer == stocks.MAX_CALLS)
                 {
                     stocks.get(start, start + stocks.Mod, 500 + pointer);
-                    Console.WriteLine("Called ");
+                    Console.WriteLine("Fill Cache ");
                     break;
                 }
 
@@ -102,6 +127,7 @@ namespace StockScreener.Controllers
             Console.WriteLine("Finished ");
         }
 
+        // Initialise service worker to write data
         private async Task init_workOne(ChannelWriter<string[]> writer, CancellationToken cancellationToken)
         {
             await Task.Delay(100);
@@ -111,6 +137,7 @@ namespace StockScreener.Controllers
             serviceWorker.CancellationToken = cancellationToken;
         }
 
+        // Initialise service worker to write data
         private async Task init_workTwo(ChannelWriter<object[]> writer, CancellationToken cancellationToken)
         {
             await Task.Delay(100);
@@ -119,51 +146,5 @@ namespace StockScreener.Controllers
 
             serviceWorker.CancellationToken = cancellationToken;
         }
-
-        // The logger factory! With priority queue!
-
-        /*   private async Task WriteItemsAsync(
-                      )
-                   {
-                       Exception localException = null;
-                       try
-                       {
-                           int request_Calls = Int32.Parse(arr[0]);
-                           int delay = Int32.Parse(arr[1]);
-
-                           for (int pointer = 0; pointer < Stocks.StocksCode.Value.Length; pointer++)
-                           {
-                               await writer.WriteAsync(Stocks.cache.Get(20), Stocks.CancellationToken);
-
-                           } //   _ = serviceWorker.StartAsync(CancellationToken);
-
-                           Console.WriteLine("cancelled " + Stocks.CancellationToken.IsCancellationRequested);
-
-                           // await writer.WriteAsync(Stocks.cache.Get(20), Stocks.CancellationToken);
-                           //  await serviceWorker.StartAsync(Stocks.CancellationToken);
-                       }
-
-                       catch (Exception ex)
-                       {
-                           if (ex is StackOverflowException || ex is ArgumentNullException || ex is NullReferenceException ||
-                           ex is IndexOutOfRangeException ||
-                           ex is Newtonsoft.Json.JsonSerializationException
-                           || ex is MissingMemberException)
-                               Console.WriteLine("exception_ " + ex);
-
-                           localException = ex;
-                       }
-                       finally
-                       {
-                           writer.Complete(localException);
-                       }
-                   }*/
-
-
-
-        /* public IActionResult Index()
-         {
-             return View();
-         }*/
     }
 }

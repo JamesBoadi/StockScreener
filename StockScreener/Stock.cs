@@ -22,13 +22,13 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
             {
                 return currentPrice;
             }
-            set
+          /*  set
             {
                 currentPrice = (currentPrice >= Close_2) ? currentPrice : Close_2;
 
                 // Update the day move if and only if current price is exceeded (Once every day)
                 UtilityFunctions.DayMove += (currentPrice >= Close_2 && UtilityFunctions.DayMove < 3) ? 1 : 0;
-            }
+            }*/
         }
 
         // Contains all the stocks information
@@ -75,7 +75,7 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         }
     
         // Call when updating cache
-        public void alertStatus()
+     /*   public void alertStatus()
         {
             // Mathmatical functions
             string tday = Utility.TDays.ToString();
@@ -112,8 +112,8 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
                     alertstatus += " BO " + "T-" + tday;
                 }
 
-            }
-        }
+            } 
+        } */
     }
 
 }

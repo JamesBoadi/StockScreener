@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component,  PureComponent  } from 'react';
 import ReactDOM from 'react-dom';
 import { render } from 'react-dom';
 import { FetchData } from './DashboardOne/FetchData';
@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react';
 
 // Fetch data for dash board one
-export class StockTableTwo extends Component {
+export class StockTableTwo extends PureComponent  {
 
     constructor(props) {
         super(props);
@@ -68,7 +68,7 @@ export class StockTableTwo extends Component {
 
     componentDidUpdate(snapshot) {
         // Update table
-        if (this.state.tb2_count === 1 && snapshot !== null) {
+        if (this.state.tb2_count === 2 && snapshot !== null) {
 
             this.updateTable()
             this.textInput.current.scrollTop = 5;
@@ -214,7 +214,7 @@ export class StockTableTwo extends Component {
         if (this.loadFromCache() === 1) {
             // Scroll Down
             this.setState({ tb2_scrollPosition: this.state.tb2_scrollPosition + 1 });
-            this.setState({ tb2_count: 1 });
+            this.setState({ tb2_count: this.state.tb2_count + 1 });
             console.log('Render 1')
         }
         else if (this.loadFromCache() === -1) {

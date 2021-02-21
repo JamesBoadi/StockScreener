@@ -6,7 +6,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
     // Utility functions
     public class Utility : UtilityFunctions
     {
-        private static readonly int dayMove = DayMove;
+/*        private static readonly int dayMove = DayMove;
 
         private static readonly int T_Days = TDays;
 
@@ -175,8 +175,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
 
         }
-
-        double current = Int32.MinValue;
+/*        double current = Int32.MinValue;
 
         public override void trendMonitor(double currentPrice, int hours, int minutes, int high, int low)
         {
@@ -246,7 +245,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 UtilityFunctions.Reversal = true;
             }
         }
-
+*/
 
 
         
@@ -280,7 +279,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
 
 
-    }
+//    }
 
 
 }
