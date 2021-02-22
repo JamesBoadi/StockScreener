@@ -6,11 +6,13 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
     // Utility functions
     public class Utility : UtilityFunctions
     {
+
+         public static readonly int tick = Tick;
 /*        private static readonly int dayMove = DayMove;
 
         private static readonly int T_Days = TDays;
 
-        public static readonly int tick = Tick;
+       
 
         private static readonly double[] highestPrice = HighestPrice;
 

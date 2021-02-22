@@ -43,6 +43,7 @@ export class StockTableTwo extends PureComponent {
             stockRecord: 0,
             scroll: 0,
             query: {},
+            start: 0,
 
             tb2: [],
             tb2_temp: [],
@@ -214,6 +215,7 @@ export class StockTableTwo extends PureComponent {
         if (this.loadFromCache() === 1) {
             // Scroll Down
             this.setState({ tb2_scrollPosition: this.state.tb2_scrollPosition + 1 });
+            this.setState({ start: this.state.tb2_scrollPosition * 50});
             this.setState({ tb2_count: this.state.tb2_count + 1 });
             console.log('Render 1')
         }
@@ -223,6 +225,7 @@ export class StockTableTwo extends PureComponent {
                 tb2_scrollPosition: (this.state.tb2_scrollPosition <= 0) ?
                     0 : this.state.tb2_scrollPosition - 1
             });
+            this.setState({ start: this.state.tb2_scrollPosition * 50});
             this.setState({ tb2_count: 1 });
             console.log('Render 2')
         }
@@ -247,6 +250,7 @@ export class StockTableTwo extends PureComponent {
             else
                 style = {};
 
+            // Get values from cache
             let list = this.props.cache.get(id);
 
             this.state.tb2_stack.push(
@@ -259,7 +263,7 @@ export class StockTableTwo extends PureComponent {
 
                         <td id={id} onClick={this.selectRow}>{list.low}</td>
                         <td id={id} onClick={this.selectRow}>{list.profitLoss}</td>
-                        <td id={id} onClick={this.selectRow}>{list.profitLossPercen}</td>
+                        <td id={id} onClick={this.selectRow}>{list.profitLoss_percentage}</td>
                         <td id={id} onClick={this.selectRow}>{list.volume}</td>
                     </tr>
                 </tbody>)
@@ -327,21 +331,24 @@ export class StockTableTwo extends PureComponent {
     }
 
     updateTable() {
+        // Get values from cache
+        let list = this.props.cache.get(this.state.start);
+
         let t = <div>
             <div id="stack-wrapper">
                 <div id="stack-scroll">
                     <table class="stockTableTwo" aria-labelledby="tabelLabel">
                         <thead>
                             <tr>
-                                <th>1</th>
-                                <th>1</th>
-                                <th>1</th>
-                                <th>1</th>
+                                <th>{list.stockName}</th>
+                                <th>{list.time}</th>
+                                <th>{list.price}</th>
+                                <th>{list.high}</th>
 
-                                <th>1</th>
-                                <th>1</th>
-                                <th>1</th>
-                                <th>1</th>
+                                <th>{list.low}</th>
+                                <th>{list.profitLoss}</th>
+                                <th>{list.profitLoss_percentage}</th>
+                                <th>{list.volume}</th>
                             </tr>
                         </thead>
 
@@ -360,22 +367,24 @@ export class StockTableTwo extends PureComponent {
         let id;
         let mod = 0;
 
-        for (id = 0; id < 50; id++) {
-            this.state.tb2_stack[id] =
-                <tbody>
-                    <tr key={id}     >
-                        {/* Replace with map, import array that CONTAINS stock information [[1],[2]].... */}
-                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+        for (id = 1; id < 50; id++) {
+            // Get values from cache
+            let list = this.props.cache.get(id);
 
-                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
-                        <td id={id} onClick={this.selectRow}>{id + mod}</td>
+            this.state.tb2_stack.push(
+                <tbody>
+                    <tr key={id} style={style}>
+                        <td id={id} onClick={this.selectRow}>{list.stockName}</td>
+                        <td id={id} onClick={this.selectRow}>{list.time}</td>
+                        <td id={id} onClick={this.selectRow}>{list.price}</td>
+                        <td id={id} onClick={this.selectRow}>{list.high}</td>
+
+                        <td id={id} onClick={this.selectRow}>{list.low}</td>
+                        <td id={id} onClick={this.selectRow}>{list.profitLoss}</td>
+                        <td id={id} onClick={this.selectRow}>{list.profitLoss_percentage}</td>
+                        <td id={id} onClick={this.selectRow}>{list.volume}</td>
                     </tr>
-                </tbody>
+                </tbody>)
         }
     }
 
@@ -395,32 +404,7 @@ export class StockTableTwo extends PureComponent {
             </thead>
         </table>;
 
-        let table = <div>
-            <div id="stack-wrapper">
-                <div id="stack-scroll">
-                    <table class="stockTableTwo" aria-labelledby="tabelLabel">
-                        <thead>
-                            <tr>
-                                <th>1</th>
-                                <th>1</th>
-                                <th>1</th>
-                                <th>1</th>
-
-                                <th>1</th>
-                                <th>1</th>
-                                <th>1</th>
-                                <th>1</th>
-                            </tr>
-                        </thead>
-
-                        {this.state.tb2_stack}
-
-                    </table>
-                </div>
-            </div>
-        </div>;
-
-
+   
         return (
             <div>
 

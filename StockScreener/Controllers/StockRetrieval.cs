@@ -58,7 +58,7 @@ namespace StockScreener
             }
             catch (Exception ex)
             {
-                if (ex is StackOverflowException || ex is ArgumentNullException || ex is NullReferenceException || ex is ArgumentException ||
+                if (ex is StackOverflowException || ex is KeyNotFoundException|| ex is ArgumentNullException || ex is NullReferenceException || ex is ArgumentException ||
                   ex is IndexOutOfRangeException ||
                   ex is Newtonsoft.Json.JsonSerializationException
                   || ex is MissingMemberException
@@ -86,6 +86,24 @@ namespace StockScreener
             return channelOne.Reader;
         }
 
+        // Restart stream on faliure
+        public ChannelReader<object[]> RestartStream(object[] state, CancellationToken cancellationToken)
+        {
+            var channelOne = Channel.CreateUnbounded<object[]>();
+            bool _state = (bool)state[0];
+
+            _ = init_workTwo(channelOne.Writer, cancellationToken);
+
+            if (!_state) { }
+            // Stop the stream if stopasync is called
+            else
+            {
+                // Restart the stream if not already called
+            }
+
+            return channelOne.Reader;
+        }
+
         private async Task initialise_cache()
         {
             int start = 0;
@@ -97,12 +115,12 @@ namespace StockScreener
             {
                 if (pointer == stocks.MAX_CALLS)
                 {
-                    stocks.get(start, start + stocks.Mod, 500 + pointer);
+                    stocks.getStocks(start, start + stocks.Mod, 500 + pointer);
                     Console.WriteLine("Fill Cache ");
                     break;
                 }
 
-                stocks.get(start, end, 500 + pointer);
+                stocks.getStocks(start, end, 500 + pointer);
                 stocks.Request_Calls = pointer;
 
                 start += 20;

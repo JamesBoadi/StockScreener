@@ -247,7 +247,7 @@ namespace StockScreener
                 // Retrieve data from stocks
                 for (int pointer = 0; pointer < length; pointer++)
                 {
-                    s[pointer] = Stocks.cache.Get(pointer);
+                    s[pointer] = Stocks.cache.Get(pointer).Serialize();
                 }
                 
                 await WriterOne.WriteAsync(s, CancellationToken);

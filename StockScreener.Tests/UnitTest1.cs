@@ -14,15 +14,21 @@ namespace StockScreener.Tests
             this.output = output;
         }
 
+    
+
+
         [Fact]
         public void Test1()
         {
-            BackgroundServiceWorker service = new BackgroundServiceWorker();
+            Stocks stocks = new Stocks();
+
+            //stocks.initialise_cache();
+       /*     BackgroundServiceWorker service = new BackgroundServiceWorker();
             TimeSpan time = service.ReturnTime();
             
             service.convertTime(0, time);
 
-           // output.WriteLine(  );
+           // output.WriteLine(  );*/
             Assert.Equal(1, 1);
         }
     }

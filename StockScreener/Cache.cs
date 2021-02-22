@@ -50,10 +50,13 @@ namespace StockScreener
         }
 
         /// <summary>Return the item from the collection</summary>
-        public string Get(int position)
+        public Stock Get(int position)
         {
-            return JsonSerializer.Serialize(hash[position]);
+            return hash[position];
         }
+
+
+
 
     }
 

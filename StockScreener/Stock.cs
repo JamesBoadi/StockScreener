@@ -8,7 +8,8 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Channels;
-using CsvHelper;
+using System.Text.Json;
+using System.Linq;
 
 namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_server For the database (https://gist.github.com/kevinswiber/1390198)
 {
@@ -22,37 +23,27 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
             {
                 return currentPrice;
             }
-          /*  set
-            {
-                currentPrice = (currentPrice >= Close_2) ? currentPrice : Close_2;
+            /*  set
+              {
+                  currentPrice = (currentPrice >= Close_2) ? currentPrice : Close_2;
 
-                // Update the day move if and only if current price is exceeded (Once every day)
-                UtilityFunctions.DayMove += (currentPrice >= Close_2 && UtilityFunctions.DayMove < 3) ? 1 : 0;
-            }*/
+                  // Update the day move if and only if current price is exceeded (Once every day)
+                  UtilityFunctions.DayMove += (currentPrice >= Close_2 && UtilityFunctions.DayMove < 3) ? 1 : 0;
+              }*/
         }
 
         // Contains all the stocks information
         public String StockCode { get; set; }
-
+        public double High { get; set; }
+        public double Open { get; set; }
+        public double Close { get; set; }
+        public double Low { get; set; }
         public double Change { get; set; }
-
         public double ChangeP { get; set; }
-
+        public double ProfitLoss { get; set; }
+        public double ProfitLoss_Percentage { get; set; }
         public double Volume { get; set; }
-
         public double Request_Calls { get; set; }
-
-        // The value for the previous day
-        public double High_1 { get; set; }
-        public double Open_1 { get; set; }
-        public double Close_1 { get; set; }
-        public double Low_1 { get; set; }
-
-        // The values for the next day (current day)
-        public double High_2 { get; set; }
-        public double Open_2 { get; set; }
-        public double Close_2 { get; set; }
-        public double Low_2 { get; set; }
 
         // Time the stock was last updated
         public String timestamp { get; set; }
@@ -64,56 +55,77 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
 
         public String scalpStatusColor = "GREEN";
 
+        // Change array
+        public int[] changeArray = new int[6];
+
         // override object.Equals
         public bool Equals(Stock stock)
         {
+            Array.Fill(changeArray, 0);
+
             // Update timestamp if price changes
             if (stock.CurrentPrice != this.CurrentPrice)
-                return false;
-        
-            return true;
+                changeArray[0] = 1;
+            if (stock.High != this.High)
+                changeArray[1] = 1;
+            if (stock.Low != this.Low)
+                changeArray[2] = 1;
+            if (stock.ProfitLoss != this.ProfitLoss)
+                changeArray[3] = 1;
+            if (stock.ProfitLoss_Percentage != this.ProfitLoss_Percentage)
+                changeArray[4] = 1;
+            if (stock.Volume != this.Volume)
+                changeArray[5] = 1;
+
+            return changeArray.Contains(1);
         }
-    
-        // Call when updating cache
-     /*   public void alertStatus()
+
+        // Convert to JSON notation
+        public string Serialize()
         {
-            // Mathmatical functions
-            string tday = Utility.TDays.ToString();
+            return JsonSerializer.Serialize(this);
+        }
 
-            if (Utility.Reversal == true)
-            {
-                alertstatus = "Reversal";
-            }
-            else
-            {
-                // No BO
-                if (Utility.DayMove == 0)
-                    alertstatus = "";
+        // Call when updating cache
+        /*   public void alertStatus()
+           {
+               // Mathmatical functions
+               string tday = Utility.TDays.ToString();
 
-                // Current price is above the BO line (configure property)
-                else if (Utility.DayMove == 1)
-                    alertstatus = "1D";
-                else if (Utility.DayMove == 2)
-                    alertstatus = "2D";
-                else if (Utility.DayMove == 3)
-                    alertstatus = "2D~";
+               if (Utility.Reversal == true)
+               {
+                   alertstatus = "Reversal";
+               }
+               else
+               {
+                   // No BO
+                   if (Utility.DayMove == 0)
+                       alertstatus = "";
 
-                if (!Utility.UpTrend && Utility.DownTrend)
-                {
-                    alertstatus = "BS1";
-                }
-                else if (!(Utility.UpTrend && Utility.DownTrend))
-                {
-                    // Do nothing
-                    alertstatus += "";
-                }
-                else if (Utility.UpTrend && !Utility.DownTrend)
-                {
-                    alertstatus += " BO " + "T-" + tday;
-                }
+                   // Current price is above the BO line (configure property)
+                   else if (Utility.DayMove == 1)
+                       alertstatus = "1D";
+                   else if (Utility.DayMove == 2)
+                       alertstatus = "2D";
+                   else if (Utility.DayMove == 3)
+                       alertstatus = "2D~";
 
-            } 
-        } */
+                   if (!Utility.UpTrend && Utility.DownTrend)
+                   {
+                       alertstatus = "BS1";
+                   }
+                   else if (!(Utility.UpTrend && Utility.DownTrend))
+                   {
+                       // Do nothing
+                       alertstatus += "";
+                   }
+                   else if (Utility.UpTrend && !Utility.DownTrend)
+                   {
+                       alertstatus += " BO " + "T-" + tday;
+                   }
+
+               } 
+           } */
     }
 
 }

@@ -67,7 +67,7 @@ export class FetchData extends Component {
   }
 
   componentDidMount = () => {
-    //this.sendRequest();
+    this.sendRequest();
   }
 
 
@@ -171,6 +171,7 @@ export class FetchData extends Component {
           for (count = 0; count < stockArray.length; count++) {
             let item = JSON.parse(stockArray[count]);
             this.cache.set(count, item);
+            console.log(item.changeArray);
           }
 
 

@@ -6,6 +6,14 @@ namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebS
     // Utility functions
     public abstract class UtilityFunctions
     {
+            // A tick to measure if a stock has already been called (only called once a day)
+        // Starting stock info for day
+        private static int tick = 0;
+        public static int Tick
+        {
+            get { return tick; }
+            set { tick = value; }
+        }
     /*    private static string previousTrend = "UP";
 
         public static string PreviousTrend
@@ -53,14 +61,7 @@ namespace StockScreener // https://developer.mozilla.org/en-US/docs/Web/API/WebS
             set { tDays = value; }
         }
 
-        // A tick to measure if a stock has already been called (only called once a day)
-        // Starting stock info for day
-        private static int tick = 0;
-        public static int Tick
-        {
-            get { return tick; }
-            set { tick = value; }
-        }
+    
 
         // Reccuring period of 10 days
         private static double[] highestPrice = new double[11];
