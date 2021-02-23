@@ -57,6 +57,7 @@ export class StockTableTwo extends PureComponent {
     }
 
     componentDidMount() {
+
         this.createTable()
         this.updateTable()
 
@@ -69,14 +70,13 @@ export class StockTableTwo extends PureComponent {
 
     componentDidUpdate(snapshot) {
         // Update table
-        if (this.state.tb2_count === 2 && snapshot !== null) {
+        if (this.state.tb2_count === 1 && snapshot !== null) {
 
             this.updateTable()
             this.textInput.current.scrollTop = 5;
-
             this.setState({ tb2_count: 0 });
-
         }
+
         // Scroll to the position in the table
         const scroll = this.scrollBy();
         if (this.state.validInput === true) {
@@ -101,10 +101,7 @@ export class StockTableTwo extends PureComponent {
              this.newTable()
            
          }
- 
-         
      }*/
-
 
     // Communicate with c# controller https://stackoverflow.com/questions/46946380/fetch-api-request-timeout
     async searchDatabase(e) {
@@ -215,7 +212,7 @@ export class StockTableTwo extends PureComponent {
         if (this.loadFromCache() === 1) {
             // Scroll Down
             this.setState({ tb2_scrollPosition: this.state.tb2_scrollPosition + 1 });
-            this.setState({ start: this.state.tb2_scrollPosition * 50});
+            this.setState({ start: this.state.tb2_scrollPosition * 50 });
             this.setState({ tb2_count: this.state.tb2_count + 1 });
             console.log('Render 1')
         }
@@ -225,7 +222,7 @@ export class StockTableTwo extends PureComponent {
                 tb2_scrollPosition: (this.state.tb2_scrollPosition <= 0) ?
                     0 : this.state.tb2_scrollPosition - 1
             });
-            this.setState({ start: this.state.tb2_scrollPosition * 50});
+            this.setState({ start: this.state.tb2_scrollPosition * 50 });
             this.setState({ tb2_count: 1 });
             console.log('Render 2')
         }
@@ -251,25 +248,25 @@ export class StockTableTwo extends PureComponent {
                 style = {};
 
             // Get values from cache
-            let list = this.props.cache.get(id);
+            let list = this.props.state.cache.get(id.toString());
 
             this.state.tb2_stack.push(
                 <tbody>
                     <tr key={id} style={style}>
-                        <td id={id} onClick={this.selectRow}>{list.stockName}</td>
-                        <td id={id} onClick={this.selectRow}>{list.time}</td>
-                        <td id={id} onClick={this.selectRow}>{list.price}</td>
-                        <td id={id} onClick={this.selectRow}>{list.high}</td>
+                        <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
+                        <td id={id} onClick={this.selectRow}>{list.High.toString()}</td>
 
-                        <td id={id} onClick={this.selectRow}>{list.low}</td>
-                        <td id={id} onClick={this.selectRow}>{list.profitLoss}</td>
-                        <td id={id} onClick={this.selectRow}>{list.profitLoss_percentage}</td>
-                        <td id={id} onClick={this.selectRow}>{list.volume}</td>
+                        <td id={id} onClick={this.selectRow}>{list.Low.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss_Percentage.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.Volume.toString()}</td>
                     </tr>
                 </tbody>)
         }
 
-        //   this.setState({ tb2_stack: this.state.tb2_stack });
+          this.setState({ tb2_stack: this.state.tb2_stack });
         this.setState({ tb2_count: 1 });
     }
 
@@ -309,20 +306,25 @@ export class StockTableTwo extends PureComponent {
         var t = [];
 
         console.log('start ' + start + " " + 'end ' + end);
+
         // Use shallow compare
         for (id = start; id < end; id++) {
+
+            // Get values from cache
+            let list = this.props.state.cache.get(id.toString());
+
             t.push(
                 <tbody>
                     <tr key={id}>
-                        <td id={id} onClick={this.selectRow}>{id}</td>
-                        <td id={id} onClick={this.selectRow}>{id}</td>
-                        <td id={id} onClick={this.selectRow}>{id}</td>
-                        <td id={id} onClick={this.selectRow}>{id}</td>
+                        <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
+                        <td id={id} onClick={this.selectRow}>{list.High.toString()}</td>
 
-                        <td id={id} onClick={this.selectRow}>{id}</td>
-                        <td id={id} onClick={this.selectRow}>{id}</td>
-                        <td id={id} onClick={this.selectRow}>{id}</td>
-                        <td id={id} onClick={this.selectRow}>{id}</td>
+                        <td id={id} onClick={this.selectRow}>{list.Low.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss_Percentage.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.Volume.toString()}</td>
                     </tr>
                 </tbody>);
         }
@@ -332,7 +334,7 @@ export class StockTableTwo extends PureComponent {
 
     updateTable() {
         // Get values from cache
-        let list = this.props.cache.get(this.state.start);
+        let list = this.props.state.cache.get('0');
 
         let t = <div>
             <div id="stack-wrapper">
@@ -340,15 +342,15 @@ export class StockTableTwo extends PureComponent {
                     <table class="stockTableTwo" aria-labelledby="tabelLabel">
                         <thead>
                             <tr>
-                                <th>{list.stockName}</th>
-                                <th>{list.time}</th>
-                                <th>{list.price}</th>
-                                <th>{list.high}</th>
+                                <th>{list.StockCode.toString()}</th>
+                                <th>{list.TimeStamp.toString()}</th>
+                                <th>{list.CurrentPrice.toString()}</th>
+                                <th>{list.High.toString()}</th>
 
-                                <th>{list.low}</th>
-                                <th>{list.profitLoss}</th>
-                                <th>{list.profitLoss_percentage}</th>
-                                <th>{list.volume}</th>
+                                <th>{list.Low.toString()}</th>
+                                <th>{list.ProfitLoss.toString()}</th>
+                                <th>{list.ProfitLoss_Percentage.toString()}</th>
+                                <th>{list.Volume.toString()}</th>
                             </tr>
                         </thead>
 
@@ -368,21 +370,23 @@ export class StockTableTwo extends PureComponent {
         let mod = 0;
 
         for (id = 1; id < 50; id++) {
+
+
             // Get values from cache
-            let list = this.props.cache.get(id);
+            let list = this.props.state.cache.get(id.toString());
 
             this.state.tb2_stack.push(
                 <tbody>
-                    <tr key={id} style={style}>
-                        <td id={id} onClick={this.selectRow}>{list.stockName}</td>
-                        <td id={id} onClick={this.selectRow}>{list.time}</td>
-                        <td id={id} onClick={this.selectRow}>{list.price}</td>
-                        <td id={id} onClick={this.selectRow}>{list.high}</td>
+                    <tr key={id}>
+                        <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
+                        <td id={id} onClick={this.selectRow}>{list.High.toString()}</td>
 
-                        <td id={id} onClick={this.selectRow}>{list.low}</td>
-                        <td id={id} onClick={this.selectRow}>{list.profitLoss}</td>
-                        <td id={id} onClick={this.selectRow}>{list.profitLoss_percentage}</td>
-                        <td id={id} onClick={this.selectRow}>{list.volume}</td>
+                        <td id={id} onClick={this.selectRow}>{list.Low.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss_Percentage.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.Volume.toString()}</td>
                     </tr>
                 </tbody>)
         }
@@ -396,6 +400,7 @@ export class StockTableTwo extends PureComponent {
                     <th>Time</th>
                     <th>Price</th>
                     <th>High</th>
+
                     <th>Low</th>
                     <th>P / L</th>
                     <th>P / L %</th>
@@ -404,7 +409,6 @@ export class StockTableTwo extends PureComponent {
             </thead>
         </table>;
 
-   
         return (
             <div>
 
@@ -490,6 +494,20 @@ export class StockTableTwo extends PureComponent {
         );
     }
 
-
+   /*  setInterval(() => {
+            let i;
+            for (i = 0; i < 897; i++) {
+                let list = this.props.state.cache.get(i.toString());
+                console.log("cache TWO " +
+                    list.StockCode.toString() + " " +
+                    list.High.toString() + " " +
+                    list.CurrentPrice.toString() + " " +
+                    list.Low.toString() + " " +
+                    list.ProfitLoss.toString() + " " +
+                    list.ProfitLoss_Percentage.toString() + " " +
+                    list.Volume.toString()
+                )
+            }
+        }, 10000);*/
 
 }

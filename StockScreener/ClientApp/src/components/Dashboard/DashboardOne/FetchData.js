@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import { HubConnectionBuilder } from '@aspnet/signalr';
-import { sendRequest } from '@microsoft/signalr/dist/esm/Utils';
-import { StockTable } from '../StockTable';
 import { DashboardNavbar } from '../DashboardNavbar';
 import { NavBarData } from '../NavbarData.js';
 import { TopNavbar } from '../TopNavbar.js';
@@ -26,18 +24,17 @@ export class FetchData extends Component {
 
   constructor(props) {
     super(props);
-    this.cache = new Map();
     this.readNavBarData = this.readNavBarData.bind(this);
     this.onNotifReceived = this.onNotifReceived.bind(this);
     this.hubConnection = null
     //this.startHubConnection = this.startHubConnection.bind(this);
     //this.createHubConnection = this.createHubConnection.bind(this);
     this.startStreaming = this.startStreaming.bind(this);
-    this.cache = new cache();
 
     this.state = {
+      stockTableTwo: [],
       isStreaming: false,
-      lock: false,
+      lock: true,
       forecasts: [], loading: true, hubConnection: HubConnectionBuilder(),
       nick: '',
       message: '',
@@ -45,6 +42,9 @@ export class FetchData extends Component {
       hubConnection: null,
       column_counter: 0,
       MAX_CALLS: null,
+      called: false,
+      cache: new cache(),
+
 
       data: [
         {
@@ -68,6 +68,22 @@ export class FetchData extends Component {
 
   componentDidMount = () => {
     this.sendRequest();
+  }
+
+  // Replace with event listener
+  componentDidUpdate = () => {
+    var t = [];
+    if (this.state.lock === false &&
+      this.state.called === false) {
+      t.push(<StockTableTwo
+        {...this}
+      />)
+
+      this.setState({ stockTableTwo: t });
+      this.setState({ called: true });
+    }
+
+
   }
 
 
@@ -159,6 +175,8 @@ export class FetchData extends Component {
     // Set the state of this column counter
     this.setState({ column_counter: this.state.column_counter + 1 });
     var arr = ["k"];
+    var cache_ = new cache();
+
 
     // arr.push(this.state.column_counter.toString());
     // arr.push("500");
@@ -170,11 +188,15 @@ export class FetchData extends Component {
           var count = 0;
           for (count = 0; count < stockArray.length; count++) {
             let item = JSON.parse(stockArray[count]);
-            this.cache.set(count, item);
-            console.log(item.changeArray);
+            cache_.set(count.toString(), item);
           }
 
+          this.setState({ cache: cache_ });
+          cache_.clear();
 
+          if (this.state.lock) {
+            this.setState({ lock: false });
+          }
 
           /*
                       const request_Calls = parseInt(stockArray[5]);
@@ -194,7 +216,7 @@ export class FetchData extends Component {
         },
         complete: () => {
           // render table
-          console.log('complete');
+          console.log('End of DAY CALLS');
         },
         error: (err) => {
           console.log('err ' + err);
@@ -209,6 +231,7 @@ export class FetchData extends Component {
   // https://www.codetinkerer.com/2018/06/05/aspnet-core-websockets.html
 
   render() {
+
     this.readNavBarData(0);
 
     // Create multiple fetch datas for each dashboard
@@ -228,9 +251,10 @@ export class FetchData extends Component {
         />
 
         <div id="tableContainer">
-          <StockTableTwo
-          {...this}
-          />
+
+          {this.state.stockTableTwo}
+
+
         </div>
       </div>
     );

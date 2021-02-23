@@ -43,10 +43,11 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         public double ProfitLoss { get; set; }
         public double ProfitLoss_Percentage { get; set; }
         public double Volume { get; set; }
+        public int[] ChangeArray {get; set;}
         public double Request_Calls { get; set; }
 
         // Time the stock was last updated
-        public String timestamp { get; set; }
+        public String TimeStamp { get; set; }
 
         // Default alert status
         private string alertstatus = "1D";
@@ -55,29 +56,26 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
 
         public String scalpStatusColor = "GREEN";
 
-        // Change array
-        public int[] changeArray = new int[6];
-
-        // override object.Equals
+        /// <summary>Compare the equality of stocks</summary>
         public bool Equals(Stock stock)
         {
-            Array.Fill(changeArray, 0);
+            Array.Fill(Stocks.changeArray, 0);
 
-            // Update timestamp if price changes
+            // Update objects
             if (stock.CurrentPrice != this.CurrentPrice)
-                changeArray[0] = 1;
+                Stocks.changeArray[0] = 1;
             if (stock.High != this.High)
-                changeArray[1] = 1;
+                Stocks.changeArray[1] = 1;
             if (stock.Low != this.Low)
-                changeArray[2] = 1;
+                Stocks.changeArray[2] = 1;
             if (stock.ProfitLoss != this.ProfitLoss)
-                changeArray[3] = 1;
+                Stocks.changeArray[3] = 1;
             if (stock.ProfitLoss_Percentage != this.ProfitLoss_Percentage)
-                changeArray[4] = 1;
+                Stocks.changeArray[4] = 1;
             if (stock.Volume != this.Volume)
-                changeArray[5] = 1;
+                Stocks.changeArray[5] = 1;
 
-            return changeArray.Contains(1);
+            return Stocks.changeArray.Contains(1);
         }
 
         // Convert to JSON notation

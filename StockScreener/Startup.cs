@@ -107,7 +107,7 @@ namespace StockScreener
                     name: "default",
                     pattern: "{controller=Home}/{action=DummyOne}/{page}");
                 endpoints.MapControllers();
-                endpoints.MapHub<StockRetrival>("stock");
+                endpoints.MapHub<StockHandler>("stock");
 
                 /* endpoints.MapContr endpoints.MapRazorPages();ollerRoute(
                      name: "",

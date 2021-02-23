@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 
 namespace StockScreener
 {
-    public class StockRetrival : Hub
+    public class StockHandler : Hub
     {
         static string[] request_arr = new string[2];
 
@@ -21,8 +21,6 @@ namespace StockScreener
         static bool _init_work = false;
 
         static string[] stockArray;
-
-        Stocks stocks = new Stocks();
 
         static ChannelWriter<string[]> Writer { get; set; }
 
@@ -42,7 +40,7 @@ namespace StockScreener
                 // Trigger a background thread that does the sending
                 if (init_called == false)
                 {
-                    stocks.init();
+                    Stocks.stocks.init();
                     init_called = !init_called;
                 }
 
@@ -111,17 +109,17 @@ namespace StockScreener
 
             await Task.Delay(100);
 
-            for (int pointer = 0; pointer <= stocks.MAX_CALLS; pointer++)
+            for (int pointer = 0; pointer <= Stocks.stocks.MAX_CALLS; pointer++)
             {
-                if (pointer == stocks.MAX_CALLS)
+                if (pointer == Stocks.stocks.MAX_CALLS)
                 {
-                    stocks.getStocks(start, start + stocks.Mod, 500 + pointer);
+                    Stocks.stocks.initialiseStocks(start, start + Stocks.stocks.Mod, 500 + pointer);
                     Console.WriteLine("Fill Cache ");
                     break;
                 }
 
-                stocks.getStocks(start, end, 500 + pointer);
-                stocks.Request_Calls = pointer;
+                Stocks.stocks.initialiseStocks(start, end, 500 + pointer);
+                Stocks.stocks.Request_Calls = pointer;
 
                 start += 20;
                 end += 20;
@@ -130,6 +128,7 @@ namespace StockScreener
             }
 
             Console.WriteLine("Finished ");
+            UtilityFunctions.Tick = 1; 
         }
 
         // Initialise service worker to write data
