@@ -51,7 +51,7 @@ export class StockTableTwo extends PureComponent {
             tb2_updateTable: false,
             tb2_stack: [], // Render 100 elements per scroll
             tb2_cache: [],
-            tb2_count: 1,
+            tb2_count: 0,
             tb2_numberOfClicks: []
         };
     }
@@ -79,6 +79,7 @@ export class StockTableTwo extends PureComponent {
 
         // Scroll to the position in the table
         const scroll = this.scrollBy();
+
         if (this.state.validInput === true) {
             this.textInput.current.scrollTop = scroll;
             this.setState({ validInput: false })
@@ -200,7 +201,8 @@ export class StockTableTwo extends PureComponent {
     */
     loadFromCache() {
         let units = (this.state.scroll);
-        return (units > 454) ? 1 : (units < 3) ? -1 : 0;
+        console.log("units " + units);
+        return (units > 425) ? 1 : (units < 3) ? -1 : 0;
     }
 
     scrollPosition() {
@@ -211,10 +213,12 @@ export class StockTableTwo extends PureComponent {
     scrollToPosition() {
         if (this.loadFromCache() === 1) {
             // Scroll Down
-            this.setState({ tb2_scrollPosition: this.state.tb2_scrollPosition + 1 });
+            this.setState({ tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ?
+                15 : this.state.tb2_scrollPosition + 1 });
             this.setState({ start: this.state.tb2_scrollPosition * 50 });
             this.setState({ tb2_count: this.state.tb2_count + 1 });
-            console.log('Render 1')
+            
+            console.log('Scroll Down ' + this.state.tb2_scrollPosition )
         }
         else if (this.loadFromCache() === -1) {
             // Scroll Up
@@ -224,7 +228,7 @@ export class StockTableTwo extends PureComponent {
             });
             this.setState({ start: this.state.tb2_scrollPosition * 50 });
             this.setState({ tb2_count: 1 });
-            console.log('Render 2')
+            console.log('Scroll Up')
         }
     }
 
@@ -266,7 +270,7 @@ export class StockTableTwo extends PureComponent {
                 </tbody>)
         }
 
-          this.setState({ tb2_stack: this.state.tb2_stack });
+        this.setState({ tb2_stack: this.state.tb2_stack });
         this.setState({ tb2_count: 1 });
     }
 
@@ -305,7 +309,7 @@ export class StockTableTwo extends PureComponent {
         let end = ((this.state.tb2_scrollPosition * 50) + 50);
         var t = [];
 
-        console.log('start ' + start + " " + 'end ' + end);
+        console.log('down!!!!!!');
 
         // Use shallow compare
         for (id = start; id < end; id++) {
@@ -334,7 +338,7 @@ export class StockTableTwo extends PureComponent {
 
     updateTable() {
         // Get values from cache
-        let list = this.props.state.cache.get('0');
+        let list = this.props.state.cache.get(this.state.start.toString());
 
         let t = <div>
             <div id="stack-wrapper">
@@ -494,20 +498,20 @@ export class StockTableTwo extends PureComponent {
         );
     }
 
-   /*  setInterval(() => {
-            let i;
-            for (i = 0; i < 897; i++) {
-                let list = this.props.state.cache.get(i.toString());
-                console.log("cache TWO " +
-                    list.StockCode.toString() + " " +
-                    list.High.toString() + " " +
-                    list.CurrentPrice.toString() + " " +
-                    list.Low.toString() + " " +
-                    list.ProfitLoss.toString() + " " +
-                    list.ProfitLoss_Percentage.toString() + " " +
-                    list.Volume.toString()
-                )
-            }
-        }, 10000);*/
+    /*  setInterval(() => {
+             let i;
+             for (i = 0; i < 897; i++) {
+                 let list = this.props.state.cache.get(i.toString());
+                 console.log("cache TWO " +
+                     list.StockCode.toString() + " " +
+                     list.High.toString() + " " +
+                     list.CurrentPrice.toString() + " " +
+                     list.Low.toString() + " " +
+                     list.ProfitLoss.toString() + " " +
+                     list.ProfitLoss_Percentage.toString() + " " +
+                     list.Volume.toString()
+                 )
+             }
+         }, 10000);*/
 
 }

@@ -176,7 +176,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 //  data = client.GetRealTimePrices(stockArray);
                 //  int pointer = 0;
                 int code = start;
-                for (int i = 0; i < stockArray.Length; i++) // foreach (RealTimePrice data_ in data)
+                for (int i = 0; i < end; i++) // foreach (RealTimePrice data_ in data)
                 {
                     stock.StockCode = StocksCode.Value[code];
                     stock.Change = 91;
@@ -186,13 +186,13 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     stock.ProfitLoss_Percentage = 99;
                     stock.ChangeArray = Stocks.changeArray;
                     stock.Volume = 13;
-                    
+
 
                     stock.High = 11;
                     stock.Low = 14;
                     stock.Open = 76;
                     stock.Close = 10;
-                    
+
                     /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
                       string _currentTime = time.ToString("HH:mmttss");
                       
@@ -238,22 +238,30 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 int pointer = start;
                 while (pointer < end)
                 {
-                    stock.StockCode = StocksCode.Value[pointer];
-                    stock.Change = 1111;
-                    stock.ChangeP = 1;
-                    stock.Volume = 1;
-                    stock.ProfitLoss = 1;
-                    stock.ProfitLoss_Percentage = 999;
 
-                    stock.High = 2;
-                    stock.Low = 1;
-                    stock.Open = 1;
-                    stock.Close = 3;
+                    stock.StockCode = StocksCode.Value[pointer];
+                    stock.Change = 91;
+                    stock.ChangeP = 1;
+                    stock.Volume = 11;
+                    stock.ProfitLoss = 1;
+                    stock.ProfitLoss_Percentage = 99;
+                    stock.ChangeArray = Stocks.changeArray;
+                    stock.Volume = 13;
+
+
+                    stock.High = 10;
+                    stock.Low = 14;
+                    stock.Open = 76;
+                    stock.Close = 10;
 
                     /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
                       string _currentTime = time.ToString("HH:mmttss");
-
+                      
                       stock.timestamp = _currentTime;*/
+
+                    stock.Request_Calls = 5;
+
+                    stock.TimeStamp = "9:00";
 
                     bool update = cache.Get(pointer).Equals(stock);
 
@@ -262,9 +270,10 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
                     // Compare each stock
                     if (update)
-                        //cache.Update(pointer, stock);
+                        cache.Update(pointer, stock);
 
-                        pointer++;
+                    stock = new Stock();
+                    pointer++;
                 }
             }
             catch (Exception ex)
