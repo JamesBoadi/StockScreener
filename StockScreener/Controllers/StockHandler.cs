@@ -14,17 +14,10 @@ namespace StockScreener
 {
     public class StockHandler : Hub
     {
-        static string[] request_arr = new string[2];
 
         static bool init_called = false;
 
         static bool _init_work = false;
-
-        static string[] stockArray;
-
-        static ChannelWriter<string[]> Writer { get; set; }
-
-        static CancellationToken CancellationToken { get; set; }
 
         static ILogger<BackgroundServiceWorker> logger;// = new ILogger<BackgroundServiceWorker>();
 
@@ -32,7 +25,7 @@ namespace StockScreener
 
         // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/generics/ Use this for type casting
 
-        public ChannelReader<string[]> RequestData(string[] arr, CancellationToken cancellationToken)
+        public ChannelReader<string[]> RequestData(int request_Calls, CancellationToken cancellationToken)
         {
             var channelTwo = Channel.CreateUnbounded<string[]>();
             try
@@ -44,6 +37,7 @@ namespace StockScreener
                     init_called = !init_called;
                 }
 
+                // Initialise writer and cancellation tokens
                 if (_init_work == false)
                 {
                     _ = initialise_cache();
@@ -51,12 +45,29 @@ namespace StockScreener
                     _init_work = !_init_work;
                 }
 
-                // Start a service worker
-                _ = serviceWorker.StartAsync(cancellationToken); 
+                // Start a Service Worker
+                _ = serviceWorker.StartAsync(cancellationToken);
+
+                // Requests made
+                Stocks.stocks.Request_Calls = request_Calls;
+
+                // Check if the task was cancelled
+                if (cancellationToken.IsCancellationRequested
+                && Stocks.API_REQUESTS <= Stocks.MAX_API_REQUESTS)
+                {
+                    // REDIRECT TOOOO 404
+                    _ = serviceWorker.StartAsync(cancellationToken);
+                }
+                else if (Stocks.API_REQUESTS == Stocks.MAX_API_REQUESTS)
+                {
+                    // Dispose Timer
+                    serviceWorker.Dispose();
+                }
+
             }
             catch (Exception ex)
             {
-                if (ex is StackOverflowException || ex is KeyNotFoundException|| ex is ArgumentNullException || ex is NullReferenceException || ex is ArgumentException ||
+                if (ex is StackOverflowException || ex is KeyNotFoundException || ex is ArgumentNullException || ex is NullReferenceException || ex is ArgumentException ||
                   ex is IndexOutOfRangeException ||
                   ex is Newtonsoft.Json.JsonSerializationException
                   || ex is MissingMemberException
@@ -119,7 +130,6 @@ namespace StockScreener
                 }
 
                 Stocks.stocks.initialiseStocks(start, end, 500 + pointer);
-                Stocks.stocks.Request_Calls = pointer;
 
                 start += 20;
                 end += 20;
@@ -128,7 +138,7 @@ namespace StockScreener
             }
 
             Console.WriteLine("Finished ");
-            UtilityFunctions.Tick = 1; 
+            UtilityFunctions.Tick = 1;
         }
 
         // Initialise service worker to write data

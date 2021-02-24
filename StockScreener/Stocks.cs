@@ -87,6 +87,12 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             set { max_Calls = value; }
         }
 
+        // Maximum API requests
+        public static readonly int MAX_API_REQUESTS = 96;
+
+        // The number of times an API request is made
+        public static int API_REQUESTS = 0;
+
         private int mod = 0;
 
         public int Mod
@@ -187,7 +193,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     stock.ChangeArray = Stocks.changeArray;
                     stock.Volume = 13;
 
-
                     stock.High = 11;
                     stock.Low = 14;
                     stock.Open = 76;
@@ -195,11 +200,10 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
                     /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
                       string _currentTime = time.ToString("HH:mmttss");
-                      
+
                       stock.timestamp = _currentTime;*/
 
-                    stock.Request_Calls = 5;
-
+                    stock.Request_Calls = 0;
                     stock.TimeStamp = "9:00";
 
                     // Data from the previous day starting the next day
@@ -238,7 +242,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 int pointer = start;
                 while (pointer < end)
                 {
-
                     stock.StockCode = StocksCode.Value[pointer];
                     stock.Change = 91;
                     stock.ChangeP = 1;
@@ -247,7 +250,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     stock.ProfitLoss_Percentage = 99;
                     stock.ChangeArray = Stocks.changeArray;
                     stock.Volume = 13;
-
 
                     stock.High = 10;
                     stock.Low = 14;
@@ -260,13 +262,12 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                       stock.timestamp = _currentTime;*/
 
                     stock.Request_Calls = 5;
-
                     stock.TimeStamp = "9:00";
-
                     bool update = cache.Get(pointer).Equals(stock);
-
                     stock.ChangeArray = Stocks.changeArray;
-                    stock.Request_Calls = 1;
+
+                    Stocks.stocks.Request_Calls = Stocks.stocks.Request_Calls + 1;
+                    stock.Request_Calls = Stocks.stocks.Request_Calls;
 
                     // Compare each stock
                     if (update)
@@ -275,6 +276,8 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     stock = new Stock();
                     pointer++;
                 }
+
+                Stocks.API_REQUESTS = Stocks.API_REQUESTS + 1;
             }
             catch (Exception ex)
             {

@@ -31,6 +31,7 @@ export class FetchData extends Component {
     //this.createHubConnection = this.createHubConnection.bind(this);
     this.startStreaming = this.startStreaming.bind(this);
 
+
     this.state = {
       stockTableTwo: [],
       isStreaming: false,
@@ -40,11 +41,11 @@ export class FetchData extends Component {
       message: '',
       messages: [],
       hubConnection: null,
-      column_counter: 0,
-      MAX_CALLS: null,
+      request_Calls: -1,
+      request_Update: 0,
+      MAX_CALLS: 896,
       called: false,
       cache: new cache(),
-
 
       data: [
         {
@@ -67,7 +68,7 @@ export class FetchData extends Component {
   }
 
   componentDidMount = () => {
-    this.sendRequest();
+    // this.sendRequest();
   }
 
   // Replace with event listener
@@ -82,10 +83,7 @@ export class FetchData extends Component {
       this.setState({ stockTableTwo: t });
       this.setState({ called: true });
     }
-
-
   }
-
 
   readNavBarData = (num) => {
     var NavBar = NavBarData.navBar;
@@ -158,7 +156,6 @@ export class FetchData extends Component {
     return isOK;
   }
 
-
   async sendRequest() {
     const hubConnection = new signalR.HubConnectionBuilder()
       .withUrl('https://localhost:44362/stock')
@@ -172,47 +169,36 @@ export class FetchData extends Component {
 
     console.log("CONNECTION " + hubConnection);
 
-    // Set the state of this column counter
-    this.setState({ column_counter: this.state.column_counter + 1 });
-    var arr = ["k"];
     var cache_ = new cache();
 
-
-    // arr.push(this.state.column_counter.toString());
-    // arr.push("500");
-    hubConnection.stream("RequestData", arr)
+    // Change so that we don't have to call requests using string
+    hubConnection.stream("RequestData", this.state.request_Calls, this.state.request_Update)
       .subscribe({
         next: (stockArray) => {
 
           // Account for faliures in connection
           var count = 0;
           for (count = 0; count < stockArray.length; count++) {
-            let item = JSON.parse(stockArray[count]);
+            const item = JSON.parse(stockArray[count]);
+            this.setState({ request_Calls: item.Request_Calls });
             cache_.set(count.toString(), item);
           }
 
           this.setState({ cache: cache_ });
           cache_.clear();
 
-          if (this.state.lock) {
-            this.setState({ lock: false });
-          }
+          console.log("REQUESTS " + this.state.request_Calls)
 
-          /*
-                      const request_Calls = parseInt(stockArray[5]);
-                      const max_Calls = parseInt(stockArray[6]);
-          
-                      this.setState({ column_counter: request_Calls });
-          
-                      if (this.state.MAX_CALLS == null || this.state.MAX_CALLS != max_Calls)
-                        this.setState({ MAX_CALLS: max_Calls });
-          
-                      if (this.state.column_counter == this.state.MAX_CALLS) {
-                        this.setState({ lock: true })
-                      }
-          
-                      //   console.log(stockArray + " " + request_Calls + " " + max_Calls);
-                      //   console.log("Array " + stockArray);*/
+          if (this.state.request_Calls !== this.state.MAX_CALLS) {
+            this.setState({ request_Calls: request_Calls });
+
+            // Start a countdown timer and disconnect if we don't get a response
+
+          }
+          else {
+            this.setState({ lock: false });
+            this.setState({ request_Calls: -1 });
+          }
         },
         complete: () => {
           // render table
@@ -251,10 +237,7 @@ export class FetchData extends Component {
         />
 
         <div id="tableContainer">
-
           {this.state.stockTableTwo}
-
-
         </div>
       </div>
     );

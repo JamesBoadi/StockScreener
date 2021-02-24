@@ -1,5 +1,5 @@
 import React, { Component, useState, useContext } from 'react';
-import { Box } from '@chakra-ui/react';
+import { Box, Select } from '@chakra-ui/react';
 import './Dashboard.css';
 
 export const TopNavbar = props => {
@@ -16,6 +16,14 @@ export const TopNavbar = props => {
     const MSCap = <h3 id="msCap">{"MSCap: "}{props.Data[0].msCap}{' ( ' + props.Data[0].msCapPercentage + ' )'}</h3>
     const Ace = <h3 id="Ace">{"ACE: "}{props.Data[0].ACE}{' ( ' + props.Data[0].ACEpercentage + ' )'}</h3>
 
+    let selectDashboard =
+    <select class="selectDashboard" name="Select Dashboard">
+        <option value="none">Dashboard 1</option>
+        <option value="none">Dashboard 2</option>
+        <option value="none">Dashboard 3</option>
+        <option value="none">Intra-Day Trading</option>        
+    </select>;
+
     // Return NavBar
     return (
         <div >
@@ -30,7 +38,8 @@ export const TopNavbar = props => {
                 borderWidth="1px"
                 color='white'>
 
-                {Screener}
+                <p id="selectDashboard">Switch Dashboard </p>
+                {selectDashboard}
 
             </Box>
         </div>

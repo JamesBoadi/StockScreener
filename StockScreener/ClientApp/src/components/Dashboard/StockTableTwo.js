@@ -86,23 +86,14 @@ export class StockTableTwo extends PureComponent {
         }
     }
 
-    getSnapshotBeforeUpdate(prevProps, prevState) {
+    getSnapshotBeforeUpdate(prevState) {
         if (prevState.tb2_scrollPosition !== this.state.tb2_scrollPosition) {
             this.newTable()
-            return this.state.tb2_scrollPosition;
+            return (this.state.tb2_scrollPosition !== undefined 
+                || this.state.tb2_scrollPosition === null)
+                ? 5 : this.state.tb2_scrollPosition;
         }
     }
-
-    /* shouldComponentUpdate(nextProps, nextState)
-     {
-         // Prevent multiple re-renders of new table
-         // Only update if the state changes (tb2_scrollPoisition)
-      /*   if(this.state.tb2_scrollPosition !== nextState.tb2_scrollPosition)
-         {
-             this.newTable()
-           
-         }
-     }*/
 
     // Communicate with c# controller https://stackoverflow.com/questions/46946380/fetch-api-request-timeout
     async searchDatabase(e) {
@@ -118,7 +109,6 @@ export class StockTableTwo extends PureComponent {
                 .then(response => response.text())
                 .then(data =>
                     this.setState({ query: JSON.parse(data) }),
-
                     this.searchRecords()
                 ).catch(error =>
                     console.log("error " + error),

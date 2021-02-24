@@ -61,7 +61,6 @@ namespace StockScreener
             {
                 return setSession;
             }
-
             set
             {
                 setSession = value;
@@ -99,7 +98,6 @@ namespace StockScreener
         public CancellationToken CancellationToken { get; set; }
         // Type task for asyc operations
         
-        
         // Start operation for retreving stocks every 30 seconds
         public Task StartAsync(CancellationToken stoppingToken)
         {
@@ -107,7 +105,7 @@ namespace StockScreener
             {
                 // _logger.LogInformation("Timed Hosted Service running.");
                 _timer = new Timer(getDataFromCache, null,
-                TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(60));
+                TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(10));
             }
             catch (Exception ex)
             {
@@ -136,7 +134,6 @@ namespace StockScreener
 
             return new int[] { _currentTime_hours_, _currentTime_minutes_ };
         }
-
 
         object[] sessionProperties = new object[2];
 
@@ -253,7 +250,7 @@ namespace StockScreener
                     data[pointer] = Stocks.cache.Get(pointer).Serialize();
                 }
                 
-                await WriterOne.WriteAsync(data, CancellationToken);
+                await WriterOne.WriteAsync(data,  CancellationToken);
             }
 
             catch (Exception ex)
