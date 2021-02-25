@@ -67,44 +67,41 @@ export const DashboardNavbar = props => {
 
                 <Button style={{ position: 'absolute', top: '160px', left: '300px' }}>
                     Change Alert Settings</Button>
-                
-                
+
+
                 <div id="tableSettings">
                     <div class="vl"></div>
                     <div class="v2"></div>
                     <p id="table_">Table Settings</p>
 
+                    <div id="disableColumns" >
+                        <p id="hideName"
+                            style={{ position: 'absolute', top: '10px', left: '575px' }}>Disable </p>
 
-                    <div></div>
+                        <label id="stockName" >Stock <br /> Name</label>
+                        <input class="stockName" type="checkbox" />
 
-                    <p id="hideName">Hide Name</p>
+                        <label id="time">Time</label>
+                        <input class="time" type="checkbox" />
 
-                    <label id="stockName">Stock Name</label>
-                    <input class="stockName" type="checkbox" />
+                        <label id="hidePrice">Hide  <br />  Price</label>
+                        <input class="hidePrice" type="checkbox" />
 
-                    <label id="time">Time</label>
-                    <input class="time" type="checkbox" />
+                        <label id="high">High</label>
+                        <input class="high" type="checkbox" />
 
-                    <label id="hidePrice">Hide Price</label>
-                    <input class="hidePrice" type="checkbox" />
+                        <label id="low">Low</label>
+                        <input class="low" type="checkbox" />
 
-                    <label id="high">High</label>
-                    <input class="high" type="checkbox" />
+                        <label id="profitLoss">P / L</label>
+                        <input class="profitLoss" type="checkbox" />
 
-                    <label id="low">Low</label>
-                    <input class="low" type="checkbox" />
-                   
-                    <label id="profitLoss">P / L</label>
-                    <input class="profitLoss" type="checkbox" />
+                        <label id="profitLossPercentage">P / L %</label>
+                        <input class="profitLossPercentage" type="checkbox" />
 
-                    <label id="profitLossPercentage">P / L %</label>
-                    <input class="profitLossPercentage" type="checkbox" />
-
-                    <label id="Volume">Volume</label>
-                    <input class="Volume" type="checkbox"/>
-
-                 
-
+                        <label id="volume">Volume</label>
+                        <input class="volume" type="checkbox" />
+                    </div>
                 </div>
 
             </Box>

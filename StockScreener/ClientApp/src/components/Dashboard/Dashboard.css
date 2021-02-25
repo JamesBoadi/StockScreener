@@ -645,14 +645,14 @@
   }
 
   .DashboardNavbar #tableSettings{
-  
-
+    color: white;
+   
   }
   
   .DashboardNavbar #table_{
     position: absolute;
     top: 0px;
-    left: 650px;
+    left: 575px;
     font-size: 18px;
     font-family: 'sans-serif';  
     color: white;
@@ -669,9 +669,130 @@
   .v2 {
     position: absolute;
     top: 0px;
-    left: 850px;
+    left: 1200px;
     border-left: 1px solid white;
     height: 14rem;
+  }
+
+  .DashboardNavbar #stockName{
+    position: absolute;
+    top: 60px;
+    left: 575px;
+    transform: translate(0px, -16.5px);
+  }
+
+  .DashboardNavbar .stockName{
+    position: absolute;
+    top: 60px;
+    left: 560px;
+  }
+  
+  .DashboardNavbar #time{
+    position: absolute;
+    top: 60px;
+    left: 645px;
+    transform: translate(0px, -5px);
+  }
+
+  .DashboardNavbar .time{
+    position: absolute;
+    top: 60px;
+    left: 630px;
+  }
+  
+  .DashboardNavbar #hidePrice{
+    position: absolute;
+    top: 60px;
+    left: 705px;
+    transform: translate(0px, -16.5px); 
+  }
+
+  .DashboardNavbar .hidePrice{
+    position: absolute;
+    top: 60px;
+    left: 690px;
+  }
+
+  .DashboardNavbar #high{
+    position: absolute;
+    top: 60px;
+    left: 770px;
+    transform: translate(0px, -5px);
+  }
+
+  .DashboardNavbar .high{
+    position: absolute;
+    top: 60px;
+    left: 755px;
+  }
+
+  .DashboardNavbar #low{
+    position: absolute;
+    top: 60px;
+    left: 830px;
+    transform: translate(0px, -5px);
+  }
+
+  .DashboardNavbar .low{
+    position: absolute;
+    top: 60px;
+    left: 815px;
+  }
+
+  .DashboardNavbar #profitLoss{
+    position: absolute;
+    top: 60px;
+    left: 885px;
+    transform: translate(0px, -5px);
+  }
+
+  .DashboardNavbar .profitLoss{
+    position: absolute;
+    top: 60px;
+    left: 870px;
+  }
+
+  .DashboardNavbar #profitLossPercentage{
+    position: absolute;
+    top: 60px;
+    left: 945px;
+    transform: translate(0px, -5px);
+  }
+
+  .DashboardNavbar .profitLossPercentage{
+    position: absolute;
+    top: 60px;
+    left: 930px;
+  }
+
+  .DashboardNavbar #profitLossPercentage{
+    position: absolute;
+    top: 60px;
+    left: 945px;
+    transform: translate(0px, -5px);
+  }
+
+  .DashboardNavbar .profitLossPercentage{
+    position: absolute;
+    top: 60px;
+    left: 930px;
+  }
+
+  .DashboardNavbar #volume{
+    position: absolute;
+    top: 60px;
+    left: 1015px;
+    transform: translate(0px, -5px);
+  }
+
+  .DashboardNavbar .volume{
+    position: absolute;
+    top: 60px;
+    left: 1000px;
+  }
+
+  .DashboardNavbar #disableColumns{
+    transform: translate(0px, 15px);
   }
 
 /************** DashboardOneSettings table ***************/
@@ -753,7 +874,6 @@
     top: 10px;
     right: 5px;
   }
-
 
   .containerTwo {
     display: block;
