@@ -364,8 +364,7 @@ export class StockTableTwo extends PureComponent {
         let mod = 0;
 
         for (id = 1; id < 50; id++) {
-
-
+            
             // Get values from cache
             let list = this.props.state.cache.get(id.toString());
 

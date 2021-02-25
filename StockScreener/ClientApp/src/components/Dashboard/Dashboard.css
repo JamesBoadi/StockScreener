@@ -575,6 +575,104 @@
     left: 100px;
   }
 
+  
+  .DashboardNavbar #customalertFrequencyLabel{
+    position: absolute;
+    top: 133.5px;
+    left: 120px;
+    color: white;
+  }
+
+  .DashboardNavbar #customalertFrequency{
+    position: absolute;
+    top: 140px;
+    left: 100px;
+    font-size: 18px;
+    font-family: 'sans-serif';  
+    color: white;
+  }
+
+  .DashboardNavbar .customalertFrequency{
+    position: absolute;
+    top: 160px;
+    left: 100px;
+  }
+
+  .DashboardNavbar .alertFrequencyMinutes{
+    position: absolute;
+    top: 170px;
+    left: 180px;
+    color: white;
+  }
+
+  .DashboardNavbar #alertTime{
+    transform: translate(70px, 25px);
+  }
+
+  .DashboardNavbar #alertCriteria{
+    position: absolute;
+    top: -25px;
+    left: 300px;
+    font-size: 18px;
+    font-family: 'sans-serif';  
+    color: white;
+  }
+
+  .DashboardNavbar #startTime{
+    position: absolute;
+    top: 26px;
+    left: 300px;
+    color: white;
+  }
+  
+  .DashboardNavbar #endTime{
+    position: absolute;
+    top: 86px;
+    left: 300px;
+    color: white;
+  }
+
+  .DashboardNavbar .startTime{
+    position: absolute;
+    top: 26px;
+    left: 380px;
+  }
+
+  .DashboardNavbar .endTime{
+    position: absolute;
+    top: 86px;
+    left: 380px;
+  }
+
+  .DashboardNavbar #tableSettings{
+  
+
+  }
+  
+  .DashboardNavbar #table_{
+    position: absolute;
+    top: 0px;
+    left: 650px;
+    font-size: 18px;
+    font-family: 'sans-serif';  
+    color: white;
+  }
+
+  .vl {
+    position: absolute;
+    top: 0px;
+    left: 550px;
+    border-left: 1px solid white;
+    height: 14rem;
+  }
+
+  .v2 {
+    position: absolute;
+    top: 0px;
+    left: 850px;
+    border-left: 1px solid white;
+    height: 14rem;
+  }
 
 /************** DashboardOneSettings table ***************/
 /*********************************************************/
