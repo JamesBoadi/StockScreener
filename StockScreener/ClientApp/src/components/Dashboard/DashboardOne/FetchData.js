@@ -67,8 +67,47 @@ export class FetchData extends Component {
     };
   }
 
+  
+
   componentDidMount = () => {
-    // this.sendRequest();
+    var cache_ = new cache();
+    var count;
+    for (count = 0; count < 897; count++) {
+     
+      const P = {
+        StockCode: count,
+        Change: 91,
+        ChangeP: 1,
+        Volume: 11,
+        CurrentPrice: 102,
+        ProfitLoss: 1,
+        ProfitLoss_Percentage: 99,
+        ChangeArray: 888,
+        High: 10,
+        Low: 14,
+        Open: 76,
+        Close: 10,
+
+        /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
+          string _currentTime = time.ToString("HH:mmttss");
+          
+          stock.timestamp = _currentTime;*/
+
+        Request_Calls: 5,
+        TimeStamp: "9:00",
+        ChangeArray: "iii",
+        Request_Calls: "1"
+      }
+
+  //  console.log(P.StockCode + " " + "kkk");
+      cache_.set(count.toString(), P);
+      
+    }
+
+     
+      this.setState({ cache: cache_ });
+     this.setState({ lock: false });
+  //  this.sendRequest();
   }
 
   // Replace with event listener
@@ -82,10 +121,12 @@ export class FetchData extends Component {
 
       this.setState({ stockTableTwo: t });
       this.setState({ called: true });
+      t = [];
     }
   }
 
   readNavBarData = (num) => {
+    /*
     var NavBar = NavBarData.navBar;
     var currentData = this.state.data;
 
@@ -99,7 +140,8 @@ export class FetchData extends Component {
     currentData[0].ACE = NavBar[num].ACE;
     currentData[0].ACEpercentage = NavBar[num].ACEpercentage;
 
-    this.state.data = currentData;
+    this.state.data = currentData;*/
+    //  this.setState({ lock: false });
   }
 
   // Add the Row
@@ -168,11 +210,10 @@ export class FetchData extends Component {
       .catch(err => console.log('Error while establishing hubConnection :(')); // Redirect to 404 page
 
     console.log("CONNECTION " + hubConnection);
-
     var cache_ = new cache();
 
     // Change so that we don't have to call requests using string
-    hubConnection.stream("RequestData", this.state.request_Calls, this.state.request_Update)
+    hubConnection.stream("RequestData", this.state.request_Calls)
       .subscribe({
         next: (stockArray) => {
 
@@ -182,23 +223,24 @@ export class FetchData extends Component {
             const item = JSON.parse(stockArray[count]);
             this.setState({ request_Calls: item.Request_Calls });
             cache_.set(count.toString(), item);
+            //console.log(item.StockCode + " " + "kkk");
           }
 
           this.setState({ cache: cache_ });
           cache_.clear();
 
-          console.log("REQUESTS " + this.state.request_Calls)
-
+          //  console.log("REQUESTS " + this.state.request_Calls)
+          this.setState({ lock: false });
+          /*
           if (this.state.request_Calls !== this.state.MAX_CALLS) {
             this.setState({ request_Calls: request_Calls });
 
             // Start a countdown timer and disconnect if we don't get a response
-
           }
           else {
             this.setState({ lock: false });
             this.setState({ request_Calls: -1 });
-          }
+          }*/
         },
         complete: () => {
           // render table
@@ -233,7 +275,7 @@ export class FetchData extends Component {
         />
 
         <DashboardNavbar
-          Data={this.state.data}
+          {...this}
         />
 
         <div id="tableContainer">

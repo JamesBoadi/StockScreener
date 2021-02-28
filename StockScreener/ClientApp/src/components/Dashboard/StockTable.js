@@ -54,20 +54,6 @@ export class StockTable extends Component {
 
 
     render() {
-       
-
-        let alertTableHeader = <table class="alertTableHeader" aria-labelledby="tabelLabel">
-            <thead>
-                <tr>
-                    <th>Stock <br /> Name</th>
-                    <th>Alert <br /> Time</th>
-                    <th>Price</th>
-                    <th>P / L</th>
-                    <th>Volume</th>
-                </tr>
-            </thead>
-        </table>;
-
         return (
             <div>
                
@@ -127,48 +113,9 @@ export class StockTable extends Component {
                                 findRecord={this.state.validInput}
                                 id={this.state.stockRecord}
                   />      */}
-                    {/* ALERT TABLE */}
-                    <Box
-                        style={{ position: 'absolute', top: '125px', left: '1070px' }}
-                        //     bg='rgb(30,30,30)'
-                        boxShadow='sm'
-                        textAlign='center'
-                        height='45px'
-                        width='50rem'
-                        rounded="lg"
-                        margin='auto'
-                        color='white'
-                        zIndex='999'>
+                   
 
-                        <InputGroup>
-                            <Input style={{ position: 'absolute', top: '0px', right: '16.5px', height: '29px' }}
-                                placeholder="Search " />
-                            <InputRightElement children={<img id="searchIcon" />} />
-                        </InputGroup>
 
-                        {alertTableHeader}
-
-                        <Box
-                            style={{
-                                position: 'absolute',
-                                overflowY: 'auto',
-                                top: '45px'
-                            }}
-
-                            overflowX='hidden'
-                            //  bg='rgb(30,30,30)'
-                            boxShadow='sm'
-                            textAlign='center'
-                            height='1110px'
-                            width='52rem'
-                            rounded="lg"
-                            margin='auto'
-                            color='white'
-                            zIndex='-999'>
-
-                            <AlertTable />
-                        </Box>
-                    </Box>
 
                 </div>
          

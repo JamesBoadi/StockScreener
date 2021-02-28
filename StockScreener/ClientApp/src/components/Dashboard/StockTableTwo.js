@@ -11,6 +11,7 @@ import {
     MenuGroup, MenuOptionGroup, MenuIcon, MenuCommand, MenuDivider
 } from '@chakra-ui/react';
 
+
 // Fetch data for dash board one
 export class StockTableTwo extends PureComponent {
 
@@ -25,14 +26,13 @@ export class StockTableTwo extends PureComponent {
         this.loadFromCache = this.loadFromCache.bind(this);
         this.scrollPosition = this.scrollPosition.bind(this);
         this.scrollToPosition = this.scrollToPosition.bind(this);
+      
         this.selectRow = this.selectRow.bind(this);
         this.createTable = this.createTable.bind(this);
         this.newTable = this.newTable.bind(this);
-        this.returnTable = this.returnTable.bind(this);
-
         this.getDisplay = this.getDisplay.bind(this);
-
         let style = { color: "white;" };
+        this.timeout = null;
 
         this.state = {
             green: false,
@@ -52,12 +52,15 @@ export class StockTableTwo extends PureComponent {
             tb2_stack: [], // Render 100 elements per scroll
             tb2_cache: [],
             tb2_count: 0,
-            tb2_numberOfClicks: []
+            tb2_numberOfClicks: [],
+
+            isScrolled: false,
+            scrollUp_: 0,
+            scrollDown_: 0,
         };
     }
 
     componentDidMount() {
-
         this.createTable()
         this.updateTable()
 
@@ -73,8 +76,15 @@ export class StockTableTwo extends PureComponent {
         if (this.state.tb2_count === 1 && snapshot !== null) {
 
             this.updateTable()
-            this.textInput.current.scrollTop = 5;
+            
+            if(this.state.start === 0)
+                this.textInput.current.scrollTop = 15;
+            else
+                this.textInput.current.scrollTop = 100;
+
+            this.setState({ isScrolled: false });
             this.setState({ tb2_count: 0 });
+            console.log('T is updated');
         }
 
         // Scroll to the position in the table
@@ -86,12 +96,14 @@ export class StockTableTwo extends PureComponent {
         }
     }
 
-    getSnapshotBeforeUpdate(prevState) {
-        if (prevState.tb2_scrollPosition !== this.state.tb2_scrollPosition) {
+    getSnapshotBeforeUpdate(prevProps, prevState) {
+        if (prevState.tb2_scrollPosition !== this.state.tb2_scrollPosition
+            || this.state.isScrolled) {
+            // Disable scrolling
             this.newTable()
-            return (this.state.tb2_scrollPosition !== undefined 
+            return (this.state.tb2_scrollPosition !== undefined
                 || this.state.tb2_scrollPosition === null)
-                ? 5 : this.state.tb2_scrollPosition;
+                ? 100 : this.state.tb2_scrollPosition;
         }
     }
 
@@ -182,6 +194,7 @@ export class StockTableTwo extends PureComponent {
     scroll_() {
         this.setState({ scroll: this.textInput.current.scrollTop })
         this.scrollToPosition()
+        //this.setState({ scrollUp_: scrollUp_ + 0.5 })
     }
 
     /*
@@ -192,7 +205,7 @@ export class StockTableTwo extends PureComponent {
     loadFromCache() {
         let units = (this.state.scroll);
         console.log("units " + units);
-        return (units > 425) ? 1 : (units < 3) ? -1 : 0;
+        return (units > 430) ? 1 : (units < 13 || units < 4) ? -1 : 0;
     }
 
     scrollPosition() {
@@ -203,22 +216,32 @@ export class StockTableTwo extends PureComponent {
     scrollToPosition() {
         if (this.loadFromCache() === 1) {
             // Scroll Down
-            this.setState({ tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ?
-                15 : this.state.tb2_scrollPosition + 1 });
+            this.setState({
+                tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ?
+                    this.state.tb2_scrollPosition + 1 : 15
+            });
             this.setState({ start: this.state.tb2_scrollPosition * 50 });
-            this.setState({ tb2_count: this.state.tb2_count + 1 });
-            
-            console.log('Scroll Down ' + this.state.tb2_scrollPosition )
+
+            this.setState({ isScrolled: true });
+            this.setState({ tb2_count: 1 });
+            console.log('Scroll Down ' + this.state.tb2_scrollPosition)
+            return true;
         }
         else if (this.loadFromCache() === -1) {
             // Scroll Up
             this.setState({
-                tb2_scrollPosition: (this.state.tb2_scrollPosition <= 0) ?
+                tb2_scrollPosition: (this.state.tb2_scrollPosition < 1) ?
                     0 : this.state.tb2_scrollPosition - 1
             });
-            this.setState({ start: this.state.tb2_scrollPosition * 50 });
+
+            this.setState({ start: (this.state.tb2_scrollPosition < 1) ?
+                0 : this.state.tb2_scrollPosition * 50
+            });
+
+            this.setState({ isScrolled: true });
             this.setState({ tb2_count: 1 });
             console.log('Scroll Up')
+            return false;
         }
     }
 
@@ -264,46 +287,18 @@ export class StockTableTwo extends PureComponent {
         this.setState({ tb2_count: 1 });
     }
 
-    returnTable() {
-        let target = <div>
-            <div id="stack-wrapper">
-                <div id="stack-scroll">
-                    <table class="stockTableTwo" aria-labelledby="tabelLabel">
-                        <thead>
-                            <tr>
-                                <th>1</th>
-                                <th>1</th>
-                                <th>1</th>
-                                <th>1</th>
-
-                                <th>1</th>
-                                <th>1</th>
-                                <th>1</th>
-                                <th>1</th>
-                            </tr>
-                        </thead>
-
-                        {this.state.tb2_stack}
-
-                    </table>
-                </div>
-            </div>
-        </div>;
-
-        this.setState({ tb2: target });
-    }
-
     newTable() {
         let id;
-        let start = (this.state.tb2_scrollPosition * 50);
-        let end = ((this.state.tb2_scrollPosition * 50) + 50);
+        let start = this.state.tb2_scrollPosition * 50;
+        let end = (this.state.tb2_scrollPosition * 50) + 50;
         var t = [];
 
-        console.log('down!!!!!!');
+
+
+            console.log( start + ' ' + end);
 
         // Use shallow compare
         for (id = start; id < end; id++) {
-
             // Get values from cache
             let list = this.props.state.cache.get(id.toString());
 
@@ -322,7 +317,6 @@ export class StockTableTwo extends PureComponent {
                     </tr>
                 </tbody>);
         }
-
         this.setState({ tb2_stack: t });
     }
 
@@ -364,7 +358,7 @@ export class StockTableTwo extends PureComponent {
         let mod = 0;
 
         for (id = 1; id < 50; id++) {
-            
+
             // Get values from cache
             let list = this.props.state.cache.get(id.toString());
 
@@ -384,6 +378,8 @@ export class StockTableTwo extends PureComponent {
                 </tbody>)
         }
     }
+
+   
 
     render() {
         let stockTableTwoHeader = <table class="stockTableTwoHeader" aria-labelledby="tabelLabel">
@@ -409,11 +405,13 @@ export class StockTableTwo extends PureComponent {
                 <Box
                     style={{ position: 'absolute', top: '450px', left: '60px' }}
                     bg='rgb(30,30,30)'
+
                     boxShadow='sm'
                     textAlign='center'
                     height='45px'
                     width='60rem'
                     rounded="lg"
+                    maxHeight='45px'
                     margin='auto'
                     zIndex='999'
                     color='white'>
@@ -455,33 +453,35 @@ export class StockTableTwo extends PureComponent {
 
                     {stockTableTwoHeader}
 
-
                     <Box
-                        style={{
-                            position: 'absolute',
-                            overflowY: 'auto',
-                            top: '45px'
-                        }}
-
-                        onScroll={this.scroll_}
+                        position='absolute'
+                        overflowY='visible'
+                        top='45px'
                         ref={this.textInput}
+                        onScroll={this.scroll_}
+                        display="flex"
                         overflowX='hidden'
                         bg='rgb(30,30,30)'
                         boxShadow='sm'
                         textAlign='center'
                         height='800px'
                         width='62rem'
+                        maxHeight='800px'
                         rounded="lg"
                         color='white'
                         zIndex='-999'>
 
+
+
+
                         {this.state.tb2}
+
+
 
                         {/*this.state.tableContent.map((item) =>  )*/}
 
-
-
                     </Box>
+
                 </Box>
             </div>
         );

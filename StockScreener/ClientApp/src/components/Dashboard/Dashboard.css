@@ -575,7 +575,6 @@
     left: 100px;
   }
 
-  
   .DashboardNavbar #customalertFrequencyLabel{
     position: absolute;
     top: 133.5px;
@@ -605,7 +604,7 @@
     color: white;
   }
 
-  .DashboardNavbar #alertTime{
+  .DashboardNavbar .alertTime{
     transform: translate(70px, 25px);
   }
 
@@ -644,9 +643,22 @@
     left: 380px;
   }
 
-  .DashboardNavbar #tableSettings{
+  .DashboardNavbar .enableAlerts{
+    position: absolute;
+    top: 150px;
+    left: 345px;
+  }
+
+  .DashboardNavbar #enableAlerts{
+    position: absolute;
+    top: 144px;
+    left: 365px;
     color: white;
-   
+  }
+
+  .DashboardNavbar .tableSettings{
+    color: white;
+    font-size: 13px;  
   }
   
   .DashboardNavbar #table_{
@@ -669,7 +681,7 @@
   .v2 {
     position: absolute;
     top: 0px;
-    left: 1200px;
+    left: 1110px;
     border-left: 1px solid white;
     height: 14rem;
   }
@@ -686,7 +698,7 @@
     top: 60px;
     left: 560px;
   }
-  
+
   .DashboardNavbar #time{
     position: absolute;
     top: 60px;
@@ -700,14 +712,14 @@
     left: 630px;
   }
   
-  .DashboardNavbar #hidePrice{
+  .DashboardNavbar #price{
     position: absolute;
     top: 60px;
     left: 705px;
-    transform: translate(0px, -16.5px); 
+    transform: translate(0px, -5px); 
   }
 
-  .DashboardNavbar .hidePrice{
+  .DashboardNavbar .price{
     position: absolute;
     top: 60px;
     left: 690px;
@@ -791,8 +803,139 @@
     left: 1000px;
   }
 
+/* Alert Table */
+
+  .DashboardNavbar .disableAlertColumns #alertStockName{
+    position: absolute;
+    top: 60px;
+    left: 575px;
+    transform: translate(0px, -16.5px);
+  }
+
+  .DashboardNavbar .disableAlertColumns .alertStockName{
+    position: absolute;
+    top: 60px;
+    left: 560px;
+  }
+  
+  .DashboardNavbar .disableAlertColumns #alertStockTime{
+    position: absolute;
+    top: 60px;
+    left: 645px;
+    transform: translate(0px, -16.5px);
+  }
+
+  .DashboardNavbar .disableAlertColumns .alertStockTime{
+    position: absolute;
+    top: 60px;
+    left: 630px;
+  }
+  
+  .DashboardNavbar .disableAlertColumns #alertPrice{
+    position: absolute;
+    top: 60px;
+    left: 705px;
+    transform: translate(0px, -5px); 
+  }
+
+  .DashboardNavbar .disableAlertColumns .alertPrice{
+    position: absolute;
+    top: 60px;
+    left: 690px;
+  }
+
+  .DashboardNavbar .disableAlertColumns #alertProfitLoss{
+    position: absolute;
+    top: 60px;
+    left: 770px;
+    transform: translate(0px, -5px);
+  }
+
+  .DashboardNavbar .disableAlertColumns .alertProfitLoss{
+    position: absolute;
+    top: 60px;
+    left: 755px;
+  }
+
+  .DashboardNavbar .disableAlertColumns #alertProfitVolume{
+    position: absolute;
+    top: 60px;
+    left: 830px;
+    transform: translate(0px, -5px);
+  }
+
+  .DashboardNavbar .disableAlertColumns .alertProfitVolume{
+    position: absolute;
+    top: 60px;
+    left: 815px;
+  }
+
+  /* Stock Filter */
+  .DashboardNavbar .stockFilter{
+    color: rgb(60,60,60);
+    transform: translate(30px,-28px);
+  }
+
+
+  .DashboardNavbar .stockFilter #stockFilter{
+    position: absolute;
+    top: 0px;
+    left: 10px;
+    font-size: 18px;
+    font-family: 'sans-serif'; 
+  }
+
+  .DashboardNavbar .stockFilter .startPrice{
+    position: absolute;
+    top: 38px;
+    left: 1220px;
+  }
+
+  .DashboardNavbar .stockFilter .endPrice{
+    position: absolute;
+    top: 100px;
+    left: 1220px;
+  }
+
+  .DashboardNavbar #priceRange{
+    position: absolute;
+    top: 0px;
+    left: 1130px;
+    color: white;
+  }
+
+  .DashboardNavbar .stockFilter .startPrice #startPriceLabel{
+    position: absolute;
+    left: -90px;
+    color: white;
+  }
+
+  .DashboardNavbar .stockFilter .endPrice #endPriceLabel{
+    position: absolute;
+    left: -90px;
+    color: white;
+  }
+
+  .DashboardNavbar .stockFilter #enablePriceCheck{
+    position: absolute;
+    top: 154px;
+    left: 1135px;
+    color: white;
+  } 
+
+  .DashboardNavbar .stockFilter .enablePriceCheck{
+    position: absolute;
+    top: 160px;
+    left: 1115px;
+    color: white;
+  }
+
   .DashboardNavbar #disableColumns{
     transform: translate(0px, 15px);
+  }
+
+  .DashboardNavbar .disableAlertColumns{
+    transform: translate(0px, 75px);
   }
 
 /************** DashboardOneSettings table ***************/
