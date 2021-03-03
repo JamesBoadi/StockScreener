@@ -11,9 +11,12 @@ import {
     MenuGroup, MenuOptionGroup, MenuIcon, MenuCommand, MenuDivider
 } from '@chakra-ui/react';
 
+import { AlertTable } from './AlertTable';
+import * as cache from 'cache-base';
+
 
 // Fetch data for dash board one
-export class StockTableTwo extends PureComponent {
+export class StockTableTwo extends React.Component {
 
     constructor(props) {
         super(props);
@@ -26,13 +29,20 @@ export class StockTableTwo extends PureComponent {
         this.loadFromCache = this.loadFromCache.bind(this);
         this.scrollPosition = this.scrollPosition.bind(this);
         this.scrollToPosition = this.scrollToPosition.bind(this);
-      
+
+        this.freezeScrollPosition = this.freezeScrollPosition.bind(this);
+
         this.selectRow = this.selectRow.bind(this);
         this.createTable = this.createTable.bind(this);
         this.newTable = this.newTable.bind(this);
         this.getDisplay = this.getDisplay.bind(this);
+        this.getUnits = this.getUnits.bind(this);
+
         let style = { color: "white;" };
+
         this.timeout = null;
+        this.cache = null;
+       
 
         this.state = {
             green: false,
@@ -41,28 +51,47 @@ export class StockTableTwo extends PureComponent {
             validInput: false,
             display: [],
             stockRecord: 0,
-            scroll: 0,
+            scroll: 1,
             query: {},
+            queryRes: false,
             start: 0,
+            maxScroll: 456,
 
             tb2: [],
+            tb2_style: {},
             tb2_temp: [],
             tb2_scrollPosition: 0,
             tb2_updateTable: false,
             tb2_stack: [], // Render 100 elements per scroll
             tb2_cache: [],
-            tb2_count: 0,
+            tb2_count: 1,
             tb2_numberOfClicks: [],
 
-            isScrolled: false,
+
+            isUpdating: false,
+            isScrolled: true,
             scrollUp_: 0,
             scrollDown_: 0,
+
+            lock: false,
+
+            // Rows to add from stock table to alert table
+            cachedRows: []
         };
     }
 
     componentDidMount() {
         this.createTable()
-        this.updateTable()
+        this.updateTable(15)
+        // this.setState({ scroll: (this.textInput.current.scrollTop) ?? 1 })
+
+        // Update Table 
+        this.intervalID_ = setInterval(() => {
+           this.cache = this.props.cache;
+           console.log('freeze');
+            //  this.setState({ isUpdating: true });
+
+        }, 70000);
 
         setInterval(() => {
             window.location.reload();
@@ -71,49 +100,95 @@ export class StockTableTwo extends PureComponent {
         this.setState({ scroll: this.scrollBy() })
     }
 
-    componentDidUpdate(snapshot) {
+
+    componentWillUnmount() {
+        // Clear the interval right before component unmount
+        clearInterval(this.intervalID_);
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
         // Update table
-        if (this.state.tb2_count === 1 && snapshot !== null) {
-
-            this.updateTable()
-            
-            if(this.state.start === 0)
-                this.textInput.current.scrollTop = 15;
-            else
-                this.textInput.current.scrollTop = 100;
-
-            this.setState({ isScrolled: false });
-            this.setState({ tb2_count: 0 });
-            console.log('T is updated');
-        }
-
-        // Scroll to the position in the table
+        // Create seperate states for scroll up and scroll down
+        
         const scroll = this.scrollBy();
+        if (prevState.tb2_count === 1) {
+            /*  
+                  console.log('scroll ' + units);
 
-        if (this.state.validInput === true) {
-            this.textInput.current.scrollTop = scroll;
-            this.setState({ validInput: false })
-        }
-    }
+                  this.setState({
+                      tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ?
+                          8 : 15
+                  });
+  
+                  this.setState({ start: this.state.tb2_scrollPosition * 50 });
+              }*/
 
-    getSnapshotBeforeUpdate(prevProps, prevState) {
-        if (prevState.tb2_scrollPosition !== this.state.tb2_scrollPosition
-            || this.state.isScrolled) {
-            // Disable scrolling
             this.newTable()
-            return (this.state.tb2_scrollPosition !== undefined
-                || this.state.tb2_scrollPosition === null)
-                ? 100 : this.state.tb2_scrollPosition;
+            this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
+                this.updateTable(this.state.start)
+            });
+
+            if (this.state.start === 0)
+                this.textInput.current.scrollTop = 10;
+            else
+                this.textInput.current.scrollTop = 25;
+
+            console.log('T is updated');
+
+            this.setState({ tb2_count: 0 })
+
+        } else if (this.state.validInput) {
+            this.setState({
+                tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ? this.getUnits(scroll) : 15
+            }, () => {
+                this.newTable()
+                this.setState({ start: this.state.tb2_scrollPosition * 50 })
+                this.updateTable(this.state.start)
+                this.forceUpdate()
+            });
+
+            if (this.state.start === 0)
+                this.textInput.current.scrollTop = 10;
+            else
+                this.textInput.current.scrollTop = 25;
+
+            //  console.log('2 + start ' + this.state.start + 'scrollPosition ' + this.state.tb2_scrollPosition)
+
+            this.setState({ validInput: false })
+            this.setState({ queryRes: false })
         }
     }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        if (this.state.validInput || this.state.queryRes
+            || this.state.isUpdating === false 
+          //  nextState.validInput || nextState.queryRes
+        )  
+            return true;
+        return false;
+    }
+
+    /*
+    getSnapshotBeforeUpdate(prevProps, prevState) {
+            if (prevState.tb2_scrollPosition !== this.state.tb2_scrollPosition
+                && this.state.isScrolled) {
+                    setTimeout(() => {
+                this.newTable()
+                this.updateTable()
+                return (this.state.tb2_scrollPosition !== undefined
+                    || this.state.tb2_scrollPosition === null)
+                    ? 100 : this.state.tb2_scrollPosition;  }, 800);
+            }
+    } */
 
     // Communicate with c# controller https://stackoverflow.com/questions/46946380/fetch-api-request-timeout
     async searchDatabase(e) {
-        e.preventDefault();
+        // e.preventDefault();
         let input = new String(e.target.value);
 
         if (input.length < 1) {
-            this.setState({ display: "No Stocks Found" });
+            this.setState({ queryRes: false }),
+                this.setState({ display: "No Stocks Found" });
         }
         // Buggy, fix nulls
         if (!(!input || /^\s*$/.test(input))) {
@@ -121,6 +196,7 @@ export class StockTableTwo extends PureComponent {
                 .then(response => response.text())
                 .then(data =>
                     this.setState({ query: JSON.parse(data) }),
+                    this.setState({ queryRes: true }),
                     this.searchRecords()
                 ).catch(error =>
                     console.log("error " + error),
@@ -133,15 +209,42 @@ export class StockTableTwo extends PureComponent {
         }
     }
 
+    getUnits(scroll) {
+        let units = parseFloat((((scroll / 800) / 2) % 1).toFixed(2));
+        let integer = Math.trunc(((scroll / 800) / 2));
+
+        //     units = (integer - 1 <= 0.5) ? 0 : integer;
+        // Get Integer part
+        if (units < 0.4)
+            units = integer;
+        else if (units > 0.4 && units < 0.7)
+            units = integer + 0.5;
+        else
+            units = integer + 1;
+
+        return units;
+    }
+
     getDisplay() {
         return this.state.display;
     }
 
     // select record from dropdown list
     selectRecords(e) {
+        this.setState({ validInput: true });
+        this.forceUpdate();
+
         var id = new Number(e.target.id);
         this.setState({ stockRecord: id });
-        this.setState({ validInput: true });
+
+        const scroll = this.scrollBy();
+        this.setState({
+            tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ? this.getUnits(scroll) : 15
+        }, () => {
+            this.newTable()
+            this.setState({ start: this.state.tb2_scrollPosition * 50 })
+            this.updateTable(this.state.start)
+        });
     }
 
     // create searchable records from dropdown list
@@ -178,8 +281,8 @@ export class StockTableTwo extends PureComponent {
 
     // Units to scroll by to find record in search stocks
     scrollBy() {
-        const height = 800;
-        const scroll = 34;
+        const height = 790;
+        const scroll = 33;
 
         const stockRecord = this.state.stockRecord;
 
@@ -190,11 +293,36 @@ export class StockTableTwo extends PureComponent {
         return count;
     }
 
-    // Trigger scrolling event
-    scroll_() {
+    async freezeScrollPosition(e) {
         this.setState({ scroll: this.textInput.current.scrollTop })
-        this.scrollToPosition()
-        //this.setState({ scrollUp_: scrollUp_ + 0.5 })
+        const result = await this.scroll_(e);
+        if (result == "resolved") {
+
+            clearInterval(this.intervalID);
+        }
+
+
+        // Check the position
+        let position = this.loadFromCache();
+
+        if (position !== 0) {
+            this.scrollToPosition()
+        }
+        else {
+            // Prevent re-rendering
+            this.setState({ isUpdating: true });
+        }
+    }
+
+    // Trigger scrolling event
+    async scroll_(e) {
+        e.persist();
+        return new Promise(resolve => {
+            setTimeout(() => {
+                e.stopPropagation();
+                resolve('resolved');
+            }, 900);
+        });
     }
 
     /*
@@ -204,8 +332,13 @@ export class StockTableTwo extends PureComponent {
     */
     loadFromCache() {
         let units = (this.state.scroll);
-        console.log("units " + units);
-        return (units > 430) ? 1 : (units < 13 || units < 4) ? -1 : 0;
+
+        this.setState({
+            maxScroll: (this.state.tb2_scrollPosition <= 1) ?
+                458 : 800
+        });
+
+        return (units > this.state.maxScroll) ? 1 : (units <= 4) ? -1 : 0;
     }
 
     scrollPosition() {
@@ -218,93 +351,111 @@ export class StockTableTwo extends PureComponent {
             // Scroll Down
             this.setState({
                 tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ?
-                    this.state.tb2_scrollPosition + 1 : 15
+                    this.state.tb2_scrollPosition + 0.5 : 15
             });
-            this.setState({ start: this.state.tb2_scrollPosition * 50 });
 
-            this.setState({ isScrolled: true });
+        //    console.log('Scroll Down ' + this.state.tb2_scrollPosition)
             this.setState({ tb2_count: 1 });
-            console.log('Scroll Down ' + this.state.tb2_scrollPosition)
-            return true;
+            this.setState({ isUpdating: false });
         }
         else if (this.loadFromCache() === -1) {
             // Scroll Up
             this.setState({
-                tb2_scrollPosition: (this.state.tb2_scrollPosition < 1) ?
-                    0 : this.state.tb2_scrollPosition - 1
+                tb2_scrollPosition: (this.state.tb2_scrollPosition <= 1) ?
+                    0 : this.state.tb2_scrollPosition - 0.5
             });
 
-            this.setState({ start: (this.state.tb2_scrollPosition < 1) ?
-                0 : this.state.tb2_scrollPosition * 50
-            });
-
-            this.setState({ isScrolled: true });
+       //     console.log('Scroll Up')
             this.setState({ tb2_count: 1 });
-            console.log('Scroll Up')
-            return false;
+            this.setState({ isUpdating: false });
         }
     }
 
     /* Select row from the table
        Triggers re-rendering of table */
     selectRow(e) {
+        var array = [];
         var target = new Number(e.target.id);
-        var style = {};
-
-        console.log('target ' + target)
+        //  console.log('target ' + target)
         let mod = 0;
         let id;
 
-        let start = this.state.tb2_scrollPosition * 50;
+        if (this.state.tb2_scrollPosition === 0)
+            mod = 0;
+        else
+            mod = 15;
+
+
+        let start = (this.state.tb2_scrollPosition * 50) - mod;
         let end = (this.state.tb2_scrollPosition * 50) + 50;
 
         for (id = start; id < end; id++) {
-            if (id === target && (target !== null || target !== undefined))
-                style = { backgroundColor: "rgb(0,11,34)" };
-            else
-                style = {};
+            // Get values from cache this.state.tb2_stack
+            let list = (this.cache !== null) ? this.cache.get(id.toString()) 
+            : this.props.cache.get(id.toString());
 
-            // Get values from cache
-            let list = this.props.state.cache.get(id.toString());
+            if (id == target) {
+                array.push(
+                    <tbody key={id} style={{ backgroundColor: "rgb(21,100,111)" }}>
+                        <tr >
+                            <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
+                            <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
+                            <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
+                            <td id={id} onClick={this.selectRow}>{list.High.toString()}</td>
 
-            this.state.tb2_stack.push(
-                <tbody>
-                    <tr key={id} style={style}>
-                        <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
-                        <td id={id} onClick={this.selectRow}>{list.High.toString()}</td>
+                            <td id={id} onClick={this.selectRow}>{list.Low.toString()}</td>
+                            <td id={id} onClick={this.selectRow}>{list.ProfitLoss.toString()}</td>
+                            <td id={id} onClick={this.selectRow}>{list.ProfitLoss_Percentage.toString()}</td>
+                            <td id={id} onClick={this.selectRow}>{list.Volume.toString()}</td>
+                        </tr>
+                    </tbody>)
+            }
+            else {
+                array.push(
+                    <tbody key={id}>
+                        <tr >
+                            <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
+                            <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
+                            <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
+                            <td id={id} onClick={this.selectRow}>{list.High.toString()}</td>
 
-                        <td id={id} onClick={this.selectRow}>{list.Low.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss_Percentage.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.Volume.toString()}</td>
-                    </tr>
-                </tbody>)
+                            <td id={id} onClick={this.selectRow}>{list.Low.toString()}</td>
+                            <td id={id} onClick={this.selectRow}>{list.ProfitLoss.toString()}</td>
+                            <td id={id} onClick={this.selectRow}>{list.ProfitLoss_Percentage.toString()}</td>
+                            <td id={id} onClick={this.selectRow}>{list.Volume.toString()}</td>
+                        </tr>
+                    </tbody>)
+            }
         }
 
-        this.setState({ tb2_stack: this.state.tb2_stack });
+        this.setState({ tb2_stack: array });
         this.setState({ tb2_count: 1 });
     }
 
     newTable() {
         let id;
-        let start = this.state.tb2_scrollPosition * 50;
+        let mod = 0;
+
+        if (this.state.tb2_scrollPosition === 0)
+            mod = 0;
+        else
+            mod = 15;
+
+        let start = (this.state.tb2_scrollPosition * 50) - mod;
         let end = (this.state.tb2_scrollPosition * 50) + 50;
-        var t = [];
-
-
-
-            console.log( start + ' ' + end);
+        var array = [];
 
         // Use shallow compare
         for (id = start; id < end; id++) {
-            // Get values from cache
-            let list = this.props.state.cache.get(id.toString());
 
-            t.push(
-                <tbody>
-                    <tr key={id}>
+            // Get values from cache
+            let list = (this.cache !== null) ? this.cache.get(id.toString()) 
+            : this.props.cache.get(id.toString());
+
+            //  console.log( 'WORK WORK ' + id);
+            array.push(
+                <tbody key={id}>
+                    <tr >
                         <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
                         <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
                         <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
@@ -317,12 +468,25 @@ export class StockTableTwo extends PureComponent {
                     </tr>
                 </tbody>);
         }
-        this.setState({ tb2_stack: t });
+
+        this.setState({ tb2_stack: array });
     }
 
-    updateTable() {
+    updateTable(start) {
+        let mod = 0;
+
+        if (this.state.tb2_scrollPosition === 0)
+            mod = 0;
+        else
+            mod = 15;
+
+        start = (start <= 15 || (start === undefined || start === null)) ? 0 : start - mod;
+
+     //   console.log(start + ' start')
+
         // Get values from cache
-        let list = this.props.state.cache.get(this.state.start.toString());
+        let list = (this.cache !== null) ? this.cache.get(start.toString()) 
+            : this.props.cache.get(start.toString());
 
         let t = <div>
             <div id="stack-wrapper">
@@ -341,9 +505,7 @@ export class StockTableTwo extends PureComponent {
                                 <th>{list.Volume.toString()}</th>
                             </tr>
                         </thead>
-
                         {this.state.tb2_stack}
-
                     </table>
                 </div>
             </div>
@@ -355,16 +517,16 @@ export class StockTableTwo extends PureComponent {
     createTable() {
         var table = [];
         let id;
-        let mod = 0;
 
-        for (id = 1; id < 50; id++) {
+        for (id = 0; id < 50; id++) {
 
             // Get values from cache
-            let list = this.props.state.cache.get(id.toString());
+              let list = (this.cache !== null) ? this.cache.get(id.toString()) 
+            : this.props.cache.get(id.toString());
 
             this.state.tb2_stack.push(
-                <tbody>
-                    <tr key={id}>
+                <tbody key={id}>
+                    <tr>
                         <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
                         <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
                         <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
@@ -378,8 +540,6 @@ export class StockTableTwo extends PureComponent {
                 </tbody>)
         }
     }
-
-   
 
     render() {
         let stockTableTwoHeader = <table class="stockTableTwoHeader" aria-labelledby="tabelLabel">
@@ -408,10 +568,10 @@ export class StockTableTwo extends PureComponent {
 
                     boxShadow='sm'
                     textAlign='center'
-                    height='45px'
+                    height='35px'
                     width='60rem'
                     rounded="lg"
-                    maxHeight='45px'
+                    maxHeight='35px'
                     margin='auto'
                     zIndex='999'
                     color='white'>
@@ -428,6 +588,7 @@ export class StockTableTwo extends PureComponent {
                                     }}
 
                                     onInput={this.searchDatabase}
+
                                     //   display={display}
                                     placeholder="Search "
                                 />
@@ -454,12 +615,12 @@ export class StockTableTwo extends PureComponent {
                     {stockTableTwoHeader}
 
                     <Box
+                        style={this.state.tb2_style}
                         position='absolute'
-                        overflowY='visible'
-                        top='45px'
+                        overflowY='initial'
+                        top='35px'
                         ref={this.textInput}
-                        onScroll={this.scroll_}
-                        display="flex"
+                        onScroll={this.freezeScrollPosition}
                         overflowX='hidden'
                         bg='rgb(30,30,30)'
                         boxShadow='sm'
@@ -470,19 +631,13 @@ export class StockTableTwo extends PureComponent {
                         rounded="lg"
                         color='white'
                         zIndex='-999'>
-
-
-
-
                         {this.state.tb2}
-
-
-
-                        {/*this.state.tableContent.map((item) =>  )*/}
-
                     </Box>
-
                 </Box>
+
+                {/* ALERT TABLE 
+                  <AlertTable {...this}/> */}
+
             </div>
         );
     }

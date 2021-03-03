@@ -290,8 +290,8 @@ export class AlertTable extends Component {
 
             console.log( start + ' ' + end);
 
-        // Use shallow compare
         for (id = start; id < end; id++) {
+
             // Get values from cache
             let list = this.props.state.cache.get(id.toString());
 
@@ -348,27 +348,15 @@ export class AlertTable extends Component {
     createTable() {
         var table = [];
         let id;
+        let length =  this.props.state.cachedRows.length;
         
-
-        for (id = 1; id < 50; id++) {
-
+        for (id = 0; id < length; id++) {
             // Get values from cache
             let list = this.props.state.cache.get(id.toString());
 
             this.state.tb2_stack.push(
-                <tbody>
-                    <tr key={id}>
-                        <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
-                        <td id={id} onClick={this.selectRow}>{list.High.toString()}</td>
-
-                        <td id={id} onClick={this.selectRow}>{list.Low.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss_Percentage.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.Volume.toString()}</td>
-                    </tr>
-                </tbody>)
+                this.props.state.cachedRows[id]
+               );
         }
     }
 

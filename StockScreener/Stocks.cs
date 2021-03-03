@@ -185,7 +185,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 for (int i = 0; i < end; i++) // foreach (RealTimePrice data_ in data)
                 {
                     stock.StockCode = StocksCode.Value[code];
-                    stock.Change = 91;
+                    stock.Change = new Random().Next(1,99);
                     stock.ChangeP = 1;
                     stock.Volume = 11;
                     stock.ProfitLoss = 1;
@@ -243,7 +243,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 while (pointer < end)
                 {
                     stock.StockCode = StocksCode.Value[pointer];
-                    stock.Change = 91;
+                    stock.Change = new Random().Next(1,99);
                     stock.ChangeP = 1;
                     stock.Volume = 11;
                     stock.ProfitLoss = 1;
@@ -251,7 +251,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     stock.ChangeArray = Stocks.changeArray;
                     stock.Volume = 13;
 
-                    stock.High = 10;
+                    stock.High = new Random().Next(1,99);
                     stock.Low = 14;
                     stock.Open = 76;
                     stock.Close = 10;

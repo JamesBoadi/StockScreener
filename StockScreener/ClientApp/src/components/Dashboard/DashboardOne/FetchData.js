@@ -26,16 +26,18 @@ export class FetchData extends Component {
     super(props);
     this.readNavBarData = this.readNavBarData.bind(this);
     this.onNotifReceived = this.onNotifReceived.bind(this);
-    this.hubConnection = null
+    this.hubConnection = null;
     //this.startHubConnection = this.startHubConnection.bind(this);
     //this.createHubConnection = this.createHubConnection.bind(this);
-    this.startStreaming = this.startStreaming.bind(this);
 
+
+    this.cache = new cache();
+    this.called = false;
 
     this.state = {
       stockTableTwo: [],
       isStreaming: false,
-      lock: true,
+      lock: false,
       forecasts: [], loading: true, hubConnection: HubConnectionBuilder(),
       nick: '',
       message: '',
@@ -44,8 +46,8 @@ export class FetchData extends Component {
       request_Calls: -1,
       request_Update: 0,
       MAX_CALLS: 896,
-      called: false,
-      cache: new cache(),
+      called: true,
+
 
       data: [
         {
@@ -67,81 +69,77 @@ export class FetchData extends Component {
     };
   }
 
-  
+
 
   componentDidMount = () => {
-    var cache_ = new cache();
-    var count;
-    for (count = 0; count < 897; count++) {
-     
-      const P = {
-        StockCode: count,
-        Change: 91,
-        ChangeP: 1,
-        Volume: 11,
-        CurrentPrice: 102,
-        ProfitLoss: 1,
-        ProfitLoss_Percentage: 99,
-        ChangeArray: 888,
-        High: 10,
-        Low: 14,
-        Open: 76,
-        Close: 10,
-
-        /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
-          string _currentTime = time.ToString("HH:mmttss");
-          
-          stock.timestamp = _currentTime;*/
-
-        Request_Calls: 5,
-        TimeStamp: "9:00",
-        ChangeArray: "iii",
-        Request_Calls: "1"
-      }
-
-  //  console.log(P.StockCode + " " + "kkk");
-      cache_.set(count.toString(), P);
+    /* var cache_ = new cache();
+     var count;
+     for (count = 0; count < 897; count++) {
       
-    }
+       const P = {
+         StockCode: count,
+         Change: 91,
+         ChangeP: 1,
+         Volume: 11,
+         CurrentPrice: 102,
+         ProfitLoss: 1,
+         ProfitLoss_Percentage: 99,
+         ChangeArray: 888,
+         High: 10,
+         Low: 14,
+         Open: 76,
+         Close: 10,
+ 
+         /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
+           string _currentTime = time.ToString("HH:mmttss");
+           
+           stock.timestamp = _currentTime;
+ 
+         Request_Calls: 5,
+         TimeStamp: "9:00",
+         ChangeArray: "iii",
+         Request_Calls: "1"
+       }
+ 
+   //  console.log(P.StockCode + " " + "kkk");
+       cache_.set(count.toString(), P);
+       
+     }
+ 
+       this.setState({ cache: cache_ });
+      this.setState({ lock: false });*/
 
-     
-      this.setState({ cache: cache_ });
-     this.setState({ lock: false });
-  //  this.sendRequest();
+
+
+    this.sendRequest();
   }
 
   // Replace with event listener
   componentDidUpdate = () => {
     var t = [];
-    if (this.state.lock === false &&
-      this.state.called === false) {
+    if (this.state.lock === true &&
+      this.called === false) {
       t.push(<StockTableTwo
         {...this}
       />)
 
       this.setState({ stockTableTwo: t });
-      this.setState({ called: true });
+      this.called = true;
+      //this.setState({ lock: true });
       t = [];
     }
   }
 
+  // Equality check against IMMUTABLE data
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.lock){
+      this.setState({ lock: false });
+      return true;
+    }
+    return false;
+  }
+
   readNavBarData = (num) => {
-    /*
-    var NavBar = NavBarData.navBar;
-    var currentData = this.state.data;
-
-    currentData[0].dashboardNum = NavBar[num].dashboardNum;
-    currentData[0].indexValue = NavBar[num].indexValue;
-    currentData[0].indexPercentage = NavBar[num].indexPercentage;
-    currentData[0].startScan = NavBar[num].startScan;
-    currentData[0].lastScan = NavBar[num].lastScan;
-    currentData[0].msCap = NavBar[num].msCap;
-    currentData[0].msCapPercentage = NavBar[num].msCapPercentage;
-    currentData[0].ACE = NavBar[num].ACE;
-    currentData[0].ACEpercentage = NavBar[num].ACEpercentage;
-
-    this.state.data = currentData;*/
-    //  this.setState({ lock: false });
   }
 
   // Add the Row
@@ -162,42 +160,6 @@ export class FetchData extends Component {
     }, 1000);
   }
 
-  async startStreaming(hubConnection) {
-    let isOK = false;
-    var t = ["ahhhhhhhhhhhhhhh"];
-    console.log(this.hubConnection)
-    try {
-      await hubConnection.stream("RequestData", t)
-        .subscribe({
-          next: stockArray => {
-            try {
-              console.log('HELLO' + stockArray)
-
-              var count = 0;
-
-              for (count = 0; count < stockArray.length; count++) {
-                console.log("next " + stockArray[count]);
-              }
-
-            }
-            catch (err) {
-              console.error('Comm: Error in hub streaming callback. ' + err);
-            }
-          },
-          complete: () => console.log('Comm: Hub streaming completed.'),
-          error: err => console.error('Comm: Error in hub streaming subscription. ' + err)
-        });
-
-      console.log('Comm: Hub streaming started.');
-      isOK = true;
-    }
-    catch (err) {
-      console.error('Comm: Error in hub startStreaming(). ' + err);
-    }
-
-    return isOK;
-  }
-
   async sendRequest() {
     const hubConnection = new signalR.HubConnectionBuilder()
       .withUrl('https://localhost:44362/stock')
@@ -210,13 +172,16 @@ export class FetchData extends Component {
       .catch(err => console.log('Error while establishing hubConnection :(')); // Redirect to 404 page
 
     console.log("CONNECTION " + hubConnection);
-    var cache_ = new cache();
+
+    let called = false;
 
     // Change so that we don't have to call requests using string
     hubConnection.stream("RequestData", this.state.request_Calls)
       .subscribe({
         next: (stockArray) => {
 
+          var cache_ = new cache();
+       
           // Account for faliures in connection
           var count = 0;
           for (count = 0; count < stockArray.length; count++) {
@@ -226,11 +191,16 @@ export class FetchData extends Component {
             //console.log(item.StockCode + " " + "kkk");
           }
 
-          this.setState({ cache: cache_ });
+          /*   this.setState({ cache: cache_ });*/
+
           cache_.clear();
 
-          //  console.log("REQUESTS " + this.state.request_Calls)
-          this.setState({ lock: false });
+          //
+        console.log("REQUESTS " + this.state.request_Calls)
+          this.cache = cache_;
+
+          this.setState({ lock: true });
+
           /*
           if (this.state.request_Calls !== this.state.MAX_CALLS) {
             this.setState({ request_Calls: request_Calls });

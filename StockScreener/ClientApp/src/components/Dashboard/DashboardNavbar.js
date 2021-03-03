@@ -13,7 +13,7 @@ export const DashboardNavbar = props => {
     const getStartTime = useRef(null); // Replace ref with onclick, store and retrieve state
     const getEndTime = useRef(null);
     const dateTime = new Date(); //new DateTime();
-    const alertInterval = null;
+    const alertInterval_ = null;
 
     let selectMarket =
         <select class="selectMarket" name="Select Market">
