@@ -216,7 +216,6 @@
 
   .stockTableTwoHeader thead:nth-child(odd) th
   {
-    height: 30px;
     border-bottom: 5px solid rgba(27, 209, 130, 0.897); 
     line-height: 1;
   }
@@ -273,9 +272,11 @@
     border: 0.5px solid black;
     color:	rgb(255,250,250);
   }
-/*
+
+  /*
   .stockTableTwoHeader th:hover { background-color: rgb(40,40,40); }
 
+  
   .stockTableTwo tbody:nth-child(even) tr {background-color: rgb(40,40,40); }
 */
   /************** Alert Table ******************/

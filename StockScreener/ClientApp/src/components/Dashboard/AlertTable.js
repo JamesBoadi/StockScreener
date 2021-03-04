@@ -55,20 +55,22 @@ export class AlertTable extends Component {
         };
     }
 
+
+
     componentDidMount() {
-        this.createTable()
+       /* this.createTable()
         this.updateTable()
 
         setInterval(() => {
             window.location.reload();
         }, 20000000);
 
-        this.setState({ scroll: this.scrollBy() })
+        this.setState({ scroll: this.scrollBy() })*/
     }
 
     componentDidUpdate(snapshot) {
         // Update table
-        if (this.state.tb2_count === 1 && snapshot !== null) {
+      /*  if (this.state.tb2_count === 1 && snapshot !== null) {
 
             this.updateTable()
             
@@ -88,7 +90,7 @@ export class AlertTable extends Component {
         if (this.state.validInput === true) {
             this.textInput.current.scrollTop = scroll;
             this.setState({ validInput: false })
-        }
+        }*/
     }
 
     // Prevent unecerssary updates
@@ -360,8 +362,6 @@ export class AlertTable extends Component {
         }
     }
 
-   
-
     render() {
         let alertTableHeader = <table class="alertTableHeader" aria-labelledby="tabelLabel">
             <thead>
@@ -379,7 +379,7 @@ export class AlertTable extends Component {
             <div>
                 {/* ALERT TABLE */}
                 <Box
-                    style={{ position: 'absolute', top: '125px', left: '1070px' }}
+                    style={{ position: 'absolute', top: '315px', left: '1070px' }}
                     //     bg='rgb(30,30,30)'
                     boxShadow='sm'
                     textAlign='center'
@@ -416,7 +416,7 @@ export class AlertTable extends Component {
                         color='white'
                         zIndex='-999'>
 
-                        {this.state.alertTable}
+                        {this.props.state.alertTableStack}
                     </Box>
                 </Box>
             </div>

@@ -5,8 +5,8 @@ import './Dashboard.css';
 
 export const SideBar = props => {
     const [redirect, setRedirect] = useState(null);
-    /*
-        const Dashboard = <h4 id="dashboard">{"Dashboard "}{props.Data.dashboardNum}</h4>
+    
+   /*     const Dashboard = <h4 id="dashboard">{"Dashboard "}{props.Data.dashboardNum}</h4>
         const Index = <h4 id="index">{"KLCI"}{props.Data.indexValue}{'( ' + props.Data.indexPercentage + '%)'}</h4>
         const startScan = <h3 id="startScan">{"Start Scan: "}{props.Data.startScan}</h3>
         const lastScan = <h3 id="lastScan">{"Last Scan "}{props.Data.lastScan}</h3>
@@ -36,7 +36,7 @@ export const SideBar = props => {
                 borderWidth="1px"
                 color='white'>
 
-                {/* <h4>{"D"}{props.Data.dashboardNum}</h4>
+                 <h4>{"D"}{/*props.Data.dashboardNum}*/}</h4>
 
                 <Button id="home_" colorScheme="blue" />
                 <Button id="startScan_" colorScheme="blue" />
@@ -44,13 +44,13 @@ export const SideBar = props => {
                 <Button id="settings_" colorScheme="blue" onClick={direct} />
                 <Button id="report_" colorScheme="blue" />
                 <Button id="ndsa_" colorScheme="blue" />
-                <Button id="exit_" colorScheme="blue" />*/}
+                <Button id="exit_" colorScheme="blue" />
                 {redirect }
                 { /* <Button id="run" colorScheme="blue" >Button</Button>
                     <Button id="stop" colorScheme="blue" >Button</Button>
              <Button id="dashboardTwo" colorScheme="blue">Button</Button>
                 <Button id="dashboardTwelve" colorScheme="blue">Button</Button>
-                <Button id="dashboardIdss" colorScheme="blue">Button</Button> */}
+            <Button id="dashboardIdss" colorScheme="blue">Button</Button> */}
             </Box>
         </div>
     );

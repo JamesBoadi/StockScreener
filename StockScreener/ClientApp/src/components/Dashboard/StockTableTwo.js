@@ -37,12 +37,12 @@ export class StockTableTwo extends React.Component {
         this.newTable = this.newTable.bind(this);
         this.getDisplay = this.getDisplay.bind(this);
         this.getUnits = this.getUnits.bind(this);
-
         let style = { color: "white;" };
-
         this.timeout = null;
         this.cache = null;
-       
+
+        this.initialiseSearch = false;
+
 
         this.state = {
             green: false,
@@ -67,13 +67,15 @@ export class StockTableTwo extends React.Component {
             tb2_count: 1,
             tb2_numberOfClicks: [],
 
-
             isUpdating: false,
             isScrolled: true,
             scrollUp_: 0,
             scrollDown_: 0,
 
+            isSelected: false,
+
             lock: false,
+            target: 0,
 
             // Rows to add from stock table to alert table
             cachedRows: []
@@ -87,57 +89,8 @@ export class StockTableTwo extends React.Component {
 
         // Update Table 
         this.intervalID_ = setInterval(() => {
-           this.cache = this.props.cache;
-           console.log('freeze');
-            //  this.setState({ isUpdating: true });
-
-        }, 70000);
-
-        setInterval(() => {
-            window.location.reload();
-        }, 20000000);
-
-        this.setState({ scroll: this.scrollBy() })
-    }
-
-
-    componentWillUnmount() {
-        // Clear the interval right before component unmount
-        clearInterval(this.intervalID_);
-    }
-
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        // Update table
-        // Create seperate states for scroll up and scroll down
-        
-        const scroll = this.scrollBy();
-        if (prevState.tb2_count === 1) {
-            /*  
-                  console.log('scroll ' + units);
-
-                  this.setState({
-                      tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ?
-                          8 : 15
-                  });
-  
-                  this.setState({ start: this.state.tb2_scrollPosition * 50 });
-              }*/
-
-            this.newTable()
-            this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
-                this.updateTable(this.state.start)
-            });
-
-            if (this.state.start === 0)
-                this.textInput.current.scrollTop = 10;
-            else
-                this.textInput.current.scrollTop = 25;
-
-            console.log('T is updated');
-
-            this.setState({ tb2_count: 0 })
-
-        } else if (this.state.validInput) {
+            // Force an update
+            const scroll = this.scrollBy();
             this.setState({
                 tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ? this.getUnits(scroll) : 15
             }, () => {
@@ -151,19 +104,98 @@ export class StockTableTwo extends React.Component {
                 this.textInput.current.scrollTop = 10;
             else
                 this.textInput.current.scrollTop = 25;
+            //  this.setState({ isUpdating: true });
+        }, 20000);
+
+        setInterval(() => {
+            window.location.reload();
+        }, 20000000);
+
+        this.setState({ scroll: this.scrollBy() })
+    }
+
+    componentWillUnmount() {
+        // Clear the interval right before component unmount
+        clearInterval(this.intervalID_);
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        const scroll = this.scrollBy();
+
+        /*     if (this.initialiseSearch) {
+                 this.setState({ validInput: true });
+                 this.forceUpdate();
+     
+                 var id = new Number(1);
+                 this.setState({ stockRecord: id });
+     
+                 this.setState({
+                     tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ? this.getUnits(scroll) : 15
+                 }, () => {
+                     this.newTable()
+                     this.setState({ start: this.state.tb2_scrollPosition * 50 })
+                     this.updateTable(this.state.start)
+                 });
+     
+                 this.initialiseSearch = false;
+             }*/
+
+        // Update table
+        if (this.state.isSelected) {
+            
+            this.newTable()
+            this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
+                this.updateTable(this.state.start)
+                this.forceUpdate()
+            });
+
+            console.log('State UPDATED');
+            this.setState({ isSelected: false });
+        }
+        else if (prevState.tb2_count === 1) {
+            this.newTable()
+            this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
+                this.updateTable(this.state.start)
+            });
+
+            if (this.state.start === 0)
+                this.textInput.current.scrollTop = 10;
+            else
+                this.textInput.current.scrollTop = 25;
+
+            // console.log('T is updated');
+            this.setState({ tb2_count: 0 })
+
+        } else if (this.state.validInput) {
+
+            this.setState({
+                tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ? this.getUnits(scroll) : 15
+            }, () => {
+                this.newTable()
+                this.setState({ start: this.state.tb2_scrollPosition * 50 })
+                this.updateTable(this.state.start)
+                //   this.forceUpdate()
+            });
+
+            if (this.state.start === 0)
+                this.textInput.current.scrollTop = 10;
+            else
+                this.textInput.current.scrollTop = 25;
 
             //  console.log('2 + start ' + this.state.start + 'scrollPosition ' + this.state.tb2_scrollPosition)
 
             this.setState({ validInput: false })
             this.setState({ queryRes: false })
+
         }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
         if (this.state.validInput || this.state.queryRes
-            || this.state.isUpdating === false 
-          //  nextState.validInput || nextState.queryRes
-        )  
+            || this.state.isUpdating === false || 
+            this.state.isSelected !== nextState.isSelected
+            //  nextState.validInput || nextState.queryRes
+        )
             return true;
         return false;
     }
@@ -209,6 +241,26 @@ export class StockTableTwo extends React.Component {
         }
     }
 
+    // select record from dropdown list
+    selectRecords(e) {
+        this.setState({ validInput: true });
+        this.forceUpdate();
+
+        var id = new Number(e.target.id);
+        this.setState({ stockRecord: id });
+
+        const scroll = this.scrollBy();
+        this.setState({
+            tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ? this.getUnits(scroll) : 15
+        }, () => {
+            this.newTable()
+            this.setState({ start: this.state.tb2_scrollPosition * 50 })
+            this.updateTable(this.state.start)
+
+        });
+
+    }
+
     getUnits(scroll) {
         let units = parseFloat((((scroll / 800) / 2) % 1).toFixed(2));
         let integer = Math.trunc(((scroll / 800) / 2));
@@ -227,24 +279,6 @@ export class StockTableTwo extends React.Component {
 
     getDisplay() {
         return this.state.display;
-    }
-
-    // select record from dropdown list
-    selectRecords(e) {
-        this.setState({ validInput: true });
-        this.forceUpdate();
-
-        var id = new Number(e.target.id);
-        this.setState({ stockRecord: id });
-
-        const scroll = this.scrollBy();
-        this.setState({
-            tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ? this.getUnits(scroll) : 15
-        }, () => {
-            this.newTable()
-            this.setState({ start: this.state.tb2_scrollPosition * 50 })
-            this.updateTable(this.state.start)
-        });
     }
 
     // create searchable records from dropdown list
@@ -285,9 +319,7 @@ export class StockTableTwo extends React.Component {
         const scroll = 33;
 
         const stockRecord = this.state.stockRecord;
-
         let heightUnits = (stockRecord / scroll);
-
         let count = height * heightUnits;
 
         return count;
@@ -354,7 +386,7 @@ export class StockTableTwo extends React.Component {
                     this.state.tb2_scrollPosition + 0.5 : 15
             });
 
-        //    console.log('Scroll Down ' + this.state.tb2_scrollPosition)
+            //    console.log('Scroll Down ' + this.state.tb2_scrollPosition)
             this.setState({ tb2_count: 1 });
             this.setState({ isUpdating: false });
         }
@@ -365,7 +397,7 @@ export class StockTableTwo extends React.Component {
                     0 : this.state.tb2_scrollPosition - 0.5
             });
 
-       //     console.log('Scroll Up')
+            //     console.log('Scroll Up')
             this.setState({ tb2_count: 1 });
             this.setState({ isUpdating: false });
         }
@@ -374,8 +406,10 @@ export class StockTableTwo extends React.Component {
     /* Select row from the table
        Triggers re-rendering of table */
     selectRow(e) {
+
         var array = [];
         var target = new Number(e.target.id);
+        this.setState({ target: target });
         //  console.log('target ' + target)
         let mod = 0;
         let id;
@@ -385,19 +419,18 @@ export class StockTableTwo extends React.Component {
         else
             mod = 15;
 
-
         let start = (this.state.tb2_scrollPosition * 50) - mod;
         let end = (this.state.tb2_scrollPosition * 50) + 50;
 
         for (id = start; id < end; id++) {
             // Get values from cache this.state.tb2_stack
-            let list = (this.cache !== null) ? this.cache.get(id.toString()) 
-            : this.props.cache.get(id.toString());
+            let list = this.props.cache.get(id.toString());
 
             if (id == target) {
+
                 array.push(
-                    <tbody key={id} style={{ backgroundColor: "rgb(21,100,111)" }}>
-                        <tr >
+                    <tbody key={id} >
+                        <tr style={{ color: "green", backgroundColor: "rgb(21,100,111)" }}>
                             <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
                             <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
                             <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
@@ -410,6 +443,7 @@ export class StockTableTwo extends React.Component {
                         </tr>
                     </tbody>)
             }
+
             else {
                 array.push(
                     <tbody key={id}>
@@ -429,7 +463,9 @@ export class StockTableTwo extends React.Component {
         }
 
         this.setState({ tb2_stack: array });
-        this.setState({ tb2_count: 1 });
+        this.setState({ isSelected: true });
+        // Send Information to Display Stock
+        this.props.displayStockInfo(e);
     }
 
     newTable() {
@@ -444,17 +480,24 @@ export class StockTableTwo extends React.Component {
         let start = (this.state.tb2_scrollPosition * 50) - mod;
         let end = (this.state.tb2_scrollPosition * 50) + 50;
         var array = [];
+        let style = {};
 
         // Use shallow compare
         for (id = start; id < end; id++) {
 
+            if (id == this.state.target){
+                style = { color: "green", backgroundColor: "rgb(21,100,111)" };
+                console.log('New table');
+            }
+            else
+                style = {};
+               
             // Get values from cache
-            let list = (this.cache !== null) ? this.cache.get(id.toString()) 
-            : this.props.cache.get(id.toString());
-
+            let list = this.props.cache.get(id.toString());
             //  console.log( 'WORK WORK ' + id);
+
             array.push(
-                <tbody key={id}>
+                <tbody key={id} style={style}>
                     <tr >
                         <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
                         <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
@@ -482,11 +525,10 @@ export class StockTableTwo extends React.Component {
 
         start = (start <= 15 || (start === undefined || start === null)) ? 0 : start - mod;
 
-     //   console.log(start + ' start')
+        //   console.log(start + ' start')
 
         // Get values from cache
-        let list = (this.cache !== null) ? this.cache.get(start.toString()) 
-            : this.props.cache.get(start.toString());
+        let list = this.props.cache.get(start.toString());
 
         let t = <div>
             <div id="stack-wrapper">
@@ -521,8 +563,8 @@ export class StockTableTwo extends React.Component {
         for (id = 0; id < 50; id++) {
 
             // Get values from cache
-              let list = (this.cache !== null) ? this.cache.get(id.toString()) 
-            : this.props.cache.get(id.toString());
+            let list = this.props.cache.get(id.toString());
+
 
             this.state.tb2_stack.push(
                 <tbody key={id}>
@@ -563,7 +605,7 @@ export class StockTableTwo extends React.Component {
 
                 {/* STOCK TABLE TWO */}
                 <Box
-                    style={{ position: 'absolute', top: '450px', left: '60px' }}
+                    style={{ position: 'absolute', top: '520px', left: '60px' }}
                     bg='rgb(30,30,30)'
 
                     boxShadow='sm'
@@ -635,8 +677,6 @@ export class StockTableTwo extends React.Component {
                     </Box>
                 </Box>
 
-                {/* ALERT TABLE 
-                  <AlertTable {...this}/> */}
 
             </div>
         );

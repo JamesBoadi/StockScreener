@@ -8,7 +8,7 @@ import {
 export const DashboardNavbar = props => {
 
     const [alertEnabled, setalertEnabled] = useState(true);
-    const [alertInterval, setAlertInterval] = useState(60000);
+    const [alertInterval, setAlertInterval] = useState(6000);
     const [intervalSet, isIntervalSet] = useState(false);
     const getStartTime = useRef(null); // Replace ref with onclick, store and retrieve state
     const getEndTime = useRef(null);
