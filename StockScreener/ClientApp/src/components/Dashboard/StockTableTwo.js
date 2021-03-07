@@ -139,17 +139,14 @@ export class StockTableTwo extends React.Component {
      
                  this.initialiseSearch = false;
              }*/
-
         // Update table
         if (this.state.isSelected) {
-            
             this.newTable()
             this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
                 this.updateTable(this.state.start)
                 this.forceUpdate()
             });
 
-            console.log('State UPDATED');
             this.setState({ isSelected: false });
         }
         else if (prevState.tb2_count === 1) {
@@ -174,7 +171,6 @@ export class StockTableTwo extends React.Component {
                 this.newTable()
                 this.setState({ start: this.state.tb2_scrollPosition * 50 })
                 this.updateTable(this.state.start)
-                //   this.forceUpdate()
             });
 
             if (this.state.start === 0)
@@ -184,9 +180,8 @@ export class StockTableTwo extends React.Component {
 
             //  console.log('2 + start ' + this.state.start + 'scrollPosition ' + this.state.tb2_scrollPosition)
 
-            this.setState({ validInput: false })
-            this.setState({ queryRes: false })
-
+            this.setState({ validInput: false });
+            this.setState({ queryRes: false });
         }
     }
 
@@ -406,7 +401,6 @@ export class StockTableTwo extends React.Component {
     /* Select row from the table
        Triggers re-rendering of table */
     selectRow(e) {
-
         var array = [];
         var target = new Number(e.target.id);
         this.setState({ target: target });
@@ -465,7 +459,7 @@ export class StockTableTwo extends React.Component {
         this.setState({ tb2_stack: array });
         this.setState({ isSelected: true });
         // Send Information to Display Stock
-        this.props.displayStockInfo(e);
+        this.props.setTarget(e);
     }
 
     newTable() {
@@ -484,10 +478,8 @@ export class StockTableTwo extends React.Component {
 
         // Use shallow compare
         for (id = start; id < end; id++) {
-
             if (id == this.state.target){
                 style = { color: "green", backgroundColor: "rgb(21,100,111)" };
-                console.log('New table');
             }
             else
                 style = {};

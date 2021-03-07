@@ -22,10 +22,10 @@ export class AlertTable extends Component {
         this.loadFromCache = this.loadFromCache.bind(this);
         this.scrollPosition = this.scrollPosition.bind(this);
         this.scrollToPosition = this.scrollToPosition.bind(this);
-        this.selectRow = this.selectRow.bind(this);
-        this.createTable = this.createTable.bind(this);
         this.newTable = this.newTable.bind(this);
         this.getDisplay = this.getDisplay.bind(this);
+        this.removeRow = this.removeRow.bind(this);
+
         let style = { color: "white;" };
         this.timeout = null;
 
@@ -49,6 +49,10 @@ export class AlertTable extends Component {
             tb2_count: 0,
             tb2_numberOfClicks: [],
 
+            // Alert Table States
+            alertTableStack: [],
+            alertTable: [],
+
             isScrolled: false,
             scrollUp_: 0,
             scrollDown_: 0,
@@ -58,50 +62,54 @@ export class AlertTable extends Component {
 
 
     componentDidMount() {
-       /* this.createTable()
-        this.updateTable()
-
-        setInterval(() => {
-            window.location.reload();
-        }, 20000000);
-
-        this.setState({ scroll: this.scrollBy() })*/
+        /* this.createTable()
+         this.updateTable()
+ 
+         setInterval(() => {
+             window.location.reload();
+         }, 20000000);
+ 
+         this.setState({ scroll: this.scrollBy() })*/
     }
 
-    componentDidUpdate(snapshot) {
-        // Update table
-      /*  if (this.state.tb2_count === 1 && snapshot !== null) {
-
-            this.updateTable()
-            
-            if(this.state.start === 0)
-                this.textInput.current.scrollTop = 15;
-            else
-                this.textInput.current.scrollTop = 100;
-
-            this.setState({ isScrolled: false });
-            this.setState({ tb2_count: 0 });
-            console.log('T is updated');
-        }
-
-        // Scroll to the position in the table
-        const scroll = this.scrollBy();
-
-        if (this.state.validInput === true) {
-            this.textInput.current.scrollTop = scroll;
-            this.setState({ validInput: false })
-        }*/
-    }
-
-    // Prevent unecerssary updates
-    getSnapshotBeforeUpdate(prevProps, prevState) {
-        if (prevState.tb2_scrollPosition !== this.state.tb2_scrollPosition
-            || this.state.isScrolled) {
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.props.state.addAlertTableRowBool) {
             this.newTable()
-            return (this.state.tb2_scrollPosition !== undefined
-                || this.state.tb2_scrollPosition === null)
-                ? 100 : this.state.tb2_scrollPosition;
+            this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
+                this.updateTable(this.state.start)
+            });
+            this.props.setAlertTableRowBool(false);
         }
+
+        // Update table
+        /*  if (this.state.tb2_count === 1 && snapshot !== null) {
+  
+              this.updateTable()
+              
+              if(this.state.start === 0)
+                  this.textInput.current.scrollTop = 15;
+              else
+                  this.textInput.current.scrollTop = 100;
+  
+              this.setState({ isScrolled: false });
+              this.setState({ tb2_count: 0 });
+              console.log('T is updated');
+          }
+  
+          // Scroll to the position in the table
+          const scroll = this.scrollBy();
+  
+          if (this.state.validInput === true) {
+              this.textInput.current.scrollTop = scroll;
+              this.setState({ validInput: false })
+          }*/
+    }
+    shouldComponentUpdate(nextProps, nextState) {
+        if (this.props.state.addAlertTableRowBool !== nextProps.addAlertTableRowBool) {
+            // console.log('NEXT ')
+            return true;
+        }
+        return false;
     }
 
     // Communicate with c# controller https://stackoverflow.com/questions/46946380/fetch-api-request-timeout
@@ -222,7 +230,7 @@ export class AlertTable extends Component {
             this.setState({ isScrolled: true });
             this.setState({ tb2_count: 1 });
             console.log('Scroll Down ' + this.state.tb2_scrollPosition)
-           
+
         }
         else if (this.loadFromCache() === -1) {
             // Scroll Up
@@ -231,135 +239,117 @@ export class AlertTable extends Component {
                     0 : this.state.tb2_scrollPosition - 1
             });
 
-            this.setState({ start: (this.state.tb2_scrollPosition < 1) ?
-                0 : this.state.tb2_scrollPosition * 50
+            this.setState({
+                start: (this.state.tb2_scrollPosition < 1) ?
+                    0 : this.state.tb2_scrollPosition * 50
             });
 
             this.setState({ isScrolled: true });
             this.setState({ tb2_count: 1 });
-            console.log('Scroll Up')
-          
+            console.log('Scroll Up');
         }
     }
 
-    /* Select row from the table
-       Triggers re-rendering of table */
-    selectRow(e) {
-        var target = new Number(e.target.id);
-        var style = {};
+    // Create a new table
+    newTable() {
+        var t = [];
+        let style = {};
+        let pointer;
+        let start = 0;
+        let end = this.props.state.alertTableStocks.length - 1;
 
-        console.log('target ' + target)
-       
-        let id;
-
-        let start = this.state.tb2_scrollPosition * 50;
-        let end = (this.state.tb2_scrollPosition * 50) + 50;
-
-        for (id = start; id < end; id++) {
-            if (id === target && (target !== null || target !== undefined))
-                style = { backgroundColor: "rgb(0,11,34)" };
+        for (pointer = start; pointer <= end; pointer++) {
+            if (pointer == this.props.state.clickAlertTableRow)
+                style = { backgroundColor: "rgb(21,100,111)" };
             else
                 style = {};
 
-            // Get values from cache
-            let list = this.props.state.cache.get(id.toString());
-
-            this.state.tb2_stack.push(
-                <tbody>
-                    <tr key={id} style={style}>
-                        <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
-                        <td id={id} onClick={this.selectRow}>{list.High.toString()}</td>
-
-                        <td id={id} onClick={this.selectRow}>{list.Low.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss_Percentage.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.Volume.toString()}</td>
-                    </tr>
-                </tbody>)
-        }
-
-        this.setState({ tb2_stack: this.state.tb2_stack });
-        this.setState({ tb2_count: 1 });
-    }
-
-    newTable() {
-        let id;
-        let start = this.state.tb2_scrollPosition * 50;
-        let end = (this.state.tb2_scrollPosition * 50) + 50;
-        var t = [];
-
-            console.log( start + ' ' + end);
-
-        for (id = start; id < end; id++) {
-
-            // Get values from cache
-            let list = this.props.state.cache.get(id.toString());
-
             t.push(
                 <tbody>
-                    <tr key={id}>
-                        <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
-                        <td id={id} onClick={this.selectRow}>{list.High.toString()}</td>
-
-                        <td id={id} onClick={this.selectRow}>{list.Low.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss_Percentage.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.Volume.toString()}</td>
+                    <tr key={pointer} style={style}>
+                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                            {this.props.state.alertTableStocks[pointer].StockCode.toString()}</td>
+                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                            {this.props.state.alertTableStocks[pointer].TimeStamp.toString()}</td>
+                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                            {this.props.state.alertTableStocks[pointer].CurrentPrice.toString()} </td>
+                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                            {this.props.state.alertTableStocks[pointer].ProfitLoss_Percentage.toString()}</td>
+                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                            {this.props.state.alertTableStocks[pointer].Volume.toString()}</td>
                     </tr>
                 </tbody>);
         }
-        this.setState({ tb2_stack: t });
+
+        this.setState({ alertTableStack: t });
     }
 
+    // Remove row from table
+    removeRow()
+    {
+      
+        let pointer;
+        let start = 0;
+        let end = this.props.state.alertTableStocks.length - 1;
+
+        for (pointer = start; pointer <= end; pointer++) {
+           
+            t.push(
+                <tbody>
+                    <tr key={pointer} style={style}>
+                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                            {this.props.state.alertTableStocks[pointer].StockCode.toString()}</td>
+                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                            {this.props.state.alertTableStocks[pointer].TimeStamp.toString()}</td>
+                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                            {this.props.state.alertTableStocks[pointer].CurrentPrice.toString()} </td>
+                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                            {this.props.state.alertTableStocks[pointer].ProfitLoss_Percentage.toString()}</td>
+                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                            {this.props.state.alertTableStocks[pointer].Volume.toString()}</td>
+                    </tr>
+                </tbody>);
+        }
+
+        this.setState({ alertTableStack: t });
+
+
+    }
+
+
+    // Update the table
     updateTable() {
         // Get values from cache
-        let list = this.props.state.cache.get(this.state.start.toString());
+        const pointer = 0;
+        let id = 0;
 
         let t = <div>
             <div id="stack-wrapper">
                 <div id="stack-scroll">
-                    <table class="stockTableTwo" aria-labelledby="tabelLabel">
+                    <table class="alertTable" aria-labelledby="tabelLabel">
                         <thead>
                             <tr>
-                                <th>{list.StockCode.toString()}</th>
-                                <th>{list.TimeStamp.toString()}</th>
-                                <th>{list.CurrentPrice.toString()}</th>
-                                <th>{list.High.toString()}</th>
-
-                                <th>{list.Low.toString()}</th>
-                                <th>{list.ProfitLoss.toString()}</th>
-                                <th>{list.ProfitLoss_Percentage.toString()}</th>
-                                <th>{list.Volume.toString()}</th>
+                                <th id={id} onClick={this.props.displayStockInfo}>
+                                    {this.props.state.alertTableStocks[pointer].StockCode.toString()}</th>
+                                <th id={id} onClick={this.props.displayStockInfo}>
+                                    {this.props.state.alertTableStocks[pointer].TimeStamp.toString()}</th>
+                                <th id={id} onClick={this.props.displayStockInfo}>
+                                    {this.props.state.alertTableStocks[pointer].CurrentPrice.toString()} </th>
+                                <th id={id} onClick={this.props.displayStockInfo}>
+                                    {this.props.state.alertTableStocks[pointer].ProfitLoss_Percentage.toString()}</th>
+                                <th id={id} onClick={this.props.displayStockInfo}>
+                                    {this.props.state.alertTableStocks[pointer].Volume.toString()}</th>
                             </tr>
                         </thead>
 
-                        {this.state.tb2_stack}
+                        {this.state.alertTableStack}
 
                     </table>
                 </div>
             </div>
         </div>;
 
-        this.setState({ tb2: t });
-    }
-
-    createTable() {
-        var table = [];
-        let id;
-        let length =  this.props.state.cachedRows.length;
-        
-        for (id = 0; id < length; id++) {
-            // Get values from cache
-            let list = this.props.state.cache.get(id.toString());
-
-            this.state.tb2_stack.push(
-                this.props.state.cachedRows[id]
-               );
-        }
+        this.setState({ alertTable: t });
     }
 
     render() {
@@ -416,7 +406,8 @@ export class AlertTable extends Component {
                         color='white'
                         zIndex='-999'>
 
-                        {this.props.state.alertTableStack}
+                        {this.state.alertTable}
+
                     </Box>
                 </Box>
             </div>

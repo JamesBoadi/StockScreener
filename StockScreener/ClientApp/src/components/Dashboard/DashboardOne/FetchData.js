@@ -1,21 +1,24 @@
 import React, { Component } from 'react';
-import { HubConnectionBuilder } from '@aspnet/signalr';
 import { DashboardNavbar } from '../DashboardNavbar';
 import { NavBarData } from '../NavbarData.js';
 import { TopNavbar } from '../TopNavbar.js';
+import { AlertTable } from '../AlertTable';
 import { SideBar } from '../SideBar';
+import { DashboardSettings } from '../DashboardSettings';
+import { StockTable } from '../StockTable';
+import { StockTableTwo } from '../StockTableTwo';
 import {
   Box, Button, NumberInput,
   NumberInputField, NumberInputStepper,
   NumberIncrementStepper, NumberDecrementStepper
 } from '@chakra-ui/react';
-import { DashboardSettings } from '../DashboardSettings';
+
 import Nav from 'reactstrap/lib/Nav';
-import { StockTable } from '../StockTable';
-import { StockTableTwo } from '../StockTableTwo';
+
 import * as signalR from '@aspnet/signalr';
 import * as cache from 'cache-base';
-import { AlertTable } from '../AlertTable';
+import * as HashMap from 'hashmap';
+
 
 /*
 const hubConnection = new HubConnectionBuilder()
@@ -35,19 +38,29 @@ export class FetchData extends Component {
     this.addAlertTableRow = this.addAlertTableRow.bind(this);
     this.removeAlertTableRow = this.removeAlertTableRow.bind(this);
     this.displayStockInfo = this.displayStockInfo.bind(this);
+    this.setAlertTableRowBool = this.setAlertTableRowBool.bind(this);
+    this.getAlertTableRowBool = this.getAlertTableRowBool.bind(this);
+    this.setClickAlertTableRow = this.setClickAlertTableRow.bind(this);
+    this.getClickAlertTableRow = this.getAlertTableRowBool.bind(this);
+
+    this.setTarget = this.setTarget.bind(this);
+    this.keyExists = this.keyExists.bind(this);
     this.hubConnection = null;
     //this.startHubConnection = this.startHubConnection.bind(this);
     //this.createHubConnection = this.createHubConnection.bind(this);
-
-
     this.cache = new cache();
     this.called = false;
+    this.alertTable = [];
+    this.textInput = React.createRef();
+    this.map = new HashMap();
+
+    
 
     this.state = {
       stockTableTwo: [],
       isStreaming: false,
       lock: false,
-      forecasts: [], loading: true, hubConnection: HubConnectionBuilder(),
+      forecasts: [], loading: true,
       nick: '',
       message: '',
       messages: [],
@@ -66,10 +79,13 @@ export class FetchData extends Component {
       scroll: 0,
       query: {},
 
-      addAlertTableRow: false,
+      addAlertTableRowBool: false,
       alertTableStocks: [],
       alertTableStack: [],
+      clickAlertTableRow: false,
       target: 0,
+
+      maxNumberOfAlertTableRows: 0,
 
       data: [
         {
@@ -90,8 +106,6 @@ export class FetchData extends Component {
       ]
     };
   }
-
-
 
   componentDidMount = () => {
     var cache_ = new cache();
@@ -115,13 +129,11 @@ export class FetchData extends Component {
         /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
           string _currentTime = time.ToString("HH:mmttss"); */
         //stock.timestamp = _currentTime
-
         Request_Calls: 5,
         TimeStamp: "9:00",
         ChangeArray: "iii",
         Request_Calls: "1"
       }
-
 
       //console.log(P.StockCode + " " + "kkk");
       cache_.set(count.toString(), P);
@@ -156,65 +168,113 @@ export class FetchData extends Component {
       this.setState({ lock: false });
       return true;
     }
+    else if (this.state.addAlertTableRowBool !== nextState.addAlertTableRowBool) {
+      return true;
+    }
     return false;
   }
 
+  // Set the target of a row clicked
+  setTarget(e) {
+    const alertTableId = parseInt(e.target.id);
+    this.setState({ target: alertTableId });
+  }
+
   displayStockInfo(e) {
-    
-    const id = new Number(e.target.id);
-    this.setState({target: id});
+    const alertTableId = parseInt(e.target.id);
+    this.setState({ clickAlertTableRow: alertTableId});
+    this.setState({ addAlertTableRowBool: true });
   }
 
-  
-  addAlertTableRow() {
-    var t = [];
+  // Disable button until a stock is CLICKED
+  async keyExists(e, id) {
+    e.persist();
+    return new Promise(resolve => {
+      setTimeout(() => {
+        e.stopPropagation();
+        const id_ = parseInt(id);
+
+        for (const pair of this.map) {
+          let value = parseInt(pair.value);
+          if (id_ === value)
+            resolve(true);
+        }
+        resolve(false);
+      }, 100);
+    });
+  }
+
+  async addAlertTableRow(e) {
+    //  console.log('next')
+
+    var t = this.state.alertTableStack;
     var alertTableStocks = this.state.alertTableStocks;
-    const id = this.state.target;
-    // Stocks to be displayed in alert table
-    alertTableStocks.push(this.cache.get(id));
-    const pointer = alertTableStocks.length - 1;
+    let id_ = parseInt(this.state.target);
 
-    if (this.state.addAlertTableRow) {
-        t.push(
-          <tbody>
-            <tr key={id}>
-              <td id={id} onClick={this.displayStockInfo}>{alertTableStocks[pointer].StockCode.toString()}</td>
-              <td id={id} onClick={this.displayStockInfo}>{alertTableStocks[pointer].TimeStamp.toString()}</td>
-              <td id={id} onClick={this.displayStockInfo}>{alertTableStocks[pointer].CurrentPrice.toString()} </td>
-              <td id={id} onClick={this.displayStockInfo}>{alertTableStocks[pointer].ProfitLoss_Percentage.toString()}</td>
-              <td id={id} onClick={this.displayStockInfo}>{alertTableStocks[pointer].Volume.toString()}</td>
-            </tr>
-          </tbody>
-        )
-      
-      // Force an update
-      this.setState({ addAlertTableRow: false });
-      this.setState({ alertTableStack: t });
-      t = [];
-    }
+    const exists = await this.keyExists(e, id_);
+    const maxRows = 45; 
+
+    console.log(this.state.maxNumberOfAlertTableRows)
+
+    if (exists || this.state.maxNumberOfAlertTableRows >= maxRows)
+      return;
+
+    // Read from Database
+
+    // Stocks to be displayed in alert table
+    alertTableStocks.push(this.cache.get(id_.toString()))
+    let pointer = alertTableStocks.length - 1;
+
+    t.push(
+      <tbody>
+        <tr key={pointer} >
+          <td id={pointer} onClick={this.displayStockInfo}>{alertTableStocks[pointer].StockCode.toString()}</td>
+          <td id={pointer} onClick={this.displayStockInfo}>{alertTableStocks[pointer].TimeStamp.toString()}</td>
+          <td id={pointer} onClick={this.displayStockInfo}>{alertTableStocks[pointer].CurrentPrice.toString()} </td>
+          <td id={pointer} onClick={this.displayStockInfo}>{alertTableStocks[pointer].ProfitLoss_Percentage.toString()}</td>
+          <td id={pointer} onClick={this.displayStockInfo}>{alertTableStocks[pointer].Volume.toString()}</td>
+        </tr>
+      </tbody>
+    )
+
+    // Add id with its value to map
+    // key: 0..N value: 
+    this.map.set(pointer, id_);
+
+
+    // Save to Database
+
+
+    // Force an update
+    this.setState({ maxNumberOfAlertTableRows: this.state.maxNumberOfAlertTableRows + 1 });
+    this.setState({ alertTableStack: t });
+    this.setState({ alertTableStocks: alertTableStocks });
+    this.setState({ addAlertTableRowBool: true });
   }
 
+  setAlertTableRowBool(bool) {
+    this.setState({ addAlertTableRowBool: bool });
+  }
+
+  getAlertTableRowBool() {
+    return this.state.addAlertTableRowBool;
+  }
+
+  setClickAlertTableRow(bool) {
+    this.setState({ clickAlertTableRow: bool });
+  }
+
+  getClickAlertTableRow() {
+    return this.state.clickAlertTableRow;
+  }
 
   // Are you sure you want to remove this stock?
   removeAlertTableRow() {
     var t = [];
     var alertTableStocks = this.state.alertTableStocks;
 
-    if (this.state.addAlertTableRow) {
-      let id;
-      for (id = 0; id < alertTableStocks.length; id++) {
-        t.push(
-          <tbody>
-            <tr key={id} style={style}>
-              <td id={id} onClick={this.displayStockInfo}>{alertTableStocks[id].StockCode.toString()}</td>
-              <td id={id} onClick={this.displayStockInfo}>{alertTableStocks[id].TimeStamp.toString()}</td>
-              <td id={id} onClick={this.displayStockInfo}>{alertTableStocks[id].CurrentPrice.toString()} </td>
-              <td id={id} onClick={this.displayStockInfo}>{alertTableStocks[id].ProfitLoss_Percentage.toString()}</td>
-              <td id={id} onClick={this.displayStockInfo}>{alertTableStocks[id].Volume.toString()}</td>
-            </tr>
-          </tbody>
-        )
-      }
+
+
 
       this.setState({ addAlertTableRow: false });
       this.setState({ alertTableStack: t });
@@ -284,7 +344,7 @@ export class FetchData extends Component {
           /*
           if (this.state.request_Calls !== this.state.MAX_CALLS) {
             this.setState({ request_Calls: request_Calls });
-
+  
             // Start a countdown timer and disconnect if we don't get a response
           }
           else {
@@ -357,8 +417,8 @@ export class FetchData extends Component {
               && !priceChangeUp) ? "visible" : "hidden"
           }} colorScheme="blue" />
 
-          <Button onClick={this.addAlertTableRow} 
-          style={{ position: 'absolute', bottom: '20px', right: '180px', width: '90px' }}>
+          <Button onClick={this.addAlertTableRow}
+            style={{ position: 'absolute', bottom: '20px', right: '180px', width: '90px' }}>
             Add <br />to Alerts</Button>
 
           <Button style={{ position: 'absolute', bottom: '20px', right: '50px', width: '90px' }}>
