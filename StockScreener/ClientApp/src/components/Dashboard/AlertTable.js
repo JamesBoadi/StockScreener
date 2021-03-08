@@ -73,12 +73,20 @@ export class AlertTable extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+
         if (this.props.state.addAlertTableRowBool) {
-            this.newTable()
+            this.newTable();
             this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
-                this.updateTable(this.state.start)
+                this.updateTable(this.state.start);
             });
             this.props.setAlertTableRowBool(false);
+        }
+        if (this.props.state.removeAlertTableRowBool) {
+            this.removeRow();
+            this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
+                this.updateTable(this.state.start);
+            });
+            this.props.setRemoveAlertTableRowBool(false);
         }
 
         // Update table
@@ -258,8 +266,10 @@ export class AlertTable extends Component {
         let start = 0;
         let end = this.props.state.alertTableStocks.length - 1;
 
+        console.log('UPDATE ' );
+
         for (pointer = start; pointer <= end; pointer++) {
-            if (pointer == this.props.state.clickAlertTableRow)
+            if (pointer === this.props.state.target)
                 style = { backgroundColor: "rgb(21,100,111)" };
             else
                 style = {};
@@ -267,15 +277,15 @@ export class AlertTable extends Component {
             t.push(
                 <tbody>
                     <tr key={pointer} style={style}>
-                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
                             {this.props.state.alertTableStocks[pointer].StockCode.toString()}</td>
-                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
                             {this.props.state.alertTableStocks[pointer].TimeStamp.toString()}</td>
-                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
                             {this.props.state.alertTableStocks[pointer].CurrentPrice.toString()} </td>
-                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
                             {this.props.state.alertTableStocks[pointer].ProfitLoss_Percentage.toString()}</td>
-                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
                             {this.props.state.alertTableStocks[pointer].Volume.toString()}</td>
                     </tr>
                 </tbody>);
@@ -285,35 +295,34 @@ export class AlertTable extends Component {
     }
 
     // Remove row from table
-    removeRow()
-    {
-      
-        let pointer;
+    removeRow() {
+        let t = [];
+        let style = {};
+
+        let pointer = 0;
         let start = 0;
         let end = this.props.state.alertTableStocks.length - 1;
 
         for (pointer = start; pointer <= end; pointer++) {
-           
+      //      console.log('POINTER ' + pointer + ' TARGET ' + this.props.state.target);
             t.push(
                 <tbody>
                     <tr key={pointer} style={style}>
-                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
                             {this.props.state.alertTableStocks[pointer].StockCode.toString()}</td>
-                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
                             {this.props.state.alertTableStocks[pointer].TimeStamp.toString()}</td>
-                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
                             {this.props.state.alertTableStocks[pointer].CurrentPrice.toString()} </td>
-                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
                             {this.props.state.alertTableStocks[pointer].ProfitLoss_Percentage.toString()}</td>
-                        <td id={pointer} onClick={this.props.displayStockInfo}>
+                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
                             {this.props.state.alertTableStocks[pointer].Volume.toString()}</td>
                     </tr>
                 </tbody>);
         }
 
         this.setState({ alertTableStack: t });
-
-
     }
 
 
@@ -328,18 +337,18 @@ export class AlertTable extends Component {
                 <div id="stack-scroll">
                     <table class="alertTable" aria-labelledby="tabelLabel">
                         <thead>
-                            <tr>
-                                <th id={id} onClick={this.props.displayStockInfo}>
+                            {/* <tr>
+                                <th id={id} onClick={this.props.selectAlertTableRow}>
                                     {this.props.state.alertTableStocks[pointer].StockCode.toString()}</th>
-                                <th id={id} onClick={this.props.displayStockInfo}>
+                                <th id={id} onClick={this.props.selectAlertTableRow}>
                                     {this.props.state.alertTableStocks[pointer].TimeStamp.toString()}</th>
-                                <th id={id} onClick={this.props.displayStockInfo}>
+                                <th id={id} onClick={this.props.selectAlertTableRow}>
                                     {this.props.state.alertTableStocks[pointer].CurrentPrice.toString()} </th>
-                                <th id={id} onClick={this.props.displayStockInfo}>
+                                <th id={id} onClick={this.props.selectAlertTableRow}>
                                     {this.props.state.alertTableStocks[pointer].ProfitLoss_Percentage.toString()}</th>
-                                <th id={id} onClick={this.props.displayStockInfo}>
+                                <th id={id} onClick={this.props.selectAlertTableRow}>
                                     {this.props.state.alertTableStocks[pointer].Volume.toString()}</th>
-                            </tr>
+                           </tr>*/}
                         </thead>
 
                         {this.state.alertTableStack}
@@ -349,7 +358,10 @@ export class AlertTable extends Component {
             </div>
         </div>;
 
+
+        // console.log('UPDATE ');
         this.setState({ alertTable: t });
+
     }
 
     render() {

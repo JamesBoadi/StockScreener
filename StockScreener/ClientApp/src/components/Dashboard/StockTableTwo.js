@@ -458,8 +458,9 @@ export class StockTableTwo extends React.Component {
 
         this.setState({ tb2_stack: array });
         this.setState({ isSelected: true });
+        
         // Send Information to Display Stock
-        this.props.setTarget(e);
+        this.props.selectStockTableRow(e);
     }
 
     newTable() {
