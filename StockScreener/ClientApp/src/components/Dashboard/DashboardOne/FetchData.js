@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { DashboardNavbar } from '../DashboardNavbar';
 import { NavBarData } from '../NavbarData.js';
 import { TopNavbar } from '../TopNavbar.js';
-import { AlertTable } from '../AlertTable';
+import { NotificationsTable } from '../NotificationsTable';
 import { SideBar } from '../SideBar';
 import { DashboardSettings } from '../DashboardSettings';
 import { StockTable } from '../StockTable';
@@ -37,7 +37,7 @@ export class FetchData extends Component {
     this.onNotifReceived = this.onNotifReceived.bind(this);
     this.addAlertTableRow = this.addAlertTableRow.bind(this);
     this.removeAlertTableRow = this.removeAlertTableRow.bind(this);
-  
+
     this.setAlertTableRowBool = this.setAlertTableRowBool.bind(this);
     this.getAlertTableRowBool = this.getAlertTableRowBool.bind(this);
     this.setRemoveAlertTableRowBool = this.setRemoveAlertTableRowBool.bind(this);
@@ -138,7 +138,7 @@ export class FetchData extends Component {
         ChangeArray: "iii",
         Request_Calls: "1"
       }
-      this.props.eventQueue(0, this.triggerAnimation);
+  
       //console.log(P.StockCode + " " + "kkk");
       cache_.set(count.toString(), P);
     }
@@ -195,10 +195,10 @@ export class FetchData extends Component {
 
   // Disable button until a stock is CLICKED
   async keyExists(e, target) {
-  //  e.persist();
+    //  e.persist();
     return new Promise(resolve => {
       setTimeout(() => {
-    //    e.stopPropagation();
+        //    e.stopPropagation();
         const target_ = parseInt(target);
 
         for (const pair of this.map) {
@@ -243,7 +243,7 @@ export class FetchData extends Component {
     // key: 0..N value: alertTable
     this.map.set(pointer, target);
     // Save to Database
-    
+
     console.log('NEXT')
 
     // Force an update
@@ -253,8 +253,7 @@ export class FetchData extends Component {
     this.setState({ addAlertTableRowBool: true });
   }
 
-  triggerAnimation(param)
-  {
+  triggerAnimation(param) {
     console.log('CALL ACK HELL ' + param)
 
 
@@ -276,9 +275,8 @@ export class FetchData extends Component {
     let alertTableStocks = [];
 
     for (pointer = start; pointer <= end; pointer++) {
-     // console.log('alertTableId ' + pointer + ' target ' + target);
-      if (pointer === target)
-      {
+      // console.log('alertTableId ' + pointer + ' target ' + target);
+      if (pointer === target) {
         this.map.delete(pointer);
         continue;
       }
@@ -306,6 +304,16 @@ export class FetchData extends Component {
   getRemoveAlertTableRowBool() {
     return this.state.removeAlertTableRowBool;
   }
+
+  set(bool) {
+    this.setState({ addAlertTableRowBool: bool });
+  }
+
+
+  getAlertTableRowBool() {
+    return this.state.addAlertTableRowBool;
+  }
+
   readNavBarData = (num) => {
   }
 
@@ -347,7 +355,6 @@ export class FetchData extends Component {
             const item = JSON.parse(stockArray[count]);
             this.setState({ request_Calls: item.Request_Calls });
             cache_.set(count.toString(), item);
-            this.props.eventQueue(item.ChangeArray);
           }
 
           this.cache = cache_;
@@ -356,9 +363,9 @@ export class FetchData extends Component {
           /*
           if (this.state.request_Calls !== this.state.MAX_CALLS) {
             this.setState({ request_Calls: request_Calls });
-  
             // Start a countdown timer and disconnect if we don't get a response
           }
+
           else {
             this.setState({ lock: false });
             this.setState({ request_Calls: -1 });
@@ -375,6 +382,9 @@ export class FetchData extends Component {
         }
       });
   }
+
+
+
 
   onNotifReceived(res) {
     console.info('Yayyyyy, I just received a notification!!!', res);
@@ -438,23 +448,23 @@ export class FetchData extends Component {
             Remove  <br /> from Alerts</Button>
         </Box>
 
-        {/* <SideBar
+          {/* <SideBar
           isStreaming={() => { return this.state.isStreaming }}
        /> */}
-        <TopNavbar
-          Data={this.state.data}
-        />
+          <TopNavbar
+            Data={this.state.data}
+          />
 
-        {/* ALERT TABLE */
-          <AlertTable {...this} />
-        }
-        <DashboardNavbar
-          {...this}
-        />
+          {/* ALERT TABLE */
+            <NotificationsTable {...this} />
+          }
+          <DashboardNavbar
+            {...this}
+          />
 
-        <div id="tableContainer">
-          {this.state.stockTableTwo}
-        </div>
+          <div id="tableContainer">
+            {this.state.stockTableTwo}
+          </div>
 
 
       </div>

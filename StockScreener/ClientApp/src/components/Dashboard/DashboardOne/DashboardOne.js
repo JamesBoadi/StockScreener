@@ -1,7 +1,7 @@
 import React, { Component, useState, useContext } from 'react';
 import { Button, ButtonGroup } from "@chakra-ui/react";
-import {Alert } from './Alert.js';
 import '../Dashboard.css';
+import { FetchData } from './FetchData.js';
 
 export class DashboardOne extends Component {
 
@@ -30,7 +30,7 @@ export class DashboardOne extends Component {
             <div>
 
                 <header class="App-header">
-                    <Alert/>
+                    <FetchData/>
                 </header>
 
             </div>

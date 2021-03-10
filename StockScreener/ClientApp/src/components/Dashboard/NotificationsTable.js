@@ -10,7 +10,7 @@ import {
     MenuGroup, MenuOptionGroup, MenuIcon, MenuCommand, MenuDivider
 } from '@chakra-ui/react';
 
-export class AlertTable extends Component {
+export class NotificationsTable extends Component {
     constructor(props) {
         super(props);
         this.searchDatabase = this.searchDatabase.bind(this);

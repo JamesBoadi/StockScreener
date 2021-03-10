@@ -10,9 +10,9 @@ import {
     Menu, MenuButton, MenuList, MenuItem, MenuItemOption,
     MenuGroup, MenuOptionGroup, MenuIcon, MenuCommand, MenuDivider
 } from '@chakra-ui/react';
+import { StockTableTwoAlert } from './DashboardOne/StockTableTwoAlert';
 
-import { AlertTable } from './AlertTable';
-import * as cache from 'cache-base';
+import * as HashMap from 'hashmap';
 
 
 // Fetch data for dash board one
@@ -29,9 +29,7 @@ export class StockTableTwo extends React.Component {
         this.loadFromCache = this.loadFromCache.bind(this);
         this.scrollPosition = this.scrollPosition.bind(this);
         this.scrollToPosition = this.scrollToPosition.bind(this);
-
         this.freezeScrollPosition = this.freezeScrollPosition.bind(this);
-
         this.triggerAnimation = this.triggerAnimation.bind(this);
 
         this.selectRow = this.selectRow.bind(this);
@@ -39,11 +37,14 @@ export class StockTableTwo extends React.Component {
         this.newTable = this.newTable.bind(this);
         this.getDisplay = this.getDisplay.bind(this);
         this.getUnits = this.getUnits.bind(this);
-        let style = { color: "white;" };
+
+        this.addToStyleMap = this.addToStyleMap.bind(this);
+        
         this.timeout = null;
         this.cache = null;
 
         this.initialiseSearch = false;
+        this.styleMap = new HashMap();
 
 
         this.state = {
@@ -74,8 +75,9 @@ export class StockTableTwo extends React.Component {
             scrollUp_: 0,
             scrollDown_: 0,
 
-            isSelected: false,
 
+            updateStyleMap: false,
+            isSelected: false,
             lock: false,
             target: 0,
 
@@ -108,7 +110,7 @@ export class StockTableTwo extends React.Component {
                 this.textInput.current.scrollTop = 25;
             //  this.setState({ isUpdating: true });*/
 
-
+/*
             const scroll = this.scrollBy();
             this.setState({
                 tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ? this.getUnits(scroll) : 15
@@ -117,7 +119,7 @@ export class StockTableTwo extends React.Component {
                 this.setState({ start: this.state.tb2_scrollPosition * 50 })
                 this.updateTable(this.state.start)
                 this.forceUpdate()
-            });
+            });*/
             
         }, 5000);
 
@@ -163,7 +165,7 @@ export class StockTableTwo extends React.Component {
 
             this.setState({ isSelected: false });
         }
-        else if (prevState.tb2_count === 1) {
+        else if (prevState.tb2_count === 1 || this.state.updateStyleMap) {
             this.newTable()
             this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
                 this.updateTable(this.state.start)
@@ -176,6 +178,7 @@ export class StockTableTwo extends React.Component {
 
             // console.log('T is updated');
             this.setState({ tb2_count: 0 })
+            this.setState({ updateStyleMap: false })
 
         } else if (this.state.validInput) {
 
@@ -562,7 +565,18 @@ export class StockTableTwo extends React.Component {
         this.setState({ tb2: t });
     }
 
-    triggerAnimation(color) {
+    /** styleMap: { color,  transition} */
+    addToStyleMap(count, color, time)
+    {
+        const style = { 
+            backgroundColor: color.toString(),
+            transition: 'background-color'.concat(`${time}ms linear`), 
+         };
+        this.styleMap.set(count, style);
+      //  this.setState({ updateStyleMap: true })
+    }
+
+    triggerAnimation(color, time) {
         let id;
         let mod = 0;
 
@@ -578,18 +592,16 @@ export class StockTableTwo extends React.Component {
 
         // Use shallow compare  
         for (id = start; id < end; id++) {
-            if (id == this.state.target){
-                style = {  transition: "background-color 4000ms linear", backgroundColor: color };
-            }
-            else
-                style = {};
-               
+            
+                style = { transition: 'background-color'.concat(`${time}ms linear`), 
+                backgroundColor: color.toString() };
+            
             // Get values from cache
             let list = this.props.cache.get(id.toString());
             //  console.log( 'WORK WORK ' + id);
 
             array.push(
-                <tbody key={id} style={style}>
+                <tbody key={id} style={this.styleMap.get(id)}>
                     <tr >
                         <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
                         <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
@@ -729,6 +741,12 @@ export class StockTableTwo extends React.Component {
                 </Box>
 
 
+                {/* StockTableTwo Alert Table */}
+                <StockTableTwoAlert 
+                {...this}
+                cache={this.props.cache}/>
+
+
             </div>
         );
     }
@@ -748,5 +766,6 @@ export class StockTableTwo extends React.Component {
                  )
              }
          }, 10000);*/
+         
 
 }

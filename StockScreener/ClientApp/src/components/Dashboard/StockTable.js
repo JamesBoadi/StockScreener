@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react';
 import { StockTableOne } from './StockTableOne';
 import { StockTableTwo } from './StockTableTwo';
-import { AlertTable } from './AlertTable';
+import { AlertTable } from './NotificationsTable';
 import { ConsoleLogger } from '@microsoft/signalr/dist/esm/Utils';
 
 // https://packagecontrol.io/packages/CSS%20Format

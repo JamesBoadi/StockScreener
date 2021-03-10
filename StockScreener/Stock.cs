@@ -43,7 +43,7 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         public double ProfitLoss { get; set; }
         public double ProfitLoss_Percentage { get; set; }
         public double Volume { get; set; }
-        public int[] ChangeArray {get; set;}
+        public int[] ChangeArray { get; set; }
         public double Request_Calls { get; set; }
 
         // Time the stock was last updated
@@ -59,21 +59,33 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         /// <summary>Compare the equality of stocks</summary>
         public bool Equals(Stock stock)
         {
-            Array.Fill(Stocks.changeArray, 0);
+            Random random = new Random();
+            int[] array = { -1, 1, -2 };
+            int start2 = random.Next(0, array.Length - 1);
 
-            // Update objects
-            if (stock.CurrentPrice != this.CurrentPrice)
-                Stocks.changeArray[0] = 1;
-            if (stock.High != this.High)
-                Stocks.changeArray[1] = 1;
-            if (stock.Low != this.Low)
-                Stocks.changeArray[2] = 1;
-            if (stock.ProfitLoss != this.ProfitLoss)
-                Stocks.changeArray[3] = 1;
-            if (stock.ProfitLoss_Percentage != this.ProfitLoss_Percentage)
-                Stocks.changeArray[4] = 1;
-            if (stock.Volume != this.Volume)
-                Stocks.changeArray[5] = 1;
+            Stocks.changeArray[0] = array[start2];
+            Stocks.changeArray[1] = array[start2];
+            Stocks.changeArray[2] = array[start2];
+            Stocks.changeArray[3] = array[start2];
+            Stocks.changeArray[4] = array[start2];
+            Stocks.changeArray[5] = array[start2];
+
+            
+            //Array.Fill(Stocks.changeArray, 0);
+            /*
+                        // Update objects
+                        if (stock.CurrentPrice != this.CurrentPrice)
+                            Stocks.changeArray[0] = 1;
+                        if (stock.High != this.High)
+                            Stocks.changeArray[1] = 1;
+                        if (stock.Low != this.Low)
+                            Stocks.changeArray[2] = 1;
+                        if (stock.ProfitLoss != this.ProfitLoss)
+                            Stocks.changeArray[3] = 1;
+                        if (stock.ProfitLoss_Percentage != this.ProfitLoss_Percentage)
+                            Stocks.changeArray[4] = 1;
+                        if (stock.Volume != this.Volume)
+                            Stocks.changeArray[5] = 1;*/
 
             return Stocks.changeArray.Contains(1);
         }
