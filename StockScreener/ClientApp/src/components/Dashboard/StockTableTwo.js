@@ -32,6 +32,8 @@ export class StockTableTwo extends React.Component {
 
         this.freezeScrollPosition = this.freezeScrollPosition.bind(this);
 
+        this.triggerAnimation = this.triggerAnimation.bind(this);
+
         this.selectRow = this.selectRow.bind(this);
         this.createTable = this.createTable.bind(this);
         this.newTable = this.newTable.bind(this);
@@ -90,7 +92,7 @@ export class StockTableTwo extends React.Component {
         // Update Table 
         this.intervalID_ = setInterval(() => {
             // Force an update
-            const scroll = this.scrollBy();
+         /*   const scroll = this.scrollBy();
             this.setState({
                 tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ? this.getUnits(scroll) : 15
             }, () => {
@@ -104,8 +106,20 @@ export class StockTableTwo extends React.Component {
                 this.textInput.current.scrollTop = 10;
             else
                 this.textInput.current.scrollTop = 25;
-            //  this.setState({ isUpdating: true });
-        }, 20000);
+            //  this.setState({ isUpdating: true });*/
+
+
+            const scroll = this.scrollBy();
+            this.setState({
+                tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ? this.getUnits(scroll) : 15
+            }, () => {
+                this.triggerAnimation("rgba(17, 189, 80, 0.897)")
+                this.setState({ start: this.state.tb2_scrollPosition * 50 })
+                this.updateTable(this.state.start)
+                this.forceUpdate()
+            });
+            
+        }, 5000);
 
         setInterval(() => {
             window.location.reload();
@@ -327,8 +341,7 @@ export class StockTableTwo extends React.Component {
 
             clearInterval(this.intervalID);
         }
-
-
+        
         // Check the position
         let position = this.loadFromCache();
 
@@ -547,6 +560,51 @@ export class StockTableTwo extends React.Component {
         </div>;
 
         this.setState({ tb2: t });
+    }
+
+    triggerAnimation(color) {
+        let id;
+        let mod = 0;
+
+        if (this.state.tb2_scrollPosition === 0)
+            mod = 0;
+        else
+            mod = 15;
+
+        let start = (this.state.tb2_scrollPosition * 50) - mod;
+        let end = (this.state.tb2_scrollPosition * 50) + 50;
+        var array = [];
+        let style = {};
+
+        // Use shallow compare  
+        for (id = start; id < end; id++) {
+            if (id == this.state.target){
+                style = {  transition: "background-color 4000ms linear", backgroundColor: color };
+            }
+            else
+                style = {};
+               
+            // Get values from cache
+            let list = this.props.cache.get(id.toString());
+            //  console.log( 'WORK WORK ' + id);
+
+            array.push(
+                <tbody key={id} style={style}>
+                    <tr >
+                        <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
+                        <td id={id} onClick={this.selectRow}>{list.High.toString()}</td>
+
+                        <td id={id} onClick={this.selectRow}>{list.Low.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss_Percentage.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.Volume.toString()}</td>
+                    </tr>
+                </tbody>);
+        }
+
+        this.setState({ tb2_stack: array });
     }
 
     createTable() {

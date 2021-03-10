@@ -14,10 +14,10 @@ import {
 } from '@chakra-ui/react';
 
 import Nav from 'reactstrap/lib/Nav';
-
 import * as signalR from '@aspnet/signalr';
 import * as cache from 'cache-base';
 import * as HashMap from 'hashmap';
+
 
 
 /*
@@ -46,6 +46,8 @@ export class FetchData extends Component {
     this.selectAlertTableRow = this.selectAlertTableRow.bind(this);
     this.selectStockTableRow = this.selectStockTableRow.bind(this);
 
+    this.triggerAnimation = this.triggerAnimation.bind(this);
+
     this.keyExists = this.keyExists.bind(this);
     this.hubConnection = null;
     //this.startHubConnection = this.startHubConnection.bind(this);
@@ -55,7 +57,6 @@ export class FetchData extends Component {
     this.alertTable = [];
     this.textInput = React.createRef();
     this.map = new HashMap();
-
 
 
     this.state = {
@@ -137,7 +138,7 @@ export class FetchData extends Component {
         ChangeArray: "iii",
         Request_Calls: "1"
       }
-
+      this.props.eventQueue(0, this.triggerAnimation);
       //console.log(P.StockCode + " " + "kkk");
       cache_.set(count.toString(), P);
     }
@@ -252,6 +253,16 @@ export class FetchData extends Component {
     this.setState({ addAlertTableRowBool: true });
   }
 
+  triggerAnimation(param)
+  {
+    console.log('CALL ACK HELL ' + param)
+
+
+
+
+
+
+  }
 
   // Are you sure you want to remove this stock?
   removeAlertTableRow() {
@@ -309,12 +320,6 @@ export class FetchData extends Component {
     </tbody>)
   }
 
-  // Replace with signal R (Keep th e cache)
-  async temporaryStore() {
-    setInterval(() => {
-    }, 1000);
-  }
-
   async sendRequest() {
     const hubConnection = new signalR.HubConnectionBuilder()
       .withUrl('https://localhost:44362/stock')
@@ -342,16 +347,11 @@ export class FetchData extends Component {
             const item = JSON.parse(stockArray[count]);
             this.setState({ request_Calls: item.Request_Calls });
             cache_.set(count.toString(), item);
-            //console.log(item.StockCode + " " + "kkk");
+            this.props.eventQueue(item.ChangeArray);
           }
-
-          /*   this.setState({ cache: cache_ });*/
-          //
-          //console.log("REQUESTS " + this.state.request_Calls)
 
           this.cache = cache_;
           this.setState({ lock: true });
-
 
           /*
           if (this.state.request_Calls !== this.state.MAX_CALLS) {

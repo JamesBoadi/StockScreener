@@ -3,20 +3,14 @@ import { Button, ButtonGroup } from "@chakra-ui/react";
 import { Layout } from './components/Layout';
 import { Redirect } from "react-router-dom";
 import { DashboardOne } from './components/Dashboard/DashboardOne/DashboardOne';
-
 import { DashboardNavBar } from './components/Dashboard/DashboardNavbar';
-
-
 import { DashboardInterface } from './components/DashboardInterface';
 import { Router, Route, Switch } from 'react-router';
 import { FetchData } from './components/Dashboard/DashboardOne/FetchData';
 import { Counter } from './components/Counter';
-
 import './custom.css'
 
-
 export default class App extends Component {
-
   static displayName = App.name;
 
   componentDidMount()
@@ -32,20 +26,13 @@ export default class App extends Component {
             <Route path='/fetch-data' component={FetchData} />
             <Route path='/DashboardOne' component={DashboardOne} />
      */
-
     return (
-
       <div>
-
         <Switch>
           <Route exact path='/' component={DashboardOne} />
           <Route path='/DashboardOne' component={DashboardOne} />
         </Switch>
-
       </div>
-
-
-
     );
   }
 }
