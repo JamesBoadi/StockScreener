@@ -63,12 +63,12 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
             int[] array = { -1, 1, -2 };
             int start2 = random.Next(0, array.Length - 1);
 
-            Stocks.changeArray[0] = array[start2];
-            Stocks.changeArray[1] = array[start2];
-            Stocks.changeArray[2] = array[start2];
-            Stocks.changeArray[3] = array[start2];
-            Stocks.changeArray[4] = array[start2];
-            Stocks.changeArray[5] = array[start2];
+            Stocks.changeArray[0] = array[ random.Next(0, array.Length) ];
+            Stocks.changeArray[1] = array[random.Next(0, array.Length )];
+            Stocks.changeArray[2] = array[random.Next(0, array.Length )];
+            Stocks.changeArray[3] = array[random.Next(0, array.Length )];
+            Stocks.changeArray[4] = array[random.Next(0, array.Length )];
+            Stocks.changeArray[5] = array[random.Next(0, array.Length )];
 
             
             //Array.Fill(Stocks.changeArray, 0);

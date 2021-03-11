@@ -185,7 +185,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 for (int i = 0; i < end; i++) // foreach (RealTimePrice data_ in data)
                 {
                     stock.StockCode = StocksCode.Value[code];
-                    stock.Change = new Random().Next(1,99);
+                    stock.Change = new Random().Next(1, 99);
                     stock.ChangeP = 1;
                     stock.Volume = 11;
                     stock.ProfitLoss = 1;
@@ -234,6 +234,9 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         public static int[] changeArray = new int[6];
         public void updateStocks(int start, int end)
         {
+            Random random = new Random();
+            int[] array = { -1, 1, -2 };
+
             try
             {
                 //   data = client.GetRealTimePrices(stockArray);
@@ -242,16 +245,19 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 int pointer = start;
                 while (pointer < end)
                 {
+                    int start2 = random.Next(0, array.Length);
+                    changeArray = new int[6] { start2, start2, start2, start2, start2, start2 };
+
                     stock.StockCode = StocksCode.Value[pointer];
-                    stock.Change = new Random().Next(1,99);
+                    stock.Change = new Random().Next(1, 99);
                     stock.ChangeP = 1;
                     stock.Volume = 11;
                     stock.ProfitLoss = 1;
                     stock.ProfitLoss_Percentage = 99;
-                    stock.ChangeArray = Stocks.changeArray;
+                    //  stock.ChangeArray = Stocks.changeArray;
                     stock.Volume = 13;
 
-                    stock.High = new Random().Next(1,99);
+                    stock.High = new Random().Next(1, 99);
                     stock.Low = 14;
                     stock.Open = 76;
                     stock.Close = 10;
@@ -270,7 +276,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     stock.Request_Calls = Stocks.stocks.Request_Calls;
 
                     // Compare each stock
-                    if (update)
+                    if (update || !update)
                         cache.Update(pointer, stock);
 
                     stock = new Stock();

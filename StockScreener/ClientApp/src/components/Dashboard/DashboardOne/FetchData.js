@@ -112,41 +112,57 @@ export class FetchData extends Component {
   }
 
   componentDidMount = () => {
-    var cache_ = new cache();
-    var count;
-    for (count = 0; count < 897; count++) {
 
-      const P = {
-        StockCode: count,
-        Change: 91,
-        ChangeP: 1,
-        Volume: 11,
-        CurrentPrice: 102,
-        ProfitLoss: 1,
-        ProfitLoss_Percentage: 99,
-        ChangeArray: 888,
-        High: 10,
-        Low: 14,
-        Open: 76,
-        Close: 10,
+    this.intervalID = setInterval(() => {
+      let state = [-1, 1, 0, -2];
+   
+      
+      
+      var cache_ = new cache();
+      var count;
+      for (count = 0; count < 897; count++) {
+        let start2 = parseInt(Math.floor(Math.random() * state.length));
+        let changeArr = [state[start2], state[start2], state[start2],
+        state[start2], state[start2], state[start2]];
 
-        /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
-          string _currentTime = time.ToString("HH:mmttss"); */
-        //stock.timestamp = _currentTime
-        Request_Calls: 5,
-        TimeStamp: "9:00",
-        ChangeArray: "iii",
-        Request_Calls: "1"
+        const P = {
+          StockCode: count,
+          Change: 91,
+          ChangeP: 1,
+          Volume: 11,
+          CurrentPrice: 102,
+          ProfitLoss: 1,
+          ProfitLoss_Percentage: 99,
+          High: 10,
+          Low: 14,
+          Open: 76,
+          Close: 10,
+
+          ChangeArray: changeArr,
+          /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
+            string _currentTime = time.ToString("HH:mmttss"); */
+          //stock.timestamp = _currentTime
+          Request_Calls: 5,
+          TimeStamp: "9:00",
+
+          Request_Calls: "1"
+        }
+
+
+        cache_.set(count.toString(), P);
       }
-  
-      //console.log(P.StockCode + " " + "kkk");
-      cache_.set(count.toString(), P);
-    }
+    
+      this.cache = cache_;
+      this.setState({ lock: true });
+      this.forceUpdate()
+    }, 5000);
 
-    this.cache = cache_;
-    this.setState({ lock: true });
-    this.forceUpdate()
-    //this.sendRequest();
+
+    // this.sendRequest();
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.intervalID);
   }
 
   // Replace with event listener
@@ -448,23 +464,23 @@ export class FetchData extends Component {
             Remove  <br /> from Alerts</Button>
         </Box>
 
-          {/* <SideBar
+        {/* <SideBar
           isStreaming={() => { return this.state.isStreaming }}
        /> */}
-          <TopNavbar
-            Data={this.state.data}
-          />
+        <TopNavbar
+          Data={this.state.data}
+        />
 
-          {/* ALERT TABLE */
-            <NotificationsTable {...this} />
-          }
-          <DashboardNavbar
-            {...this}
-          />
+        {/* ALERT TABLE */
+          <NotificationsTable {...this} />
+        }
+        <DashboardNavbar
+          {...this}
+        />
 
-          <div id="tableContainer">
-            {this.state.stockTableTwo}
-          </div>
+        <div id="tableContainer">
+          {this.state.stockTableTwo}
+        </div>
 
 
       </div>
