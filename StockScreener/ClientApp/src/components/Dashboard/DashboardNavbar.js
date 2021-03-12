@@ -49,40 +49,44 @@ export const DashboardNavbar = props => {
     function triggerAlert(bool) {
         if (bool === false) {
             clearInterval(interval);
-            debugger;
+            
         }
-
-        let startTime = parseTime(getStartTime.current.value.toString());
-        let endTime = parseTime(getEndTime.current.value.toString());
-
-        let startTime_hours = startTime[0];
-        let startTime_minutes = startTime[1];
-
-        let endTime_hours = endTime[0];
-        let endTime_minutes = endTime[1];
-
-        let dateTime_hours = dateTime.getUTCHours() + 8;
-        let datetime_minutes = dateTime.getMinutes();
-
-        if (intervalSet === false) {
-            if (dateTime_hours > startTime_hours && dateTime_hours < endTime_hours) {
-                // Trigger an alert set according to interval
-                alertInterval = setInterval(() => {
-
-                    intervalSet = true;
-                }, alertInterval);
-            }
-            else if (dateTime_hours === startTime_hours || dateTime_hours === endTime_hours) {
-                if (datetime_minutes > startTime_minutes
-                    && datetime_minutes < endTime_minutes) {
-                    
-                        alertInterval = setInterval(() => {
-
-                            intervalSet = true;
+        else
+        {
+            let startTime = parseTime(getStartTime.current.value.toString());
+            let endTime = parseTime(getEndTime.current.value.toString());
+    
+            let startTime_hours = startTime[0];
+            let startTime_minutes = startTime[1];
+    
+            let endTime_hours = endTime[0];
+            let endTime_minutes = endTime[1];
+    
+            let dateTime_hours = dateTime.getUTCHours() + 8;
+            let datetime_minutes = dateTime.getMinutes();
+    
+            if (intervalSet === false) {
+                if (dateTime_hours > startTime_hours && dateTime_hours < endTime_hours) {
+                    // Trigger an alert set according to interval
+                    alertInterval = setInterval(() => {
+    
+                        intervalSet = true;
                     }, alertInterval);
+                }
+                else if (dateTime_hours === startTime_hours || dateTime_hours === endTime_hours) {
+                    if (datetime_minutes > startTime_minutes
+                        && datetime_minutes < endTime_minutes) {
+                        
+                            alertInterval = setInterval(() => {
+    
+                                intervalSet = true;
+                        }, alertInterval);
+                    }
                 }
             }
         }
+
+       
     }
 
     function parseTime(str) {

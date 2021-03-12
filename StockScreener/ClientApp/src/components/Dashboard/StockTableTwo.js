@@ -11,7 +11,7 @@ import {
     MenuGroup, MenuOptionGroup, MenuIcon, MenuCommand, MenuDivider
 } from '@chakra-ui/react';
 import { StockTableTwoAlert } from './DashboardOne/StockTableTwoAlert';
-
+import throttle from 'lodash.throttle';
 import * as HashMap from 'hashmap';
 
 
@@ -28,7 +28,8 @@ export class StockTableTwo extends React.Component {
         this.textInput = React.createRef();
         this.loadFromCache = this.loadFromCache.bind(this);
         this.scrollPosition = this.scrollPosition.bind(this);
-        this.scrollToPosition = this.scrollToPosition.bind(this);
+        this.scrollToPosition = throttle(this.scrollToPosition, 1000);// this.scrollToPosition.bind(this);
+
         this.freezeScrollPosition = this.freezeScrollPosition.bind(this);
         this.triggerAnimation = this.triggerAnimation.bind(this);
 
@@ -38,14 +39,16 @@ export class StockTableTwo extends React.Component {
         this.getDisplay = this.getDisplay.bind(this);
         this.getUnits = this.getUnits.bind(this);
 
+        this.setScrollUpdate = this.setScrollUpdate.bind(this);
         this.addToStyleMap = this.addToStyleMap.bind(this);
+
+        this.disableScrolling = this.disableScrolling.bind(this)
 
         this.timeout = null;
         this.cache = null;
 
         this.initialiseSearch = false;
         this.styleMap = new HashMap();
-
 
         this.state = {
             green: false,
@@ -75,14 +78,16 @@ export class StockTableTwo extends React.Component {
             scrollUp_: 0,
             scrollDown_: 0,
 
-
             updateStyleMap: true,
             isSelected: false,
             lock: false,
             target: 0,
 
+            scrollUpdated: false,
             triggerAlertID: false,
             triggerAlertColor: "",
+
+            disableScrolling: false,
 
             // Rows to add from stock table to alert table
             cachedRows: []
@@ -97,40 +102,9 @@ export class StockTableTwo extends React.Component {
 
         this.createTable()
         this.updateTable(15)
+        // this.setState({ disableScrolling: false});
+
         // this.setState({ scroll: (this.textInput.current.scrollTop) ?? 1 })
-
-        // Update Table 
-        this.intervalID_ = setInterval(() => {
-            // Force an update
-            /*   const scroll = this.scrollBy();
-               this.setState({
-                   tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ? this.getUnits(scroll) : 15
-               }, () => {
-                   this.newTable()
-                   this.setState({ start: this.state.tb2_scrollPosition * 50 })
-                   this.updateTable(this.state.start)
-                   this.forceUpdate()
-               });
-   
-               if (this.state.start === 0)
-                   this.textInput.current.scrollTop = 10;
-               else
-                   this.textInput.current.scrollTop = 25;
-               //  this.setState({ isUpdating: true });*/
-
-            /*
-                        const scroll = this.scrollBy();
-                        this.setState({
-                            tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ? this.getUnits(scroll) : 15
-                        }, () => {
-                            this.triggerAnimation("rgba(17, 189, 80, 0.897)")
-                            this.setState({ start: this.state.tb2_scrollPosition * 50 })
-                            this.updateTable(this.state.start)
-                            this.forceUpdate()
-                        });*/
-
-        }, 5000);
-
         setInterval(() => {
             window.location.reload();
         }, 20000000);
@@ -146,7 +120,8 @@ export class StockTableTwo extends React.Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         const scroll = this.scrollBy();
 
-        // Update table
+
+        // Update table if a row is selected
         if (this.state.isSelected) {
             this.newTable()
             this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
@@ -156,7 +131,9 @@ export class StockTableTwo extends React.Component {
 
             this.setState({ isSelected: false });
         }
+        // Update if scrolled
         else if (prevState.tb2_count === 1) {
+
             this.newTable()
             this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
                 this.updateTable(this.state.start)
@@ -167,11 +144,11 @@ export class StockTableTwo extends React.Component {
             else
                 this.textInput.current.scrollTop = 25;
 
-            // console.log('T is updated');
+
+            this.setState({ scrollUpdated: true })
             this.setState({ tb2_count: 0 })
-
-
-        } else if (this.state.validInput) {
+        }
+        else if (this.state.validInput) {
 
             this.setState({
                 tb2_scrollPosition: (this.state.tb2_scrollPosition <= 15) ? this.getUnits(scroll) : 15
@@ -192,39 +169,39 @@ export class StockTableTwo extends React.Component {
             this.setState({ queryRes: false });
         }
         else if (this.state.updateStyleMap) {
+            console.log('TRIGGER! 2' + this.state.disableScrolling)
             this.newTable()
-            this.setState({ start: this.state.tb2_scrollPosition * 50 })
+            //   this.setState({ start: this.state.tb2_scrollPosition * 50 })
             this.updateTable(this.state.start)
 
             this.setState({ updateStyleMap: false })
+
         }
+
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (this.state.validInput || this.state.queryRes
-            || this.state.isUpdating === false ||
-            this.state.isSelected !== nextState.isSelected
+        if (nextState.tb2_count !== this.state.tb2_count)
+            return true;
+        else if (this.state.validInput || this.state.queryRes
+            || this.state.isUpdating === false
+            || this.state.isSelected !== nextState.isSelected
             || this.state.updateStyleMap !== nextState.updateStyleMap
-            //  nextState.validInput || nextState.queryRes
         )
             return true;
         return false;
     }
 
-    /*
-    getSnapshotBeforeUpdate(prevProps, prevState) {
-            if (prevState.tb2_scrollPosition !== this.state.tb2_scrollPosition
-                && this.state.isScrolled) {
-                    setTimeout(() => {
-                this.newTable()
-                this.updateTable()
-                return (this.state.tb2_scrollPosition !== undefined
-                    || this.state.tb2_scrollPosition === null)
-                    ? 100 : this.state.tb2_scrollPosition;  }, 800);
-            }
-    } */
+    // Disable scrolling
+    disableScrolling(e) {
+        this.setState({ disableScrolling: e.target.checked })
+    }
 
-    // Communicate with c# controller https://stackoverflow.com/questions/46946380/fetch-api-request-timeout
+    setScrollUpdate(bool) {
+        this.setState({ scrollUpdated: bool })
+    }
+
+    // Search box retrieves stocks from database
     async searchDatabase(e) {
         // e.preventDefault();
         let input = new String(e.target.value);
@@ -252,7 +229,7 @@ export class StockTableTwo extends React.Component {
         }
     }
 
-    // select record from dropdown list
+    // Select Stocks from dropdown list
     selectRecords(e) {
         this.setState({ validInput: true });
         this.forceUpdate();
@@ -269,7 +246,6 @@ export class StockTableTwo extends React.Component {
             this.updateTable(this.state.start)
 
         });
-
     }
 
     getUnits(scroll) {
@@ -340,19 +316,19 @@ export class StockTableTwo extends React.Component {
         this.setState({ scroll: this.textInput.current.scrollTop })
         const result = await this.scroll_(e);
         if (result == "resolved") {
+            // Check the position
+            let position = this.loadFromCache();
 
-            clearInterval(this.intervalID);
-        }
-
-        // Check the position
-        let position = this.loadFromCache();
-
-        if (position !== 0) {
-            this.scrollToPosition()
+            if (position !== 0) {
+                this.scrollToPosition()
+            }
+            else {
+                // Prevent re-rendering
+                this.setState({ isUpdating: true });
+            }
         }
         else {
-            // Prevent re-rendering
-            this.setState({ isUpdating: true });
+            // 404
         }
     }
 
@@ -373,6 +349,9 @@ export class StockTableTwo extends React.Component {
         units: 0 No change
     */
     loadFromCache() {
+        if (this.state.disableScrolling)
+            return 0;
+
         let units = (this.state.scroll);
 
         this.setState({
@@ -417,6 +396,13 @@ export class StockTableTwo extends React.Component {
        Triggers re-rendering of table */
     selectRow(e) {
         var array = [];
+
+        let style = {
+            backgroundColor: ""
+        };
+
+        this.styleMap.set(this.state.target, style);
+
         var target = new Number(e.target.id);
         this.setState({ target: target });
         //  console.log('target ' + target)
@@ -431,6 +417,14 @@ export class StockTableTwo extends React.Component {
         let start = (this.state.tb2_scrollPosition * 50) - mod;
         let end = (this.state.tb2_scrollPosition * 50) + 50;
 
+
+        style = {
+            backgroundColor: "rgb(21,100,111)"
+        };
+
+        this.styleMap.set(target, style);
+
+
         for (id = start; id < end; id++) {
             // Get values from cache this.state.tb2_stack
             let list = this.props.cache.get(id.toString());
@@ -439,7 +433,7 @@ export class StockTableTwo extends React.Component {
 
                 array.push(
                     <tbody key={id} >
-                        <tr style={{ color: "green", backgroundColor: "rgb(21,100,111)" }}>
+                        <tr style={this.styleMap.get(id)}>
                             <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
                             <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
                             <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
@@ -456,7 +450,7 @@ export class StockTableTwo extends React.Component {
             else {
                 array.push(
                     <tbody key={id}>
-                        <tr >
+                        <tr style={this.styleMap.get(id)}>
                             <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
                             <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
                             <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
@@ -565,7 +559,8 @@ export class StockTableTwo extends React.Component {
     }
 
     /** styleMap: { color,  transition} */
-    addToStyleMap(triggerAlertID, triggerAlertColor, time) {
+    addToStyleMap(triggerAlertID, triggerAlertColor, time, priority) {
+
         let bool = true;
         let style;
         let i = 0;
@@ -580,7 +575,7 @@ export class StockTableTwo extends React.Component {
             else {
                 style = {
                     backgroundColor: 'rgb(30,30,30)',
-                    transition: 'background-color '.concat(`${time} linear`),
+                    transition: 'background-color '.concat(`${time}ms linear`),
                 };
             }
 
@@ -593,15 +588,14 @@ export class StockTableTwo extends React.Component {
 
             bool = !bool;
 
-            if (i++ >= 2)
+            if (i++ >= 3)
                 clearInterval(loop);
 
         }, 2000);
 
-
+        //   this.setState({ updateStyleMap: true });
         this.setState({ triggerAlertID: triggerAlertID });
         this.setState({ triggerAlertColor: triggerAlertColor });
-
     }
 
     triggerAnimation(color, time) {
@@ -708,6 +702,11 @@ export class StockTableTwo extends React.Component {
                     margin='auto'
                     zIndex='999'
                     color='white'>
+
+                    <div style={{ position: 'absolute', top: '0px', left: '0px' }}>
+                        <input class="disableScrolling" type="checkbox" onChange={this.disableScrolling} />
+                        <label id="disableScrolling"> Disable Scrolling</label>
+                    </div>
 
                     <div class="stockTableTwoMenu">
                         <div class="dropdown">
