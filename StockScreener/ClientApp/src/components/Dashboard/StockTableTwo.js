@@ -31,7 +31,7 @@ export class StockTableTwo extends React.Component {
         this.scrollToPosition = throttle(this.scrollToPosition, 1000);// this.scrollToPosition.bind(this);
 
         this.freezeScrollPosition = this.freezeScrollPosition.bind(this);
-        this.triggerAnimation = this.triggerAnimation.bind(this);
+        this.setAlertInterval = this.setAlertInterval.bind(this);
 
         this.selectRow = this.selectRow.bind(this);
         this.createTable = this.createTable.bind(this);
@@ -87,7 +87,11 @@ export class StockTableTwo extends React.Component {
             triggerAlertID: false,
             triggerAlertColor: "",
 
+
             disableScrolling: false,
+
+            alertInterval: 60000,
+            maximumAlertNotifications: 0,
 
             // Rows to add from stock table to alert table
             cachedRows: []
@@ -169,7 +173,7 @@ export class StockTableTwo extends React.Component {
             this.setState({ queryRes: false });
         }
         else if (this.state.updateStyleMap) {
-            console.log('TRIGGER! 2' + this.state.disableScrolling)
+
             this.newTable()
             //   this.setState({ start: this.state.tb2_scrollPosition * 50 })
             this.updateTable(this.state.start)
@@ -559,7 +563,7 @@ export class StockTableTwo extends React.Component {
     }
 
     /** styleMap: { color,  transition} */
-    addToStyleMap(triggerAlertID, triggerAlertColor, time, priority) {
+    addToStyleMap(triggerAlertID, triggerAlertColor, time) {
 
         let bool = true;
         let style;
@@ -598,49 +602,45 @@ export class StockTableTwo extends React.Component {
         this.setState({ triggerAlertColor: triggerAlertColor });
     }
 
-    triggerAnimation(color, time) {
-        let id;
-        let mod = 0;
+    // Calculate interval and number of alert notifcations
+    setAlertInterval() {
+        const triggerAlert = this.props.state.triggerAlert;
+        const alertInterval = this.props.state.alertInterval;
+        const startTime = this.props.state.startTime;
+        const endTime = this.props.state.endTime;
 
-        if (this.state.tb2_scrollPosition === 0)
-            mod = 0;
-        else
-            mod = 15;
+        // Calculate number of notiifications
+        let startTime_hours = startTime[0];
+        let startTime_minutes = startTime[1];
 
-        let start = (this.state.tb2_scrollPosition * 50) - mod;
-        let end = (this.state.tb2_scrollPosition * 50) + 50;
-        var array = [];
-        let style = {};
+        let endTime_hours = endTime[0];
+        let endTime_minutes = endTime[1];
 
-        // Use shallow compare  
-        for (id = start; id < end; id++) {
+        // Calculate total minutes
+        if(startTime_hours == 0)
+        {
+            startTime_minutes += 60; 
+        } 
+        else{
+            startTime_minutes += (1 + startTime_hours) * 60;  
+        } 
+        
+        if(endTime_hours == 0)
+        {
+            endTime_minutes += 60; 
+        } 
+        else {
+            endTime_minutes += (1 + endTime_hours) * 60;  
+        } 
 
-            style = {
-                transition: 'background-color'.concat(`${time}ms linear`),
-                backgroundColor: color.toString()
-            };
+        const maxNotifications = Math.round((Math.abs(startTime_minutes - endTime_minutes) / alertInterval));
 
-            // Get values from cache
-            let list = this.props.cache.get(id.toString());
-            //  console.log( 'WORK WORK ' + id);
-
-            array.push(
-                <tbody key={id} style={this.styleMap.get(id)}>
-                    <tr >
-                        <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
-                        <td id={id} onClick={this.selectRow}>{list.High.toString()}</td>
-
-                        <td id={id} onClick={this.selectRow}>{list.Low.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss_Percentage.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.Volume.toString()}</td>
-                    </tr>
-                </tbody>);
+        if (maxNotifications < 1) {
+            window.alert("Alerts have ");
         }
-
-        this.setState({ tb2_stack: array });
+        this.setState({maximumAlertNotifications: maxNotifications})
+        this.setState({triggerAlert: triggerAlert})
+        this.setState({alertInterval: alertInterval})
     }
 
     createTable() {

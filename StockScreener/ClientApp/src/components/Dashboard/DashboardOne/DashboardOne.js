@@ -1,14 +1,14 @@
 import React, { Component, useState, useContext } from 'react';
 import { Button, ButtonGroup } from "@chakra-ui/react";
 import '../Dashboard.css';
-import { FetchData } from './FetchData.js';
+import { DashboardNavbar } from './DashboardNavbar';
 
 export class DashboardOne extends Component {
 
     constructor(props) {
         super(props);
         this.cache = new Map();
-       // this.redirect = this.redirect.bind(this);
+        // this.redirect = this.redirect.bind(this);
 
         this.state = {
             lock: false,
@@ -16,13 +16,13 @@ export class DashboardOne extends Component {
         };
     }
 
-   /* redirect = (num) => {
-        switch (num) {
-            case 6:
-                <Redirect to="/dashboardSettings" />
-                break;
-        }
-    }*/
+    /* redirect = (num) => {
+         switch (num) {
+             case 6:
+                 <Redirect to="/dashboardSettings" />
+                 break;
+         }
+     }*/
 
     render() {
         //  FetchData.sendRequest("I have a message", "of glory");
@@ -30,7 +30,7 @@ export class DashboardOne extends Component {
             <div>
 
                 <header class="App-header">
-                    <FetchData/>
+                    <DashboardNavbar />
                 </header>
 
             </div>

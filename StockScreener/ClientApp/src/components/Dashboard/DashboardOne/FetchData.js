@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import { DashboardNavbar } from '../DashboardNavbar';
-import { NavBarData } from '../NavbarData.js';
 import { TopNavbar } from '../TopNavbar.js';
 import { NotificationsTable } from '../NotificationsTable';
 import { SideBar } from '../SideBar';
 import { DashboardSettings } from '../DashboardSettings';
 import { StockTable } from '../StockTable';
 import { StockTableTwo } from '../StockTableTwo';
+
 import {
   Box, Button, NumberInput,
   NumberInputField, NumberInputStepper,
@@ -17,8 +16,6 @@ import Nav from 'reactstrap/lib/Nav';
 import * as signalR from '@aspnet/signalr';
 import * as cache from 'cache-base';
 import * as HashMap from 'hashmap';
-
-
 
 /*
 const hubConnection = new HubConnectionBuilder()
@@ -57,7 +54,6 @@ export class FetchData extends Component {
     this.alertTable = [];
     this.textInput = React.createRef();
     this.map = new HashMap();
-
 
     this.state = {
       stockTableTwo: [],
@@ -115,9 +111,7 @@ export class FetchData extends Component {
 
     this.intervalID = setInterval(() => {
       let state = [-1, 1, 0, -2];
-   
-      
-      
+
       var cache_ = new cache();
       var count;
       for (count = 0; count < 897; count++) {
@@ -172,6 +166,9 @@ export class FetchData extends Component {
     if (this.state.lock === true &&
       this.called === false) {
       t.push(<StockTableTwo
+        alertInterval={this.props.state.alertInterval}
+        startTime={this.props.state.startTime}
+        endTime={this.props.state.endTime}
         {...this}
       />)
 
@@ -182,7 +179,7 @@ export class FetchData extends Component {
     }
   }
 
-  // Equality check against IMMUTABLE data
+
   shouldComponentUpdate(nextProps, nextState) {
     if (this.state.lock) {
       this.setState({ lock: false });
@@ -474,9 +471,7 @@ export class FetchData extends Component {
         {/* ALERT TABLE */
           <NotificationsTable {...this} />
         }
-        <DashboardNavbar
-          {...this}
-        />
+      
 
         <div id="tableContainer">
           {this.state.stockTableTwo}
