@@ -90,8 +90,8 @@ export class StockTableTwo extends React.Component {
 
             disableScrolling: false,
 
-            alertInterval: 60000,
-            maximumAlertNotifications: 0,
+            alertInterval: 30000,
+            maximumAlertNotifications: 11,
 
             // Rows to add from stock table to alert table
             cachedRows: []
@@ -602,7 +602,7 @@ export class StockTableTwo extends React.Component {
         this.setState({ triggerAlertColor: triggerAlertColor });
     }
 
-    // Calculate interval and number of alert notifcations
+    // Calculate interval and number of alert notifcations (Auto only)
     setAlertInterval() {
         const triggerAlert = this.props.state.triggerAlert;
         const alertInterval = this.props.state.alertInterval;
@@ -636,7 +636,7 @@ export class StockTableTwo extends React.Component {
         const maxNotifications = Math.round((Math.abs(startTime_minutes - endTime_minutes) / alertInterval));
 
         if (maxNotifications < 1) {
-            window.alert("Alerts have ");
+            window.alert("Increase Interval time frame");
         }
         this.setState({maximumAlertNotifications: maxNotifications})
         this.setState({triggerAlert: triggerAlert})

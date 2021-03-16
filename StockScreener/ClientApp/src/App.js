@@ -8,6 +8,7 @@ import { Router, Route, Switch } from 'react-router';
 import { FetchData } from './components/Dashboard/DashboardOne/FetchData';
 import { Counter } from './components/Counter';
 import './custom.css'
+import 'antd/dist/antd.css';
 
 export default class App extends Component {
   static displayName = App.name;

@@ -156,8 +156,14 @@ export class DashboardNavbar extends Component {
                                 {startTime}
                                 <label id="endTime">End Time</label>
                                 {endTime}
-                                <label id="enableAlerts">Enable Alerts</label>
-                                <input class="enableAlerts" type="checkbox" onChange={this.setAlert} />
+                                <label id="enableNotifications">Notifications</label>
+                                <input class="enableNotifications" type="checkbox" onChange={this.setAlert} />
+                           
+                                <label id="enableNotifications">Manual</label>
+                                <input class="enableNotifications" type="checkbox" onChange={this.setAlert} />
+                           
+                                <label id="enableNotifications">Auto</label>
+                                <input class="enableNotifications" type="checkbox" onChange={this.setAlert} />
                             </div>
                         </div>
 
