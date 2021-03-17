@@ -41,7 +41,6 @@ export class StockTableTwo extends React.Component {
 
         this.setScrollUpdate = this.setScrollUpdate.bind(this);
         this.addToStyleMap = this.addToStyleMap.bind(this);
-
         this.disableScrolling = this.disableScrolling.bind(this)
 
         this.timeout = null;
@@ -123,7 +122,6 @@ export class StockTableTwo extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         const scroll = this.scrollBy();
-
 
         // Update table if a row is selected
         if (this.state.isSelected) {
@@ -617,30 +615,28 @@ export class StockTableTwo extends React.Component {
         let endTime_minutes = endTime[1];
 
         // Calculate total minutes
-        if(startTime_hours == 0)
-        {
-            startTime_minutes += 60; 
-        } 
-        else{
-            startTime_minutes += (1 + startTime_hours) * 60;  
-        } 
-        
-        if(endTime_hours == 0)
-        {
-            endTime_minutes += 60; 
-        } 
+        if (startTime_hours == 0) {
+            startTime_minutes += 60;
+        }
         else {
-            endTime_minutes += (1 + endTime_hours) * 60;  
-        } 
+            startTime_minutes += (1 + startTime_hours) * 60;
+        }
+
+        if (endTime_hours == 0) {
+            endTime_minutes += 60;
+        }
+        else {
+            endTime_minutes += (1 + endTime_hours) * 60;
+        }
 
         const maxNotifications = Math.round((Math.abs(startTime_minutes - endTime_minutes) / alertInterval));
 
         if (maxNotifications < 1) {
             window.alert("Increase Interval time frame");
         }
-        this.setState({maximumAlertNotifications: maxNotifications})
-        this.setState({triggerAlert: triggerAlert})
-        this.setState({alertInterval: alertInterval})
+        this.setState({ maximumAlertNotifications: maxNotifications })
+        this.setState({ triggerAlert: triggerAlert })
+        this.setState({ alertInterval: alertInterval })
     }
 
     createTable() {
@@ -708,6 +704,7 @@ export class StockTableTwo extends React.Component {
                         <label id="disableScrolling"> Disable Scrolling</label>
                     </div>
 
+                    {/* Search Box */}
                     <div class="stockTableTwoMenu">
                         <div class="dropdown">
 
@@ -716,7 +713,9 @@ export class StockTableTwo extends React.Component {
                                     style={{
                                         position: 'absolute', top: '0px',
                                         right: '16.5px', height: '29px',
-                                        minWidth: '12.25rem'
+                                        minWidth: '12.25rem',
+                                        width:'12.25rem',
+                                        color: 'black'
                                     }}
 
                                     onInput={this.searchDatabase}
@@ -728,14 +727,16 @@ export class StockTableTwo extends React.Component {
                                 <InputRightElement children={<img id="searchIcon" />} />
                             </InputGroup>
 
+                            {/* Drop down Menu */}
                             <div class="dropdown-content">
                                 <Box
-                                    min-width='17.26rem'
-                                    width='17.26rem'
-                                    height='80px'
+                                    min-width='12.25rem'
+                                    width='12.25rem'
+                                    height='8rem'
                                     overflowY='auto'
                                     bg='#f9f9f9'
-                                    top='0px'>
+                                    top='0px'
+                                    backgroundColor='rgb(40,40,40)'>
 
                                     {this.getDisplay()}
 

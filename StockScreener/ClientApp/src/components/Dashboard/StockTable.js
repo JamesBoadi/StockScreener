@@ -73,8 +73,7 @@ export class StockTable extends Component {
                     <h4 style={{ position: 'relative', top: '30px', left: '0px', color: 'white' }}>Message: Possible Reversal</h4>
 
                     {/* Entry: Largest gap in either shorts or calls (Calculate in c#) */}
-                    <h4 style={{ position: 'relative', top: '35px', left: '0px', color: 'white' }}>Possible Entry:
-                        </h4>
+                    <h4 style={{ position: 'relative', top: '35px', left: '0px', color: 'white' }}>Start Price </h4>
 
                     <NumberInput
                         style={{ left: '170px' }}
@@ -86,7 +85,7 @@ export class StockTable extends Component {
                         </NumberInputStepper>
                     </NumberInput>
 
-                    <h4 style={{ position: 'relative', top: '10px', left: '0px', color: 'white' }}>Take Profit: 270.6</h4>
+                    <h4 style={{ position: 'relative', top: '10px', left: '0px', color: 'white' }}>Target Price: 270.6</h4>
 
                     <Button id="GreenArrow" style={{
                         position: 'absolute', top: '60px', right: '180px'

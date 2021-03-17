@@ -142,7 +142,6 @@ export class FetchData extends Component {
           Request_Calls: "1"
         }
 
-
         cache_.set(count.toString(), P);
       }
     
@@ -268,12 +267,6 @@ export class FetchData extends Component {
 
   triggerAnimation(param) {
     console.log('CALL ACK HELL ' + param)
-
-
-
-
-
-
   }
 
   // Are you sure you want to remove this stock?
@@ -472,95 +465,12 @@ export class FetchData extends Component {
           <NotificationsTable {...this} />
         }
       
-
         <div id="tableContainer">
           {this.state.stockTableTwo}
         </div>
-
 
       </div>
     );
   }
 }
 
-
-
-    //  FetchData.sendRequest("I have a message", "of glory");
-/*
-
- static convertFrombytes() {
-console.log('I am running!');
-/* writeToScreen("CONNECTED");
-doSend("WebSocket rocks");
-console.log("Sample application");
-}
-    const protocol = new signalR.JsonHubProtocol();
-    const transport = signalR.HttpTransportType.ServerSentEvents;
-
-    const options = {
-      transport,
-      logMessageContent: true,
-      logger: signalR.LogLevel.Trace,
-      //accessTokenFactory: () => this.props.accessToken,
-    };
-
-    // create the hubConnection instance
-    this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://localhost:44362/stock')
-      .build();
-
-    //  this.hubConnection.on('RequestData', this.onNotifReceived);
-    //this.hubConnection.on('DownloadSession', this.onNotifReceived);
-    //this.hubConnection.on('UploadSession', this.onNotifReceived);
-
-    this.hubConnection.start()
-      .then(() => console.info('SignalR Connected'))
-      .catch(err => console.error('SignalR Connection Error: ', err));
-
-
-
-  <br />
-    <input
-      type="text"
-      value={this.state.message}
-      onChange={e => this.setState({ message: e.target.value })}
-    />
-
-    <button onClick={
-      this.sendRequest}>Send</button>
-    <div>
-
-      {this.state.messages.map((message, index) => (
-        <span style={{ display: 'block' }} key={index}> {message} </span>
-      ))}
-    </div>
-
-    {this.renderTable(obj)}
-*/
-
-/*   var streamTwo_ = this.state.hubConnection.stream("LockStream", arr)
-              .subscribe({
-                next: (sessionProperties) => {
-                 const session = parseInt(sessionProperties[0]); // Get the session to display time
-                  const state = Boolean(sessionProperties[1]);
-
-                  if (state === -1)
-                    this.setState({ lock: true });
-                  else {
-                    if (this.state.lock !== false)
-                      this.setState({ lock: false });
-                  }
-                },
-                complete: () => {
-                  // render table
-                  console.log('complete');
-                },
-                error: (err) => {
-                  console.log('err ' + err);
-                }
-              });
-
-          /*  if (this.state.lock) {
-              console.log('ERASED');
-              stream_.dispose(); // Dispose stream if lock is true
-            }*/

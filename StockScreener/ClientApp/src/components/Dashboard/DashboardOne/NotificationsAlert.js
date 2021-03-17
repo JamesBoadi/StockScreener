@@ -4,8 +4,6 @@ import { FetchData } from './FetchData.js';
 
 import * as Queue from 'queue';
 
-import { Menu, Dropdown } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
 
 // Replace with Redux
 export class NotificationsAlert extends React.Component {
@@ -55,25 +53,7 @@ export class NotificationsAlert extends React.Component {
 
     render()
     {
-        const menu = (
-            <Menu>
-              <Menu.Item key="0">
-                <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-                  1st menu item
-                </a>
-              </Menu.Item>
-              <Menu.Item key="1">
-                <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-                  2nd menu item
-                </a>
-              </Menu.Item>
-              <Menu.Divider />
-              <Menu.Item key="3" disabled>
-                3rd menu item（disabled）
-              </Menu.Item>
-            </Menu>
-          );
-
+        
         return null;
     }
 }

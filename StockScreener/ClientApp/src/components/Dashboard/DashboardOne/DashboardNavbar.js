@@ -5,7 +5,8 @@ import {
     NumberIncrementStepper, NumberDecrementStepper,
 } from '@chakra-ui/react';
 import { FetchData } from './FetchData.js';
-import { render } from 'react-dom';
+import { Menu, Dropdown } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 
 export class DashboardNavbar extends Component {
     constructor(props) {
@@ -22,15 +23,27 @@ export class DashboardNavbar extends Component {
         this.setAlertTrigger = this.setAlertTrigger.bind(this);
         this.parseTime = this.parseTime.bind(this);
 
+        this.enableNotificationsMenu = this.enableNotificationsMenu.bind(this);
+        this.addToNotificationsMenu = this.addToNotificationsMenu.bind(this);
+
         this.state = {
             animationTime: 5000,
             alertEnabled: false,
             alertInterval: 1000,
             triggerAlert: false,
             startTime: [],
-            endTime: []
+            endTime: [],
+            notifications: [],
+            notificationsMenuVisible: false
 
         };
+    }
+
+    componentDidMount() {
+        for (let index = 0; index < 455; index++) {
+            this.addToNotificationsMenu("ok", "776", "");
+        }
+       
     }
 
     // Save all settings
@@ -96,6 +109,39 @@ export class DashboardNavbar extends Component {
         return [hours, minutes];
     }
 
+    // Enable/Disable Menu of Notifications
+    enableNotificationsMenu(e) {
+        this.setState({ notificationsMenuVisible: !this.state.notificationsMenuVisible })
+    }
+
+    // Add notification to Menu
+    addToNotificationsMenu(stock, currentPrice, signal) {
+        let notifications = this.state.notifications;
+
+        let alert;
+        switch (signal) {
+            case "Bullish":
+                alert = `${stock} has hit target price of ${currentPrice}
+                ${signal} signal`
+                break;
+            case "Bearish":
+                alert = `${stock} has dropped to price of ${currentPrice}
+                ${signal} signal`
+                break;
+            default:
+                alert = `${stock} has hit target price of ${currentPrice}
+                Bearish signal`
+        }
+
+        notifications.push(
+            <div class="record">
+                {alert}
+            </div>
+        );
+
+        this.setState({ notifications: notifications });
+    }
+
     render() {
         let selectMarket =
             <select class="selectMarket" name="Select Market">
@@ -123,7 +169,7 @@ export class DashboardNavbar extends Component {
         return (
             <div class="DashboardNavbar">
                 <Box
-                    style={{ position: 'absolute', top: '80px', left: '60px', zIndex: -999 }}
+                    style={{ position: 'absolute', top: '80px', left: '60px', zIndex: 888 }}
                     bg='rgb(40,40,40)'
                     boxShadow='sm'
                     textAlign='center'
@@ -132,7 +178,6 @@ export class DashboardNavbar extends Component {
                     rounded="lg"
                     borderWidth="1px"
                 >
-
                     <div class="grid-container">
                         <div class="grid-item">
 
@@ -156,14 +201,14 @@ export class DashboardNavbar extends Component {
                                 {startTime}
                                 <label id="endTime">End Time</label>
                                 {endTime}
-                                <label id="enableNotifications">Notifications</label>
+                                {/*}   <label id="enableNotifications">Notifications</label>
                                 <input class="enableNotifications" type="checkbox" onChange={this.setAlert} />
-                           
+
                                 <label id="enableNotifications">Manual</label>
                                 <input class="enableNotifications" type="checkbox" onChange={this.setAlert} />
-                           
+
                                 <label id="enableNotifications">Auto</label>
-                                <input class="enableNotifications" type="checkbox" onChange={this.setAlert} />
+                                <input class="enableNotifications" type="checkbox" onChange={this.setAlert} /> */}
                             </div>
                         </div>
 
@@ -224,7 +269,6 @@ export class DashboardNavbar extends Component {
                         </div>
 
                         <div class="grid-item">
-
                             <p id="stockFilter">Stock Filter</p>
                             <p id="priceRange">Price Range</p>
 
@@ -256,12 +300,44 @@ export class DashboardNavbar extends Component {
                                 <label id="enablePriceCheck">Enable Price Detection</label>
                                 <input class="enablePriceCheck" type="checkbox" />
 
-                                <Button style={{ position: 'absolute', top: '155px', left: '1330px' }}
+
+
+                                <a
+                                    style={{
+                                        color: 'white',
+                                        position: 'absolute', top: '-6px', left: '1300px',
+                                    }} onClick={this.enableNotificationsMenu}>
+                                    Notifications <DownOutlined />
+
+
+                                    <div class="dropdown-content">
+                                        <Box
+                                            min-width='12.25rem'
+                                            width='12.25rem'
+                                            height='8rem'
+                                            overflowY='auto'
+                                            bg='#f9f9f9'
+                                            top='0px'
+                                            left='0px'
+                                            backgroundColor='wheat.511'
+                                        >
+
+                                            {this.state.notifications}
+                                        </Box>
+                                    </div>
+                                </a>
+
+
+
+                                <Button style={{ position: 'absolute', top: '155px', left: '1500px' }}
                                     onClick={this.saveConfiguration}>Save Configuration</Button>
                             </div>
                         </div>
 
-                        {/*  <Button style={{ position: 'absolute', top: '135px', left: '410px' }}>Save</Button>
+                        {/* 
+                              
+                        
+                        <Button style={{ position: 'absolute', top: '135px', left: '410px' }}>Save</Button>
                     <Button style={{ position: 'absolute', top: '135px', left: '200px' }}>
                         Change Alert Settings</Button>*/}
 
