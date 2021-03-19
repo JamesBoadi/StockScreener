@@ -317,10 +317,11 @@ export class DashboardNavbar extends Component {
                                 {startTime}
                                 <label id="endTime">End Time</label>
                                 {endTime}
-                                {/*   <label id="enableNotifications">Notifications</label>
-                                <input class="enableNotifications" type="checkbox" onChange={this.setAlert} />
-
-                                <label id="enableNotifications">Manual</label>
+                                 <label id="manualAlerts">Manual</label>
+                                <input class="manualAlerts" type="checkbox" onChange={this.setAlert} />
+                                <label id="autoAlerts">Auto</label>
+                                <input class="autoAlerts" type="checkbox" onChange={this.setAlert} />
+                              {/*    <label id="enableNotifications">Manual</label>
                                 <input class="enableNotifications" type="checkbox" onChange={this.setAlert} />
 
                                 <label id="enableNotifications">Auto</label>
@@ -329,11 +330,12 @@ export class DashboardNavbar extends Component {
                         </div>
 
 
-                        <div class="grid-item">
-                            <div class="tableSettings">
+                        <div class="grid-item" >
+                            <div class="tableSettings" >
                                 <div class="vl"></div>
                                 <div class="v2"></div>
                                 <p id="table_">Columns Filter</p>
+                               
                                 <div id="disableColumns" >
 
                                     {/* <p id="hideName"
@@ -385,10 +387,10 @@ export class DashboardNavbar extends Component {
                         </div>
 
                         <div class="grid-item">
+                            <div class="priceDetection">
                             <p id="stockFilter">Stock Filter</p>
                             <p id="priceRange">Price Range</p>
 
-                            <div class="stockFilter">
                                 <div class="startPrice">
                                     <p id="startPriceLabel">Start Price</p>
                                     <NumberInput
@@ -416,6 +418,8 @@ export class DashboardNavbar extends Component {
                                 <label id="enablePriceCheck">Enable Price Detection</label>
                                 <input class="enablePriceCheck" type="checkbox" />
 
+                                <label id="overridePrices">Override Custom Prices</label>
+                                <input class="overridePrices" type="checkbox" />
                                 <a
                                     style={{
                                         color: 'white',
@@ -441,8 +445,9 @@ export class DashboardNavbar extends Component {
                                     </div>
                                 </a>
 
-                                <Button style={{ position: 'absolute', top: '155px', left: '1500px', zIndex: '-999' }}
+                                <Button style={{ position: 'absolute', top: '154px', left: '1325px', zIndex: '-999' }}
                                     onClick={this.saveConfiguration}>Save Configuration</Button>
+                   
                             </div>
                         </div>
 
