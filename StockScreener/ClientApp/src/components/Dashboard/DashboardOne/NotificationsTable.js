@@ -266,7 +266,7 @@ export class NotificationsTable extends Component {
         let start = 0;
         let end = this.props.state.alertTableStocks.length - 1;
 
-        console.log('UPDATE ' );
+       // console.log('UPDATE ' );
 
         for (pointer = start; pointer <= end; pointer++) {
             if (pointer === this.props.state.target)

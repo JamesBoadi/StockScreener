@@ -35,8 +35,9 @@ namespace StockScreener.Controllers
             _logger = logger;
         }
 
+     
         // Return stock names in order of subsequence
-        [Route("test/{query?}")]   // Attribute route   HttpResponseMessage 
+        [Route("searchstock/{query?}")]   // Attribute route   HttpResponseMessage 
         public string transmitData(string query) // convert to json
         {
             User user = new User();
@@ -45,17 +46,15 @@ namespace StockScreener.Controllers
             List<String> list = new List<String>();
             OrderedDictionary dict = new OrderedDictionary();
 
+            // Remove Whitespaces and double entries
             for (int i = 0; i < stockList.Count; i++)
             {
                 string name = stockList[i].Name.ToLower();
                 string trimmed = String.Concat(
-
                 name.Where(c => !Char.IsWhiteSpace(c))
                 //.Where(c => !Char.IsLetter('-') || !Char.IsLetter('&'))
                 );
-
                 // Console.WriteLine(trimmed);
-
                 if (trimmed.Contains(query))
                 {
                     if (!list.Contains(name))
@@ -65,13 +64,7 @@ namespace StockScreener.Controllers
                     }
                 }
             }
-
-            /*  object[] json = new object[list.Count];
-              /* Format
-
-                 array = [ {id, array}....
-                 ]
-              */
+            // Add to the array
             int pointer = 0;
             string res = "";
             string[] arr = new string[dict.Count];
@@ -87,18 +80,12 @@ namespace StockScreener.Controllers
                 pointer++;
             }
 
-            Console.WriteLine("Get Away ");
-
+            // Return JSON
             stockCode.stockCode = arr;
             string data = JsonSerializer.Serialize(stockCode);
-
-
-
-
-
             return data;
         }
-
+/*
         [HttpGet("{page}")] // Conventional route (For pages that do not exist)
         public ContentResult DummyOne(int page)
         {
@@ -134,10 +121,10 @@ namespace StockScreener.Controllers
             requestMessage.Content = new StringContent(res, UTF8Encoding.UTF8);
             requestMessage.RequestUri = new Uri("https://localhost:44362/test/" + query);
             HttpClient httpClient = new HttpClient();
-            await httpClient.SendAsync(requestMessage);*/
+            await httpClient.SendAsync(requestMessage);
 
 
-        /* Cancellation token cancels the event if outside time zone (or if not connected, redirect to something went wrong) */
+        /* Cancellation token cancels the event if outside time zone (or if not connected, redirect to something went wrong) 
 
         public static async Task getRealTimePrices(HttpContext context, WebSocket webSocket)
         {
@@ -158,7 +145,7 @@ namespace StockScreener.Controllers
             await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, System.Threading.CancellationToken.None);
         }
 
-
+*/
 
 
     }

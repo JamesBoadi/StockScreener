@@ -8,21 +8,24 @@ import { FetchData } from './FetchData.js';
 import { Menu, Dropdown } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 
+
 export class DashboardNavbar extends Component {
     constructor(props) {
         super(props);
-
         this.array = [];
         this.getStartTime = React.createRef(); // Replace ref with onclick, store and retrieve state
         this.getEndTime = React.createRef();
         this.dateTime = new Date();
         this.alertInterval_ = null;
-
         this.saveConfiguration = this.saveConfiguration.bind(this);
+        //this.setGlobalTargetPrice = this.setGlobalTargetPrice.bind(this);
+        //this.setStartTargetPrice = this.setStartTargetPrice.bind(this);
+        // Global sets local does not set global
         this.setAlert = this.setAlert.bind(this);
         this.setAlertTrigger = this.setAlertTrigger.bind(this);
         this.parseTime = this.parseTime.bind(this);
-
+        this.notifications = this.notifications.bind(this);
+        this.enableNotifications = this.enableNotifications.bind(this);
         this.enableNotificationsMenu = this.enableNotificationsMenu.bind(this);
         this.addToNotificationsMenu = this.addToNotificationsMenu.bind(this);
 
@@ -33,22 +36,167 @@ export class DashboardNavbar extends Component {
             triggerAlert: false,
             startTime: [],
             endTime: [],
-            notifications: [],
-            notificationsMenuVisible: false
+            notifications_temp: [],
+            notifications: [
+                /*    { <div style={{
+                         position: 'absolute', color: "black", fontSize: '22px',
+                         fontWeight: 800, float: 'left'
+                     }}>
+                         Notifications <br/>
+                     </div> */
+            ],
 
+            updateNotifications: false,
+            notificationsMenuVisible: false,
+            manualAlert: true,
+            autoAlert: false,
+            manualNotifications: false,
+            autoNotifications: false,
+
+            setNotifications: false,
+            notificationsEnabled: 0,
+            globalStartPrice: 0,
+            globalTargetPrice: 0
         };
     }
 
     componentDidMount() {
-        for (let index = 0; index < 455; index++) {
-            this.addToNotificationsMenu("ok", "776", "");
+    }
+
+    componentDidUpdate = (prevProps, prevState, snapshot) => {
+        if (this.state.updateNotifications) {
+            this.setState({ notifications: this.state.notifications_temp });
+            this.setState({ updateNotifications: false });
         }
-       
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextState.updateNotifications !== this.state.updateNotifications ||
+            nextState.notifications_temp.length !== this.state.notifications_temp.length
+            || nextState.notificationsMenuVisible !== this.state.notificationsMenuVisible) {
+            return true;
+        }
+        return false;
+    }
+
+    // Enable/Disable Menu of Notifications
+    enableNotificationsMenu(e) {
+        this.setState({ notificationsMenuVisible: !this.state.notificationsMenuVisible })
+    }
+
+    // Add notification to Menu
+    addToNotificationsMenu(stock, previousPrice, currentPrice,
+        startPrice, targetPrice, state) {
+        let notifications = this.state.notifications;
+
+        let alert;
+        switch (state) {
+            case 3:
+                alert = `${stock} has increased to a price of ${currentPrice}
+                from ${previousPrice} to ${startPrice} Bullish signal warning`
+                break;
+            case 2:
+                alert = `${stock} has increased to a price of ${currentPrice}
+                from ${previousPrice} Bullish signal`
+                break;
+            case 1:
+                alert = `${stock} has hit target price of ${targetPrice}
+                from ${previousPrice} to ${currentPrice} Bullish signal`
+                break;
+            case -1:
+                alert = `${stock} has dropped to price of ${currentPrice}
+                from ${previousPrice} Bearish signal`
+                break;
+            case -2:
+                alert = `${stock} has dropped to price of ${currentPrice}
+                from ${startPrice} Bearish signal warning`
+                break;
+            case -3:
+                alert = `${stock} has hit target price of ${targetPrice}
+                from ${previousPrice} Bearish signal`
+                break;
+        }
+
+        notifications.push(
+            <div class="record"
+                style={{ position: "relative", color: "grey", top: "10px" }}>
+                {alert}
+            </div>
+        );
+
+        this.setState({ updateNotifications: true });
+        this.setState({ notifications_temp: notifications });
+    }
+
+    // Call notifications
+    notifications(stock, previousPrice, currentPrice,
+        localStartPrice, localTargetPrice, state) {
+
+        let targetPrice;
+        let startPrice;
+
+        let globalStartPrice = this.state.globalStartPrice;
+        let globalTargetPrice = this.state.globalTargetPrice;
+
+        // Override global price individually
+        if (localStartPrice !== globalStartPrice)
+            startPrice = localStartPrice;
+        else
+            startPrice = globalStartPrice;
+
+        if (localTargetPrice !== globalTargetPrice)
+            targetPrice = localTargetPrice
+        else
+            targetPrice = globalTargetPrice;
+
+        // User specifies a Bearish criteria
+        if (startPrice > targetPrice) {
+            if (currentPrice > startPrice) {
+                state = 3; // Override state
+            } else if (currentPrice < targetPrice) {
+                state = -3;
+            }
+        } else if (startPrice < targetPrice) {// User specifies a Bullish criteria
+            if (currentPrice < startPrice) {
+                state = -2;
+            } else if (currentPrice >= targetPrice) {
+                state = 1;
+            }
+        }
+        else // If the prices are equal
+        {
+            if (currentPrice < startPrice) {
+                state = -2;
+            } else if (currentPrice >= targetPrice) {
+                state = 1;
+            }
+            console.log('Equal ');
+        }
+        /*   console.log('POINTER ' + stock + ' STATE ' + state + ' current 150 ' + ' startPrice ' + localStartPrice
+               + ' targetPrice ' + localTargetPrice);*/
+
+        // Default states: 2, -1
+        this.addToNotificationsMenu(stock, previousPrice, currentPrice,
+            startPrice, targetPrice, state);
     }
 
     // Save all settings
     saveConfiguration() {
         this.setAlertTrigger(this.state.alertEnabled);
+
+        if (this.state.setNotifications) {
+            this.setState({ notificationsEnabled: 1 })
+        }
+    }
+
+    // Enable Alert Notifications
+    enableNotifications(e) {
+        if (e.target.checked)
+            this.setState({ notificationsEnabled: 1 })
+        else
+            this.setState({ notificationsEnabled: 0 })
+
+        this.setState({ setNotifications: e.target.checked })
     }
 
     // Checkbox that enables alert
@@ -109,38 +257,6 @@ export class DashboardNavbar extends Component {
         return [hours, minutes];
     }
 
-    // Enable/Disable Menu of Notifications
-    enableNotificationsMenu(e) {
-        this.setState({ notificationsMenuVisible: !this.state.notificationsMenuVisible })
-    }
-
-    // Add notification to Menu
-    addToNotificationsMenu(stock, currentPrice, signal) {
-        let notifications = this.state.notifications;
-
-        let alert;
-        switch (signal) {
-            case "Bullish":
-                alert = `${stock} has hit target price of ${currentPrice}
-                ${signal} signal`
-                break;
-            case "Bearish":
-                alert = `${stock} has dropped to price of ${currentPrice}
-                ${signal} signal`
-                break;
-            default:
-                alert = `${stock} has hit target price of ${currentPrice}
-                Bearish signal`
-        }
-
-        notifications.push(
-            <div class="record">
-                {alert}
-            </div>
-        );
-
-        this.setState({ notifications: notifications });
-    }
 
     render() {
         let selectMarket =
@@ -201,7 +317,7 @@ export class DashboardNavbar extends Component {
                                 {startTime}
                                 <label id="endTime">End Time</label>
                                 {endTime}
-                                {/*}   <label id="enableNotifications">Notifications</label>
+                                {/*   <label id="enableNotifications">Notifications</label>
                                 <input class="enableNotifications" type="checkbox" onChange={this.setAlert} />
 
                                 <label id="enableNotifications">Manual</label>
@@ -212,12 +328,12 @@ export class DashboardNavbar extends Component {
                             </div>
                         </div>
 
+
                         <div class="grid-item">
                             <div class="tableSettings">
                                 <div class="vl"></div>
                                 <div class="v2"></div>
                                 <p id="table_">Columns Filter</p>
-
                                 <div id="disableColumns" >
 
                                     {/* <p id="hideName"
@@ -300,47 +416,40 @@ export class DashboardNavbar extends Component {
                                 <label id="enablePriceCheck">Enable Price Detection</label>
                                 <input class="enablePriceCheck" type="checkbox" />
 
-
-
                                 <a
                                     style={{
                                         color: 'white',
-                                        position: 'absolute', top: '-6px', left: '1300px',
+                                        position: 'absolute', top: '-70px', left: '1300px',
                                     }} onClick={this.enableNotificationsMenu}>
                                     Notifications <DownOutlined />
 
-
                                     <div class="dropdown-content">
                                         <Box
-                                            min-width='12.25rem'
-                                            width='12.25rem'
-                                            height='8rem'
+                                            visibility={(this.state.notificationsMenuVisible) ? 'visible' : 'hidden'}
+                                            min-width='16.25rem'
+                                            width='16.25rem'
+                                            height='17.25rem'
                                             overflowY='auto'
                                             bg='#f9f9f9'
                                             top='0px'
                                             left='0px'
                                             backgroundColor='wheat.511'
+                                            zIndex='999'
                                         >
-
                                             {this.state.notifications}
                                         </Box>
                                     </div>
                                 </a>
 
-
-
-                                <Button style={{ position: 'absolute', top: '155px', left: '1500px' }}
+                                <Button style={{ position: 'absolute', top: '155px', left: '1500px', zIndex: '-999' }}
                                     onClick={this.saveConfiguration}>Save Configuration</Button>
                             </div>
                         </div>
 
                         {/* 
-                              
-                        
                         <Button style={{ position: 'absolute', top: '135px', left: '410px' }}>Save</Button>
                     <Button style={{ position: 'absolute', top: '135px', left: '200px' }}>
                         Change Alert Settings</Button>*/}
-
                     </div>
                 </Box>
 

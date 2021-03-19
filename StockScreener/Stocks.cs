@@ -117,6 +117,10 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             set { isBearish = value; }
         }
 
+        public static int targetPrice = 0;
+
+        public static int startPrice = 0;
+
         // Replace blocking operation with await tasks and loading bar
         // Initialise StockList and StockCode
         public void init()

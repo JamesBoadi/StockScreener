@@ -31,7 +31,7 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
                   UtilityFunctions.DayMove += (currentPrice >= Close_2 && UtilityFunctions.DayMove < 3) ? 1 : 0;
               }*/
         }
-
+        
         // Contains all the stocks information
         public String StockCode { get; set; }
         public double High { get; set; }
@@ -59,35 +59,56 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         /// <summary>Compare the equality of stocks</summary>
         public bool Equals(Stock stock)
         {
-            Random random = new Random();
-            int[] array = { -1, 1, -2 };
-            int start2 = random.Next(0, array.Length - 1);
+            // Default states 2, -1, 0
+            if (stock.CurrentPrice == this.CurrentPrice)
+            {
+                Stocks.changeArray[0] = 0;
+            }
+            else
+            {
+                Stocks.changeArray[0] = (stock.CurrentPrice < this.CurrentPrice) ? -1 : 2;
+            }
+            if (stock.High == this.High)
+            {
+                Stocks.changeArray[1] = 0;
+            }
+            else
+            {
+                Stocks.changeArray[1] = (stock.High < this.High) ? -1 : 2;
+            }
+            if (stock.Low == this.Low)
+            {
+                Stocks.changeArray[2] = 0;
+            }
+            else
+            {
+                Stocks.changeArray[2] = (stock.Low < this.Low) ? -1 : 2;
+            }
+            if (stock.ProfitLoss == this.ProfitLoss)
+            {
+                Stocks.changeArray[3] = 0;
+            }
+            else
+            {
+                Stocks.changeArray[3] = (stock.ProfitLoss < this.ProfitLoss) ? -1 : 2;
+            }
+            if (stock.ProfitLoss_Percentage == this.ProfitLoss_Percentage)
+            {
 
-            Stocks.changeArray[0] = array[ random.Next(0, array.Length) ];
-            Stocks.changeArray[1] = array[random.Next(0, array.Length )];
-            Stocks.changeArray[2] = array[random.Next(0, array.Length )];
-            Stocks.changeArray[3] = array[random.Next(0, array.Length )];
-            Stocks.changeArray[4] = array[random.Next(0, array.Length )];
-            Stocks.changeArray[5] = array[random.Next(0, array.Length )];
+                Stocks.changeArray[4] = 0;
+            }
+            else
+            {
+                Stocks.changeArray[4] = (stock.ProfitLoss_Percentage < this.ProfitLoss_Percentage) ? -1 : 2;
+            }
+            if (stock.Volume == this.Volume)
+                Stocks.changeArray[5] = 0;
+            else
+            {
+                Stocks.changeArray[5] = (stock.Volume < this.Volume) ? -1 : 2;
+            }
 
-            
-            //Array.Fill(Stocks.changeArray, 0);
-            /*
-                        // Update objects
-                        if (stock.CurrentPrice != this.CurrentPrice)
-                            Stocks.changeArray[0] = 1;
-                        if (stock.High != this.High)
-                            Stocks.changeArray[1] = 1;
-                        if (stock.Low != this.Low)
-                            Stocks.changeArray[2] = 1;
-                        if (stock.ProfitLoss != this.ProfitLoss)
-                            Stocks.changeArray[3] = 1;
-                        if (stock.ProfitLoss_Percentage != this.ProfitLoss_Percentage)
-                            Stocks.changeArray[4] = 1;
-                        if (stock.Volume != this.Volume)
-                            Stocks.changeArray[5] = 1;*/
-
-            return Stocks.changeArray.Contains(1);
+            return Stocks.changeArray.Contains(-1) || Stocks.changeArray.Contains(2);
         }
 
         // Convert to JSON notation

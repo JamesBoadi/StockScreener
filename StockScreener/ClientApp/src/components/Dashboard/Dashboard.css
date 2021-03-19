@@ -235,7 +235,7 @@
   #searchIcon
   {
     position: absolute;
-    background: url("./SearchIcon.jpeg") no-repeat scroll 0 0 transparent;
+    background: url("./Images/SearchIcon.jpeg") no-repeat scroll 0 0 transparent;
     color: #000000;
     cursor: context-menu;
     font-weight: bold;
@@ -415,6 +415,7 @@
     padding: 12px 16px;
     top: 19px;
     left: 0px;
+    
   }
   
   .DashboardNavbar .notifications .dropdown:hover .dropdown-content {
@@ -423,6 +424,7 @@
   }
 
   .DashboardNavbar .notifications, th, td{
+    position: 'relative';
     padding: 2.5px;
     border: 0.5px solid black;
     color:	rgb(255,250,250);    
@@ -433,6 +435,7 @@
     background-color: 'rgb(40,40,40)';
     font-size: 14px;
     font-weight: 300;
+    
   }
 
   .DashboardNavbar .notifications .record:hover { background-color: rgb(40,40,90); }
@@ -457,7 +460,7 @@
   #home_
   {
     position: absolute;
-    background: url("./Home.jpeg") no-repeat scroll 0 0 transparent;
+    background: url("./Images/Home.jpeg") no-repeat scroll 0 0 transparent;
     color: #000000;
     cursor: pointer;
     font-weight: bold;
@@ -471,7 +474,7 @@
   #GreenArrow
   {
     position: absolute;
-    background: url("./GreenArrowUp.png") no-repeat scroll 0 0 transparent;
+    background: url("./Images/GreenArrowUp.png") no-repeat scroll 0 0 transparent;
     color: #000000;
     cursor: pointer;
     font-weight: bold;
@@ -482,7 +485,7 @@
   #RedArrow
   {
     position: absolute;
-    background: url("./redArrowDown.png") no-repeat scroll 0 0 transparent;
+    background: url("./Images/redArrowDown.png") no-repeat scroll 0 0 transparent;
     color: #000000;
     cursor: pointer;
     font-weight: bold;
@@ -493,7 +496,7 @@
   #startScan_
   {
     position: absolute;
-    background: url("./startScan.jpeg") no-repeat scroll 0 0 transparent;
+    background: url("./Images/startScan.jpeg") no-repeat scroll 0 0 transparent;
     color: #000000;
     cursor: pointer;
     font-weight: bold;
@@ -507,7 +510,7 @@
   #stopScan_
   {
     position: absolute;
-    background: url("./stopScan.jpeg") no-repeat scroll 0 0 transparent;
+    background: url("./Images/stopScan.jpeg") no-repeat scroll 0 0 transparent;
     color: #000000;
     cursor: pointer;
     font-weight: bold;
@@ -521,7 +524,7 @@
   #settings_
   {
     position: absolute;
-    background: url("./settings.jpeg") no-repeat scroll 0 0 transparent;
+    background: url("./Images/settings.jpeg") no-repeat scroll 0 0 transparent;
     color: #000000;
     cursor: pointer;
     font-weight: bold;
@@ -535,7 +538,7 @@
   #report_
   {
     position: absolute;
-    background: url("./report.jpeg") no-repeat scroll 0 0 transparent;
+    background: url("./Images/report.jpeg") no-repeat scroll 0 0 transparent;
     color: #000000;
     cursor: pointer;
     font-weight: bold;
@@ -549,7 +552,7 @@
   #ndsa_
   {
     position: absolute;
-    background: url("./ndsa.jpeg") no-repeat scroll 0 0 transparent;
+    background: url("./Images/ndsa.jpeg") no-repeat scroll 0 0 transparent;
     cursor: pointer;
     font-weight: bold;
     height: 53px;
@@ -562,7 +565,7 @@
   #exit_
   {
     position: absolute;
-    background: url("./exit.jpeg") no-repeat scroll 0 0 transparent;
+    background: url("./Images/exit.jpeg") no-repeat scroll 0 0 transparent;
     cursor: pointer;
     font-weight: bold;
     height: 53px;

@@ -1,7 +1,7 @@
 import React, { Component, PureComponent } from 'react';
 import ReactDOM from 'react-dom';
 import { render } from 'react-dom';
-import { FetchData } from './DashboardOne/FetchData';
+import { FetchData } from './FetchData';
 import {
     Box, Button, NumberInput,
     NumberInputField, NumberInputStepper,
@@ -10,7 +10,7 @@ import {
     Menu, MenuButton, MenuList, MenuItem, MenuItemOption,
     MenuGroup, MenuOptionGroup, MenuIcon, MenuCommand, MenuDivider
 } from '@chakra-ui/react';
-import { StockTableTwoAlert } from './DashboardOne/StockTableTwoAlert';
+import { StockTableTwoAlert } from './StockTableTwoAlert';
 import throttle from 'lodash.throttle';
 import * as HashMap from 'hashmap';
 
@@ -81,20 +81,18 @@ export class StockTableTwo extends React.Component {
             isSelected: false,
             lock: false,
             target: 0,
-
             scrollUpdated: false,
             triggerAlertID: false,
             triggerAlertColor: "",
 
 
             disableScrolling: false,
-
             alertInterval: 30000,
             maximumAlertNotifications: 11,
 
             // Rows to add from stock table to alert table
             cachedRows: []
-        };
+        }
     }
 
     componentDidMount() {
@@ -209,12 +207,12 @@ export class StockTableTwo extends React.Component {
         let input = new String(e.target.value);
 
         if (input.length < 1) {
-            this.setState({ queryRes: false }),
-                this.setState({ display: "No Stocks Found" });
+            this.setState({ queryRes: false });
+            this.setState({ display: "No Stocks Found" });
         }
         // Buggy, fix nulls
         if (!(!input || /^\s*$/.test(input))) {
-            await fetch('test/'.concat(input))
+            await fetch('searchstock/'.concat(input))
                 .then(response => response.text())
                 .then(data =>
                     this.setState({ query: JSON.parse(data) }),
@@ -477,6 +475,7 @@ export class StockTableTwo extends React.Component {
     newTable() {
         let id;
         let mod = 0;
+        const endMod = 50;
 
         if (this.state.tb2_scrollPosition === 0)
             mod = 0;
@@ -484,7 +483,7 @@ export class StockTableTwo extends React.Component {
             mod = 15;
 
         let start = (this.state.tb2_scrollPosition * 50) - mod;
-        let end = (this.state.tb2_scrollPosition * 50) + 50;
+        let end = (this.state.tb2_scrollPosition * 50) + endMod;
         var array = [];
         let style = {};
 
@@ -521,6 +520,7 @@ export class StockTableTwo extends React.Component {
 
     updateTable(start) {
         let mod = 0;
+        const endMod = 50;
 
         if (this.state.tb2_scrollPosition === 0)
             mod = 0;
@@ -529,7 +529,10 @@ export class StockTableTwo extends React.Component {
 
         start = (start <= 15 || (start === undefined || start === null)) ? 0 : start - mod;
 
-        //   console.log(start + ' start')
+        // Set start and end variables for FetchData
+        this.props.setStart(start);
+        this.props.setEnd(start + endMod);
+        this.props.setUpdateNotifications(true);
 
         // Get values from cache
         let list = this.props.cache.get(start.toString());
@@ -719,8 +722,6 @@ export class StockTableTwo extends React.Component {
                                     }}
 
                                     onInput={this.searchDatabase}
-
-                                    //   display={display}
                                     placeholder="Search "
                                 />
 
@@ -773,8 +774,6 @@ export class StockTableTwo extends React.Component {
                 <StockTableTwoAlert
                     {...this}
                     cache={this.props.cache} />
-
-
             </div>
         );
     }
