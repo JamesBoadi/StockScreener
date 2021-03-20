@@ -289,7 +289,7 @@ export class DashboardNavbar extends Component {
                     bg='rgb(40,40,40)'
                     boxShadow='sm'
                     textAlign='center'
-                    height='14rem'
+                    height='14.5rem'
                     width='115rem'
                     rounded="lg"
                     borderWidth="1px"
@@ -317,11 +317,17 @@ export class DashboardNavbar extends Component {
                                 {startTime}
                                 <label id="endTime">End Time</label>
                                 {endTime}
-                                 <label id="manualAlerts">Manual</label>
+                                <label id="manualAlerts">Manual</label>
                                 <input class="manualAlerts" type="checkbox" onChange={this.setAlert} />
                                 <label id="autoAlerts">Auto</label>
                                 <input class="autoAlerts" type="checkbox" onChange={this.setAlert} />
-                              {/*    <label id="enableNotifications">Manual</label>
+                                
+                                
+                                <label id="manualAlertsNotifications">Notifications</label>
+                                <input class="manualAlertsNotifications" type="checkbox" onChange={this.setAlert} />
+                               {/*   <label id="autoAlertsNotifications">Auto <br/> Notifications</label>
+                                <input class="autoAlertsNotifications" type="checkbox" onChange={this.setAlert} />
+                                  <label id="enableNotifications">Manual</label>
                                 <input class="enableNotifications" type="checkbox" onChange={this.setAlert} />
 
                                 <label id="enableNotifications">Auto</label>
@@ -335,7 +341,7 @@ export class DashboardNavbar extends Component {
                                 <div class="vl"></div>
                                 <div class="v2"></div>
                                 <p id="table_">Columns Filter</p>
-                               
+
                                 <div id="disableColumns" >
 
                                     {/* <p id="hideName"
@@ -388,8 +394,8 @@ export class DashboardNavbar extends Component {
 
                         <div class="grid-item">
                             <div class="priceDetection">
-                            <p id="stockFilter">Stock Filter</p>
-                            <p id="priceRange">Price Range</p>
+                            
+                                <p id="priceRange">Price Range</p>
 
                                 <div class="startPrice">
                                     <p id="startPriceLabel">Start Price</p>
@@ -445,10 +451,9 @@ export class DashboardNavbar extends Component {
                                     </div>
                                 </a>
 
-                                <Button style={{ position: 'absolute', top: '154px', left: '1325px', zIndex: '-999' }}
-                                    onClick={this.saveConfiguration}>Save Configuration</Button>
-                   
                             </div>
+                            <Button style={{ position: 'absolute', top: '170px', left: '1370px', zIndex: '-999' }}
+                                    onClick={this.saveConfiguration}>Save Configuration</Button>
                         </div>
 
                         {/* 

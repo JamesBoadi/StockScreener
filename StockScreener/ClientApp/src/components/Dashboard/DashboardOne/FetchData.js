@@ -218,8 +218,6 @@ export class FetchData extends Component {
     return false;
   }
 
-
-  
   // Set local prices using global prices without overriding prices already set
   setLocalPrices(startPrice, targetPrice)
   {
@@ -286,8 +284,8 @@ export class FetchData extends Component {
 
     // Clear Interval only on manual mode
     this.notificationsInterval = setInterval(() => {
-      let pointer = this.state.start;
-      const end = this.state.end;
+      let pointer = 0;//this.state.start;
+      const end = 897;//this.state.end;
 
       this.notificationsDelayInterval = setInterval(() => {
         const stock = this.stockDashBoardMap.get(pointer).StockCode;
@@ -301,11 +299,11 @@ export class FetchData extends Component {
         this.props.notifications(stock, previousPrice, currentPrice,
           localStartPrice, localTargetPrice, currentPrice_state);
 
-        if (pointer++ > end) {
+        if (pointer++ >= end) {
           clearInterval(this.notificationsInterval)
         }
       }, 1750);
-    }, (!this.state.autoAlert) ? defaultInterval : this.props.state.alertInterval);
+    }, (!this.props.state.manualAlert) ? defaultInterval : this.props.state.alertInterval);
   }
 
   // ID Setter
@@ -431,7 +429,6 @@ export class FetchData extends Component {
   set(bool) {
     this.setState({ addAlertTableRowBool: bool });
   }
-
 
   getAlertTableRowBool() {
     return this.state.addAlertTableRowBool;

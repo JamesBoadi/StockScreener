@@ -690,6 +690,7 @@
     left: 380px;
   }
 
+
   .DashboardNavbar .manualAlerts{
     position: absolute;
     top: 130px;
@@ -705,16 +706,31 @@
 
   .DashboardNavbar .autoAlerts{
     position: absolute;
-    top: 130px;
-    left: 400px;
+    top: 130.5px;
+    left: 395px;
   }
 
   .DashboardNavbar #autoAlerts{
     position: absolute;
-    top: 125px;
+    top: 125.5px;
     left: 415px;
     color: white;
   }
+
+  .DashboardNavbar .manualAlertsNotifications{
+    position: absolute;
+    top: 160px;
+    left: 300px;
+  }
+
+  .DashboardNavbar #manualAlertsNotifications{
+    position: absolute;
+    top: 155px;
+    left: 320px;
+    color: white;
+  }
+
+  /* Table Settings */
 
   .DashboardNavbar .tableSettings{
     color: white;
@@ -736,7 +752,7 @@
     top: 0px;
     left: 550px;
     border-left: 1px solid white;
-    height: 14rem;
+    height: 14.5rem;
   }
 
   .v2 {
@@ -744,7 +760,7 @@
     top: 0px;
     left: 1110px;
     border-left: 1px solid white;
-    height: 14rem;
+    height: 14.5rem;
   }
 
   .DashboardNavbar #stockName{
@@ -982,33 +998,32 @@
 
   .DashboardNavbar .priceDetection #enablePriceCheck{
     position: absolute;
-    top: 140px;
-    left: 1135px;
+    top: 145px;
+    left: 1150px;
     color: white;
   } 
 
   .DashboardNavbar .priceDetection .enablePriceCheck{
     position: absolute;
-    top: 146px;
-    left: 1115px;
+    top: 151px;
+    left: 1130px;
     color: white;
   }
 
   /* Override Prices */ 
   .DashboardNavbar .priceDetection #overridePrices{
     position: absolute;
-    top: 165px;
-    left: 1135px;
+    top: 175px;
+    left: 1150px;
     color: white;
   } 
 
   .DashboardNavbar .priceDetection .overridePrices{
     position: absolute;
-    top: 170px;
-    left: 1115px;
+    top: 180px;
+    left: 1130px;
     color: white;
   }
-
 
   .DashboardNavbar #disableColumns{
     transform: translate(0px, 15px);
@@ -1119,7 +1134,7 @@
 
 
   @media screen and (max-width: 800px) { 
-    #tableContainer
+ /*   #tableContainer
     {
       position: absolute;
       display: flex;
@@ -1137,6 +1152,6 @@
       min-width: 70rem;
       min-height: auto;
       margin: auto;
-    }
+    }*/
   }
   
