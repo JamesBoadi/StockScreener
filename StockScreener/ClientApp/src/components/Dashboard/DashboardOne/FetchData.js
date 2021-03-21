@@ -5,6 +5,7 @@ import { SideBar } from '../SideBar';
 import { DashboardSettings } from '../DashboardSettings';
 import { StockTableTwo } from './StockTableTwo';
 import { AlertReducer } from './AlertReducer.js';
+import Cache  from './Cache.js';
 
 import {
   Box, Button, NumberInput,
@@ -47,6 +48,7 @@ export class FetchData extends Component {
     this.setStart = this.setStart.bind(this);
     this.setRemoveAlertTableRowBool = this.setRemoveAlertTableRowBool.bind(this);
 
+    this.getCache = this.getCache.bind(this);
     this.setLocalPrices = this.setLocalPrices.bind(this);
     this.overrideLocalPrices = this.overrideLocalPrices.bind(this);
 
@@ -56,8 +58,8 @@ export class FetchData extends Component {
     this.hubConnection = null;
     //this.startHubConnection = this.startHubConnection.bind(this);
     //this.createHubConnection = this.createHubConnection.bind(this);
-
-
+    this.setCache = this.setCache.bind(this);
+    this.updateCache = this.updateCache.bind(this);
     this.setUpdateNotifications = this.setUpdateNotifications.bind(this);
 
     this.cache = new cache();
@@ -103,6 +105,12 @@ export class FetchData extends Component {
       start: 0,
       end: 50,
 
+      updateCache: false,
+      cache: new cache(),
+
+
+
+
       data: [
         {
           dashboardNum: null,
@@ -124,51 +132,55 @@ export class FetchData extends Component {
   }
 
   componentDidMount = () => {
-    this.intervalID = setInterval(() => {
-      let state = [-1, 2];
-      var cache_ = new cache();
-      var count;
-      for (count = 0; count < 897; count++) {
-        let start2 = parseInt(Math.floor(Math.random() * state.length));
-        let changeArr = [state[start2], state[start2], state[start2],
-        state[start2], state[start2], state[start2]];
-
-        const P = {
-          StockCode: count,
-          Change: 91,
-          ChangeP: 1,
-          Volume: 11,
-          CurrentPrice: 102,
-          ProfitLoss: 1,
-          ProfitLoss_Percentage: 99,
-          High: 10,
-          Low: 14,
-          Open: 76,
-          Close: 10,
-
-          ChangeArray: changeArr,
-          /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
-            string _currentTime = time.ToString("HH:mmttss"); */
-          //stock.timestamp = _currentTime
-          Request_Calls: 5,
-          TimeStamp: "9:00",
-
-          Request_Calls: "1"
+    /*  this.intervalID = setInterval(() => {
+        let state = [-1, 2];
+        var cache_ = new cache();
+        var count;
+        for (count = 0; count < 897; count++) {
+          let start2 = parseInt(Math.floor(Math.random() * state.length));
+          let changeArr = [state[start2], state[start2], state[start2],
+          state[start2], state[start2], state[start2]];
+  
+          const P = {
+            StockCode: count,
+            Change: 91,
+            ChangeP: 1,
+            Volume: 11,
+            CurrentPrice: 102,
+            ProfitLoss: 1,
+            ProfitLoss_Percentage: 99,
+            High: 10,
+            Low: 14,
+            Open: 76,
+            Close: 10,
+  
+            ChangeArray: changeArr,
+            /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
+              string _currentTime = time.ToString("HH:mmttss"); 
+            //stock.timestamp = _currentTime
+            Request_Calls: 5,
+            TimeStamp: "9:00",
+  
+            Request_Calls: "1"
+          }
+          cache_.set(count.toString(), P);
         }
-        cache_.set(count.toString(), P);
-      }
+  
+        this.cache = cache_;
+        this.setState({ lock: true });
+        this.forceUpdate()
+      }, 5000);*/
 
-      this.cache = cache_;
-      this.setState({ lock: true });
-      this.forceUpdate()
-    }, 5000);
+    // Override local prices
+    this.overrideLocalPrices(this.props.state.globalStartPrice,
+      this.props.state.globalTargetPrice);
 
-    // this.sendRequest();
+    this.sendRequest();
     // this.addToNotificationsMenu();
   }
 
   componentWillUnmount() {
-    clearInterval(this.intervalID);
+    //clearInterval(this.intervalID);
   }
 
   // Replace with event listener
@@ -179,7 +191,7 @@ export class FetchData extends Component {
       t.push(<StockTableTwo
         alertInterval={this.props.state.alertInterval}
         endTime={this.props.state.endTime}
-
+        cache={this.getCache()}
         {...this}
       />)
 
@@ -190,11 +202,11 @@ export class FetchData extends Component {
 
     // Update only if on manual mode and the user has scrolled down
     if (this.state.updateNotifications) { // || this.state.setManualNotifications
-     // clearInterval(this.notificationsInterval)
-     // this.addToNotificationsMenu(); 
-      this.setState({updateNotifications: false});
+      // clearInterval(this.notificationsInterval)
+      // this.addToNotificationsMenu(); 
+      this.setState({ updateNotifications: false });
     }
-    
+
     /*
         if (this.props.state.setNotifications && this.props.state.notificationsEnabled === 0) {
           clearInterval(this.interval)
@@ -218,39 +230,46 @@ export class FetchData extends Component {
     return false;
   }
 
+
+  updateCache(bool) {
+    this.setState({ updateCache: bool })
+  }
+
   // Set local prices using global prices without overriding prices already set
-  setLocalPrices(startPrice, targetPrice)
-  {
-    const data = 
+  setLocalPrices(startPrice, targetPrice) {
+    const clickedAlertTableRowID = this.state.clickedAlertTableRowID;
+    const data =
     {
       LocalStartPrice: startPrice,
       LocalTargetPrice: targetPrice
     }
 
     for (let key = 0; key < 897; key++) {
-      this.stockDashBoardMap.set(key, data);      
+      if (key === clickedAlertTableRowID) {
+        this.stockDashBoardMap.set(key, data);
+        break;
+      }
     }
+
   }
 
   // Override local prices using global prices
-  overrideLocalPrices(startPrice, targetPrice)
-  {
-    const clickedAlertTableRowID = this.state.clickedAlertTableRowID;
-    const data = 
+  overrideLocalPrices(startPrice, targetPrice) {
+    const data =
     {
       LocalStartPrice: startPrice,
-      LocalTargetPrice: targetPrice
+      LocalTargetPrice: targetPrice,
+      Override: "YES" // If set by user, price will be overriden
     }
 
     for (let key = 0; key < 897; key++) {
-      this.stockDashBoardMap.set(clickedAlertTableRowID, data);      
+      this.stockDashBoardMap.set(key, data);
     }
   }
 
   // Update stock hashmap
-  updateStockDashBoardMap()
-  {
-    const data = 
+  updateStockDashBoardMap() {
+    const data =
     {
       LocalStartPrice: this.startPriceRef.current.value,
       LocalTargetPrice: this.targetPriceRef.current.value
@@ -262,8 +281,7 @@ export class FetchData extends Component {
   }
 
   // Update Notifications Setter
-  setUpdateNotifications(bool)
-  {
+  setUpdateNotifications(bool) {
     this.setState({ updateNotifications: bool });
   }
 
@@ -430,6 +448,8 @@ export class FetchData extends Component {
     this.setState({ addAlertTableRowBool: bool });
   }
 
+
+
   getAlertTableRowBool() {
     return this.state.addAlertTableRowBool;
   }
@@ -440,6 +460,17 @@ export class FetchData extends Component {
   // Add the Row
   addRow = () => {
 
+  }
+
+  setCache(cache_) {
+    let cache = this.state.cache;
+    cache = cache_;
+    this.setState({ cache: cache })
+  }
+
+  getCache() {
+
+    return this.state.cache;
   }
 
   async sendRequest() {
@@ -462,17 +493,30 @@ export class FetchData extends Component {
       .subscribe({
         next: (stockArray) => {
           cache_.clear();
-
           // Account for faliures in connection
           var count = 0;
           for (count = 0; count < stockArray.length; count++) {
             const item = JSON.parse(stockArray[count]);
             this.setState({ request_Calls: item.Request_Calls });
             cache_.set(count.toString(), item);
+
+            Cache.set(count,item);
+
+            
+
           }
 
+
+          this.setCache(cache_);
           this.cache = cache_;
-          this.setState({ lock: true });
+
+          this.setState({ cache: cache_ })
+
+          this.setState({ updateCache: true });
+
+          if (!this.state.lock) {
+            this.setState({ lock: true });
+          }
 
           /*
           if (this.state.request_Calls !== this.state.MAX_CALLS) {
@@ -495,9 +539,6 @@ export class FetchData extends Component {
         }
       });
   }
-
-
-
 
   onNotifReceived(res) {
     console.info('Yayyyyy, I just received a notification!!!', res);
@@ -523,16 +564,14 @@ export class FetchData extends Component {
           zIndex='0'>
 
           <h1 style={{ position: 'relative', textAlign: 'center', color: 'white' }}>AAPL (Apple Inc)</h1>
-          <h3 style={{ position: 'relative', textAlign: 'center', color: 'white' }}>Price: 286.7</h3>
-          <h4 style={{ position: 'relative', top: '30px', left: '0px', color: 'white' }}>Sector: Technology</h4>
-          <h4 style={{ position: 'relative', top: '30px', left: '0px', color: 'white' }}>Message: Possible Reversal</h4>
+          <h2 style={{ position: 'relative', left: '150px', color: 'white' }}>Previous: 286.5</h2>
+          <h2 style={{ position: 'relative', top: '-55.5px', left: '600px', color: 'white' }}>Price: 299.5</h2>
+          <h4 style={{ position: 'relative', top: '38px', left: '5px', color: 'white' }}>Start Price:  </h4>
 
-          {/* Entry: Largest gap in either shorts or calls (Calculate in c#) */}
-          <h4 style={{ position: 'relative', top: '35px', left: '0px', color: 'white' }}>Target Price:  </h4>
           <NumberInput
-            ref={this.startPriceRef}
-            style={{ left: '170px' }}
-            size="md" maxW={70} defaultValue={15} min={10} max={20}>
+            // ref={this.startPriceRef}
+            style={{ position: 'relative', top: '0px', left: '150px' }}
+            size="md" maxW={70} maxH={10} defaultValue={15} min={10} max={20}>
             <NumberInputField />
             <NumberInputStepper >
               <NumberIncrementStepper />
@@ -540,19 +579,19 @@ export class FetchData extends Component {
             </NumberInputStepper>
           </NumberInput>
 
-          <h4 style={{ position: 'relative', top: '10px', left: '0px', color: 'white' }}>Take Profit: 270.6</h4>
 
-          {/*   <Button id="GreenArrow" style={{
-            position: 'absolute', top: '60px', right: '180px'
-            , visibility: (!this.state.red && this.state.green
-              && this.state.priceChangeUp) ? "visible" : "hidden"
-          }} colorScheme="blue" />
+          <h4 style={{ position: 'relative', top: '38px', left: '5px', color: 'white' }}>Target Price:  </h4>
 
-          <Button id="RedArrow" style={{
-            position: 'absolute', top: '60px', right: '90px',
-            visibility: (this.state.red && !this.state.green
-              && !priceChangeUp) ? "visible" : "hidden"
-          }} colorScheme="blue" />*/}
+          <NumberInput
+            // ref={this.targetPriceRef}
+            style={{ position: 'relative', top: '0px', left: '150px' }}
+            size="md" maxW={70} defaultValue={15} min={10} max={20}>
+            <NumberInputField />
+            <NumberInputStepper >
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
 
           <Button onClick={this.addAlertTableRow}
             style={{ position: 'absolute', bottom: '20px', right: '180px', width: '90px' }}>
@@ -565,19 +604,16 @@ export class FetchData extends Component {
           <Button onClick={this.updateStockDashBoardMap}
             style={{ position: 'absolute', bottom: '20px', right: '50px', width: '90px' }}>
             Remove  <br /> from Alerts</Button>
-
         </Box>
 
-        {/*   <SideBar
-          isStreaming={() => { return this.state.isStreaming }}
-      /> */}
+        {/* <SideBar isStreaming={() => { return this.state.isStreaming }}/> */}
+
         <TopNavbar
           Data={this.state.data}
         />
 
         {/* ALERT TABLE */}
         <NotificationsTable {...this} />
-
 
         <div id="tableContainer">
           {this.state.stockTableTwo}
@@ -588,3 +624,14 @@ export class FetchData extends Component {
   }
 }
 
+{/*   <Button id="GreenArrow" style={{
+            position: 'absolute', top: '60px', right: '180px'
+            , visibility: (!this.state.red && this.state.green
+              && this.state.priceChangeUp) ? "visible" : "hidden"
+          }} colorScheme="blue" />
+
+          <Button id="RedArrow" style={{
+            position: 'absolute', top: '60px', right: '90px',
+            visibility: (this.state.red && !this.state.green
+              && !priceChangeUp) ? "visible" : "hidden"
+          }} colorScheme="blue" />*/}

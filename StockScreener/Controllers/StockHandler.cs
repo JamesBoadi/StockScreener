@@ -43,16 +43,18 @@ namespace StockScreener
                     _ = initialise_cache();
                     _ = init_workOne(channelTwo.Writer, cancellationToken);
                     _init_work = !_init_work;
-                }
-
+             
                 // Start a Service Worker
                 _ = serviceWorker.StartAsync(cancellationToken);
+                }
+
+             
 
                 // Requests made
-                Stocks.stocks.Request_Calls = request_Calls;
+              //  Stocks.stocks.Request_Calls = request_Calls;
 
                 // Check if the task was cancelled
-                if (cancellationToken.IsCancellationRequested
+            /*    if (cancellationToken.IsCancellationRequested
                 && Stocks.API_REQUESTS <= Stocks.MAX_API_REQUESTS)
                 {
                     // REDIRECT TOOOO 404
@@ -61,8 +63,8 @@ namespace StockScreener
                 else if (Stocks.API_REQUESTS == Stocks.MAX_API_REQUESTS)
                 {
                     // Dispose Timer
-                    serviceWorker.Dispose();
-                }
+                   // serviceWorker.Dispose(); // Works
+                }*/
 
             }
             catch (Exception ex)

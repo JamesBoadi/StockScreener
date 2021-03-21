@@ -44,6 +44,8 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         public double ProfitLoss_Percentage { get; set; }
         public double Volume { get; set; }
         public int[] ChangeArray { get; set; }
+
+        public int Signal { get; set; }
         public double Request_Calls { get; set; }
 
         // Time the stock was last updated

@@ -79,6 +79,9 @@ export class DashboardNavbar extends Component {
         return false;
     }
 
+    // 
+
+
     // Enable/Disable Menu of Notifications
     enableNotificationsMenu(e) {
         this.setState({ notificationsMenuVisible: !this.state.notificationsMenuVisible })
@@ -319,13 +322,15 @@ export class DashboardNavbar extends Component {
                                 {endTime}
                                 <label id="manualAlerts">Manual</label>
                                 <input class="manualAlerts" type="checkbox" onChange={this.setAlert} />
+
                                 <label id="autoAlerts">Auto</label>
                                 <input class="autoAlerts" type="checkbox" onChange={this.setAlert} />
-                                
-                                
+
                                 <label id="manualAlertsNotifications">Notifications</label>
                                 <input class="manualAlertsNotifications" type="checkbox" onChange={this.setAlert} />
-                               {/*   <label id="autoAlertsNotifications">Auto <br/> Notifications</label>
+
+
+                                {/*   <label id="autoAlertsNotifications">Auto <br/> Notifications</label>
                                 <input class="autoAlertsNotifications" type="checkbox" onChange={this.setAlert} />
                                   <label id="enableNotifications">Manual</label>
                                 <input class="enableNotifications" type="checkbox" onChange={this.setAlert} />
@@ -372,7 +377,6 @@ export class DashboardNavbar extends Component {
                                     <input class="volume" type="checkbox" />
                                 </div>
 
-
                                 <div class="disableAlertColumns">
                                     <label id="alertStockName" >Stock <br /> Name</label>
                                     <input class="alertStockName" type="checkbox" />
@@ -394,7 +398,7 @@ export class DashboardNavbar extends Component {
 
                         <div class="grid-item">
                             <div class="priceDetection">
-                            
+
                                 <p id="priceRange">Price Range</p>
 
                                 <div class="startPrice">
@@ -426,34 +430,43 @@ export class DashboardNavbar extends Component {
 
                                 <label id="overridePrices">Override Custom Prices</label>
                                 <input class="overridePrices" type="checkbox" />
+
+
+                                <label id="hideBullishStocks">Hide Bullish Stocks</label>
+                                <input class="hideBullishStocks" type="checkbox" />
+
+                                
+                                <label id="hideBearishStocks">Hide Bearish Stocks</label>
+                                <input class="hideBearishStocks" type="checkbox" />
+
                                 <a
                                     style={{
                                         color: 'white',
-                                        position: 'absolute', top: '-70px', left: '1300px',
+                                        position: 'absolute', top: '-60px', left: '1400px',
                                     }} onClick={this.enableNotificationsMenu}>
                                     Notifications <DownOutlined />
-
-                                    <div class="dropdown-content">
-                                        <Box
-                                            visibility={(this.state.notificationsMenuVisible) ? 'visible' : 'hidden'}
-                                            min-width='16.25rem'
-                                            width='16.25rem'
-                                            height='17.25rem'
-                                            overflowY='auto'
-                                            bg='#f9f9f9'
-                                            top='0px'
-                                            left='0px'
-                                            backgroundColor='wheat.511'
-                                            zIndex='999'
-                                        >
-                                            {this.state.notifications}
-                                        </Box>
-                                    </div>
                                 </a>
 
+                                <div class="dropdown-content">
+                                    <Box
+                                        style={{position: 'relative'}}
+                                        visibility={(this.state.notificationsMenuVisible) ? 'visible' : 'hidden'}
+                                        min-width='16.25rem'
+                                        width='16.25rem'
+                                        height='17.25rem'
+                                        overflowY='auto'
+                                        bg='#f9f9f9'
+                                        top='-35px'
+                                        left='1400px'
+                                        backgroundColor='wheat.511'
+                                        zIndex='999'
+                                    >
+                                        {this.state.notifications}
+                                    </Box>
+                                </div>
                             </div>
                             <Button style={{ position: 'absolute', top: '170px', left: '1370px', zIndex: '-999' }}
-                                    onClick={this.saveConfiguration}>Save Configuration</Button>
+                                onClick={this.saveConfiguration}>Save Configuration</Button>
                         </div>
 
                         {/* 

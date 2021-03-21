@@ -105,7 +105,7 @@ namespace StockScreener
             {
                 // _logger.LogInformation("Timed Hosted Service running.");
                 _timer = new Timer(getDataFromCache, null,
-                TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(10));
+                TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(15));
             }
             catch (Exception ex)
             {

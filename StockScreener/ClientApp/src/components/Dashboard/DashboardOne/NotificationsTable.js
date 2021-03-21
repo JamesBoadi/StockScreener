@@ -392,12 +392,7 @@ export class NotificationsTable extends Component {
                     color='white'
                     zIndex='999'>
 
-                    <InputGroup>
-                        <Input style={{ position: 'absolute', top: '0px', right: '16.5px', height: '29px' }}
-                            placeholder="Search " />
-                        <InputRightElement children={<img id="searchIcon" />} />
-                    </InputGroup>
-
+                  
                     {alertTableHeader}
 
                     <Box
@@ -406,9 +401,7 @@ export class NotificationsTable extends Component {
                             overflowY: 'auto',
                             top: '45px'
                         }}
-
                         overflowX='hidden'
-                        //  bg='rgb(30,30,30)'
                         boxShadow='sm'
                         textAlign='center'
                         height='1110px'

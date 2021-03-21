@@ -188,15 +188,18 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 int code = start;
                 for (int i = 0; i < end; i++) // foreach (RealTimePrice data_ in data)
                 {
+                    int s = new Random().Next(-99, 99);
+                    bool positive = s >= 0;
+                    bool negative = s < 0;
                     stock.StockCode = StocksCode.Value[code];
-                    stock.Change = new Random().Next(1, 99);
+                    stock.Change = s;
                     stock.ChangeP = 1;
                     stock.Volume = 11;
                     stock.ProfitLoss = 1;
                     stock.ProfitLoss_Percentage = 99;
                     stock.ChangeArray = Stocks.changeArray;
                     stock.Volume = 13;
-
+                    stock.Signal = (positive && !negative) ? 1 : -1; // Replace with xor
                     stock.High = 11;
                     stock.Low = 14;
                     stock.Open = 76;
@@ -241,6 +244,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             Random random = new Random();
             int[] array = { -1, 1, -2 };
 
+
             try
             {
                 //   data = client.GetRealTimePrices(stockArray);
@@ -249,11 +253,14 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 int pointer = start;
                 while (pointer < end)
                 {
+                    int s = new Random().Next(-99, 99);
+                    bool positive = s >= 0;
+                    bool negative = s < 0;
                     int start2 = random.Next(0, array.Length);
                     changeArray = new int[6] { start2, start2, start2, start2, start2, start2 };
 
                     stock.StockCode = StocksCode.Value[pointer];
-                    stock.Change = new Random().Next(1, 99);
+                    stock.Change = s;
                     stock.ChangeP = 1;
                     stock.Volume = 11;
                     stock.ProfitLoss = 1;
@@ -265,10 +272,11 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     stock.Low = 14;
                     stock.Open = 76;
                     stock.Close = 10;
+                    stock.Signal = (positive && !negative) ? 1 : -1;
 
                     /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
                       string _currentTime = time.ToString("HH:mmttss");
-                      
+
                       stock.timestamp = _currentTime;*/
 
                     stock.Request_Calls = 5;

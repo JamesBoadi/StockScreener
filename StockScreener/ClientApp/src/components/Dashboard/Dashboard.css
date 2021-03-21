@@ -226,7 +226,8 @@
     border-collapse: collapse;
     font-family: sans-serif;
     font-size: 14px;
-    min-height: 1200px;
+   /* height: 1200px;
+    min-height: 1200px;*/
     width: 60rem;
     left: 0px;
     top: 35px;
@@ -948,11 +949,11 @@
   }
 
   /* Price Detection */
+
   .DashboardNavbar .priceDetection{
     color: rgb(60,60,60);
     transform: translate(60px,0px);
   }
-
 
   .DashboardNavbar .priceDetection #priceDetection{
     position: absolute;
@@ -961,9 +962,6 @@
     font-size: 18px;
     font-family: 'sans-serif'; 
   }
-
-
-  
 
   .DashboardNavbar .priceDetection .startPrice{
     position: absolute;
@@ -1025,6 +1023,42 @@
     color: white;
   }
 
+   /* Hide Bullish Stocks */
+
+  .DashboardNavbar .priceDetection #hideBullishStocks{
+    position: absolute;
+    top: 38px;
+    left: 1335px;
+    color: white;
+  } 
+
+  .DashboardNavbar .priceDetection .hideBullishStocks{
+    position: absolute;
+    top: 42px;
+    left: 1315px;
+    color: white;
+  }
+
+  /* Hide Bearish Stocks */ 
+
+  .DashboardNavbar .priceDetection #hideBearishStocks{
+    position: absolute;
+    top: 70px;
+    left: 1335px;
+    color: white;
+  } 
+
+  .DashboardNavbar .priceDetection .hideBearishStocks{
+    position: absolute;
+    top: 75px;
+    left: 1315px;
+    color: white;
+  }
+
+
+
+
+
   .DashboardNavbar #disableColumns{
     transform: translate(0px, 15px);
   }
@@ -1054,8 +1088,6 @@
   .rowDiv {
     border: 1px solid #668db6;
     background-color: #cee6fe;
-
-
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;

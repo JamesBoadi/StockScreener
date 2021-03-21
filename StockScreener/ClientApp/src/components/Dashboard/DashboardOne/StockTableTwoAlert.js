@@ -3,6 +3,7 @@ import { AlertReducer } from './AlertReducer.js';
 import { FetchData } from './FetchData.js';
 import PriorityQueue from 'priority-q';
 import throttle from 'lodash.throttle';
+import * as cache from 'cache-base';
 
 // Replace with Redux
 export class StockTableTwoAlert extends React.Component {
@@ -19,6 +20,7 @@ export class StockTableTwoAlert extends React.Component {
         this.array = [];
         this.priority_queue = new PriorityQueue();
 
+
         this.queue = [];
         this.queue_Length = 0;
         this.queue_End = 0;
@@ -26,75 +28,89 @@ export class StockTableTwoAlert extends React.Component {
         this.start = 0;
         this.end = 0;
 
+        this.updateCache = false;
+
         this.state = {
             animationTime: 5000,
             queueCount: 0,
             update_priorityQueue: false,
             triggerAnimation: false,
             start: 0,
-            end: 0
+            end: 0,
+            cache: new cache()
         };
     }
     // 404 if component does not mount
     componentDidMount() {
-        let mod;
-
-        if (this.props.state.tb2_scrollPosition === 0)
-            mod = 0;
-        else
-            mod = 15;
-
-        const start = (this.props.state.tb2_scrollPosition * 50) - mod;
-        const end = (this.props.state.tb2_scrollPosition * 50) + 50;
-
-        this.start = start;
-        this.end = end;
-
-        let pointer = start;
-        while (pointer < end) {
-            var currentPrice_state = parseInt(this.props.cache.get(pointer.toString()).ChangeArray[0]);
-            var state = AlertReducer(currentPrice_state);
-
-            if (currentPrice_state !== 0) {
-                this.queue.push(pointer);
-                // Update existing element
-                this.array[pointer] = [pointer, state, 5000];
-            }
-            pointer++;
-        }
-
-        this.manualAlert(this.props.cache, this.props.addToStyleMap);
-
         this.interval = setInterval(() => {
-            if (this.state.update_priorityQueue) {
-                this.manualAlert(this.props.cache, this.props.addToStyleMap);
-                this.setState({ queueCount: this.state.queueCount + 1 })
-                this.setState({ update_priorityQueue: false })
-            }
-            else {
-                // Retry
-                this.retry = setInterval(() => {
-                    if (this.state.update_priorityQueue) {
-                        this.manualAlert(this.props.cache, this.props.addToStyleMap);
-                        this.setState({ queueCount: this.state.queueCount + 1 })
-                        this.setState({ update_priorityQueue: false })
-                        clearInterval(this.retry)
+            if (this.props.updateCache) {
+
+                console.log('change ')
+
+                this.setState({ cache: Cache.cache() }, () => {
+                    let mod;
+
+                    if (this.props.state.tb2_scrollPosition === 0)
+                        mod = 0;
+                    else
+                        mod = 15;
+
+                    const start = (this.props.state.tb2_scrollPosition * 50) - mod;
+                    const end = (this.props.state.tb2_scrollPosition * 50) + 50;
+
+                    this.start = start;
+                    this.end = end;
+
+                    let pointer = start;
+                    while (pointer < end) {
+                        var currentPrice_state = parseInt(this.state.cache.get(pointer.toString()).ChangeArray[0]);
+                        var state = AlertReducer(currentPrice_state);
+
+                        if (currentPrice_state !== 0) {
+                            this.queue.push(pointer);
+                            // Update existing element
+                            this.array[pointer] = [pointer, state, 5000];
+                        }
+                        pointer++;
                     }
-                }, 60000); // No interval on manual mode
-            }
 
-            if (this.state.queueCount >= this.props.state.maximumAlertNotifications) {
-                clearInterval(this.interval)
-            }
+                    this.manualAlert(this.state.cache, this.state.addToStyleMap);
 
-        }, this.props.state.alertInterval);
+                    this.interval = setInterval(() => {
+                        if (this.state.update_priorityQueue) {
+                            this.manualAlert(this.state.cache, this.state.addToStyleMap);
+                            this.setState({ queueCount: this.state.queueCount + 1 })
+                            this.setState({ update_priorityQueue: false })
+                        }
+                        else {
+                            // Retry
+                            this.retry = setInterval(() => {
+                                if (this.state.update_priorityQueue) {
+                                    this.manualAlert(this.state.cache, this.props.addToStyleMap);
+                                    this.setState({ queueCount: this.state.queueCount + 1 })
+                                    this.setState({ update_priorityQueue: false })
+                                    clearInterval(this.retry)
+                                }
+                            }, 60000); // No interval on manual mode
+                        }
+
+                        if (this.state.queueCount >= this.props.state.maximumAlertNotifications) {
+                            clearInterval(this.interval)
+                        }
+
+                    }, this.props.state.alertInterval);
+                });
+
+                this.props.updateCache(false); // Alter function if err
+            }
+        }, 5000); // Retry
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.props.state.disableScrolling === false) {
             this.priority_queue.clear()
             clearInterval(this.animationTime);
-            this.manualAlert(this.props.cache, this.props.addToStyleMap);
+            this.manualAlert(this.state.cache, this.props.addToStyleMap);
             this.props.setScrollUpdate(false);
         }
 
@@ -271,7 +287,6 @@ export class StockTableTwoAlert extends React.Component {
 
     // Trigger alert manually by scroll
     manualAlert(cache, callback) {
-
         let mod;
 
         if (this.props.state.tb2_scrollPosition === 0)
@@ -285,7 +300,7 @@ export class StockTableTwoAlert extends React.Component {
         this.start = start;
         this.end = end;
         let delay = 0;
-        
+
         // Add stocks to array and priority priority_queue;
         let pointer = start;
         while (pointer < end) {
