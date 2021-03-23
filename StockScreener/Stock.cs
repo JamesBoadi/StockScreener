@@ -15,23 +15,26 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
 {
     public class Stock
     {
-        Utility utiltiy = new Utility();
-        private double currentPrice = 0;
-        public double CurrentPrice
+        public Stock(int CurrentPrice, int Change, int ChangeP, int Volume, int ProfitLoss,
+            int ProfitLoss_Percentage, int[] ChangeArray, int High, int Low,
+            int Signal, int Open, int Close)
         {
-            get
-            {
-                return currentPrice;
-            }
-            /*  set
-              {
-                  currentPrice = (currentPrice >= Close_2) ? currentPrice : Close_2;
-
-                  // Update the day move if and only if current price is exceeded (Once every day)
-                  UtilityFunctions.DayMove += (currentPrice >= Close_2 && UtilityFunctions.DayMove < 3) ? 1 : 0;
-              }*/
+            this.CurrentPrice = CurrentPrice;
+            this.Open = Open;
+            this.Close = Close;
+            this.High = High;
+            this.Low = Low;
+            this.Signal = Signal;
+            this.ChangeArray = ChangeArray;
+            this.ProfitLoss_Percentage = ProfitLoss_Percentage;
+            this.ProfitLoss = ProfitLoss;
+            this.Volume = Volume;
+            this.ChangeP = ChangeP;
+            this.Change = Change;
         }
-        
+
+        private double CurrentPrice { get; set; }
+       
         // Contains all the stocks information
         public String StockCode { get; set; }
         public double High { get; set; }
@@ -51,16 +54,10 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         // Time the stock was last updated
         public String TimeStamp { get; set; }
 
-        // Default alert status
-        private string alertstatus = "1D";
-
-        public String alertStatusColor = "RED";
-
-        public String scalpStatusColor = "GREEN";
-
         /// <summary>Compare the equality of stocks</summary>
         public bool Equals(Stock stock)
         {
+            /*
             // Default states 2, -1, 0
             if (stock.CurrentPrice == this.CurrentPrice)
             {
@@ -108,9 +105,9 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
             else
             {
                 Stocks.changeArray[5] = (stock.Volume < this.Volume) ? -1 : 2;
-            }
+            }*/
 
-            return Stocks.changeArray.Contains(-1) || Stocks.changeArray.Contains(2);
+            return true;// Stocks.changeArray.Contains(-1) || Stocks.changeArray.Contains(2);
         }
 
         // Convert to JSON notation

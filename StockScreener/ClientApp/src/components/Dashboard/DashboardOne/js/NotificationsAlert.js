@@ -1,6 +1,6 @@
 import React from 'react';
 import { AlertReducer } from './AlertReducer.js';
-import { FetchData } from './FetchData.js';
+import { FetchData } from '../FetchData.js';
 
 import * as Queue from 'queue';
 

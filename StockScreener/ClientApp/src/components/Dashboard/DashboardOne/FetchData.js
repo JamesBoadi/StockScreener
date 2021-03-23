@@ -4,8 +4,10 @@ import { NotificationsTable } from './NotificationsTable';
 import { SideBar } from '../SideBar';
 import { DashboardSettings } from '../DashboardSettings';
 import { StockTableTwo } from './StockTableTwo';
-import { AlertReducer } from './AlertReducer.js';
-import Cache  from './Cache.js';
+import { AlertReducer } from './js/AlertReducer.js';
+import TableCache from './js/TableCache.js';
+import AlertCache from './js/AlertCache.js';
+import DataServiceWorker from './js/DataServiceWorker.js'
 
 import {
   Box, Button, NumberInput,
@@ -71,6 +73,11 @@ export class FetchData extends Component {
     this.map = new HashMap();
     this.stockDashBoardMap = new HashMap();
 
+    this.hubConnection = new signalR.HubConnectionBuilder()
+      .withUrl('https://localhost:44362/stock')
+      .configureLogging(signalR.LogLevel.Information)
+      .build();
+
     this.state = {
       stockTableTwo: [],
       isStreaming: false,
@@ -132,55 +139,60 @@ export class FetchData extends Component {
   }
 
   componentDidMount = () => {
-    /*  this.intervalID = setInterval(() => {
-        let state = [-1, 2];
-        var cache_ = new cache();
-        var count;
-        for (count = 0; count < 897; count++) {
-          let start2 = parseInt(Math.floor(Math.random() * state.length));
-          let changeArr = [state[start2], state[start2], state[start2],
-          state[start2], state[start2], state[start2]];
-  
-          const P = {
-            StockCode: count,
-            Change: 91,
-            ChangeP: 1,
-            Volume: 11,
-            CurrentPrice: 102,
-            ProfitLoss: 1,
-            ProfitLoss_Percentage: 99,
-            High: 10,
-            Low: 14,
-            Open: 76,
-            Close: 10,
-  
-            ChangeArray: changeArr,
-            /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
-              string _currentTime = time.ToString("HH:mmttss"); 
-            //stock.timestamp = _currentTime
-            Request_Calls: 5,
-            TimeStamp: "9:00",
-  
-            Request_Calls: "1"
-          }
-          cache_.set(count.toString(), P);
+    /*this.intervalID = setInterval(() => {
+      let state = [-1, 2];
+      var cache_ = new cache();
+      var count;
+      for (count = 0; count < 897; count++) {
+        let start2 = parseInt(Math.floor(Math.random() * state.length));
+        let changeArr = [state[start2], state[start2], state[start2],
+        state[start2], state[start2], state[start2]];
+
+        const P = {
+          StockCode: count,
+          Change: 91,
+          ChangeP: 1,
+          Volume: 11,
+          CurrentPrice: 102,
+          ProfitLoss: 1,
+          ProfitLoss_Percentage: 99,
+          High: 10,
+          Low: 14,
+          Open: 76,
+          Close: 10,
+
+          ChangeArray: changeArr,
+          /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
+            string _currentTime = time.ToString("HH:mmttss");
+          //stock.timestamp = _currentTime
+          Request_Calls: 5,
+          TimeStamp: "9:00",
+
+          Request_Calls: "1"
         }
-  
-        this.cache = cache_;
-        this.setState({ lock: true });
-        this.forceUpdate()
-      }, 5000);*/
+        cache_.set(count.toString(), P);
+        Cache.set(count, P);
+      }
+
+      this.cache = cache_;
+      this.setState({ lock: true });
+      //this.setState({ updateCache: true });
+      this.forceUpdate()
+    }, 5000); */
 
     // Override local prices
     this.overrideLocalPrices(this.props.state.globalStartPrice,
       this.props.state.globalTargetPrice);
 
-    this.sendRequest();
+    DataServiceWorker(this.hubConnection_.bind(this))
+    // Data Service Worker
+
+    // this.sendRequest();
     // this.addToNotificationsMenu();
   }
 
   componentWillUnmount() {
-    //clearInterval(this.intervalID);
+    clearInterval(this.intervalID);
   }
 
   // Replace with event listener
@@ -448,8 +460,6 @@ export class FetchData extends Component {
     this.setState({ addAlertTableRowBool: bool });
   }
 
-
-
   getAlertTableRowBool() {
     return this.state.addAlertTableRowBool;
   }
@@ -473,71 +483,77 @@ export class FetchData extends Component {
     return this.state.cache;
   }
 
-  async sendRequest() {
-    const hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://localhost:44362/stock')
-      .configureLogging(signalR.LogLevel.Information)
-      .build();
+  /** Establish a Signal R connection */
+  async hubConnection_() {
 
-    await hubConnection
+    await this.hubConnection
       .start()
-      .then(() => console.log('Connection started!'))
-      .catch(err => console.log('Error while establishing hubConnection :(')); // Redirect to 404 page
+      .then(() => {
+        console.log('Successfully connected');
+        this.hubConnection.on('requestData', function (data) {
+          console.log('data '+ data);
+        })
+      })
+      .catch(err => {
+        console.log('Error while establishing hubConnection :( ')
+        return false;
+      }); // Redirect to 404 page
+     
+    /*
+       //.stream("RequestData", this.state.request_Calls)
+       this.hubConnection.subscribe({
+            next: (stockArray) => {
+              // cache_.clear();
+              console.log('State ' + stockArray)
+    
+              /* // Account for faliures in connection
+               var count = 0;
+               for (count = 0; count < stockArray.length; count++) {
+                 const item = JSON.parse(stockArray[count]);
+                 this.setState({ request_Calls: item.Request_Calls });
+       
+                 cache_.set(count.toString(), item);
+       
+                 TableCache.set(count, item);
+                 AlertCache.set(count, item);
+                 // console.log('State 1 ' + item.ChangeArray[0] )
+               }
+       
+       
+               this.setCache(cache_);
+               this.cache = cache_;
+               this.setState({ cache: cache_ })
+               this.setState({ updateCache: true });
+               this.setState({ lock: true });
+       
+               /*
+               if (this.state.request_Calls !== this.state.MAX_CALLS) {
+                 this.setState({ request_Calls: request_Calls });
+                 // Start a countdown timer and disconnect if we don't get a response
+               }
+       
+               else {
+                 this.setState({ lock: false });
+                 this.setState({ request_Calls: -1 });
+               }*         
+            },
+    
+            complete: () => {
+              // render table
+              console.log('End of DAY CALLS');
+            },
+            error: (err) => {
+              console.log('err ' + err);
+            }
+          });*/
 
-    console.log("CONNECTION " + hubConnection);
+    return true;
+  }
 
-
+  sendRequest(hubConnection) {
     var cache_ = new cache();
     // Change so that we don't have to call requests using string
-    hubConnection.stream("RequestData", this.state.request_Calls)
-      .subscribe({
-        next: (stockArray) => {
-          cache_.clear();
-          // Account for faliures in connection
-          var count = 0;
-          for (count = 0; count < stockArray.length; count++) {
-            const item = JSON.parse(stockArray[count]);
-            this.setState({ request_Calls: item.Request_Calls });
-            cache_.set(count.toString(), item);
 
-            Cache.set(count,item);
-
-            
-
-          }
-
-
-          this.setCache(cache_);
-          this.cache = cache_;
-
-          this.setState({ cache: cache_ })
-
-          this.setState({ updateCache: true });
-
-          if (!this.state.lock) {
-            this.setState({ lock: true });
-          }
-
-          /*
-          if (this.state.request_Calls !== this.state.MAX_CALLS) {
-            this.setState({ request_Calls: request_Calls });
-            // Start a countdown timer and disconnect if we don't get a response
-          }
-
-          else {
-            this.setState({ lock: false });
-            this.setState({ request_Calls: -1 });
-          }*/
-        },
-
-        complete: () => {
-          // render table
-          console.log('End of DAY CALLS');
-        },
-        error: (err) => {
-          console.log('err ' + err);
-        }
-      });
   }
 
   onNotifReceived(res) {
@@ -606,19 +622,19 @@ export class FetchData extends Component {
             Remove  <br /> from Alerts</Button>
         </Box>
 
-        {/* <SideBar isStreaming={() => { return this.state.isStreaming }}/> */}
+        {/* <SideBar isStreaming={() => { return this.state.isStreaming }}/> 
 
         <TopNavbar
           Data={this.state.data}
         />
 
-        {/* ALERT TABLE */}
+        {/* ALERT TABLE 
         <NotificationsTable {...this} />
 
         <div id="tableContainer">
           {this.state.stockTableTwo}
         </div>
-
+      */}
       </div>
     );
   }

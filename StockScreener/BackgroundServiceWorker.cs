@@ -97,15 +97,17 @@ namespace StockScreener
 
         public CancellationToken CancellationToken { get; set; }
         // Type task for asyc operations
-        
+
         // Start operation for retreving stocks every 30 seconds
-        public Task StartAsync(CancellationToken stoppingToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
             try
             {
                 // _logger.LogInformation("Timed Hosted Service running.");
                 _timer = new Timer(getDataFromCache, null,
                 TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(15));
+
+
             }
             catch (Exception ex)
             {
@@ -225,11 +227,13 @@ namespace StockScreener
               SetSession = sessionProperties;*/
         }
 
+        static int REQUESTS = 1;
         public async void getDataFromCache(object current_state)
         {
             await Task.Delay(100);
-            int length = Stocks.StocksCode.Value.Length;
-            string[] data = new string[length];
+            // int length = Stocks.StocksCode.Value.Length;
+            //    string[] data = new string[length];
+
 
             Console.WriteLine("Execution count + start ");
             try
@@ -239,18 +243,19 @@ namespace StockScreener
 
                   while (count < 2)
                       convertTime(++count, time);*/
-            
+
                 // Update stocks
-                Stocks.stocks.updateStocks(0,length);
+                //  Stocks.stocks.updateStocks(0,length);
 
                 // await WriterTwo.WriteAsync(SetSession, CancellationToken); 
                 // Retrieve data from stocks
-                for (int pointer = 0; pointer < length; pointer++)
-                {
-                    data[pointer] = Stocks.cache.Get(pointer).Serialize();
-                }
-                
-                await WriterOne.WriteAsync(data,  CancellationToken);
+                /*  for (int pointer = 0; pointer < length; pointer++)
+                  {
+                      data[pointer] = Stocks.cache.Get(pointer).Serialize();
+                  }*/
+
+
+                await WriterOne.WriteAsync(new string[1] { "HEY! " + REQUESTS++.ToString() }, CancellationToken);
             }
 
             catch (Exception ex)
@@ -301,7 +306,7 @@ namespace StockScreener
         // Stop the timer
         public Task StopAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Timed Hosted Service is stopping.");
+            //  _logger.LogInformation("Timed Hosted Service is stopping.");
 
             _timer?.Change(Timeout.Infinite, 0);
 

@@ -66,6 +66,9 @@ namespace StockScreener
             services.AddSignalR();
             services.AddSignalRCore();
 
+            // Add Signal R as a Hosted Service
+            services.AddHostedService<Worker>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -107,6 +110,7 @@ namespace StockScreener
                     name: "default",
                     pattern: "{controller=Home}/{action=DummyOne}/{page}");
                 endpoints.MapControllers();
+               
                 endpoints.MapHub<StockHandler>("stock");
 
                 /* endpoints.MapContr endpoints.MapRazorPages();ollerRoute(

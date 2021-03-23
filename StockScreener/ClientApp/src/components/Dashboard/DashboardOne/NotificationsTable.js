@@ -59,8 +59,6 @@ export class NotificationsTable extends Component {
         };
     }
 
-
-
     componentDidMount() {
         /* this.createTable()
          this.updateTable()
@@ -73,7 +71,6 @@ export class NotificationsTable extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-
         if (this.props.state.addAlertTableRowBool) {
             this.newTable();
             this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {

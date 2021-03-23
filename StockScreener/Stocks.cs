@@ -18,7 +18,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         internal static readonly String API_TOKEN = ConfigurationManager.AppSettings["API_TOKEN"];
         internal static EODHistoricalDataClient client = new EODHistoricalDataClient(API_TOKEN, true);
 
-
         /*
                 static List<Database> stockList { get; set; }//= new List<Database>()  
                 static public List<Database> StockList { get { return stockList; } set { stockList = value; } }
@@ -127,7 +126,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         {
             init_StockList();
             init_StockCode();
-            Array.Fill(Stocks.changeArray, 0);
         }
 
         public void init_StockList()
@@ -157,7 +155,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             get { return cancellationToken; }
             set { cancellationToken = value; }
         }
-        Stock stock = new Stock();
+       
 
         public static Stocks stocks = new Stocks();
 
@@ -182,49 +180,21 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         {
             try
             {
-                copy(start, end);
-                //  data = client.GetRealTimePrices(stockArray);
-                //  int pointer = 0;
-                int code = start;
-                for (int i = 0; i < end; i++) // foreach (RealTimePrice data_ in data)
-                {
-                    int s = new Random().Next(-99, 99);
-                    bool positive = s >= 0;
-                    bool negative = s < 0;
-                    stock.StockCode = StocksCode.Value[code];
-                    stock.Change = s;
-                    stock.ChangeP = 1;
-                    stock.Volume = 11;
-                    stock.ProfitLoss = 1;
-                    stock.ProfitLoss_Percentage = 99;
-                    stock.ChangeArray = Stocks.changeArray;
-                    stock.Volume = 13;
-                    stock.Signal = (positive && !negative) ? 1 : -1; // Replace with xor
-                    stock.High = 11;
-                    stock.Low = 14;
-                    stock.Open = 76;
-                    stock.Close = 10;
+            /*    copy(start, end);
+                data = client.GetRealTimePrices(stockArray);
+                Stock stock;
 
-                    /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
-                      string _currentTime = time.ToString("HH:mmttss");
-
-                      stock.timestamp = _currentTime;*/
-
-                    stock.Request_Calls = 0;
-                    stock.TimeStamp = "9:00";
-
-                    // Data from the previous day starting the next day
-                    if (Utility.Tick == 0)
-                    {
-                        stock.High = 3;
-                        stock.Low = 11;
-                        stock.Open = 9;
-                        stock.Close = 10;
-
-                        cache.Add(stock);
-                        stock = new Stock();
-                    }
+                foreach (RealTimePrice data_ in data)
+                { 
+                   // stock = new Stock()
                 }
+
+                // Data from the previous day starting the next day
+                if (Utility.Tick == 0)
+                {
+                    // cache.Add(stock);
+                }*/
+
             }
             catch (Exception ex)
             {
@@ -238,64 +208,34 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         }
 
         // Change array
-        public static int[] changeArray = new int[6];
+        //  public static int[] changeArray = new int[6];
         public void updateStocks(int start, int end)
         {
-            Random random = new Random();
-            int[] array = { -1, 1, -2 };
-
-
             try
-            {
-                //   data = client.GetRealTimePrices(stockArray);
-                //  int pointer = 0;
-                // foreach (RealTimePrice data_ in data)
-                int pointer = start;
-                while (pointer < end)
+            { 
+                // Stock stock = new Stock();
+            /*    data = client.GetRealTimePrices(stockArray);
+                foreach (RealTimePrice data_ in data)
                 {
-                    int s = new Random().Next(-99, 99);
-                    bool positive = s >= 0;
-                    bool negative = s < 0;
-                    int start2 = random.Next(0, array.Length);
-                    changeArray = new int[6] { start2, start2, start2, start2, start2, start2 };
+                    // data_.
 
-                    stock.StockCode = StocksCode.Value[pointer];
-                    stock.Change = s;
-                    stock.ChangeP = 1;
-                    stock.Volume = 11;
-                    stock.ProfitLoss = 1;
-                    stock.ProfitLoss_Percentage = 99;
-                    //  stock.ChangeArray = Stocks.changeArray;
-                    stock.Volume = 13;
-
-                    stock.High = new Random().Next(1, 99);
-                    stock.Low = 14;
-                    stock.Open = 76;
-                    stock.Close = 10;
-                    stock.Signal = (positive && !negative) ? 1 : -1;
-
-                    /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
-                      string _currentTime = time.ToString("HH:mmttss");
-
-                      stock.timestamp = _currentTime;*/
-
-                    stock.Request_Calls = 5;
-                    stock.TimeStamp = "9:00";
-                    bool update = cache.Get(pointer).Equals(stock);
-                    stock.ChangeArray = Stocks.changeArray;
-
-                    Stocks.stocks.Request_Calls = Stocks.stocks.Request_Calls + 1;
-                    stock.Request_Calls = Stocks.stocks.Request_Calls;
-
-                    // Compare each stock
-                    if (update || !update)
-                        cache.Update(pointer, stock);
-
-                    stock = new Stock();
-                    pointer++;
                 }
 
-                Stocks.API_REQUESTS = Stocks.API_REQUESTS + 1;
+               // bool update = cache.Get(pointer).Equals(stock);
+
+                /*
+                Stocks.stocks.Request_Calls = Stocks.stocks.Request_Calls + 1;
+                stock.Request_Calls = Stocks.stocks.Request_Calls;*/
+
+                // Compare each stock
+                //if (update || !update)
+             /*   cache.Update(pointer, stock);
+
+
+                pointer++;
+
+
+                Stocks.API_REQUESTS = Stocks.API_REQUESTS + 1; */
             }
             catch (Exception ex)
             {
@@ -379,6 +319,64 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
               //if() // Perform a refresh if fail (like restart thread or put on seperate thread)
               List<RealTimePrice> prices = client.GetRealTimePrices(StocksCode.Value); // enumeration
           }*/
+
+
+        /*     try
+             {
+                 //   data = client.GetRealTimePrices(stockArray);
+                 //  int pointer = 0;
+                 // foreach (RealTimePrice data_ in data)
+                 int pointer = start;
+                 while (pointer < end)
+                 {
+                     int s = new Random().Next(-99, 99);
+                     bool positive = s >= 0;
+                     bool negative = s < 0;
+                     Random random = new Random();
+                     int[] array = { -1, 2, -2 };
+                     int start2 = random.Next(0, array.Length);
+                     int[] changeArray = new int[6] { array[start2], array[start2], array[start2], array[start2],
+                     array[start2], array[start2] };
+
+                     stock.StockCode = StocksCode.Value[pointer];
+                     stock.Change = s;
+                     stock.ChangeP = 1;
+                     stock.Volume = 11;
+                     stock.ProfitLoss = 1;
+                     stock.ProfitLoss_Percentage = 99;
+                     stock.Volume = 13;
+                     stock.High = new Random().Next(1, 99);
+                     stock.Low = 14;
+                     stock.Open = 76;
+                     stock.Close = 10;
+                     stock.Signal = (positive && !negative) ? 1 : -1;
+
+
+
+                     Console.WriteLine("CRACK " + changeArray[0]);
+
+                     /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
+                       string _currentTime = time.ToString("HH:mmttss");
+
+                       stock.timestamp = _currentTime;
+
+                     stock.Request_Calls = 5;
+                     stock.TimeStamp = "9:00";
+                     bool update = cache.Get(pointer).Equals(stock);
+                     stock.ChangeArray = changeArray;
+
+                     Stocks.stocks.Request_Calls = Stocks.stocks.Request_Calls + 1;
+                     stock.Request_Calls = Stocks.stocks.Request_Calls;
+
+                     // Compare each stock
+                     //if (update || !update)
+                     cache.Update(pointer, stock);
+
+                     stock = new Stock();
+                     pointer++;
+                 }
+
+                 Stocks.API_REQUESTS = Stocks.API_REQUESTS + 1;*/
 
     }
 }
