@@ -82,13 +82,8 @@ export class FetchData extends Component {
       stockTableTwo: [],
       isStreaming: false,
       lock: false,
-      forecasts: [], loading: true,
-      nick: '',
-      message: '',
-      messages: [],
       hubConnection: null,
       request_Calls: -1,
-      request_Update: 0,
       MAX_CALLS: 896,
       called: true,
       green: false,
@@ -469,7 +464,6 @@ export class FetchData extends Component {
 
   // Add the Row
   addRow = () => {
-
   }
 
   setCache(cache_) {
@@ -479,73 +473,39 @@ export class FetchData extends Component {
   }
 
   getCache() {
-
     return this.state.cache;
   }
-
+  // this.hubConnection.invoke() timeout 60 * 5, must reach 897 by 5 minutes or return error
+  // Max wait per value 60 seconds
   /** Establish a Signal R connection */
   async hubConnection_() {
-
+    var count = -1;
     await this.hubConnection
       .start()
       .then(() => {
         console.log('Successfully connected');
-        this.hubConnection.on('requestData', function (data) {
-          console.log('data '+ data);
+        this.hubConnection.on('lockStream', function (request_Calls) {
+          // Add Timeout
+          this.setState({ request_Calls: request_Calls });
+        })
+        this.hubConnection.on('requestData', function (key, data) {
+          const item = JSON.parse(data);
+          TableCache.set(key, item);
+          AlertCache.set(key, item);
+          count += 1;
+          
+          // Atomicity
+          if (count < 897) {
+            count += 1;
+            // count - key !== 1 --> 404 reconnect the whole thing
+          }
+          else { count = 0; }
         })
       })
       .catch(err => {
         console.log('Error while establishing hubConnection :( ')
         return false;
       }); // Redirect to 404 page
-     
-    /*
-       //.stream("RequestData", this.state.request_Calls)
-       this.hubConnection.subscribe({
-            next: (stockArray) => {
-              // cache_.clear();
-              console.log('State ' + stockArray)
-    
-              /* // Account for faliures in connection
-               var count = 0;
-               for (count = 0; count < stockArray.length; count++) {
-                 const item = JSON.parse(stockArray[count]);
-                 this.setState({ request_Calls: item.Request_Calls });
-       
-                 cache_.set(count.toString(), item);
-       
-                 TableCache.set(count, item);
-                 AlertCache.set(count, item);
-                 // console.log('State 1 ' + item.ChangeArray[0] )
-               }
-       
-       
-               this.setCache(cache_);
-               this.cache = cache_;
-               this.setState({ cache: cache_ })
-               this.setState({ updateCache: true });
-               this.setState({ lock: true });
-       
-               /*
-               if (this.state.request_Calls !== this.state.MAX_CALLS) {
-                 this.setState({ request_Calls: request_Calls });
-                 // Start a countdown timer and disconnect if we don't get a response
-               }
-       
-               else {
-                 this.setState({ lock: false });
-                 this.setState({ request_Calls: -1 });
-               }*         
-            },
-    
-            complete: () => {
-              // render table
-              console.log('End of DAY CALLS');
-            },
-            error: (err) => {
-              console.log('err ' + err);
-            }
-          });*/
 
     return true;
   }
@@ -553,7 +513,6 @@ export class FetchData extends Component {
   sendRequest(hubConnection) {
     var cache_ = new cache();
     // Change so that we don't have to call requests using string
-
   }
 
   onNotifReceived(res) {
@@ -622,7 +581,7 @@ export class FetchData extends Component {
             Remove  <br /> from Alerts</Button>
         </Box>
 
-        {/* <SideBar isStreaming={() => { return this.state.isStreaming }}/> 
+        {/* <SideBar isStreaming={() => { return this.state.isStreaming }}/>  */}
 
         <TopNavbar
           Data={this.state.data}
@@ -633,8 +592,8 @@ export class FetchData extends Component {
 
         <div id="tableContainer">
           {this.state.stockTableTwo}
-        </div>
-      */}
+        </div>*/}
+    
       </div>
     );
   }
@@ -650,4 +609,61 @@ export class FetchData extends Component {
             position: 'absolute', top: '60px', right: '90px',
             visibility: (this.state.red && !this.state.green
               && !priceChangeUp) ? "visible" : "hidden"
-          }} colorScheme="blue" />*/}
+          }} colorScheme="blue" />*/
+        
+        
+    /*
+       //.stream("RequestData", this.state.request_Calls)
+       this.hubConnection.subscribe({
+            next: (stockArray) => {
+              // cache_.clear();
+              console.log('State ' + stockArray)
+    
+              /* // Account for faliures in connection
+               var count = 0;
+               for (count = 0; count < stockArray.length; count++) {
+                 const item = JSON.parse(stockArray[count]);
+                 this.setState({ request_Calls: item.Request_Calls });
+       
+                 cache_.set(count.toString(), item);
+       
+                 TableCache.set(count, item);
+                 AlertCache.set(count, item);
+                 // console.log('State 1 ' + item.ChangeArray[0] )
+               }
+       
+       
+               this.setCache(cache_);
+               this.cache = cache_;
+               this.setState({ cache: cache_ })
+               this.setState({ updateCache: true });
+               this.setState({ lock: true });
+       
+               /*
+               if (this.state.request_Calls !== this.state.MAX_CALLS) {
+                 this.setState({ request_Calls: request_Calls });
+                 // Start a countdown timer and disconnect if we don't get a response
+               }
+       
+               else {
+                 this.setState({ lock: false });
+                 this.setState({ request_Calls: -1 });
+               }*         
+            },
+    
+            complete: () => {
+              // render table
+              console.log('End of DAY CALLS');
+            },
+            error: (err) => {
+              console.log('err ' + err);
+            }
+          });*/
+        
+        
+        
+        
+        
+        
+        
+        }

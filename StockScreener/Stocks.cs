@@ -144,8 +144,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
         List<RealTimePrice> data;
 
-        public static Cache cache = new Cache();
-
         private static int pointer = -1;
         public static int Pointer { get { return pointer; } set { pointer = value; } }
 
@@ -155,11 +153,13 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             get { return cancellationToken; }
             set { cancellationToken = value; }
         }
-       
+
 
         public static Stocks stocks = new Stocks();
 
-        BackgroundServiceWorker service = new BackgroundServiceWorker();
+        //  public readonly Cache cache = new Cache();
+
+        // BackgroundServiceWorker service = new BackgroundServiceWorker();
 
         static string[] stockArray;
 
@@ -175,26 +175,45 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             }
         }
 
+        private static int[] changeArray = { -1, 1, 2, 0, 1, 1 };//new int[6];
+
+        Stock stock;
+
+        public static CacheOp cache = new CacheOp();
         // Get stocks from the cache
-        public void initialiseStocks(int start, int end, int pointer)
+        public void initialiseStocks(int start, int end)
         {
+            int s = new Random().Next(-99, 99);
+            bool positive = s >= 0;
+            bool negative = s < 0;
+
             try
             {
-            /*    copy(start, end);
-                data = client.GetRealTimePrices(stockArray);
-                Stock stock;
+                copy(start, end);
+                int pointer = start;
 
-                foreach (RealTimePrice data_ in data)
-                { 
-                   // stock = new Stock()
+                while (pointer <= end)
+                {
+                    stock = new Stock(Stocks.StocksCode.Value[pointer],
+                    1, 2, 3, 3, changeArray, 5, 6, 7, 8, 86);
+
+                    cache.Add(stock);
+                    pointer++;
                 }
 
-                // Data from the previous day starting the next day
-                if (Utility.Tick == 0)
-                {
-                    // cache.Add(stock);
-                }*/
+                /*    copy(start, end);
+                    data = client.GetRealTimePrices(stockArray);
+                    Stock stock;
 
+                foreach (RealTimePrice data_ in data)
+                {
+                    stock = new Stock(StocksCode.Value[pointer],
+                    data_.Open, data_.Change, data_.ChangeP, data_.Volume, changeArray, data_.High, data_.Low,
+                    (positive && !negative) ? 1 : -1, data_.Close, data_.PreviousClose);
+
+                    cache.Add(stock);
+                }
+            */
             }
             catch (Exception ex)
             {
@@ -208,34 +227,32 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         }
 
         // Change array
-        //  public static int[] changeArray = new int[6];
+
         public void updateStocks(int start, int end)
         {
             try
-            { 
-                // Stock stock = new Stock();
-            /*    data = client.GetRealTimePrices(stockArray);
+            {
+                
+                /*    copy(start, end);
+                    data = client.GetRealTimePrices(stockArray);
+                    Stock stock;
+
                 foreach (RealTimePrice data_ in data)
                 {
-                    // data_.
+                    stock = new Stock(StocksCode.Value[pointer],
+                    data_.Open, data_.Change, data_.ChangeP, data_.Volume, changeArray, data_.High, data_.Low,
+                    (positive && !negative) ? 1 : -1, data_.Close, data_.PreviousClose);
 
+                    cache.Add(stock);
                 }
+            */
+                   // bool update = cache.Get(pointer).Equals(stock);
 
-               // bool update = cache.Get(pointer).Equals(stock);
-
-                /*
-                Stocks.stocks.Request_Calls = Stocks.stocks.Request_Calls + 1;
-                stock.Request_Calls = Stocks.stocks.Request_Calls;*/
-
+                 
                 // Compare each stock
                 //if (update || !update)
-             /*   cache.Update(pointer, stock);
-
-
-                pointer++;
-
-
-                Stocks.API_REQUESTS = Stocks.API_REQUESTS + 1; */
+                /*   cache.Update(pointer, stock);
+*/
             }
             catch (Exception ex)
             {

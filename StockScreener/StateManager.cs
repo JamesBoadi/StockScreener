@@ -6,17 +6,11 @@ namespace StockScreener
 {
     public class StateManager
     {
-
-
-
         /* Add request to XML file */
         public static void storeRequest(int request)
         {
-
-
-
         }
-
+        
         static XmlTextReader textReader = new XmlTextReader("State.xml");
 
         /* Get request from XML file */

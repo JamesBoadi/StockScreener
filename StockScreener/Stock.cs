@@ -1,58 +1,55 @@
 using System;
+using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Web;
-using EODHistoricalData.NET;
-using System.Net;
-using System.IO;
-using System.Text;
-using System.Threading;
-using System.Threading.Channels;
 using System.Text.Json;
-using System.Linq;
 
 namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_server For the database (https://gist.github.com/kevinswiber/1390198)
 {
     public class Stock
     {
-        public Stock(int CurrentPrice, int Change, int ChangeP, int Volume, int ProfitLoss,
-            int ProfitLoss_Percentage, int[] ChangeArray, int High, int Low,
-            int Signal, int Open, int Close)
+        private static IMemoryCache _cache;
+        //private readonly MemoryCache memoryCache = new MemoryCache(_cache);
+        public  List<Stock> list = new List<Stock>();
+
+        
+        // int Pointer = 0;
+        public Stock(string StockCode, double CurrentPrice, double Change, double ChangeP,
+        double Volume, int[] ChangeArray,
+        double High, double Low, int Signal, double PrevOpen, double Close)
         {
+            this.StockCode = StockCode;
             this.CurrentPrice = CurrentPrice;
-            this.Open = Open;
+            this.PrevOpen = PrevOpen;
             this.Close = Close;
             this.High = High;
             this.Low = Low;
             this.Signal = Signal;
             this.ChangeArray = ChangeArray;
-            this.ProfitLoss_Percentage = ProfitLoss_Percentage;
-            this.ProfitLoss = ProfitLoss;
             this.Volume = Volume;
             this.ChangeP = ChangeP;
             this.Change = Change;
+            
+            list.Add(this);
         }
 
-        private double CurrentPrice { get; set; }
-       
         // Contains all the stocks information
-        public String StockCode { get; set; }
-        public double High { get; set; }
-        public double Open { get; set; }
-        public double Close { get; set; }
-        public double Low { get; set; }
-        public double Change { get; set; }
-        public double ChangeP { get; set; }
-        public double ProfitLoss { get; set; }
-        public double ProfitLoss_Percentage { get; set; }
-        public double Volume { get; set; }
-        public int[] ChangeArray { get; set; }
+        double CurrentPrice {get; set;}
+        string StockCode {get; set;}
+        double High {get; set;}
+        double PrevOpen {get; set;}
+        double Close {get; set;}
+        double Low {get; set;}
+        double Change {get; set;}
+        double ChangeP {get; set;}
+        //   double ProfitLoss;
+        // double ProfitLoss_Percentage;
+        double Volume {get; set;}
+        int[] ChangeArray {get; set;}
 
-        public int Signal { get; set; }
-        public double Request_Calls { get; set; }
+        int Signal {get; set;}
 
         // Time the stock was last updated
-        public String TimeStamp { get; set; }
+        //string TimeStamp;
 
         /// <summary>Compare the equality of stocks</summary>
         public bool Equals(Stock stock)
@@ -115,6 +112,7 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         {
             return JsonSerializer.Serialize(this);
         }
+
 
         // Call when updating cache
         /*   public void alertStatus()

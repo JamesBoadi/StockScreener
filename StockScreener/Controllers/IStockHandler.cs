@@ -18,9 +18,11 @@ namespace StockScreener
     public interface IStockHandler {
 
 
-        Task requestData(string[] request_Calls);
+        Task requestData(int key, string request_Calls);
 
-        Task requests(int requests)
+        Task lockStream(int request_Calls);
+
+      //  Task requests(int requests);
 
     /*
   static bool init_called = false;
@@ -136,7 +138,7 @@ namespace StockScreener
             {
                 if (pointer == Stocks.stocks.MAX_CALLS)
                 {
-                    Stocks.stocks.initialiseStocks(start, start + Stocks.stocks.Mod, 500 + pointer);
+                    Stocks.stocks.initialiseStocks(start, start + Stocks.stocks.Mod);
                     Console.WriteLine("Fill Cache ");
                     break;
                 }

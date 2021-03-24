@@ -44,7 +44,7 @@ namespace StockScreener
             });
 
             services.AddCors(options =>
-        {
+            {
             options.AddPolicy(MyAllowSpecificOrigins,
                               builder =>
                               {
@@ -54,21 +54,20 @@ namespace StockScreener
                                                       .AllowAnyHeader();
 
                               });
-        });
+            });
 
             services.AddHttpsRedirection(options =>
             {
                 options.HttpsPort = 44362;
             });
 
-
-
             services.AddSignalR();
             services.AddSignalRCore();
+            services.AddMemoryCache();
+            services.AddMvc();
 
             // Add Signal R as a Hosted Service
             services.AddHostedService<Worker>();
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -84,7 +83,7 @@ namespace StockScreener
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             }
 
-            
+
 
             //CorsOptions.AllowAll
             app.UseAuthentication();
@@ -110,7 +109,7 @@ namespace StockScreener
                     name: "default",
                     pattern: "{controller=Home}/{action=DummyOne}/{page}");
                 endpoints.MapControllers();
-               
+
                 endpoints.MapHub<StockHandler>("stock");
 
                 /* endpoints.MapContr endpoints.MapRazorPages();ollerRoute(

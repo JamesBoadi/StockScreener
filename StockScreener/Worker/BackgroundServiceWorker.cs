@@ -20,9 +20,15 @@ namespace StockScreener
 {
     public class BackgroundServiceWorker : IHostedService, IDisposable
     {
-        private int executionCount = 0;
+
         private readonly ILogger<BackgroundServiceWorker> _logger;
         private Timer _timer;
+
+        public readonly int MAX_API_REQUESTS = (8 * 60 * 60) / 290;
+
+        public int API_REQUESTS = 0;
+
+        public bool _streamStarted = true;
 
         private string[] tradingHours = { "09:00am-12:30pm", "02:30pm-05:00pm" };
 
@@ -30,7 +36,121 @@ namespace StockScreener
 
         const string easternZoneId = "Singapore Standard Time";
 
-        private ChannelWriter<string[]> writerOne;
+        static int REQUESTS = 1;
+
+        //  private readonly MemoryCache memoryCache;// = new MemoryCache();
+
+        private Stocks stocks = new Stocks();
+
+        public CancellationToken CancellationToken { get; set; }
+
+        // Start operation for retreving stocks every 30 seconds
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                _timer = new Timer(getDataFromCache, null,
+                TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(290));
+            }
+            catch (Exception ex)
+            {
+                if (ex is StackOverflowException || ex is ArgumentNullException || ex is NullReferenceException ||
+              ex is IndexOutOfRangeException ||
+              ex is Newtonsoft.Json.JsonSerializationException
+              || ex is MissingMemberException)
+                    Console.WriteLine("exception one " + ex);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public async void getDataFromCache(object current_state)
+        {
+            int length = Stocks.StocksCode.Value.Length;
+            try
+            {
+                if (API_REQUESTS == MAX_API_REQUESTS)
+                {
+                    API_REQUESTS = -1;
+                    _streamStarted = false;
+                    return;
+                }
+                else
+                {
+                    if (_streamStarted == false)
+                        _streamStarted = true;
+                    if (API_REQUESTS == -1)
+                    {
+                        API_REQUESTS = 0;
+                    }
+                }
+
+                /*  TimeSpan time = ReturnTime();
+                  int count = -1;
+
+                  while (count < 2)
+                      convertTime(++count, time);*/
+
+                // Update stocks
+                // var count = Interlocked.Increment(ref executionCount);
+
+                Stocks.stocks.updateStocks(0, length);
+                API_REQUESTS += 1;
+
+                await Task.Delay(100);
+            }
+            catch (Exception ex)
+            {
+                if (ex is StackOverflowException || ex is KeyNotFoundException || ex is ArgumentNullException || ex is NullReferenceException || ex is ArgumentException ||
+                ex is IndexOutOfRangeException ||
+                ex is Newtonsoft.Json.JsonSerializationException
+                || ex is MissingMemberException
+                || ex is OverflowException || ex is System.Threading.Tasks.TaskCanceledException || ex is System.Threading.Channels.ChannelClosedException)
+                    // Redirect?      
+                    Console.WriteLine("exception " + ex);
+            }
+        }
+
+        public TimeSpan ReturnTime()
+        {
+            TimeZoneInfo easternZone = TimeZoneInfo.FindSystemTimeZoneById(easternZoneId);
+            return TimeZoneInfo.ConvertTime(malaysiaTime, easternZone).TimeOfDay;
+        }
+
+        public DateTime ReturnDate()
+        {
+            TimeZoneInfo easternZone = TimeZoneInfo.FindSystemTimeZoneById(easternZoneId);
+            return TimeZoneInfo.ConvertTimeToUtc(malaysiaTime, easternZone).Date;
+        }
+
+        public Enum ReturnDay()
+        {
+            TimeZoneInfo easternZone = TimeZoneInfo.FindSystemTimeZoneById(easternZoneId);
+            return TimeZoneInfo.ConvertTimeToUtc(malaysiaTime, easternZone).DayOfWeek;
+        }
+
+        // Stop the timer
+        public Task StopAsync(CancellationToken stoppingToken)
+        {
+            //  _logger.LogInformation("Timed Hosted Service is stopping.");
+
+            _timer?.Change(Timeout.Infinite, 0);
+
+            return Task.CompletedTask;
+        }
+
+        public void Dispose()
+        {
+            _timer?.Dispose();
+        }
+
+
+    }
+
+}
+
+/*
+  private ChannelWriter<string[]> writerOne;
 
         public ChannelWriter<string[]> WriterOne
         {
@@ -90,37 +210,7 @@ namespace StockScreener
             }
         }
 
-        public BackgroundServiceWorker()//ILogger<BackgroundServiceWorker> logger)
-        {
-            // _logger = logger;
-        }
-
-        public CancellationToken CancellationToken { get; set; }
-        // Type task for asyc operations
-
-        // Start operation for retreving stocks every 30 seconds
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            try
-            {
-                // _logger.LogInformation("Timed Hosted Service running.");
-                _timer = new Timer(getDataFromCache, null,
-                TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(15));
-
-
-            }
-            catch (Exception ex)
-            {
-                if (ex is StackOverflowException || ex is ArgumentNullException || ex is NullReferenceException ||
-              ex is IndexOutOfRangeException ||
-              ex is Newtonsoft.Json.JsonSerializationException
-              || ex is MissingMemberException)
-                    Console.WriteLine("exception one " + ex);
-            }
-
-            return Task.CompletedTask;
-        }
-
+        
         public static int[] returnCurrentTime(TimeSpan currentTime)
         {
             DateTime time = DateTime.Today.Add(currentTime);
@@ -225,100 +315,7 @@ namespace StockScreener
                }   
 
               SetSession = sessionProperties;*/
-        }
-
-        static int REQUESTS = 1;
-        public async void getDataFromCache(object current_state)
-        {
-            await Task.Delay(100);
-            // int length = Stocks.StocksCode.Value.Length;
-            //    string[] data = new string[length];
 
 
-            Console.WriteLine("Execution count + start ");
-            try
-            {
-                /*  TimeSpan time = ReturnTime();
-                  int count = -1;
-
-                  while (count < 2)
-                      convertTime(++count, time);*/
-
-                // Update stocks
-                //  Stocks.stocks.updateStocks(0,length);
-
-                // await WriterTwo.WriteAsync(SetSession, CancellationToken); 
-                // Retrieve data from stocks
-                /*  for (int pointer = 0; pointer < length; pointer++)
-                  {
-                      data[pointer] = Stocks.cache.Get(pointer).Serialize();
-                  }*/
 
 
-                await WriterOne.WriteAsync(new string[1] { "HEY! " + REQUESTS++.ToString() }, CancellationToken);
-            }
-
-            catch (Exception ex)
-            {
-                if (ex is StackOverflowException || ex is KeyNotFoundException || ex is ArgumentNullException || ex is NullReferenceException || ex is ArgumentException ||
-                ex is IndexOutOfRangeException ||
-                ex is Newtonsoft.Json.JsonSerializationException
-                || ex is MissingMemberException
-                || ex is OverflowException || ex is System.Threading.Tasks.TaskCanceledException || ex is System.Threading.Channels.ChannelClosedException)
-
-                    // Redirect?      
-                    Console.WriteLine("exception " + ex);
-            }
-
-
-        }
-
-        /*
-                private void DoWork(object state)
-                {
-
-                    // Use this for testing
-
-                    var count = Interlocked.Increment(ref executionCount);
-
-                    _logger.LogInformation(
-                        "Timed Hosted Service is working. Count: {Count}", count);
-                }*/
-
-        public TimeSpan ReturnTime()
-        {
-            TimeZoneInfo easternZone = TimeZoneInfo.FindSystemTimeZoneById(easternZoneId);
-            return TimeZoneInfo.ConvertTime(malaysiaTime, easternZone).TimeOfDay;
-        }
-
-        public DateTime ReturnDate()
-        {
-            TimeZoneInfo easternZone = TimeZoneInfo.FindSystemTimeZoneById(easternZoneId);
-            return TimeZoneInfo.ConvertTimeToUtc(malaysiaTime, easternZone).Date;
-        }
-
-        public Enum ReturnDay()
-        {
-            TimeZoneInfo easternZone = TimeZoneInfo.FindSystemTimeZoneById(easternZoneId);
-            return TimeZoneInfo.ConvertTimeToUtc(malaysiaTime, easternZone).DayOfWeek;
-        }
-
-        // Stop the timer
-        public Task StopAsync(CancellationToken stoppingToken)
-        {
-            //  _logger.LogInformation("Timed Hosted Service is stopping.");
-
-            _timer?.Change(Timeout.Infinite, 0);
-
-            return Task.CompletedTask;
-        }
-
-        public void Dispose()
-        {
-            _timer?.Dispose();
-        }
-
-
-    }
-
-}
