@@ -3,16 +3,20 @@ export default function DataServiceWorker(newConnection) {
 
     /* Establish a connection here */
     window.onload = async function () {
-        const res = await newConnection();
-        // Ok
-        if (res) {
-            console.log(res)
+        await newConnection();
+    }
 
-        }
-        else
-        {
-            // 404
-        }
+}
+/* Establish if a user is connected
+       first, if not retry. This is
+       loaded at the very start of loading
+       the app
+    function establishConnection(params) {
+        // Ip address....
+        return false; // Redirect to 404
+    }
+*/
+
 /*
         if ((localStorage.getItem('connection') === null ||
             localStorage.getItem('connection') === undefined)) {
@@ -37,18 +41,3 @@ export default function DataServiceWorker(newConnection) {
                 }
             }
         }*/
-    }
-
-
-    /* Establish if a user is connected 
-       first, if not retry. This is 
-       loaded at the very start of loading
-       the app 
-    function establishConnection(params) {
-        // Ip address....
-        return false; // Redirect to 404
-    }
-*/
-
-
-}

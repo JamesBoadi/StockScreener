@@ -79,9 +79,6 @@ export class DashboardNavbar extends Component {
         return false;
     }
 
-    // 
-
-
     // Enable/Disable Menu of Notifications
     enableNotificationsMenu(e) {
         this.setState({ notificationsMenuVisible: !this.state.notificationsMenuVisible })
@@ -190,6 +187,8 @@ export class DashboardNavbar extends Component {
         if (this.state.setNotifications) {
             this.setState({ notificationsEnabled: 1 })
         }
+
+        
     }
 
     // Enable Alert Notifications
@@ -260,7 +259,6 @@ export class DashboardNavbar extends Component {
         return [hours, minutes];
     }
 
-
     render() {
         let selectMarket =
             <select class="selectMarket" name="Select Market">
@@ -297,176 +295,173 @@ export class DashboardNavbar extends Component {
                     rounded="lg"
                     borderWidth="1px"
                 >
-                    <div class="grid-container">
-                        <div class="grid-item">
+                    <div class="grid-item">
+                        <div class="frequencyAdjust">
 
                             <p id="selectMarket">Select Market</p>
                             {selectMarket}
 
                             <p id="alertFrequency">Alert Frequency</p>
                             {alertFrequency}
-
-                            <label id="customalertFrequencyLabel" for="customalertFrequency">Custom Time</label>
-                            <input id="customalertFrequency" type="checkbox" />
-
-                            {custom_alertFrequency}
-                            <label class="alertFrequencyMinutes">Minutes</label>
                         </div>
+                        {/*  <label id="customalertFrequencyLabel" for="customalertFrequency">Custom Time</label>
+                        <input id="customalertFrequency" type="checkbox" />
 
-                        <div class="grid-item">
-                            <div class="alertTime">
-                                <p id="alertCriteria">Alert Time</p>
-                                <label id="startTime">Start Time</label>
-                                {startTime}
-                                <label id="endTime">End Time</label>
-                                {endTime}
-                                <label id="manualAlerts">Manual</label>
-                                <input class="manualAlerts" type="checkbox" onChange={this.setAlert} />
+                        {custom_alertFrequency}
+                        <label class="alertFrequencyMinutes">Minutes</label>*/}
+                    </div>
 
-                                <label id="autoAlerts">Auto</label>
-                                <input class="autoAlerts" type="checkbox" onChange={this.setAlert} />
+                    <div class="grid-item">
+                        <div class="alertTime">
+                            <p id="alertCriteria">Alert Time</p>
+                            <label id="startTime">Start Time</label>
+                            {startTime}
+                            <label id="endTime">End Time</label>
+                            {endTime}
+                            <label id="manualAlerts">Manual</label>
+                            <input class="manualAlerts" type="checkbox" onChange={this.setAlert} />
 
-                                <label id="manualAlertsNotifications">Notifications</label>
-                                <input class="manualAlertsNotifications" type="checkbox" onChange={this.setAlert} />
+                            <label id="autoAlerts">Auto</label>
+                            <input class="autoAlerts" type="checkbox" onChange={this.setAlert} />
+
+                            <label id="manualAlertsNotifications">Notifications</label>
+                            <input class="manualAlertsNotifications" type="checkbox" onChange={this.setAlert} />
 
 
-                                {/*   <label id="autoAlertsNotifications">Auto <br/> Notifications</label>
+                            {/*   <label id="autoAlertsNotifications">Auto <br/> Notifications</label>
                                 <input class="autoAlertsNotifications" type="checkbox" onChange={this.setAlert} />
                                   <label id="enableNotifications">Manual</label>
                                 <input class="enableNotifications" type="checkbox" onChange={this.setAlert} />
 
                                 <label id="enableNotifications">Auto</label>
                                 <input class="enableNotifications" type="checkbox" onChange={this.setAlert} /> */}
-                            </div>
                         </div>
 
+                        <div class="tableSettings" >
+                            <div class="vl"></div>
+                            <div class="v2"></div>
+                            <p id="table_">Columns Filter</p>
 
-                        <div class="grid-item" >
-                            <div class="tableSettings" >
-                                <div class="vl"></div>
-                                <div class="v2"></div>
-                                <p id="table_">Columns Filter</p>
+                            <div class="disableColumns" >
 
-                                <div id="disableColumns" >
-
-                                    {/* <p id="hideName"
+                                {/* <p id="hideName"
                             style={{ position: 'absolute', top: '10px', left: '575px' }}>Disable Columns </p>*/}
 
-                                    <label id="stockName" >Stock <br /> Name</label>
-                                    <input class="stockName" type="checkbox" />
+                                <label id="stockName" >Stock <br /> Name</label>
+                                <input class="stockName" type="checkbox" />
 
-                                    <label id="time">Time</label>
-                                    <input class="time" type="checkbox" />
+                                <label id="time">Time</label>
+                                <input class="time" type="checkbox" />
 
-                                    <label id="price">Price</label>
-                                    <input class="price" type="checkbox" />
+                                <label id="price">Price</label>
+                                <input class="price" type="checkbox" />
 
-                                    <label id="high">High</label>
-                                    <input class="high" type="checkbox" />
+                                <label id="high">High</label>
+                                <input class="high" type="checkbox" />
 
-                                    <label id="low">Low</label>
-                                    <input class="low" type="checkbox" />
+                                <label id="low">Low</label>
+                                <input class="low" type="checkbox" />
 
-                                    <label id="profitLoss">P / L</label>
-                                    <input class="profitLoss" type="checkbox" />
+                                <label id="profitLoss">P / L</label>
+                                <input class="profitLoss" type="checkbox" />
 
-                                    <label id="profitLossPercentage">P / L %</label>
-                                    <input class="profitLossPercentage" type="checkbox" />
+                                <label id="profitLossPercentage">P / L %</label>
+                                <input class="profitLossPercentage" type="checkbox" />
 
-                                    <label id="volume">Volume</label>
-                                    <input class="volume" type="checkbox" />
-                                </div>
+                                <label id="volume">Volume</label>
+                                <input class="volume" type="checkbox" />
+                            </div>
 
-                                <div class="disableAlertColumns">
-                                    <label id="alertStockName" >Stock <br /> Name</label>
-                                    <input class="alertStockName" type="checkbox" />
+                            <div class="disableAlertColumns">
 
-                                    <label id="alertStockTime">Alert <br /> Time</label>
-                                    <input class="alertStockTime" type="checkbox" />
+                                <label id="alertStockName" >Stock <br /> Name</label>
+                                <input class="alertStockName" type="checkbox" />
 
-                                    <label id="alertPrice">Price</label>
-                                    <input class="alertPrice" type="checkbox" />
+                                <label id="alertStockTime">Alert <br /> Time</label>
+                                <input class="alertStockTime" type="checkbox" />
 
-                                    <label id="alertProfitLoss">P / L %</label>
-                                    <input class="alertProfitLoss" type="checkbox" />
+                                <label id="alertPrice">Price</label>
+                                <input class="alertPrice" type="checkbox" />
 
-                                    <label id="alertProfitVolume">Volume</label>
-                                    <input class="alertProfitVolume" type="checkbox" />
-                                </div>
+                                <label id="alertProfitLoss">P / L %</label>
+                                <input class="alertProfitLoss" type="checkbox" />
+
+                                <label id="alertProfitVolume">Volume</label>
+                                <input class="alertProfitVolume" type="checkbox" />
                             </div>
                         </div>
 
-                        <div class="grid-item">
-                            <div class="priceDetection">
 
-                                <p id="priceRange">Price Range</p>
-
-                                <div class="startPrice">
-                                    <p id="startPriceLabel">Start Price</p>
-                                    <NumberInput
-                                        size="md" min={0} maxW={70} defaultValue={1} precision={2} step={0.2}>
-                                        <NumberInputField />
-                                        <NumberInputStepper >
-                                            <NumberIncrementStepper />
-                                            <NumberDecrementStepper />
-                                        </NumberInputStepper>
-                                    </NumberInput>
-                                </div>
-
-                                <div class="endPrice">
-                                    <p id="endPriceLabel">Target Price</p>
-                                    <NumberInput
-                                        size="md" min={0} maxW={70} defaultValue={1} precision={2} step={0.2}>
-                                        <NumberInputField />
-                                        <NumberInputStepper >
-                                            <NumberIncrementStepper />
-                                            <NumberDecrementStepper />
-                                        </NumberInputStepper>
-                                    </NumberInput>
-                                </div>
-
-                                <label id="enablePriceCheck">Enable Price Detection</label>
-                                <input class="enablePriceCheck" type="checkbox" />
-
-                                <label id="overridePrices">Override Custom Prices</label>
-                                <input class="overridePrices" type="checkbox" />
-
-
-                                <label id="hideBullishStocks">Hide Bullish Stocks</label>
-                                <input class="hideBullishStocks" type="checkbox" />
-
-                                
-                                <label id="hideBearishStocks">Hide Bearish Stocks</label>
-                                <input class="hideBearishStocks" type="checkbox" />
-
-                                <a
-                                    style={{
-                                        color: 'white',
-                                        position: 'absolute', top: '-60px', left: '1400px',
-                                    }} onClick={this.enableNotificationsMenu}>
-                                    Notifications <DownOutlined />
-                                </a>
-
-                                <div class="dropdown-content">
-                                    <Box
-                                        style={{position: 'relative'}}
-                                        visibility={(this.state.notificationsMenuVisible) ? 'visible' : 'hidden'}
-                                        min-width='16.25rem'
-                                        width='16.25rem'
-                                        height='17.25rem'
-                                        overflowY='auto'
-                                        bg='#f9f9f9'
-                                        top='-35px'
-                                        left='1400px'
-                                        backgroundColor='wheat.511'
-                                        zIndex='999'
-                                    >
-                                        {this.state.notifications}
-                                    </Box>
-                                </div>
+                        <div class="priceDetection">
+                            <p id="priceRange">Price Range</p>
+                            <div class="startPrice">
+                                <p id="startPriceLabel">Start Price</p>
+                                <NumberInput
+                                    style={{ top: '5px' }}
+                                    size="md" min={0} maxW={70} defaultValue={1} precision={2} step={0.2}>
+                                    <NumberInputField />
+                                    <NumberInputStepper >
+                                        <NumberIncrementStepper />
+                                        <NumberDecrementStepper />
+                                    </NumberInputStepper>
+                                </NumberInput>
                             </div>
-                            <Button style={{ position: 'absolute', top: '170px', left: '1370px', zIndex: '-999' }}
+
+                            <div class="endPrice">
+                                <p id="endPriceLabel">Target Price</p>
+                                <NumberInput
+                                    size="md" min={0} maxW={70} defaultValue={1} precision={2} step={0.2}>
+                                    <NumberInputField />
+                                    <NumberInputStepper >
+                                        <NumberIncrementStepper />
+                                        <NumberDecrementStepper />
+                                    </NumberInputStepper>
+                                </NumberInput>
+                            </div>
+
+                            <label id="enablePriceCheck">Enable Price Detection</label>
+                            <input class="enablePriceCheck" type="checkbox" />
+
+                            <label id="overridePrices">Override Custom Prices</label>
+                            <input class="overridePrices" type="checkbox" />
+
+                            <label id="hideBullishStocks">Hide Bullish Stocks</label>
+                            <input class="hideBullishStocks" type="checkbox" />
+
+                            <label id="hideBearishStocks">Hide Bearish Stocks</label>
+                            <input class="hideBearishStocks" type="checkbox" />
+
+                            <a
+                                style={{
+                                    color: 'white',
+                                    position: 'absolute', top: '-60px', left: '1400px',
+                                }} onClick={this.enableNotificationsMenu}>
+                                Notifications <DownOutlined />
+                            </a>
+
+                            <div class="dropdown-content">
+                                <Box
+                                    style={{ position: 'absolute' }}
+                                    visibility={(this.state.notificationsMenuVisible) ? 'visible' : 'hidden'}
+                                    min-width='16.25rem'
+                                    width='16.25rem'
+                                    height='17.25rem'
+                                    overflowY='auto'
+                                    bg='#f9f9f9'
+                                    top='-35px'
+                                    left='1400px'
+                                    backgroundColor='wheat.511'
+                                    zIndex='999'
+                                >
+                                    {this.state.notifications}
+                                </Box>
+                            </div>
+
+                            <Button style={{ position: 'absolute', top: '170px', left: '1325px', zIndex: '-999' }}
                                 onClick={this.saveConfiguration}>Save Configuration</Button>
+
+
+
                         </div>
 
                         {/* 

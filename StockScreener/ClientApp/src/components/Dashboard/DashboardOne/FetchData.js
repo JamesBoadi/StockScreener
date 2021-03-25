@@ -63,6 +63,11 @@ export class FetchData extends Component {
     this.setCache = this.setCache.bind(this);
     this.updateCache = this.updateCache.bind(this);
     this.setUpdateNotifications = this.setUpdateNotifications.bind(this);
+    this.connectionTimeout = this.connectionTimeout.bind(this);
+    this.hubConnection_ = this.hubConnection_.bind(this);
+    this.addToCache = this.addToCache.bind(this);
+
+    //this.updateAll = this.updateAll.bind(this);
 
     this.cache = new cache();
     this.called = false;
@@ -77,6 +82,11 @@ export class FetchData extends Component {
       .withUrl('https://localhost:44362/stock')
       .configureLogging(signalR.LogLevel.Information)
       .build();
+
+   // this.updateCache = false;
+    this.lock = false;
+    this.connected = false;
+    this.keyCount = 0;
 
     this.state = {
       stockTableTwo: [],
@@ -107,7 +117,7 @@ export class FetchData extends Component {
       start: 0,
       end: 50,
 
-      updateCache: false,
+      _updateCache: false,
       cache: new cache(),
 
 
@@ -134,55 +144,69 @@ export class FetchData extends Component {
   }
 
   componentDidMount = () => {
-    /*this.intervalID = setInterval(() => {
-      let state = [-1, 2];
-      var cache_ = new cache();
-      var count;
-      for (count = 0; count < 897; count++) {
-        let start2 = parseInt(Math.floor(Math.random() * state.length));
-        let changeArr = [state[start2], state[start2], state[start2],
-        state[start2], state[start2], state[start2]];
+    /*  this.intervalID = setInterval(() => {
+       let state = [-1, 2];
+       var cache_ = new cache();
+       var count;
+       for (count = 0; count < 897; count++) {
+         let start2 = parseInt(Math.floor(Math.random() * state.length));
+         let changeArr = [state[start2], state[start2], state[start2],
+         state[start2], state[start2], state[start2]];
+ 
+         const item = {
+           StockCode: count,
+           Change: 91,
+           ChangeP: 1,
+           Volume: 11,
+           CurrentPrice: 102,
+           ProfitLoss: 1,
+           ProfitLoss_Percentage: 99,
+           High: 10,
+           Low: 14,
+           Open: 76,
+           Close: 10,
+ 
+           ChangeArray: changeArr,
+           /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
+             string _currentTime = time.ToString("HH:mmttss");
+           //stock.timestamp = _currentTime
+           Request_Calls: 5,
+           TimeStamp: "9:00",
+ 
+           Request_Calls: "1"
+         }
+         //cache_.set(count.toString(), item);
+         TableCache.set(count, item);
+         AlertCache.set(count, item);
+ 
+         console.log(' count ' + TableCache.get(count));
+       }
+ 
+   //    this.cache = cache_;
+ 
+       //this.setState({ cache: cache_ })
+       this.setState({ updateCache: true });
+       this.setState({ lock: true });
+    
+    //   this.forceUpdate()
+     }, 5000); */
 
-        const P = {
-          StockCode: count,
-          Change: 91,
-          ChangeP: 1,
-          Volume: 11,
-          CurrentPrice: 102,
-          ProfitLoss: 1,
-          ProfitLoss_Percentage: 99,
-          High: 10,
-          Low: 14,
-          Open: 76,
-          Close: 10,
-
-          ChangeArray: changeArr,
-          /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
-            string _currentTime = time.ToString("HH:mmttss");
-          //stock.timestamp = _currentTime
-          Request_Calls: 5,
-          TimeStamp: "9:00",
-
-          Request_Calls: "1"
-        }
-        cache_.set(count.toString(), P);
-        Cache.set(count, P);
-      }
-
-      this.cache = cache_;
-      this.setState({ lock: true });
-      //this.setState({ updateCache: true });
-      this.forceUpdate()
-    }, 5000); */
 
     // Override local prices
-    this.overrideLocalPrices(this.props.state.globalStartPrice,
-      this.props.state.globalTargetPrice);
+    // this.overrideLocalPrices(this.props.state.globalStartPrice, this.props.state.globalTargetPrice);
 
-    DataServiceWorker(this.hubConnection_.bind(this))
+
+
+    
+    
+
+
+
+    this.hubConnection_(); // iF FALSE 404 PAGE
+
+
     // Data Service Worker
 
-    // this.sendRequest();
     // this.addToNotificationsMenu();
   }
 
@@ -192,19 +216,24 @@ export class FetchData extends Component {
 
   // Replace with event listener
   componentDidUpdate = (prevProps, prevState, snapshot) => {
-    //  console.log('LOCK ' + this.state.lock) 
+
     var t = [];
+
+    console.log('DID UPDATE ' + this.state.lock)
     if (this.state.lock === true && this.called === false) {
+
       t.push(<StockTableTwo
+        {...this}
         alertInterval={this.props.state.alertInterval}
         endTime={this.props.state.endTime}
         cache={this.getCache()}
-        {...this}
+       
       />)
 
       this.setState({ stockTableTwo: t });
       this.called = true;
       t = [];
+      this.setState({ lock: false })
     }
 
     // Update only if on manual mode and the user has scrolled down
@@ -224,8 +253,8 @@ export class FetchData extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.state.lock) {
-      this.setState({ lock: false });
+    if (this.state.lock !== nextState.lock) {
+
       return true;
     }
     else if (this.state.addAlertTableRowBool !== nextState.addAlertTableRowBool
@@ -239,7 +268,7 @@ export class FetchData extends Component {
 
 
   updateCache(bool) {
-    this.setState({ updateCache: bool })
+    this.setState({updateCache: bool});
   }
 
   // Set local prices using global prices without overriding prices already set
@@ -475,39 +504,85 @@ export class FetchData extends Component {
   getCache() {
     return this.state.cache;
   }
+
+  async connectionTimeout() {
+    var count = 0;
+
+    return new Promise(resolve => {
+      this.interval = setInterval(() => {
+        // Number of retries allowed: 3
+        if (this.connected == true) {
+          clearInterval(this.interval)
+          resolve(true)
+        }
+        else if (count >= 3) {
+          clearInterval(this.interval)
+          resolve(false)
+        }
+        count++;
+      }, 8000);
+    });
+  }
+
+  async addToCache() {
+    var count = 0;
+
+    return new Promise(resolve => {
+
+
+
+
+
+
+
+    });
+  }
+
+
   // this.hubConnection.invoke() timeout 60 * 5, must reach 897 by 5 minutes or return error
   // Max wait per value 60 seconds
   /** Establish a Signal R connection */
   async hubConnection_() {
-    var count = -1;
+    var count = 0;
+
     await this.hubConnection
       .start()
       .then(() => {
         console.log('Successfully connected');
         this.hubConnection.on('lockStream', function (request_Calls) {
           // Add Timeout
-          this.setState({ request_Calls: request_Calls });
+          this.request_Calls = request_Calls;
         })
-        this.hubConnection.on('requestData', function (key, data) {
-          const item = JSON.parse(data);
-          TableCache.set(key, item);
-          AlertCache.set(key, item);
-          count += 1;
-          
-          // Atomicity
+        this.hubConnection.on('requestData', (key, data) => {
+            let item = JSON.parse(data);
+           TableCache.set(key, item);
+           AlertCache.set(key, item);
+
+
+          //  console.log(key + "  " + AlertCache.get(key) + "  " + TableCache.get(key));
           if (count < 897) {
             count += 1;
             // count - key !== 1 --> 404 reconnect the whole thing
           }
-          else { count = 0; }
+          else {
+
+            count = 0;
+            console.log("Ok")
+            this.connected = true;
+          }
         })
-      })
+      }) // Bind to constructor
       .catch(err => {
         console.log('Error while establishing hubConnection :( ')
-        return false;
+        this.connected = false;
       }); // Redirect to 404 page
 
-    return true;
+
+    const res = await this.connectionTimeout();
+
+    console.log('res  ' + this.connected);
+    this.setState({ updateCache: res });
+    this.setState({ lock: res });
   }
 
   sendRequest(hubConnection) {
@@ -587,13 +662,13 @@ export class FetchData extends Component {
           Data={this.state.data}
         />
 
-        {/* ALERT TABLE 
+        {/* ALERT TABLE */}
         <NotificationsTable {...this} />
 
         <div id="tableContainer">
           {this.state.stockTableTwo}
-        </div>*/}
-    
+        </div>
+
       </div>
     );
   }
@@ -610,60 +685,60 @@ export class FetchData extends Component {
             visibility: (this.state.red && !this.state.green
               && !priceChangeUp) ? "visible" : "hidden"
           }} colorScheme="blue" />*/
-        
-        
-    /*
-       //.stream("RequestData", this.state.request_Calls)
-       this.hubConnection.subscribe({
-            next: (stockArray) => {
-              // cache_.clear();
-              console.log('State ' + stockArray)
-    
-              /* // Account for faliures in connection
-               var count = 0;
-               for (count = 0; count < stockArray.length; count++) {
-                 const item = JSON.parse(stockArray[count]);
-                 this.setState({ request_Calls: item.Request_Calls });
-       
-                 cache_.set(count.toString(), item);
-       
-                 TableCache.set(count, item);
-                 AlertCache.set(count, item);
-                 // console.log('State 1 ' + item.ChangeArray[0] )
-               }
-       
-       
-               this.setCache(cache_);
-               this.cache = cache_;
-               this.setState({ cache: cache_ })
-               this.setState({ updateCache: true });
-               this.setState({ lock: true });
-       
-               /*
-               if (this.state.request_Calls !== this.state.MAX_CALLS) {
-                 this.setState({ request_Calls: request_Calls });
-                 // Start a countdown timer and disconnect if we don't get a response
-               }
-       
-               else {
-                 this.setState({ lock: false });
-                 this.setState({ request_Calls: -1 });
-               }*         
-            },
-    
-            complete: () => {
-              // render table
-              console.log('End of DAY CALLS');
-            },
-            error: (err) => {
-              console.log('err ' + err);
-            }
-          });*/
-        
-        
-        
-        
-        
-        
-        
-        }
+
+
+  /*
+     //.stream("RequestData", this.state.request_Calls)
+     this.hubConnection.subscribe({
+          next: (stockArray) => {
+            // cache_.clear();
+            console.log('State ' + stockArray)
+  
+            /* // Account for faliures in connection
+             var count = 0;
+             for (count = 0; count < stockArray.length; count++) {
+               const item = JSON.parse(stockArray[count]);
+               this.setState({ request_Calls: item.Request_Calls });
+     
+               cache_.set(count.toString(), item);
+     
+               TableCache.set(count, item);
+               AlertCache.set(count, item);
+               // console.log('State 1 ' + item.ChangeArray[0] )
+             }
+     
+     
+             this.setCache(cache_);
+             this.cache = cache_;
+             this.setState({ cache: cache_ })
+             this.setState({ updateCache: true });
+             this.setState({ lock: true });
+     
+             /*
+             if (this.state.request_Calls !== this.state.MAX_CALLS) {
+               this.setState({ request_Calls: request_Calls });
+               // Start a countdown timer and disconnect if we don't get a response
+             }
+     
+             else {
+               this.setState({ lock: false });
+               this.setState({ request_Calls: -1 });
+             }*         
+          },
+  
+          complete: () => {
+            // render table
+            console.log('End of DAY CALLS');
+          },
+          error: (err) => {
+            console.log('err ' + err);
+          }
+        });*/
+
+
+
+
+
+
+
+}

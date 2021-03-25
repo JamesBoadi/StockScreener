@@ -194,7 +194,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
                 while (pointer <= end)
                 {
-                    stock = new Stock(Stocks.StocksCode.Value[pointer],
+                    stock = new Stock(Stocks.StocksCode.Value[pointer],"8:00",
                     1, 2, 3, 3, changeArray, 5, 6, 7, 8, 86);
 
                     cache.Add(stock);
@@ -232,8 +232,23 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         {
             try
             {
-                
-                /*    copy(start, end);
+                int pointer = start;
+                while (pointer < end)
+                {
+                   int[] array = { -1, 2, -2 };
+                    Random random = new Random();
+                    int start2 = random.Next(0, array.Length);
+                    int[] changeArray = new int[6] { array[start2], array[start2], array[start2], array[start2],
+                     array[start2], array[start2] };
+                    stock = new Stock(Stocks.StocksCode.Value[pointer], "8:00",
+                    random.Next(0, 1001), 2, 3, 3, changeArray, 5, 6, 7, 8, 86);
+
+                    cache.Update(pointer, stock);
+                    pointer++;
+                }
+
+
+                /*    
                     data = client.GetRealTimePrices(stockArray);
                     Stock stock;
 
@@ -242,13 +257,14 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     stock = new Stock(StocksCode.Value[pointer],
                     data_.Open, data_.Change, data_.ChangeP, data_.Volume, changeArray, data_.High, data_.Low,
                     (positive && !negative) ? 1 : -1, data_.Close, data_.PreviousClose);
-
-                    cache.Add(stock);
+                    
+                    cache.Update(pointer, stock);
+                    pointer++;
                 }
             */
-                   // bool update = cache.Get(pointer).Equals(stock);
+                // bool update = cache.Get(pointer).Equals(stock);
 
-                 
+
                 // Compare each stock
                 //if (update || !update)
                 /*   cache.Update(pointer, stock);

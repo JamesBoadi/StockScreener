@@ -52,7 +52,6 @@ export class StockTableTwoAlert extends React.Component {
 
     // 404 if component does not mount
     componentDidMount() {
-
         this.test = setInterval(() => {
             if (this.props.state.enableAlerts) {
 
@@ -112,11 +111,14 @@ export class StockTableTwoAlert extends React.Component {
 
                 clearInterval(this.test);
             }
-
         }, 6000);
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+        
+
+
+
         if (this.props.state.disableScrolling === false) {
             this.priority_queue.clear()
             clearInterval(this.animationTime);
@@ -220,10 +222,6 @@ export class StockTableTwoAlert extends React.Component {
         }
     }
 
-
-
-
-
     // Take a slice of the queue and reorder it
     /** order = 1 (push to the end) order = 0 (push to the front) */
     shift(startIndex, endIndex, order) {
@@ -273,7 +271,6 @@ export class StockTableTwoAlert extends React.Component {
         let pointer = -1;
         //    console.log(array)
         this.animationTime = setInterval(() => {
-
             if (this.priority_queue.length === 0) {
                 clearInterval(this.animationTime);
                 // this.setState({ update_priorityQueue: true });
@@ -335,7 +332,6 @@ export class StockTableTwoAlert extends React.Component {
             }
             pointer++;
         }
-
         //  console.log('start ' + this.priority_queue + ' \n end \n\n ' +  this.array);
         if (this.priority_queue.length !== 0)
             this.triggerAnimation(callback, this.array);
@@ -345,7 +341,6 @@ export class StockTableTwoAlert extends React.Component {
     Create function for scrolling directly to alert
     scrollToAlert()
     {
- 
     }*/
 
     render() {

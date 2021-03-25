@@ -9,15 +9,16 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
     {
         private static IMemoryCache _cache;
         //private readonly MemoryCache memoryCache = new MemoryCache(_cache);
-        public  List<Stock> list = new List<Stock>();
+        public  List<Stock> list = new List<Stock>(); // Might not be needed
 
         
         // int Pointer = 0;
-        public Stock(string StockCode, double CurrentPrice, double Change, double ChangeP,
+        public Stock(string StockCode, string TimeStamp, double CurrentPrice, double Change, double ChangeP,
         double Volume, int[] ChangeArray,
         double High, double Low, int Signal, double PrevOpen, double Close)
         {
             this.StockCode = StockCode;
+            this.TimeStamp = TimeStamp;
             this.CurrentPrice = CurrentPrice;
             this.PrevOpen = PrevOpen;
             this.Close = Close;
@@ -33,20 +34,21 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         }
 
         // Contains all the stocks information
-        double CurrentPrice {get; set;}
-        string StockCode {get; set;}
-        double High {get; set;}
-        double PrevOpen {get; set;}
-        double Close {get; set;}
-        double Low {get; set;}
-        double Change {get; set;}
-        double ChangeP {get; set;}
+        public double CurrentPrice{ get; set; }
+        public string StockCode { get; set; }
+        public string TimeStamp { get; set; }
+        public double High { get; set; }
+        public double PrevOpen { get; set; }
+        public double Close { get; set; }
+        public double Low { get; set; }
+        public double Change { get; set; }
+        public double ChangeP { get; set; }
         //   double ProfitLoss;
         // double ProfitLoss_Percentage;
-        double Volume {get; set;}
-        int[] ChangeArray {get; set;}
+        public double Volume { get; set; }
+        public int[] ChangeArray { get; set; }
 
-        int Signal {get; set;}
+        public int Signal { get; set; }
 
         // Time the stock was last updated
         //string TimeStamp;
@@ -112,6 +114,13 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         {
             return JsonSerializer.Serialize(this);
         }
+        
+        public void Clear()
+        {
+            list.Clear();
+        }
+
+
 
 
         // Call when updating cache

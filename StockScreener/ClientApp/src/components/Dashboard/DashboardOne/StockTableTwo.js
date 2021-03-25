@@ -110,6 +110,7 @@ export class StockTableTwo extends React.Component {
 
         this.interval = setInterval(() => {
             if (this.props.state.updateCache) {
+            
                 this.setState({ cache: TableCache.cache() }); // Cannot access value immediately
             
                 if (this.updateTableData === false) {
@@ -452,7 +453,7 @@ export class StockTableTwo extends React.Component {
 
         for (id = start; id < end; id++) {
             // Get values from cache this.state.tb2_stack
-            let list = this.cache.get(id.toString());
+            let list = TableCache.get(id);
 
             if (id == target) {
 
@@ -465,8 +466,8 @@ export class StockTableTwo extends React.Component {
                             <td id={id} onClick={this.selectRow}>{list.High.toString()}</td>
 
                             <td id={id} onClick={this.selectRow}>{list.Low.toString()}</td>
-                            <td id={id} onClick={this.selectRow}>{list.ProfitLoss.toString()}</td>
-                            <td id={id} onClick={this.selectRow}>{list.ProfitLoss_Percentage.toString()}</td>
+                            <td id={id} onClick={this.selectRow}>{list.Change.toString()}</td>
+                            <td id={id} onClick={this.selectRow}>{list.ChangeP.toString()}</td>
                             <td id={id} onClick={this.selectRow}>{list.Volume.toString()}</td>
                         </tr>
                     </tbody>)
@@ -474,7 +475,7 @@ export class StockTableTwo extends React.Component {
 
             else {
                 array.push(
-                    <tbody key={id}>
+                    <tbody key={id} >
                         <tr style={this.styleMap.get(id)}>
                             <td id={id} onClick={this.selectRow}>{list.StockCode.toString()}</td>
                             <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
@@ -482,8 +483,8 @@ export class StockTableTwo extends React.Component {
                             <td id={id} onClick={this.selectRow}>{list.High.toString()}</td>
 
                             <td id={id} onClick={this.selectRow}>{list.Low.toString()}</td>
-                            <td id={id} onClick={this.selectRow}>{list.ProfitLoss.toString()}</td>
-                            <td id={id} onClick={this.selectRow}>{list.ProfitLoss_Percentage.toString()}</td>
+                            <td id={id} onClick={this.selectRow}>{list.Change.toString()}</td>
+                            <td id={id} onClick={this.selectRow}>{list.ChangeP.toString()}</td>
                             <td id={id} onClick={this.selectRow}>{list.Volume.toString()}</td>
                         </tr>
                     </tbody>)
@@ -529,7 +530,7 @@ export class StockTableTwo extends React.Component {
                 style = {};
 
             // Get values from cache
-            let list = this.state.cache.get(id.toString());
+            let list = TableCache.get(id);//this.state.cache.get(id.toString());
             //  console.log( 'WORK WORK ' + id);
 
             array.push(
@@ -541,8 +542,8 @@ export class StockTableTwo extends React.Component {
                         <td id={id} onClick={this.selectRow}>{list.High.toString()}</td>
 
                         <td id={id} onClick={this.selectRow}>{list.Low.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss_Percentage.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.Change.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.ChangeP.toString()}</td>
                         <td id={id} onClick={this.selectRow}>{list.Volume.toString()}</td>
                     </tr>
                 </tbody>);
@@ -571,7 +572,7 @@ export class StockTableTwo extends React.Component {
         this.props.setUpdateNotifications(true);
 
         // Get values from cache
-        let list = this.props.cache.get(start.toString());
+        let list = TableCache.get(start);//this.props.cache.get(start.toString());
 
         let t = <div>
             <div id="stack-wrapper">
@@ -585,8 +586,8 @@ export class StockTableTwo extends React.Component {
                                 <th>{list.High.toString()}</th>
 
                                 <th>{list.Low.toString()}</th>
-                                <th>{list.ProfitLoss.toString()}</th>
-                                <th>{list.ProfitLoss_Percentage.toString()}</th>
+                                <th>{list.Change.toString()}</th>
+                                <th>{list.ChangeP.toString()}</th>
                                 <th>{list.Volume.toString()}</th>
                             </tr>
                         </thead>
@@ -684,7 +685,7 @@ export class StockTableTwo extends React.Component {
 
         for (id = 0; id < 50; id++) {
             // Get values from cache
-            let list = this.state.cache.get(id.toString());
+            let list = TableCache.get(id); //this.state.cache.get(id.toString());
 
             this.state.tb2_stack.push(
                 <tbody key={id} style={this.styleMap.get(id)}>
@@ -695,8 +696,8 @@ export class StockTableTwo extends React.Component {
                         <td id={id} onClick={this.selectRow}>{list.High.toString()}</td>
 
                         <td id={id} onClick={this.selectRow}>{list.Low.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss.toString()}</td>
-                        <td id={id} onClick={this.selectRow}>{list.ProfitLoss_Percentage.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.Change.toString()}</td>
+                        <td id={id} onClick={this.selectRow}>{list.ChangeP.toString()}</td>
                         <td id={id} onClick={this.selectRow}>{list.Volume.toString()}</td>
                     </tr>
                 </tbody>)

@@ -18,7 +18,7 @@ namespace StockScreener
     public interface IStockHandler {
 
 
-        Task requestData(int key, string request_Calls);
+        Task requestData(int key, string data);
 
         Task lockStream(int request_Calls);
 

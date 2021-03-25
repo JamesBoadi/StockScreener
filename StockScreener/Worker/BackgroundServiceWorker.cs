@@ -50,7 +50,7 @@ namespace StockScreener
             try
             {
                 _timer = new Timer(getDataFromCache, null,
-                TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(290));
+                TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(30));
             }
             catch (Exception ex)
             {

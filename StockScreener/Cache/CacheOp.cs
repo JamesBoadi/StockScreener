@@ -39,10 +39,8 @@ namespace StockScreener
         /// <summary>Return the item from the collection</summary>
         public Stock Get(int position)
         {
-            lock (readLock)
-            {
                 return Cache.Get(position);
-            }
+            
 
         }
 

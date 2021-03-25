@@ -67,18 +67,18 @@ namespace StockScreener
                     _ = initialise_cache();
                     _init_work = !_init_work;
                     // Start the Service Worker
-                    // _ = serviceWorker.StartAsync(cancellationToken);
+                     _ = serviceWorker.StartAsync(cancellationToken);
                 }
 
                 // Start Background Service (test)
-                if (ReturnTime().Hours == 9 && ReturnTime().Minutes >= 0
-                && ReturnTime().Minutes <= 10)
+             /*   if (ReturnTime().Hours == 9 && ReturnTime().Minutes >= 0
+                && ReturnTime().Minutes <= 5)
                 {
                     if (serviceWorker._streamStarted)
                     {
                         _ = serviceWorker.StartAsync(cacheCancellationToken);
                     }
-                }
+                }*/
 
                 // Cache requests between server and client
                 if (serviceWorker.API_REQUESTS <= serviceWorker.MAX_API_REQUESTS
@@ -88,18 +88,19 @@ namespace StockScreener
                 }
                 else
                 {
-                    _ = serviceWorker.StopAsync(cacheCancellationToken);
+                  //  _ = serviceWorker.StopAsync(cacheCancellationToken);
                 }
 
                 if (_cacheFull)
                 {
                     for (int key = 0; key < MAX; key++)
-                    {
-                        await _stockHandler.Clients.All.requestData(key, Stocks.cache.Get(key).Serialize());
+                    { 
+                        String JSON = Cache.Get(key).Serialize();
+                        await _stockHandler.Clients.All.requestData(key,JSON );
                     }
                 }
 
-                await Task.Delay(60000);//60 * 1000 * 5); // Delay each call by 5 minutes
+                await Task.Delay(10000);
             }
         }
 
