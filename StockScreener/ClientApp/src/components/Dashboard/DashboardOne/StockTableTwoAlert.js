@@ -321,17 +321,24 @@ export class StockTableTwoAlert extends React.Component {
         while (pointer < end) {
             const cache = AlertCache.get(pointer);
             const inRange = (cache.CurrentPrice >= PriceSettings.getStartPrice() &&
-            cache.CurrentPrice <= PriceSettings.getTargetPrice());
+                cache.CurrentPrice <= PriceSettings.getTargetPrice());
             const priceDetectionEnabled = PriceSettings.getPriceDetectionEnabled();
-         
+
+            const currentPrice_state = parseInt(cache.ChangeArray[0]);
+            const state = AlertReducer(currentPrice_state);
+
             if (priceDetectionEnabled) {
-                const currentPrice_state = parseInt(cache.ChangeArray[0]);
-                const state = AlertReducer(currentPrice_state);
-
-                
-
                 //console.log('STATE 2' + state + '  ' + currentPrice_state);
-                if (currentPrice_state !== 0 && inRange) {
+                if (inRange) {
+                    // Prevent adding an element twice
+                    if (this.priority_queue.includes(pointer) == false)
+                        this.priority_queue.enqueue(pointer);
+
+                    // Update existing element
+                    this.array[pointer] = [pointer, state, 1600];
+                }
+            } else {
+                if (currentPrice_state !== 0) {
                     // Prevent adding an element twice
                     if (this.priority_queue.includes(pointer) == false)
                         this.priority_queue.enqueue(pointer);
@@ -340,11 +347,10 @@ export class StockTableTwoAlert extends React.Component {
                     this.array[pointer] = [pointer, state, 1600];
                 }
             }
-            
 
             pointer++;
         }
-        //  console.log('start ' + this.priority_queue + ' \n end \n\n ' +  this.array);
+
         if (this.priority_queue.length !== 0)
             this.triggerAnimation(callback, this.array);
     }

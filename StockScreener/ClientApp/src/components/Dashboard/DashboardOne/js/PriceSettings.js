@@ -4,11 +4,22 @@ import * as HashMap from 'hashmap';
 export default class PriceSettings {
     static startPrice = 0;
     static targetPrice = 0;
+
     static priceDetectionEnabled = false;
+    static hideBullishStocks = false;  
+    static hideBearishStocks = false;  
     
     static map = new HashMap();
 
     // Enable local storage of states / Database 
+
+    static sethideBullishStocks(_var) {
+        this.hideBullishStocks = _var;
+    }
+
+    static sethideBearishStocks(_var) {
+        this.hideBearishStocks = _var;
+    }
     
     static setGlobalStartPrice(_startPrice) {
         this.startPrice = _startPrice;
@@ -32,6 +43,14 @@ export default class PriceSettings {
 
     static getTargetPrice() {
         return this.targetPrice;
+    }
+
+    static getHideBullishStocks() {
+        return this.hideBullishStocks;
+    }
+    
+    static getHideBearishStocks() {
+        return this.hideBearishStocks;
     }
 
     static getLocalStartPrice(clickedAlertTableRowID) {

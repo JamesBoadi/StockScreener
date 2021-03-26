@@ -203,6 +203,8 @@ export class DashboardNavbar extends Component {
         // Enable Price Detection
         PriceSettings.setPriceDetectionEnabled(this.state.enablePriceDetection);
 
+
+        
     }
 
     // Global Start Price
