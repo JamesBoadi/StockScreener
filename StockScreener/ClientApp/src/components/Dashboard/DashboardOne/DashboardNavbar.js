@@ -7,6 +7,7 @@ import {
 import { FetchData } from './FetchData.js';
 import { Menu, Dropdown } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
+import PriceSettings from './js/PriceSettings.js';
 
 
 export class DashboardNavbar extends Component {
@@ -28,6 +29,10 @@ export class DashboardNavbar extends Component {
         this.enableNotifications = this.enableNotifications.bind(this);
         this.enableNotificationsMenu = this.enableNotificationsMenu.bind(this);
         this.addToNotificationsMenu = this.addToNotificationsMenu.bind(this);
+        this.setGlobalStartPrice = this.setGlobalStartPrice.bind(this);
+        this.setGlobalTargetPrice = this.setGlobalTargetPrice.bind(this);
+        this.setPriceDetectionEnabled = this.setPriceDetectionEnabled.bind(this);
+        this.overrideGlobalPrices = this.overrideGlobalPrices.bind(this);
 
         this.state = {
             animationTime: 5000,
@@ -52,7 +57,8 @@ export class DashboardNavbar extends Component {
             autoAlert: false,
             manualNotifications: false,
             autoNotifications: false,
-
+            enablePriceDetection: false,
+            overrideGlobalPrices: false,
             setNotifications: false,
             notificationsEnabled: 0,
             globalStartPrice: 0,
@@ -188,7 +194,35 @@ export class DashboardNavbar extends Component {
             this.setState({ notificationsEnabled: 1 })
         }
 
-        
+        // Override all prices if enabled
+        if (this.state.overrideGlobalPrices) {
+            PriceSettings.setGlobalStartPrice(this.state.globalStartPrice);
+            PriceSettings.setGlobalTargetPrice(this.state.globalTargetPrice);
+        }
+
+        // Enable Price Detection
+        PriceSettings.setPriceDetectionEnabled(this.state.enablePriceDetection);
+
+    }
+
+    // Global Start Price
+    setGlobalStartPrice(startPrice) {
+        this.setState({ globalStartPrice: startPrice });
+    }
+
+    // Global Target Price
+    setGlobalTargetPrice(targetPrice) {
+        this.setState({ globalTargetPrice: targetPrice });
+    }
+
+    // Enable Price Detection Bool
+    setPriceDetectionEnabled(e) {
+        this.setState({ enablePriceDetection: e.target.checked });
+    }
+
+    // Override Global Prices Bool
+    overrideGlobalPrices(e) {
+        this.setState({ overrideGlobalPrices: e.target.checked });
     }
 
     // Enable Alert Notifications
@@ -327,6 +361,7 @@ export class DashboardNavbar extends Component {
                             <label id="manualAlertsNotifications">Notifications</label>
                             <input class="manualAlertsNotifications" type="checkbox" onChange={this.setAlert} />
 
+                            
 
                             {/*   <label id="autoAlertsNotifications">Auto <br/> Notifications</label>
                                 <input class="autoAlertsNotifications" type="checkbox" onChange={this.setAlert} />
@@ -397,6 +432,7 @@ export class DashboardNavbar extends Component {
                             <div class="startPrice">
                                 <p id="startPriceLabel">Start Price</p>
                                 <NumberInput
+                                    onChange={this.setGlobalStartPrice}
                                     style={{ top: '5px' }}
                                     size="md" min={0} maxW={70} defaultValue={1} precision={2} step={0.2}>
                                     <NumberInputField />
@@ -410,6 +446,7 @@ export class DashboardNavbar extends Component {
                             <div class="endPrice">
                                 <p id="endPriceLabel">Target Price</p>
                                 <NumberInput
+                                    onChange={this.setGlobalTargetPrice}
                                     size="md" min={0} maxW={70} defaultValue={1} precision={2} step={0.2}>
                                     <NumberInputField />
                                     <NumberInputStepper >
@@ -419,11 +456,11 @@ export class DashboardNavbar extends Component {
                                 </NumberInput>
                             </div>
 
-                            <label id="enablePriceCheck">Enable Price Detection</label>
-                            <input class="enablePriceCheck" type="checkbox" />
+                            <label id="enablePriceCheck">Custom Price Detection</label>
+                            <input class="enablePriceCheck" type="checkbox" onChange={this.setPriceDetectionEnabled} />
 
                             <label id="overridePrices">Override Custom Prices</label>
-                            <input class="overridePrices" type="checkbox" />
+                            <input class="overridePrices" type="checkbox"  onChange={this.overrideGlobalPrices} />
 
                             <label id="hideBullishStocks">Hide Bullish Stocks</label>
                             <input class="hideBullishStocks" type="checkbox" />
@@ -431,6 +468,7 @@ export class DashboardNavbar extends Component {
                             <label id="hideBearishStocks">Hide Bearish Stocks</label>
                             <input class="hideBearishStocks" type="checkbox" />
 
+                         
                             <a
                                 style={{
                                     color: 'white',

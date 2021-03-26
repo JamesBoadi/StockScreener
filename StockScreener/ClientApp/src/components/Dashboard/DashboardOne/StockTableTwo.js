@@ -16,7 +16,7 @@ import * as HashMap from 'hashmap';
 import * as cache from 'cache-base';
 
 import TableCache from './js/TableCache.js';
-
+import PriceSettings from './js/PriceSettings.js';
 
 // Fetch data for dash board one
 export class StockTableTwo extends React.Component {
@@ -222,6 +222,8 @@ export class StockTableTwo extends React.Component {
 
     // Search box retrieves stocks from database
     async searchDatabase(e) {
+        console.log("Start Price " + PriceSettings.getStartPrice()
+        + " enable  " +  PriceSettings.getPriceDetectionEnabled()   );
         // e.preventDefault();
         let input = new String(e.target.value);
 

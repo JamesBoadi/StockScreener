@@ -5,6 +5,7 @@ import PriorityQueue from 'priority-q';
 import throttle from 'lodash.throttle';
 import * as cache from 'cache-base';
 import AlertCache from './js/AlertCache.js';
+import PriceSettings from './js/PriceSettings.js';
 
 // Replace with Redux
 export class StockTableTwoAlert extends React.Component {
@@ -115,7 +116,7 @@ export class StockTableTwoAlert extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        
+
 
 
 
@@ -314,22 +315,33 @@ export class StockTableTwoAlert extends React.Component {
 
         this.start = start;
         this.end = end;
-        let delay = 0;
 
         // Add stocks to array and priority priority_queue;
         let pointer = start;
         while (pointer < end) {
-            var currentPrice_state = parseInt(AlertCache.get(pointer).ChangeArray[0]);
-            var state = AlertReducer(currentPrice_state);
-            //console.log('STATE 2' + state + '  ' + currentPrice_state);
-            if (currentPrice_state !== 0) {
-                // Prevent adding an element twice
-                if (this.priority_queue.includes(pointer) == false)
-                    this.priority_queue.enqueue(pointer);
+            const cache = AlertCache.get(pointer);
+            const inRange = (cache.CurrentPrice >= PriceSettings.getStartPrice() &&
+            cache.CurrentPrice <= PriceSettings.getTargetPrice());
+            const priceDetectionEnabled = PriceSettings.getPriceDetectionEnabled();
+         
+            if (priceDetectionEnabled) {
+                const currentPrice_state = parseInt(cache.ChangeArray[0]);
+                const state = AlertReducer(currentPrice_state);
 
-                // Update existing element
-                this.array[pointer] = [pointer, state, 1600];
+                
+
+                //console.log('STATE 2' + state + '  ' + currentPrice_state);
+                if (currentPrice_state !== 0 && inRange) {
+                    // Prevent adding an element twice
+                    if (this.priority_queue.includes(pointer) == false)
+                        this.priority_queue.enqueue(pointer);
+
+                    // Update existing element
+                    this.array[pointer] = [pointer, state, 1600];
+                }
             }
+            
+
             pointer++;
         }
         //  console.log('start ' + this.priority_queue + ' \n end \n\n ' +  this.array);

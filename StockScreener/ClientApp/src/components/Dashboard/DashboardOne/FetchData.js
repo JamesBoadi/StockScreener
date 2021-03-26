@@ -7,6 +7,7 @@ import { StockTableTwo } from './StockTableTwo';
 import { AlertReducer } from './js/AlertReducer.js';
 import TableCache from './js/TableCache.js';
 import AlertCache from './js/AlertCache.js';
+import PriceSettings from './js/PriceSettings.js';
 import DataServiceWorker from './js/DataServiceWorker.js'
 
 import {
@@ -35,8 +36,11 @@ export class FetchData extends Component {
     super(props);
     this.readNavBarData = this.readNavBarData.bind(this);
     this.onNotifReceived = this.onNotifReceived.bind(this);
+
+    // Add, remove Table Rows
     this.addAlertTableRow = this.addAlertTableRow.bind(this);
     this.removeAlertTableRow = this.removeAlertTableRow.bind(this);
+    this.addToPortfolio = this.addToPortfolio.bind(this);
 
     this.setAlertTableRowBool = this.setAlertTableRowBool.bind(this);
     this.getAlertTableRowBool = this.getAlertTableRowBool.bind(this);
@@ -51,8 +55,7 @@ export class FetchData extends Component {
     this.setRemoveAlertTableRowBool = this.setRemoveAlertTableRowBool.bind(this);
 
     this.getCache = this.getCache.bind(this);
-    this.setLocalPrices = this.setLocalPrices.bind(this);
-    this.overrideLocalPrices = this.overrideLocalPrices.bind(this);
+
 
     this.triggerAnimation = this.triggerAnimation.bind(this);
     this.keyExists = this.keyExists.bind(this);
@@ -73,8 +76,7 @@ export class FetchData extends Component {
     this.called = false;
     this.alertTable = [];
     this.textInput = React.createRef();
-    this.startPriceRef = React.createRef();
-    this.targetPriceRef = React.createRef();
+  
     this.map = new HashMap();
     this.stockDashBoardMap = new HashMap();
 
@@ -119,9 +121,6 @@ export class FetchData extends Component {
 
       _updateCache: false,
       cache: new cache(),
-
-
-
 
       data: [
         {
@@ -216,10 +215,7 @@ export class FetchData extends Component {
 
   // Replace with event listener
   componentDidUpdate = (prevProps, prevState, snapshot) => {
-
     var t = [];
-
-    console.log('DID UPDATE ' + this.state.lock)
     if (this.state.lock === true && this.called === false) {
 
       t.push(<StockTableTwo
@@ -269,51 +265,6 @@ export class FetchData extends Component {
 
   updateCache(bool) {
     this.setState({updateCache: bool});
-  }
-
-  // Set local prices using global prices without overriding prices already set
-  setLocalPrices(startPrice, targetPrice) {
-    const clickedAlertTableRowID = this.state.clickedAlertTableRowID;
-    const data =
-    {
-      LocalStartPrice: startPrice,
-      LocalTargetPrice: targetPrice
-    }
-
-    for (let key = 0; key < 897; key++) {
-      if (key === clickedAlertTableRowID) {
-        this.stockDashBoardMap.set(key, data);
-        break;
-      }
-    }
-
-  }
-
-  // Override local prices using global prices
-  overrideLocalPrices(startPrice, targetPrice) {
-    const data =
-    {
-      LocalStartPrice: startPrice,
-      LocalTargetPrice: targetPrice,
-      Override: "YES" // If set by user, price will be overriden
-    }
-
-    for (let key = 0; key < 897; key++) {
-      this.stockDashBoardMap.set(key, data);
-    }
-  }
-
-  // Update stock hashmap
-  updateStockDashBoardMap() {
-    const data =
-    {
-      LocalStartPrice: this.startPriceRef.current.value,
-      LocalTargetPrice: this.targetPriceRef.current.value
-    }
-
-    // Update HashMap
-    const clickedAlertTableRowID = this.state.clickedAlertTableRowID;
-    this.stockDashBoardMap.set(clickedAlertTableRowID, data);
   }
 
   // Update Notifications Setter
@@ -480,6 +431,11 @@ export class FetchData extends Component {
     return this.state.removeAlertTableRowBool;
   }
 
+  addToPortfolio()
+  {
+
+  }
+
   set(bool) {
     this.setState({ addAlertTableRowBool: bool });
   }
@@ -528,13 +484,6 @@ export class FetchData extends Component {
     var count = 0;
 
     return new Promise(resolve => {
-
-
-
-
-
-
-
     });
   }
 
@@ -616,10 +565,12 @@ export class FetchData extends Component {
           <h1 style={{ position: 'relative', textAlign: 'center', color: 'white' }}>AAPL (Apple Inc)</h1>
           <h2 style={{ position: 'relative', left: '150px', color: 'white' }}>Previous: 286.5</h2>
           <h2 style={{ position: 'relative', top: '-55.5px', left: '600px', color: 'white' }}>Price: 299.5</h2>
-          <h4 style={{ position: 'relative', top: '38px', left: '5px', color: 'white' }}>Start Price:  </h4>
+       
+       
+       {/*   <h4 style={{ position: 'relative', top: '38px', left: '5px', color: 'white' }}>Start Price:  </h4>
 
           <NumberInput
-            // ref={this.startPriceRef}
+             ref={this.startPriceRef}
             style={{ position: 'relative', top: '0px', left: '150px' }}
             size="md" maxW={70} maxH={10} defaultValue={15} min={10} max={20}>
             <NumberInputField />
@@ -641,19 +592,19 @@ export class FetchData extends Component {
               <NumberIncrementStepper />
               <NumberDecrementStepper />
             </NumberInputStepper>
-          </NumberInput>
+    </NumberInput> */}
 
           <Button onClick={this.addAlertTableRow}
             style={{ position: 'absolute', bottom: '20px', right: '180px', width: '90px' }}>
-            Add <br />to Alerts</Button>
+            Add <br/>to Table</Button>
 
           <Button onClick={this.removeAlertTableRow}
             style={{ position: 'absolute', bottom: '20px', right: '50px', width: '90px' }}>
-            Remove  <br /> from Alerts</Button>
+            Remove  <br/> from Table</Button>
 
-          <Button onClick={this.updateStockDashBoardMap}
-            style={{ position: 'absolute', bottom: '20px', right: '50px', width: '90px' }}>
-            Remove  <br /> from Alerts</Button>
+          <Button onClick={this.addToPortfolio}
+            style={{ position: 'absolute', bottom: '20px', left: '40px', width: '90px' }}>
+            Add  <br/> to Portfolio</Button>
         </Box>
 
         {/* <SideBar isStreaming={() => { return this.state.isStreaming }}/>  */}
