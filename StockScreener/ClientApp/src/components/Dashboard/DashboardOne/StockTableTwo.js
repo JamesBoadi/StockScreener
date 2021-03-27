@@ -139,9 +139,22 @@ export class StockTableTwo extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         const scroll = this.scrollBy();
+        if (TableCache.getUpdateHideStocks()) {
+            console.log('  ---->  ' +  'THESE ARE MAH STOCKS!');
+            this.newTable()
+            this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
+                this.updateTable(this.state.start)
+            });
 
+            if (this.state.start === 0)
+                this.textInput.current.scrollTop = 10;
+            else
+                this.textInput.current.scrollTop = 25;
+
+            TableCache.setUpdateHideStocks(false);
+        }
         // Update table if a row is selected
-        if (this.state.isSelected) {
+        else if (this.state.isSelected) {
             this.newTable()
             this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
                 this.updateTable(this.state.start)
@@ -149,7 +162,6 @@ export class StockTableTwo extends React.Component {
             });
 
             this.setState({ isSelected: false });
-
         }
         // Update if scrolled
         else if (prevState.tb2_count === 1) {
@@ -195,7 +207,10 @@ export class StockTableTwo extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (this.updateTableData === false)
+        if (TableCache.getUpdateHideStocks()) {
+            return true;
+        }
+        else if (this.updateTableData === false)
             return false;
         else if (nextState.tb2_count !== this.state.tb2_count)
             return true;
@@ -426,24 +441,34 @@ export class StockTableTwo extends React.Component {
         var target = new Number(e.target.id);
         this.setState({ target: target });
 
-        //  console.log('target ' + target)
-        let endMod = 0;
-        let mod = 0;
         let id;
+        let mod = 0;
+        let endMod = 50;
+        let end;
+        const priceDetection = (TableCache.getPriceDetection());
+        const max = (priceDetection) ? TableCache.getMax() : 17;
+        let tb2_scrollPosition = this.state.tb2_scrollPosition;
 
-        if (this.state.tb2_scrollPosition === 0) {
+        // Reset Scroll Position (Only done once)
+        if (priceDetection && TableCache.getResetScrollPosition()) {
+            tb2_scrollPosition = 0;
+            this.setState({ tb2_scrollPosition: 0 });
+            TableCache.setResetScrollPosition(false);
+        }
+
+        if (tb2_scrollPosition === 0)
+            mod = 0;
+        else if (tb2_scrollPosition === max) {
+            endMod = (priceDetection) ? TableCache.getEndMod() : 47;
             mod = 0;
         }
-        else if (this.state.tb2_scrollPosition === 17) {
-            endMod = 47;
-            mod = 0;
-        }
-        else {
+        else
             mod = 15;
-        }
 
-        let start = (this.state.tb2_scrollPosition * 50) - mod;
-        let end = (this.state.tb2_scrollPosition * 50) + endMod;
+        end = (tb2_scrollPosition * 50) + endMod;
+        let start = (tb2_scrollPosition * 50) - mod;
+
+        //....................................
 
         style = {
             backgroundColor: "rgb(21,100,111)"
@@ -453,7 +478,8 @@ export class StockTableTwo extends React.Component {
 
         for (id = start; id < end; id++) {
             // Get values from cache this.state.tb2_stack
-            let list = TableCache.get(id);
+            let list = (!priceDetection) ? TableCache.get(id) :
+                TableCache.getOp(id);
 
             if (id == target) {
 
@@ -499,23 +525,13 @@ export class StockTableTwo extends React.Component {
     }
 
     newTable() {
-
         let id;
         let mod = 0;
         let endMod = 50;
-        let priceDetection = (PriceSettings.getHideBearishStocks() || PriceSettings.getHideBullishStocks());
-        let max = (priceDetection) ? TableCache.getMax() : 17;
-        let multiplier = (priceDetection && TableCache.getEndMod() == 0) ? TableCache.getMax() : 50;
+        let end;
+        const priceDetection = (TableCache.getPriceDetection());
+        const max = (priceDetection) ? TableCache.getMax() : 17;
         let tb2_scrollPosition = this.state.tb2_scrollPosition;
-
-        if (this.state.tb2_scrollPosition === 0)
-            mod = 0;
-        else if (this.state.tb2_scrollPosition === max) {
-            endMod = (priceDetection) ? TableCache.getEndMod() : 47;
-            mod = 0;
-        }
-        else
-            mod = 15;
 
         // Reset Scroll Position (Only done once)
         if (priceDetection && TableCache.getResetScrollPosition()) {
@@ -524,12 +540,22 @@ export class StockTableTwo extends React.Component {
             TableCache.setResetScrollPosition(false);
         }
 
+        if (tb2_scrollPosition === 0)
+            mod = 0;
+        else if (tb2_scrollPosition === max) {
+            endMod = (priceDetection) ? TableCache.getEndMod() : 47;
+            mod = 0;
+        }
+        else
+            mod = 15;
+
         end = (tb2_scrollPosition * 50) + endMod;
         let start = (tb2_scrollPosition * 50) - mod;
 
         var array = [];
         let style;
-        console.log('END ' + tb2_scrollPosition);
+
+        
 
         // Use shallow compare
         for (id = start; id < end; id++) {
@@ -540,9 +566,11 @@ export class StockTableTwo extends React.Component {
                 style = {};
 
             // Get values from cache
-            let list = TableCache.get(id);//this.state.cache.get(id.toString());
-            //  console.log( 'WORK WORK ' + id);
+            let list = (!priceDetection) ? TableCache.get(id) :
+                TableCache.getOp(id);//this.state.cache.get(id.toString());
 
+
+            //  console.log( 'WORK WORK ' + id);
             array.push(
                 <tbody key={id} style={this.styleMap.get(id)}>
                     <tr >
@@ -564,12 +592,20 @@ export class StockTableTwo extends React.Component {
     updateTable(start) {
         let mod = 0;
         let endMod = 50;
-        let priceDetection = (PriceSettings.getHideBearishStocks() || PriceSettings.getHideBullishStocks());
-        let max = (priceDetection) ? TableCache.getMax() : 17;
+        const priceDetection = (TableCache.getPriceDetection());
+        const max = (priceDetection) ? TableCache.getMax() : 17;
+        let tb2_scrollPosition = this.state.tb2_scrollPosition;
 
-        if (this.state.tb2_scrollPosition === 0)
+        // Reset Scroll Position (Only done once)
+        if (priceDetection && TableCache.getResetScrollPosition()) {
+            tb2_scrollPosition = 0;
+            this.setState({ tb2_scrollPosition: 0 });
+            TableCache.setResetScrollPosition(false);
+        }
+
+        if (tb2_scrollPosition === 0)
             mod = 0;
-        else if (this.state.tb2_scrollPosition === max) {
+        else if (tb2_scrollPosition === max) {
             endMod = (priceDetection) ? TableCache.getEndMod() : 47;
             mod = 0;
         }
@@ -584,8 +620,8 @@ export class StockTableTwo extends React.Component {
         this.props.setUpdateNotifications(true);
 
         // Get values from cache
-        let list = (PriceSettings.getHideBullishStocks()
-            || PriceSettings.getHideBearishStocks()) ? TableCache.hideBearishStocks() : TableCache.get(start);
+        let list = (!priceDetection) ? TableCache.get(start) :
+            TableCache.getOp(start);
         //this.props.cache.get(start.toString());
 
         let t = <div>
@@ -616,7 +652,7 @@ export class StockTableTwo extends React.Component {
 
     /** styleMap : { color,  transition} */
     addToStyleMap(triggerAlertID, triggerAlertColor, time) {
-        console.log(triggerAlertID + ' change ' + triggerAlertColor + ' time ' + time)
+        //console.log(triggerAlertID + ' change ' + triggerAlertColor + ' time ' + time)
         let bool = true;
         let style;
         let i = 0;
@@ -697,8 +733,8 @@ export class StockTableTwo extends React.Component {
         var table = [];
         let id;
 
-        let end = (PriceSettings.getHideBearishStocks() || PriceSettings.getHideBullishStocks())
-            ? TableCache.getEnd() : 50;
+        const priceDetection = (TableCache.getPriceDetection());
+        const end = (!priceDetection) ? TableCache.getEnd() : 50;
 
         for (id = 0; id < end; id++) {
             // Get values from cache

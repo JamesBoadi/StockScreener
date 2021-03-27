@@ -194,7 +194,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
                 while (pointer <= end)
                 {
-                    stock = new Stock(Stocks.StocksCode.Value[pointer],"8:00",
+                    stock = new Stock(Stocks.StocksCode.Value[pointer], "8:00",
                     1, 2, 3, 3, changeArray, 5, 6, 7, 8, 86);
 
                     cache.Add(stock);
@@ -235,13 +235,16 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 int pointer = start;
                 while (pointer < end)
                 {
-                   int[] array = { -1, 2, -2 };
+                    int[] array = { -1, 2, -2 };
                     Random random = new Random();
                     int start2 = random.Next(0, array.Length);
+
                     int[] changeArray = new int[6] { array[start2], array[start2], array[start2], array[start2],
                      array[start2], array[start2] };
+
+
                     stock = new Stock(Stocks.StocksCode.Value[pointer], "8:00",
-                    random.Next(0, 1001), 2, 3, 3, changeArray, 5, 6, 7, 8, 86);
+                    random.Next(0, 10), 2, 3, 3, changeArray, 5, 6, 7, 8, 86);
 
                     cache.Update(pointer, stock);
                     pointer++;

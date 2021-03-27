@@ -8,6 +8,7 @@ import { FetchData } from './FetchData.js';
 import { Menu, Dropdown } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import PriceSettings from './js/PriceSettings.js';
+import TableCache from './js/TableCache.js';
 
 
 export class DashboardNavbar extends Component {
@@ -33,6 +34,12 @@ export class DashboardNavbar extends Component {
         this.setGlobalTargetPrice = this.setGlobalTargetPrice.bind(this);
         this.setPriceDetectionEnabled = this.setPriceDetectionEnabled.bind(this);
         this.overrideGlobalPrices = this.overrideGlobalPrices.bind(this);
+
+        this.setHideBearishStocks = this.setHideBearishStocks.bind(this);
+        this.setHideBullishStocks = this.setHideBullishStocks.bind(this);
+        this.hideBullishStocksConfig = this.hideBullishStocksConfig.bind(this);
+        this.hideBearishStocksConfig = this.hideBearishStocksConfig.bind(this);
+
 
         this.state = {
             animationTime: 5000,
@@ -62,7 +69,10 @@ export class DashboardNavbar extends Component {
             setNotifications: false,
             notificationsEnabled: 0,
             globalStartPrice: 0,
-            globalTargetPrice: 0
+            globalTargetPrice: 0,
+            hideBearishStocks: false,
+            hideBullishStocks: false
+
         };
     }
 
@@ -203,16 +213,68 @@ export class DashboardNavbar extends Component {
         // Enable Price Detection
         PriceSettings.setPriceDetectionEnabled(this.state.enablePriceDetection);
 
-
-        
+        // Set variables for hiding bullish and bearish stocks
+        if (this.state.hideBullishStocks && !PriceSettings.getHideBullishStocks()) {
+            this.hideBullishStocksConfig();
+            PriceSettings.sethideBullishStocks(true);
+        } else if (!this.state.hideBullishStocks) {
+            PriceSettings.sethideBullishStocks(false);
+        }
+        if (this.state.hideBearishStocks && !PriceSettings.getHideBearishStocks()) {
+            this.hideBearishStocksConfig();
+            PriceSettings.sethideBearishStocks(true);
+        } else if (!this.state.hideBearishStocks) {
+            PriceSettings.sethideBearishStocks(false);
+        }
     }
 
-    // Global Start Price
+    // hideStocksConfig
+    hideBullishStocksConfig() {
+        // Create a Signal Graph
+        this.bullishInterval = setInterval(() => {
+
+            if (!PriceSettings.getHideBullishStocks()) {
+                // Disable Price Detection
+                TableCache.setPriceDetection(false); 
+                clearInterval(this.bullishInterval);
+            }
+
+            TableCache.hideBullishStocks();
+
+        }, 15000);
+    }
+
+    // hideStocksConfig
+    hideBearishStocksConfig() {
+        // Create a Signal Graph
+        this.bearishInterval = setInterval(() => {
+
+            if (!PriceSettings.getHideBearishStocks()) {
+                // Disable Price Detection
+                TableCache.setPriceDetection(false);
+                clearInterval(this.bearishInterval);
+            }
+            
+            TableCache.hideBearishStocks();
+
+        }, 25000);
+    }
+
+    // Set hide Bullish Stocks
+    setHideBullishStocks(e) {
+        this.setState({ hideBullishStocks: e.target.checked });
+    }
+    // Set hide Bearish Stocks
+    setHideBearishStocks(e) {
+        this.setState({ hideBearishStocks: e.target.checked });
+    }
+
+    //Set Global Start Price
     setGlobalStartPrice(startPrice) {
         this.setState({ globalStartPrice: startPrice });
     }
 
-    // Global Target Price
+    // Set Global Target Price
     setGlobalTargetPrice(targetPrice) {
         this.setState({ globalTargetPrice: targetPrice });
     }
@@ -363,7 +425,7 @@ export class DashboardNavbar extends Component {
                             <label id="manualAlertsNotifications">Notifications</label>
                             <input class="manualAlertsNotifications" type="checkbox" onChange={this.setAlert} />
 
-                            
+
 
                             {/*   <label id="autoAlertsNotifications">Auto <br/> Notifications</label>
                                 <input class="autoAlertsNotifications" type="checkbox" onChange={this.setAlert} />
@@ -462,15 +524,15 @@ export class DashboardNavbar extends Component {
                             <input class="enablePriceCheck" type="checkbox" onChange={this.setPriceDetectionEnabled} />
 
                             <label id="overridePrices">Override Custom Prices</label>
-                            <input class="overridePrices" type="checkbox"  onChange={this.overrideGlobalPrices} />
+                            <input class="overridePrices" type="checkbox" onChange={this.overrideGlobalPrices} />
 
                             <label id="hideBullishStocks">Hide Bullish Stocks</label>
-                            <input class="hideBullishStocks" type="checkbox" />
+                            <input class="hideBullishStocks" type="checkbox" onChange={this.setHideBullishStocks}/>
 
                             <label id="hideBearishStocks">Hide Bearish Stocks</label>
-                            <input class="hideBearishStocks" type="checkbox" />
+                            <input class="hideBearishStocks" type="checkbox" onChange={this.setHideBearishStocks}/>
 
-                         
+
                             <a
                                 style={{
                                     color: 'white',
