@@ -8,6 +8,7 @@ import { FetchData } from './FetchData.js';
 import { Menu, Dropdown } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import PriceSettings from './js/PriceSettings.js';
+import AlertSettings from './js/AlertSettings.js';
 import TableCache from './js/TableCache.js';
 
 
@@ -17,13 +18,15 @@ export class DashboardNavbar extends Component {
         this.array = [];
         this.getStartTime = React.createRef(); // Replace ref with onclick, store and retrieve state
         this.getEndTime = React.createRef();
+        this.alertFrequencyRef = React.createRef();
         this.dateTime = new Date();
         this.alertInterval_ = null;
         this.saveConfiguration = this.saveConfiguration.bind(this);
         //this.setGlobalTargetPrice = this.setGlobalTargetPrice.bind(this);
         //this.setStartTargetPrice = this.setStartTargetPrice.bind(this);
         // Global sets local does not set global
-        this.setAlert = this.setAlert.bind(this);
+        this.setManualAlert = this.setManualAlert.bind(this);
+        this.setAutoAlert = this.setAutoAlert.bind(this);
         this.setAlertTrigger = this.setAlertTrigger.bind(this);
         this.parseTime = this.parseTime.bind(this);
         this.notifications = this.notifications.bind(this);
@@ -39,7 +42,6 @@ export class DashboardNavbar extends Component {
         this.setHideBullishStocks = this.setHideBullishStocks.bind(this);
         this.hideBullishStocksConfig = this.hideBullishStocksConfig.bind(this);
         this.hideBearishStocksConfig = this.hideBearishStocksConfig.bind(this);
-
 
         this.state = {
             animationTime: 5000,
@@ -57,11 +59,9 @@ export class DashboardNavbar extends Component {
                          Notifications <br/>
                      </div> */
             ],
-
             updateNotifications: false,
             notificationsMenuVisible: false,
-            manualAlert: true,
-            autoAlert: false,
+
             manualNotifications: false,
             autoNotifications: false,
             enablePriceDetection: false,
@@ -70,8 +70,19 @@ export class DashboardNavbar extends Component {
             notificationsEnabled: 0,
             globalStartPrice: 0,
             globalTargetPrice: 0,
-            hideBearishStocks: false,
-            hideBullishStocks: false
+
+
+            manualAlert: false,
+            autoAlert: true,
+
+            manualDisabled: true,
+            autoDisabled: false,
+
+            hideBearishStocks: true,
+            hideBullishStocks: false,
+
+            hideBearishStocksDisabled: false,
+            hideBullishStocksDisabled: true,
 
         };
     }
@@ -87,7 +98,11 @@ export class DashboardNavbar extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextState.updateNotifications !== this.state.updateNotifications ||
+        if (nextState.autoDisabled !== this.state.autoDisabled ||
+            nextState.manualDisabled !== this.state.manualDisabled ||
+            nextState.hideBearishStocks !== this.state.hideBearishStocks ||
+            nextState.hideBullishStocks !== this.state.hideBullishStocks ||
+            nextState.updateNotifications !== this.state.updateNotifications ||
             nextState.notifications_temp.length !== this.state.notifications_temp.length
             || nextState.notificationsMenuVisible !== this.state.notificationsMenuVisible) {
             return true;
@@ -145,8 +160,7 @@ export class DashboardNavbar extends Component {
     }
 
     // Call notifications
-    notifications(stock, previousPrice, currentPrice,
-        localStartPrice, localTargetPrice, state) {
+    notifications(stock, previousPrice, currentPrice, state) {
 
         let targetPrice;
         let startPrice;
@@ -154,8 +168,11 @@ export class DashboardNavbar extends Component {
         let globalStartPrice = this.state.globalStartPrice;
         let globalTargetPrice = this.state.globalTargetPrice;
 
+        startPrice = globalStartPrice;
+        targetPrice = globalTargetPrice;
+
         // Override global price individually
-        if (localStartPrice !== globalStartPrice)
+     /*   if (localStartPrice !== globalStartPrice)
             startPrice = localStartPrice;
         else
             startPrice = globalStartPrice;
@@ -163,7 +180,7 @@ export class DashboardNavbar extends Component {
         if (localTargetPrice !== globalTargetPrice)
             targetPrice = localTargetPrice
         else
-            targetPrice = globalTargetPrice;
+            targetPrice = globalTargetPrice;*/
 
         // User specifies a Bearish criteria
         if (startPrice > targetPrice) {
@@ -196,13 +213,35 @@ export class DashboardNavbar extends Component {
             startPrice, targetPrice, state);
     }
 
+
+
+
     // Save all settings
     saveConfiguration() {
-        this.setAlertTrigger(this.state.alertEnabled);
+        AlertSettings.setAlertInterval(this.alertFrequencyRef.current.value);
+
+        //selectedIndex  )
+        //this.setAlertTrigger(this.state.alertEnabled);
 
         if (this.state.setNotifications) {
             this.setState({ notificationsEnabled: 1 })
         }
+
+        // Set Alert Times
+        // Detect Change in Alert Settings
+        if (AlertSettings.getManual() !== this.state.manualAlert
+            || AlertSettings.getAuto() !== this.state.autoAlert) {
+            console.log(' CHANGE IN ALERT SETTINGS ');
+            AlertSettings.setUpdateAlertSettings(true);
+        }
+
+        if (!this.state.autoAlert) {
+            console.log('scroll false')
+            TableCache.setDisableScroll(false);
+        }
+        console.log(this.state.manualAlert+' mn '+this.state.autoAlert);
+        AlertSettings.setManual(this.state.manualAlert);
+        AlertSettings.setAuto(this.state.autoAlert);
 
         // Override all prices if enabled
         if (this.state.overrideGlobalPrices) {
@@ -217,12 +256,14 @@ export class DashboardNavbar extends Component {
         if (this.state.hideBullishStocks && !PriceSettings.getHideBullishStocks()) {
             this.hideBullishStocksConfig();
             PriceSettings.sethideBullishStocks(true);
+            AlertSettings.setUpdateAlertSettings(true);
         } else if (!this.state.hideBullishStocks) {
             PriceSettings.sethideBullishStocks(false);
         }
         if (this.state.hideBearishStocks && !PriceSettings.getHideBearishStocks()) {
             this.hideBearishStocksConfig();
             PriceSettings.sethideBearishStocks(true);
+            AlertSettings.setUpdateAlertSettings(true);
         } else if (!this.state.hideBearishStocks) {
             PriceSettings.sethideBearishStocks(false);
         }
@@ -235,38 +276,46 @@ export class DashboardNavbar extends Component {
 
             if (!PriceSettings.getHideBullishStocks()) {
                 // Disable Price Detection
-                TableCache.setPriceDetection(false); 
+                TableCache.setDisableScroll(false);
+                TableCache.setPriceDetection(false);
+                TableCache.setUpdateHideStocks(true);
                 clearInterval(this.bullishInterval);
             }
-
+            TableCache.setDisableScroll(true);
             TableCache.hideBullishStocks();
 
-        }, 15000);
+        }, 60000);
     }
 
     // hideStocksConfig
     hideBearishStocksConfig() {
         // Create a Signal Graph
         this.bearishInterval = setInterval(() => {
-
             if (!PriceSettings.getHideBearishStocks()) {
                 // Disable Price Detection
+                TableCache.setDisableScroll(false);
                 TableCache.setPriceDetection(false);
+                TableCache.setUpdateHideStocks(true);
                 clearInterval(this.bearishInterval);
             }
-            
+            TableCache.setDisableScroll(true);
             TableCache.hideBearishStocks();
 
-        }, 25000);
+        }, 60000);
     }
 
     // Set hide Bullish Stocks
     setHideBullishStocks(e) {
         this.setState({ hideBullishStocks: e.target.checked });
+
+        this.setState({ hideBearishStocksDisabled: !this.state.hideBearishStocksDisabled });
+
     }
     // Set hide Bearish Stocks
     setHideBearishStocks(e) {
         this.setState({ hideBearishStocks: e.target.checked });
+
+        this.setState({ hideBullishStocksDisabled: !this.state.hideBullishStocksDisabled });
     }
 
     //Set Global Start Price
@@ -299,9 +348,20 @@ export class DashboardNavbar extends Component {
         this.setState({ setNotifications: e.target.checked })
     }
 
-    // Checkbox that enables alert
-    setAlert(e) {
-        this.setState({ alertEnabled: e.target.checked });
+    // Checkbox that enables manual alert
+    setManualAlert(e) {
+        this.setState({ manualAlert: e.target.checked });
+
+        // Disable auto alert checkbox 
+        this.setState({ autoDisabled: !this.state.autoDisabled });
+    }
+
+    // Checkbox that enables auto alert
+    setAutoAlert(e) {
+        this.setState({ autoAlert: e.target.checked });
+
+        // Disable auto alert checkbox 
+        this.setState({ manualDisabled: !this.state.manualDisabled });
     }
 
     // Determine whether or not an alert should be triggered
@@ -320,24 +380,14 @@ export class DashboardNavbar extends Component {
         let endTime_hours = endTime[0];
         let endTime_minutes = endTime[1];
 
-        let dateTime_hours = (this.dateTime.getUTCHours() + 8 >= 24) ? Math.abs(24 - (this.dateTime.getUTCHours() + 8))
-            : this.dateTime.getUTCHours() + 8;
-        let datetime_minutes = this.dateTime.getMinutes();
+        /*   console.log('start time h ' + startTime_hours + ' start time m ' + startTime_minutes
+               + ' end time h  ' + endTime_hours + '  end time m ' + endTime_minutes
+               + ' DATETIME    ' + dateTime_hours);*/
+        /*
 
-        // Trigger an alert if it is within time frame
-        if (dateTime_hours >= 9 && dateTime_hours <= 5) {
-            if (startTime_hours >= dateTime_hours && endTime_hours < dateTime_hours) {
-                if (dateTime_hours == 4 && endTime_minutes <= 59) {
-                    alertBool = true;
-                }
-            }
-        }
-
-        console.log(alertBool);
-
-        this.setState({ startTime: [startTime_hours, startTime_minutes] })
-        this.setState({ endTime: [endTime_hours, endTime_minutes] })
-        this.setState({ triggerAlert: alertBool })
+    this.setState({ startTime: [startTime_hours, startTime_minutes] })
+    this.setState({ endTime: [endTime_hours, endTime_minutes] })
+    this.setState({ triggerAlert: alertBool })*/
     }
 
     parseTime(str) {
@@ -364,14 +414,14 @@ export class DashboardNavbar extends Component {
             </select>;
 
         let alertFrequency =
-            <select class="alertFrequency" name="Frequency">
-                <option value="none">1 Minute</option>
-                <option value="none">5 Minutes</option>
-                <option value="none">10 Minutes</option>
-                <option value="none">15 Minutes</option>
-                <option value="none">30 Minutes</option>
-                <option value="none">1 Hour</option>
-                <option value="none">3 Hours</option>
+            <select class="alertFrequency" name="Frequency" ref={this.alertFrequencyRef}>
+                <option value="60000">1 Minute</option>
+                <option value="300000">5 Minutes</option>
+                <option value="600000">10 Minutes</option>
+                <option value="900000">15 Minutes</option>
+                <option value="1800000">30 Minutes</option>
+                <option value="3600000">1 Hour</option>
+                <option value="10800000">3 Hours</option>
             </select>;
 
         let custom_alertFrequency = <input class="customalertFrequency" type="number" id="quantity"
@@ -416,24 +466,27 @@ export class DashboardNavbar extends Component {
                             {startTime}
                             <label id="endTime">End Time</label>
                             {endTime}
-                            <label id="manualAlerts">Manual</label>
-                            <input class="manualAlerts" type="checkbox" onChange={this.setAlert} />
+
+                             <label id="manualAlerts">Manual</label>
+
+                            <input class="manualAlerts" type="checkbox" checked={this.state.manualAlert}
+                                disabled={this.state.manualDisabled} onChange={this.setManualAlert} />
 
                             <label id="autoAlerts">Auto</label>
-                            <input class="autoAlerts" type="checkbox" onChange={this.setAlert} />
 
-                            <label id="manualAlertsNotifications">Notifications</label>
-                            <input class="manualAlertsNotifications" type="checkbox" onChange={this.setAlert} />
+                            <input class="autoAlerts" type="checkbox" checked={this.state.autoAlert}
+                                disabled={this.state.autoDisabled} onChange={this.setAutoAlert} /> {/* {...(this.state.manualAlert == 1) ? disabled : ""} */}
 
-
-
-                            {/*   <label id="autoAlertsNotifications">Auto <br/> Notifications</label>
-                                <input class="autoAlertsNotifications" type="checkbox" onChange={this.setAlert} />
+                            {/* 
+                              <label id="manualAlertsNotifications">Notifications</label>
+                            <input class="manualAlertsNotifications" type="checkbox" />
+                            <label id="autoAlertsNotifications">Auto <br/> Notifications</label>
+                                <input class="autoAlertsNotifications" type="checkbox" onChange={this.setManualAlert} />
                                   <label id="enableNotifications">Manual</label>
-                                <input class="enableNotifications" type="checkbox" onChange={this.setAlert} />
+                                <input class="enableNotifications" type="checkbox" onChange={this.setManualAlert} />
 
                                 <label id="enableNotifications">Auto</label>
-                                <input class="enableNotifications" type="checkbox" onChange={this.setAlert} /> */}
+                                <input class="enableNotifications" type="checkbox" onChange={this.setManualAlert} /> */}
                         </div>
 
                         <div class="tableSettings" >
@@ -527,16 +580,23 @@ export class DashboardNavbar extends Component {
                             <input class="overridePrices" type="checkbox" onChange={this.overrideGlobalPrices} />
 
                             <label id="hideBullishStocks">Hide Bullish Stocks</label>
-                            <input class="hideBullishStocks" type="checkbox" onChange={this.setHideBullishStocks}/>
+                            <input class="hideBullishStocks" type="checkbox"
+                                checked={this.state.hideBullishStocks}
+                                disabled={this.state.hideBullishStocksDisabled}
+                                onChange={this.setHideBullishStocks} />
+                            {/*  />*/}
 
                             <label id="hideBearishStocks">Hide Bearish Stocks</label>
-                            <input class="hideBearishStocks" type="checkbox" onChange={this.setHideBearishStocks}/>
-
+                            <input class="hideBearishStocks" type="checkbox"
+                                checked={this.state.hideBearishStocks}
+                                disabled={this.state.hideBearishStocksDisabled}
+                                onChange={this.setHideBearishStocks} />
+                            {/*  />*/}
 
                             <a
                                 style={{
                                     color: 'white',
-                                    position: 'absolute', top: '-60px', left: '1400px',
+                                    position: 'absolute', top: '-68px', left: '1130px',
                                 }} onClick={this.enableNotificationsMenu}>
                                 Notifications <DownOutlined />
                             </a>
@@ -551,7 +611,7 @@ export class DashboardNavbar extends Component {
                                     overflowY='auto'
                                     bg='#f9f9f9'
                                     top='-35px'
-                                    left='1400px'
+                                    left='1130px'
                                     backgroundColor='wheat.511'
                                     zIndex='999'
                                 >
@@ -561,8 +621,6 @@ export class DashboardNavbar extends Component {
 
                             <Button style={{ position: 'absolute', top: '170px', left: '1325px', zIndex: '-999' }}
                                 onClick={this.saveConfiguration}>Save Configuration</Button>
-
-
 
                         </div>
 

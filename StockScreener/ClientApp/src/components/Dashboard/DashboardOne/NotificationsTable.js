@@ -281,7 +281,7 @@ export class NotificationsTable extends Component {
                         <td id={pointer} onClick={this.props.selectAlertTableRow}>
                             {this.props.state.alertTableStocks[pointer].CurrentPrice.toString()} </td>
                         <td id={pointer} onClick={this.props.selectAlertTableRow}>
-                            {this.props.state.alertTableStocks[pointer].ProfitLoss_Percentage.toString()}</td>
+                            {this.props.state.alertTableStocks[pointer].ChangeP.toString()}</td>
                         <td id={pointer} onClick={this.props.selectAlertTableRow}>
                             {this.props.state.alertTableStocks[pointer].Volume.toString()}</td>
                     </tr>
@@ -312,7 +312,7 @@ export class NotificationsTable extends Component {
                         <td id={pointer} onClick={this.props.selectAlertTableRow}>
                             {this.props.state.alertTableStocks[pointer].CurrentPrice.toString()} </td>
                         <td id={pointer} onClick={this.props.selectAlertTableRow}>
-                            {this.props.state.alertTableStocks[pointer].ProfitLoss_Percentage.toString()}</td>
+                            {this.props.state.alertTableStocks[pointer].ChangeP.toString()}</td>
                         <td id={pointer} onClick={this.props.selectAlertTableRow}>
                             {this.props.state.alertTableStocks[pointer].Volume.toString()}</td>
                     </tr>

@@ -6,7 +6,9 @@ import { DashboardSettings } from '../DashboardSettings';
 import { StockTableTwo } from './StockTableTwo';
 import { AlertReducer } from './js/AlertReducer.js';
 import TableCache from './js/TableCache.js';
+import NotificationsCache from './js/NotificationsCache.js';
 import AlertCache from './js/AlertCache.js';
+import AlertSettings from './js/AlertSettings.js';
 import PriceSettings from './js/PriceSettings.js';
 import DataServiceWorker from './js/DataServiceWorker.js'
 
@@ -49,13 +51,10 @@ export class FetchData extends Component {
 
     this.selectAlertTableRow = this.selectAlertTableRow.bind(this);
     this.selectStockTableRow = this.selectStockTableRow.bind(this);
-
     this.setEnd = this.setEnd.bind(this);
     this.setStart = this.setStart.bind(this);
     this.setRemoveAlertTableRowBool = this.setRemoveAlertTableRowBool.bind(this);
-
     this.getCache = this.getCache.bind(this);
-
 
     this.triggerAnimation = this.triggerAnimation.bind(this);
     this.keyExists = this.keyExists.bind(this);
@@ -76,7 +75,7 @@ export class FetchData extends Component {
     this.called = false;
     this.alertTable = [];
     this.textInput = React.createRef();
-  
+
     this.map = new HashMap();
     this.stockDashBoardMap = new HashMap();
 
@@ -85,10 +84,11 @@ export class FetchData extends Component {
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
-   // this.updateCache = false;
+    // this.updateCache = false;
     this.lock = false;
     this.connected = false;
     this.keyCount = 0;
+    this.updateStockInfo = false;
 
     this.state = {
       stockTableTwo: [],
@@ -118,6 +118,15 @@ export class FetchData extends Component {
       updateNotifications: false,
       start: 0,
       end: 50,
+
+      stockInfoName: [],
+      stockInfoHeader: [],
+      stockInfoPrevPrice: [],
+      stockInfoCurrPrice: [],
+      stockInfoCode: [],
+
+
+      updateStockInfo: false,
 
       _updateCache: false,
       cache: new cache(),
@@ -196,8 +205,8 @@ export class FetchData extends Component {
 
 
 
-    
-    
+
+
 
 
 
@@ -216,14 +225,21 @@ export class FetchData extends Component {
   // Replace with event listener
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     var t = [];
-    if (this.state.lock === true && this.called === false) {
 
+    if (this.updateStockInfo) {
+      this.setState({ stockInfoHeader: this.state.stockInfoName[0] });
+      this.setState({ stockInfoPrevPrice: this.state.stockInfoName[1] });
+      this.setState({ stockInfoCurrPrice: this.state.stockInfoName[2] });
+      this.setState({ stockInfoCode: this.state.stockInfoName[3] });
+
+      this.updateStockInfo = false;
+    }
+    else if (this.state.lock === true && this.called === false) {
       t.push(<StockTableTwo
         {...this}
         alertInterval={this.props.state.alertInterval}
         endTime={this.props.state.endTime}
         cache={this.getCache()}
-       
       />)
 
       this.setState({ stockTableTwo: t });
@@ -238,7 +254,6 @@ export class FetchData extends Component {
       // this.addToNotificationsMenu(); 
       this.setState({ updateNotifications: false });
     }
-
     /*
         if (this.props.state.setNotifications && this.props.state.notificationsEnabled === 0) {
           clearInterval(this.interval)
@@ -249,8 +264,7 @@ export class FetchData extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.state.lock !== nextState.lock) {
-
+    if (this.state.lock !== nextState.lock || this.updateStockInfo) {
       return true;
     }
     else if (this.state.addAlertTableRowBool !== nextState.addAlertTableRowBool
@@ -262,9 +276,8 @@ export class FetchData extends Component {
     return false;
   }
 
-
   updateCache(bool) {
-    this.setState({updateCache: bool});
+    this.setState({ updateCache: bool });
   }
 
   // Update Notifications Setter
@@ -293,28 +306,46 @@ export class FetchData extends Component {
       const end = 897;//this.state.end;
 
       this.notificationsDelayInterval = setInterval(() => {
-        const stock = this.stockDashBoardMap.get(pointer).StockCode;
-        const localStartPrice = this.stockDashBoardMap.get(pointer).LocalStartPrice;
-        const localTargetPrice = this.stockDashBoardMap.get(pointer).LocalTargetPrice;
-        const currentPrice_state = parseInt(this.cache.get(pointer.toString()).ChangeArray[0]);
-        const currentPrice = parseInt(this.cache.get(pointer.toString()).CurrentPrice);
-        const previousPrice = parseInt(this.cache.get(pointer.toString()).CurrentPrice)
-          - parseInt(this.cache.get(pointer.toString()).Change);
+        // const stock = this.stockDashBoardMap.get(pointer).StockCode;
+        //  const localStartPrice = this.stockDashBoardMap.get(pointer).LocalStartPrice;
+        //  const localTargetPrice = this.stockDashBoardMap.get(pointer).LocalTargetPrice;
+        const stock = NotificationsCache.get(pointer).StockCode;
+        const currentPrice_state = parseInt(NotificationsCache.get(pointer).ChangeArray[0]);
+        const currentPrice = parseInt(NotificationsCache.get(pointer).CurrentPrice);
+        const previousPrice = parseInt(NotificationsCache.getPreviousPrice(pointer));
 
-        this.props.notifications(stock, previousPrice, currentPrice,
-          localStartPrice, localTargetPrice, currentPrice_state);
+        this.props.notifications(stock, previousPrice, currentPrice, currentPrice_state);
 
         if (pointer++ >= end) {
           clearInterval(this.notificationsInterval)
         }
-      }, 1750);
-    }, (!this.props.state.manualAlert) ? defaultInterval : this.props.state.alertInterval);
+      }, );
+    }, AlertSettings.getAlertInterval());
   }
 
-  // ID Setter
+  // Triggered when a table row is clicked
   selectStockTableRow(e) {
     const alertTableId = parseInt(e.target.id);
+    console.log('Clicked ' + alertTableId)
+
+    var info = [];
+
+    info.push(<h1 style={{ position: 'absolute', textAlign: 'center', left: '270px', color: 'white' }}>
+      {TableCache.get(alertTableId).StockName}</h1>);
+
+    info.push(<h2 style={{ position: 'absolute', textAlign: 'center', top: '75px', left: '270px', color: 'white' }}>
+      Previous: {TableCache.getPreviousPrice(alertTableId)}</h2>);
+
+    info.push(<h2 style={{ position: 'absolute', textAlign: 'center', top: '120px', left: '270px', color: 'white' }}>
+      Price: {TableCache.get(alertTableId).CurrentPrice}</h2>);
+
+    info.push(<h1 style={{ position: 'absolute', textAlign: 'center', left: '0px', color: 'white' }}>
+      {TableCache.get(alertTableId).StockCode}</h1>);
+
+    this.setState({ stockInfoName: info });
+
     this.setState({ clickedAlertTableRowID: alertTableId });
+    this.updateStockInfo = true;
   }
 
   // Select Row Setter
@@ -343,6 +374,7 @@ export class FetchData extends Component {
     });
   }
 
+  // Add a Row to Alert Table
   async addAlertTableRow(e) {
     var t = this.state.alertTableStack;
     var alertTableStocks = this.state.alertTableStocks;
@@ -355,9 +387,8 @@ export class FetchData extends Component {
       return;
     // Read from Database
 
-
     // Stocks to be displayed in alert table
-    alertTableStocks.push(this.cache.get(target.toString()))
+    alertTableStocks.push(TableCache.get(target))
     let pointer = alertTableStocks.length - 1;
 
     t.push(
@@ -366,7 +397,7 @@ export class FetchData extends Component {
           <td id={pointer} onClick={this.selectAlertTableRow}>{alertTableStocks[pointer].StockCode.toString()}</td>
           <td id={pointer} onClick={this.selectAlertTableRow}>{alertTableStocks[pointer].TimeStamp.toString()}</td>
           <td id={pointer} onClick={this.selectAlertTableRow}>{alertTableStocks[pointer].CurrentPrice.toString()} </td>
-          <td id={pointer} onClick={this.selectAlertTableRow}>{alertTableStocks[pointer].ProfitLoss_Percentage.toString()}</td>
+          <td id={pointer} onClick={this.selectAlertTableRow}>{alertTableStocks[pointer].ChangeP.toString()}</td>
           <td id={pointer} onClick={this.selectAlertTableRow}>{alertTableStocks[pointer].Volume.toString()}</td>
         </tr>
       </tbody>
@@ -431,8 +462,7 @@ export class FetchData extends Component {
     return this.state.removeAlertTableRowBool;
   }
 
-  addToPortfolio()
-  {
+  addToPortfolio() {
 
   }
 
@@ -487,7 +517,6 @@ export class FetchData extends Component {
     });
   }
 
-
   // this.hubConnection.invoke() timeout 60 * 5, must reach 897 by 5 minutes or return error
   // Max wait per value 60 seconds
   /** Establish a Signal R connection */
@@ -503,10 +532,10 @@ export class FetchData extends Component {
           this.request_Calls = request_Calls;
         })
         this.hubConnection.on('requestData', (key, data) => {
-            let item = JSON.parse(data);
-           TableCache.set(key, item);
-           AlertCache.set(key, item);
-
+          let item = JSON.parse(data);
+          TableCache.set(key, item);
+          AlertCache.set(key, item);
+          NotificationsCache.set(key, item);
 
           //  console.log(key + "  " + AlertCache.get(key) + "  " + TableCache.get(key));
           if (count < 897) {
@@ -514,7 +543,6 @@ export class FetchData extends Component {
             // count - key !== 1 --> 404 reconnect the whole thing
           }
           else {
-
             count = 0;
             console.log("Ok")
             this.connected = true;
@@ -525,7 +553,6 @@ export class FetchData extends Component {
         console.log('Error while establishing hubConnection :( ')
         this.connected = false;
       }); // Redirect to 404 page
-
 
     const res = await this.connectionTimeout();
 
@@ -543,13 +570,10 @@ export class FetchData extends Component {
     console.info('Yayyyyy, I just received a notification!!!', res);
   }
 
-  // https://www.codetinkerer.com/2018/06/05/aspnet-core-websockets.html
-
   render() {
     // Create multiple fetch datas for each dashboard
     //Dashboard
     return (
-
       <div>
         {/* Stock Dashboard */}
         <Box
@@ -562,12 +586,13 @@ export class FetchData extends Component {
           margin='auto'
           zIndex='0'>
 
-          <h1 style={{ position: 'relative', textAlign: 'center', color: 'white' }}>AAPL (Apple Inc)</h1>
-          <h2 style={{ position: 'relative', left: '150px', color: 'white' }}>Previous: 286.5</h2>
-          <h2 style={{ position: 'relative', top: '-55.5px', left: '600px', color: 'white' }}>Price: 299.5</h2>
-       
-       
-       {/*   <h4 style={{ position: 'relative', top: '38px', left: '5px', color: 'white' }}>Start Price:  </h4>
+          {this.state.stockInfoCode}
+          {this.state.stockInfoHeader}
+          {this.state.stockInfoPrevPrice}
+          {this.state.stockInfoCurrPrice}
+
+
+          {/*   <h4 style={{ position: 'relative', top: '38px', left: '5px', color: 'white' }}>Start Price:  </h4>
 
           <NumberInput
              ref={this.startPriceRef}
@@ -579,7 +604,6 @@ export class FetchData extends Component {
               <NumberDecrementStepper />
             </NumberInputStepper>
           </NumberInput>
-
 
           <h4 style={{ position: 'relative', top: '38px', left: '5px', color: 'white' }}>Target Price:  </h4>
 
@@ -596,15 +620,15 @@ export class FetchData extends Component {
 
           <Button onClick={this.addAlertTableRow}
             style={{ position: 'absolute', bottom: '20px', right: '180px', width: '90px' }}>
-            Add <br/>to Table</Button>
+            Add <br />to Table</Button>
 
           <Button onClick={this.removeAlertTableRow}
             style={{ position: 'absolute', bottom: '20px', right: '50px', width: '90px' }}>
-            Remove  <br/> from Table</Button>
+            Remove  <br /> from Table</Button>
 
           <Button onClick={this.addToPortfolio}
             style={{ position: 'absolute', bottom: '20px', left: '40px', width: '90px' }}>
-            Add  <br/> to Portfolio</Button>
+            Add  <br /> to Portfolio</Button>
         </Box>
 
         {/* <SideBar isStreaming={() => { return this.state.isStreaming }}/>  */}

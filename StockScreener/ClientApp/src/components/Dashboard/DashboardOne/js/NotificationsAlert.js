@@ -53,7 +53,6 @@ export class NotificationsAlert extends React.Component {
 
     render()
     {
-        
         return null;
     }
 }

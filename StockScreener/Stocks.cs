@@ -70,7 +70,18 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             set { stocksCode = value; }
         }
 
+        private static Lazy<string[]> stocksName; //= new Lazy<string[]>();
+
+        public static Lazy<string[]> StocksName
+        {
+            get { return stocksName; }
+            set { stocksName = value; }
+        }
+
         string[] stockCode;
+
+        string[] stockName;
+
         private int request_Calls = 0;
         public int Request_Calls
         {
@@ -136,6 +147,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         public void init_StockCode()
         {
             Stocks.StocksCode = new Lazy<string[]>(() => getStockCode(), LazyThreadSafetyMode.ExecutionAndPublication);
+            Stocks.StocksName = new Lazy<string[]>(() => getStockName(), LazyThreadSafetyMode.ExecutionAndPublication);
             MAX_CALLS = ((StocksCode.Value.Length - (StocksCode.Value.Length % 20)) / 20);
             Mod = ((StocksCode.Value.Length % 20) - 1);
         }
@@ -194,14 +206,15 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
                 while (pointer <= end)
                 {
-                    stock = new Stock(Stocks.StocksCode.Value[pointer], "8:00",
+                    stock = new Stock(Stocks.StocksCode.Value[pointer],
+                    Stocks.StocksName.Value[pointer], "8:00",
                     1, 2, 3, 3, changeArray, 5, 6, 7, 8, 86);
 
                     cache.Add(stock);
                     pointer++;
                 }
 
-                /*    copy(start, end);
+             /*      copy(start, end);
                     data = client.GetRealTimePrices(stockArray);
                     Stock stock;
 
@@ -212,8 +225,8 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     (positive && !negative) ? 1 : -1, data_.Close, data_.PreviousClose);
 
                     cache.Add(stock);
-                }
-            */
+                } */
+            
             }
             catch (Exception ex)
             {
@@ -242,8 +255,8 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     int[] changeArray = new int[6] { array[start2], array[start2], array[start2], array[start2],
                      array[start2], array[start2] };
 
-
-                    stock = new Stock(Stocks.StocksCode.Value[pointer], "8:00",
+                    stock = new Stock(Stocks.StocksCode.Value[pointer],
+                    Stocks.StocksName.Value[pointer], "8:00",
                     random.Next(0, 10), 2, 3, 3, changeArray, 5, 6, 7, 8, 86);
 
                     cache.Update(pointer, stock);
@@ -329,6 +342,20 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             }
 
             return stockCode;
+        }
+
+        public string[] getStockName()
+        {
+            int pointer = -1;
+            List<Database> _stocks = StockList.Value;
+            stockName = new string[_stocks.Count];
+
+            foreach (Database data in _stocks)
+            {
+                stockName[++pointer] = data.Name;
+            }
+
+            return stockName;
         }
 
         /*

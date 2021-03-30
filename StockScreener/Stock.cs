@@ -13,11 +13,12 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
 
         
         // int Pointer = 0;
-        public Stock(string StockCode, string TimeStamp, double CurrentPrice, double Change, double ChangeP,
-        double Volume, int[] ChangeArray,
+        public Stock(string StockCode, string StockName, string TimeStamp, double CurrentPrice,
+         double Change, double ChangeP, double Volume, int[] ChangeArray,
         double High, double Low, int Signal, double PrevOpen, double Close)
         {
             this.StockCode = StockCode;
+            this.StockName = StockName;
             this.TimeStamp = TimeStamp;
             this.CurrentPrice = CurrentPrice;
             this.PrevOpen = PrevOpen;
@@ -36,6 +37,7 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         // Contains all the stocks information
         public double CurrentPrice{ get; set; }
         public string StockCode { get; set; }
+        public string StockName { get; set; }
         public string TimeStamp { get; set; }
         public double High { get; set; }
         public double PrevOpen { get; set; }

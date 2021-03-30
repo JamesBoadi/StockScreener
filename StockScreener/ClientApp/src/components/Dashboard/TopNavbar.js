@@ -38,10 +38,9 @@ export const TopNavbar = props => {
                 borderWidth="1px"
                 color='white'>
 
-                <p id="selectDashboard">Switch Dashboard </p>
-                {selectDashboard}
-
-                
+                <p id="selectDashboard">Dashboard A</p>
+  
+                <p style={{position: "absolute", right: "70px", top: "10px" }}> Version 1.00 </p>
 
             </Box>
         </div>
