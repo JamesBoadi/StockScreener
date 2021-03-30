@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 
 /* Table for adding Alerts */
-export class NotificationsTable extends Component {
+export class PortFolio extends Component {
     constructor(props) {
         super(props);
         this.searchDatabase = this.searchDatabase.bind(this);

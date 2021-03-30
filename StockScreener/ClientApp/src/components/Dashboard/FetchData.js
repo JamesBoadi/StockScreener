@@ -1,23 +1,23 @@
 import React, { Component } from 'react';
-import { TopNavbar } from '../TopNavbar.js';
-import { NotificationsTable } from './NotificationsTable';
-import { SideBar } from '../SideBar';
-import { DashboardSettings } from '../DashboardSettings';
-import { StockTableTwo } from './StockTableTwo';
-import { AlertReducer } from './js/AlertReducer.js';
-import TableCache from './js/TableCache.js';
-import NotificationsCache from './js/NotificationsCache.js';
-import AlertCache from './js/AlertCache.js';
-import AlertSettings from './js/AlertSettings.js';
-import PriceSettings from './js/PriceSettings.js';
-import DataServiceWorker from './js/DataServiceWorker.js'
+import { TopNavbar } from './TopNavbar.js';
+import { NotificationsTable } from './DashboardOne/NotificationsTable';
+import { DashboardSettings } from './DashboardSettings';
+import { StockTableTwo } from './DashboardOne/StockTableTwo';
+import { AlertReducer } from './DashboardOne/js/AlertReducer.js';
+import TableCache from './DashboardOne/js/TableCache.js';
+import NotificationsCache from './DashboardOne/js/NotificationsCache.js';
+import AlertCache from './DashboardOne/js/AlertCache.js';
+import AlertSettings from './DashboardOne/js/AlertSettings.js';
+import PriceSettings from './DashboardOne/js/PriceSettings.js';
+import DataServiceWorker from './DashboardOne/js/DataServiceWorker.js'
 
 import {
-  Box, Button, NumberInput,
+  Box, NumberInput,
   NumberInputField, NumberInputStepper,
   NumberIncrementStepper, NumberDecrementStepper
 } from '@chakra-ui/react';
 
+import { Menu, Button } from 'antd';
 import Nav from 'reactstrap/lib/Nav';
 import * as signalR from '@aspnet/signalr';
 import * as cache from 'cache-base';
@@ -70,7 +70,6 @@ export class FetchData extends Component {
     this.addToCache = this.addToCache.bind(this);
 
     //this.updateAll = this.updateAll.bind(this);
-
     this.cache = new cache();
     this.called = false;
     this.alertTable = [];
@@ -125,12 +124,11 @@ export class FetchData extends Component {
       stockInfoCurrPrice: [],
       stockInfoCode: [],
 
-
       updateStockInfo: false,
-
       _updateCache: false,
       cache: new cache(),
 
+      collapsed: false,
       data: [
         {
           dashboardNum: null,
@@ -226,6 +224,7 @@ export class FetchData extends Component {
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     var t = [];
 
+    // Display Stock Info
     if (this.updateStockInfo) {
       this.setState({ stockInfoHeader: this.state.stockInfoName[0] });
       this.setState({ stockInfoPrevPrice: this.state.stockInfoName[1] });
@@ -242,25 +241,13 @@ export class FetchData extends Component {
         cache={this.getCache()}
       />)
 
+      this.addToNotificationsMenu();
       this.setState({ stockTableTwo: t });
       this.called = true;
       t = [];
       this.setState({ lock: false })
     }
 
-    // Update only if on manual mode and the user has scrolled down
-    if (this.state.updateNotifications) { // || this.state.setManualNotifications
-      // clearInterval(this.notificationsInterval)
-      // this.addToNotificationsMenu(); 
-      this.setState({ updateNotifications: false });
-    }
-    /*
-        if (this.props.state.setNotifications && this.props.state.notificationsEnabled === 0) {
-          clearInterval(this.interval)
-        }
-        else if (this.props.state.setNotifications && this.props.state.notificationsEnabled === 1) {
-          this.addToNotificationsMenu()
-        }*/
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -307,8 +294,8 @@ export class FetchData extends Component {
 
       this.notificationsDelayInterval = setInterval(() => {
         // const stock = this.stockDashBoardMap.get(pointer).StockCode;
-        //  const localStartPrice = this.stockDashBoardMap.get(pointer).LocalStartPrice;
-        //  const localTargetPrice = this.stockDashBoardMap.get(pointer).LocalTargetPrice;
+        // const localStartPrice = this.stockDashBoardMap.get(pointer).LocalStartPrice;
+        // const localTargetPrice = this.stockDashBoardMap.get(pointer).LocalTargetPrice;
         const stock = NotificationsCache.get(pointer).StockCode;
         const currentPrice_state = parseInt(NotificationsCache.get(pointer).ChangeArray[0]);
         const currentPrice = parseInt(NotificationsCache.get(pointer).CurrentPrice);
@@ -319,7 +306,7 @@ export class FetchData extends Component {
         if (pointer++ >= end) {
           clearInterval(this.notificationsInterval)
         }
-      }, );
+      }, 7000);
     }, AlertSettings.getAlertInterval());
   }
 
@@ -570,11 +557,16 @@ export class FetchData extends Component {
     console.info('Yayyyyy, I just received a notification!!!', res);
   }
 
+
+ 
+
   render() {
     // Create multiple fetch datas for each dashboard
     //Dashboard
     return (
       <div>
+     
+
         {/* Stock Dashboard */}
         <Box
           style={{ position: 'absolute', top: '340px', left: '60px' }}
@@ -590,6 +582,8 @@ export class FetchData extends Component {
           {this.state.stockInfoHeader}
           {this.state.stockInfoPrevPrice}
           {this.state.stockInfoCurrPrice}
+
+
 
 
           {/*   <h4 style={{ position: 'relative', top: '38px', left: '5px', color: 'white' }}>Start Price:  </h4>

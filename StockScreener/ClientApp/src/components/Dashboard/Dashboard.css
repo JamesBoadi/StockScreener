@@ -53,8 +53,20 @@
     .side-bar 
     {
       min-height: 100%;
-     
     }
+
+    
+  .sidenav {
+    height: 100vh; /* Full-height: remove this if you want "auto" height */
+    background-color: white;
+ /*   width: 160px; /* Set the width of the sidebar 
+    position: fixed;
+    left: 0;
+    top: 0;
+    background-color:rgb(60,60,60); /* Black 
+   // overflow-x: hidden; /* Disable horizontal scroll 
+    padding-top: 60px;*/
+  }
     
     .App-header {
       display: grid;
@@ -112,7 +124,8 @@
     position: fixed;
     left: 0;
     top: 0;
-    background-color:rgb(60,60,60); /* Black */
+    color: white;
+    background-color:white; /* Black */
     overflow-x: hidden; /* Disable horizontal scroll */
     padding-top: 60px;
   }
@@ -1174,6 +1187,13 @@
 
 
   @media screen and (max-width: 800px) { 
+
+    
+    .side-bar 
+    {
+      min-height: 100%;
+  
+    }
  /*   #tableContainer
     {
       position: absolute;
@@ -1181,11 +1201,6 @@
       left: 0;
     }
 
-    .side-bar 
-    {
-      min-height: 100%;
-  
-    }
 
     #ox
     {

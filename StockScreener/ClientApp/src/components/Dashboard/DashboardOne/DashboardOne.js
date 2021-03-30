@@ -1,6 +1,7 @@
 import React, { Component, useState, useContext } from 'react';
 import { Button, ButtonGroup } from "@chakra-ui/react";
 import { DashboardNavbar } from './DashboardNavbar';
+
 import '../Dashboard.css';
 
 export class DashboardOne extends Component {
@@ -26,9 +27,9 @@ export class DashboardOne extends Component {
         //  FetchData.sendRequest("I have a message", "of glory");
         return (
             <div>
-
+                
                 <header class="App-header">
-                  <DashboardNavbar />
+                <DashboardNavbar style={{transform: 'translateX(20px)'}}/>
                 </header>
 
             </div>

@@ -4,13 +4,12 @@ import {
     NumberInputField, NumberInputStepper,
     NumberIncrementStepper, NumberDecrementStepper,
 } from '@chakra-ui/react';
-import { FetchData } from './FetchData.js';
+import { FetchData } from '../../Dashboard/FetchData.js';
 import { Menu, Dropdown } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import PriceSettings from './js/PriceSettings.js';
 import AlertSettings from './js/AlertSettings.js';
 import TableCache from './js/TableCache.js';
-
 
 export class DashboardNavbar extends Component {
     constructor(props) {

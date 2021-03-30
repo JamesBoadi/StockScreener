@@ -1,7 +1,6 @@
 import React, { Component, PureComponent } from 'react';
 import ReactDOM from 'react-dom';
 import { render } from 'react-dom';
-import { FetchData } from './FetchData';
 import {
     Box, Button, NumberInput,
     NumberInputField, NumberInputStepper,

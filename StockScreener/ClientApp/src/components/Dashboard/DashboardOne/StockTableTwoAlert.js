@@ -1,6 +1,5 @@
 import React from 'react';
 import { AlertReducer } from './js/AlertReducer.js';
-import { FetchData } from './FetchData.js';
 import PriorityQueue from 'priority-q';
 import throttle from 'lodash.throttle';
 import * as cache from 'cache-base';
@@ -257,7 +256,7 @@ export class StockTableTwoAlert extends React.Component {
                 this.setState({ continueAnimation: false })
             }
 
-        }, parseInt(AlertSettings.getAlertInterval()));
+        }, AlertSettings.getAlertInterval());
     }
 
     render() {
