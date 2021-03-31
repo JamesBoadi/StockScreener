@@ -296,6 +296,64 @@
   
   .stockTableTwo tbody:nth-child(odd) tr {background-color: rgb(40,40,40); }*/
 
+  
+  /************** PortFolio Table ******************/
+  /*********************************************/
+  .portfolioTableHeader
+  {
+    position: absolute;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-family: sans-serif;
+    min-height: 1200px;
+    height: 1rem;
+    font-weight: 100;
+    font-size: 14px;
+    width: 50rem;
+    left: 0px;
+    top: 45px;
+    background-color:  rgb(40,40,40); 
+  }
+
+  .portfolioTableHeader thead:nth-child(odd) th
+  {
+    border-bottom: 5px solid rgba(27, 209, 130, 0.897); 
+    line-height: 1;
+  }
+
+  .portfolioTable  {
+    position: absolute;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-family: sans-serif;
+    font-size: 14px;
+  /*  min-height: 1200px;*/
+    width: 50rem;
+    left: 0px;
+    top: 45px;
+  }
+  
+  .portfolioTable, th, td{
+    padding: 2.5px;
+    border: 0.5px solid black;
+    color:	rgb(255,250,250);
+  }
+
+  
+  .portfolio .dropdown-content {
+    display: none;
+    position: absolute;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    top: 19px;
+    right: 0px;
+    z-index: 999;
+    
+    
+  }
+
+
+
   /************** Alert Table ******************/
   /*********************************************/
 

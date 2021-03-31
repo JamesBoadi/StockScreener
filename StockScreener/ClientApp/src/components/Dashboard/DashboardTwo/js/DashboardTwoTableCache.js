@@ -3,8 +3,6 @@ import * as cache from 'cache-base';
 
 
 export default class TableCache {
-
-
     static cache_ = new cache();
     static cacheOp_ = new cache();
     static endMod = 47;
@@ -61,7 +59,6 @@ export default class TableCache {
     static getDisableScroll() {
         return this.disableUpdate;
     }
-
 
     static get(key) {
         return this.cache_.get(key.toString());

@@ -47,9 +47,9 @@ namespace StockScreener.Controllers
             OrderedDictionary dict = new OrderedDictionary();
 
             // Remove Whitespaces and double entries
-            for (int i = 0; i < stockList.Count; i++)
+            for (int id = 0; id < stockList.Count; id++)
             {
-                string name = stockList[i].Name.ToLower();
+                string name = stockList[id].Name.ToLower();
                 string trimmed = String.Concat(
                 name.Where(c => !Char.IsWhiteSpace(c))
                 //.Where(c => !Char.IsLetter('-') || !Char.IsLetter('&'))
@@ -60,7 +60,7 @@ namespace StockScreener.Controllers
                     if (!list.Contains(name))
                     {
                         list.Add(name);
-                        dict.Add(i, name);
+                        dict.Add(id, name);
                     }
                 }
             }
@@ -71,9 +71,9 @@ namespace StockScreener.Controllers
 
             foreach (DictionaryEntry de in dict)
             {
-                res += ((int)de.Key).ToString();
+                res += ((int)de.Key).ToString(); // StockCode
                 res += ",";
-                res += (string)de.Value;
+                res += (string)de.Value; // Id
 
                 arr[pointer] = res;
                 res = "";
@@ -131,13 +131,13 @@ namespace StockScreener.Controllers
 
             var buffer = new byte[1024 * 4];
 
-            Console.WriteLine("May i did");
+            Console.WriteLine("May id did");
             WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), System.Threading.CancellationToken.None);
 
             while (!result.CloseStatus.HasValue)
             {
                 await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), result.MessageType, result.EndOfMessage, System.Threading.CancellationToken.None);
-                Console.WriteLine("did i lose an election");
+                Console.WriteLine("did id lose an election");
 
                 result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), System.Threading.CancellationToken.None);
             }

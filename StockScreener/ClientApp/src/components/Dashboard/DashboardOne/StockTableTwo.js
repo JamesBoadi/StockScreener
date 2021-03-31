@@ -14,7 +14,7 @@ import throttle from 'lodash.throttle';
 import * as HashMap from 'hashmap';
 import * as cache from 'cache-base';
 
-import TableCache from './js/TableCache.js';
+import TableCache from '../DashboardTwo/js/DashboardTwoTableCache.js';
 import AlertSettings from './js/AlertSettings.js';
 import PriceSettings from './js/PriceSettings.js';
 
@@ -805,7 +805,7 @@ export class StockTableTwo extends React.Component {
 
         return (
             <div>
-
+                
                 {/* STOCK TABLE TWO */}
                 <Box
                     style={{ position: 'absolute', top: '520px', left: '60px' }}

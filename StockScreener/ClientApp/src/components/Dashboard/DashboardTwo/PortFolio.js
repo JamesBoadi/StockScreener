@@ -2,13 +2,32 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { render } from 'react-dom';
 import {
-    Box, Button, NumberInput,
+    Box, NumberInput,
     NumberInputField, NumberInputStepper,
     NumberIncrementStepper, NumberDecrementStepper,
-    Input, InputGroup, InputRightElement, InputLeftElement,
+    InputGroup, InputRightElement, InputLeftElement,
     Menu, MenuButton, MenuList, MenuItem, MenuItemOption,
     MenuGroup, MenuOptionGroup, MenuIcon, MenuCommand, MenuDivider
 } from '@chakra-ui/react';
+import 'antd/dist/antd.css';
+
+import {
+    Form,
+    Input,
+    Button,
+    Radio,
+    Select,
+    Cascader,
+    DatePicker,
+    InputNumber,
+    TreeSelect,
+    Switch,
+    AutoComplete
+} from 'antd';
+
+import { Search } from './Search';
+import DashboardTwoTableCache from './js/DashboardTwoTableCache';
+
 
 /* Table for adding Alerts */
 export class PortFolio extends Component {
@@ -26,6 +45,7 @@ export class PortFolio extends Component {
         this.newTable = this.newTable.bind(this);
         this.getDisplay = this.getDisplay.bind(this);
         this.removeRow = this.removeRow.bind(this);
+        this.setSelectedRecord = this.setSelectedRecord.bind(this);
 
         let style = { color: "white;" };
         this.timeout = null;
@@ -52,13 +72,21 @@ export class PortFolio extends Component {
 
             // Alert Table States
             alertTableStack: [],
-            alertTable: [],
+            portfolioTable: [],
 
             isScrolled: false,
             scrollUp_: 0,
             scrollDown_: 0,
+            componentSize: 'default',
+
+            formIsVisible: true,
+            selectedRecordValue: ""
         };
     }
+
+    onFormLayoutChange = ({ size }) => {
+        this.setState({ componentSize: size })
+    };
 
     componentDidMount() {
         /* this.createTable()
@@ -72,19 +100,24 @@ export class PortFolio extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.props.state.addAlertTableRowBool) {
-            this.newTable();
-            this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
-                this.updateTable(this.state.start);
-            });
-            this.props.setAlertTableRowBool(false);
-        }
-        if (this.props.state.removeAlertTableRowBool) {
-            this.removeRow();
-            this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
-                this.updateTable(this.state.start);
-            });
-            this.props.setRemoveAlertTableRowBool(false);
+        /*    if (this.props.state.addAlertTableRowBool) {
+                this.newTable();
+                this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
+                    this.updateTable(this.state.start);
+                });
+                this.props.setAlertTableRowBool(false);
+            }
+            if (this.props.state.removeAlertTableRowBool) {
+                this.removeRow();
+                this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
+                    this.updateTable(this.state.start);
+                });
+                this.props.setRemoveAlertTableRowBool(false);
+            }*/
+
+        if (this.state.validInput) {
+            this.setState({ validInput: false });
+            this.setState({ queryRes: false });
         }
 
         // Update table
@@ -110,27 +143,32 @@ export class PortFolio extends Component {
               this.setState({ validInput: false })
           }*/
     }
+
     shouldComponentUpdate(nextProps, nextState) {
-        if (this.props.state.addAlertTableRowBool !== nextProps.addAlertTableRowBool) {
+        if (this.state.validInput || this.state.queryRes) {
             // console.log('NEXT ')
+
             return true;
         }
         return false;
     }
-
+    // Search box retrieves stocks from database
     async searchDatabase(e) {
-        e.preventDefault();
+        // e.preventDefault();
         let input = new String(e.target.value);
 
         if (input.length < 1) {
+            this.setState({ queryRes: false });
             this.setState({ display: "No Stocks Found" });
         }
+
         // Buggy, fix nulls
         if (!(!input || /^\s*$/.test(input))) {
-            await fetch('test/'.concat(input))
+            await fetch('searchstock/'.concat(input))
                 .then(response => response.text())
                 .then(data =>
                     this.setState({ query: JSON.parse(data) }),
+                    this.setState({ queryRes: true }),
                     this.searchRecords()
                 ).catch(error =>
                     console.log("error " + error),
@@ -152,6 +190,12 @@ export class PortFolio extends Component {
         var id = new Number(e.target.id);
         this.setState({ stockRecord: id });
         this.setState({ validInput: true });
+
+        const stockName = DashboardTwoTableCache.get(id).StockName;
+        this.setState({ selectedRecordValue: stockName });
+
+
+
     }
 
     // create searchable records from dropdown list
@@ -171,6 +215,7 @@ export class PortFolio extends Component {
                     <div
                         id={id}
                         class="record"
+                        style={{ color: 'wheat', cursor: 'pointer' }}
                         onClick={this.selectRecords}>
                         {value}
                         <br />
@@ -184,6 +229,10 @@ export class PortFolio extends Component {
         }
 
         this.setState({ display: string });
+    }
+
+    setSelectedRecord(value) {
+        this.setState({ selectedRecordValue: value });
     }
 
     // Units to scroll by to find record in search stocks
@@ -263,7 +312,7 @@ export class PortFolio extends Component {
         let start = 0;
         let end = this.props.state.alertTableStocks.length - 1;
 
-       // console.log('UPDATE ' );
+        // console.log('UPDATE ' );
 
         for (pointer = start; pointer <= end; pointer++) {
             if (pointer === this.props.state.target)
@@ -301,7 +350,7 @@ export class PortFolio extends Component {
         let end = this.props.state.alertTableStocks.length - 1;
 
         for (pointer = start; pointer <= end; pointer++) {
-      //      console.log('POINTER ' + pointer + ' TARGET ' + this.props.state.target);
+            //      console.log('POINTER ' + pointer + ' TARGET ' + this.props.state.target);
             t.push(
                 <tbody>
                     <tr key={pointer} style={style}>
@@ -332,7 +381,7 @@ export class PortFolio extends Component {
         let t = <div>
             <div id="stack-wrapper">
                 <div id="stack-scroll">
-                    <table class="alertTable" aria-labelledby="tabelLabel">
+                    <table class="portfolioTable" aria-labelledby="tabelLabel">
                         <thead>
                             {/* <tr>
                                 <th id={id} onClick={this.props.selectAlertTableRow}>
@@ -357,12 +406,12 @@ export class PortFolio extends Component {
 
 
         // console.log('UPDATE ');
-        this.setState({ alertTable: t });
+        this.setState({ portfolioTable: t });
 
     }
 
     render() {
-        let alertTableHeader = <table class="alertTableHeader" aria-labelledby="tabelLabel">
+        let portfolioTableHeader = <table class="portfolioTableHeader" aria-labelledby="tabelLabel">
             <thead>
                 <tr>
                     <th>Stock <br /> Name</th>
@@ -371,14 +420,65 @@ export class PortFolio extends Component {
                     <th>P / L</th>
                     <th>Volume</th>
                 </tr>
+
+
+
+
             </thead>
         </table>;
 
         return (
             <div>
-                {/* ALERT TABLE */}
+
+                <div class="dropdown-content" style={{
+                    position: 'absolute'
+                    , top: '315px', left: '700px', zIndex: '999'
+                }}>
+                    <Box
+                        min-width='12.25rem'
+                        width='24rem'
+                        height='24rem'
+                        overflowY='auto'
+                        bg='#f9f9f9'
+                        top='0px'
+                        visibility={this.state.formIsVisible}
+
+                        backgroundColor='whiteAlpha.508'
+                    >
+                        <h4 style={{ position: 'absolute', color: 'black', float: 'left' }}>Add Stocks </h4>
+                        <Form
+                            style={{ transform: "translateY(60px)" }}
+                            labelCol={{
+                                span: 4,
+                            }}
+                            wrapperCol={{
+                                span: 14,
+                            }}
+                            layout="horizontal"
+                            initialValues={{
+                                size: this.state.componentSize,
+                            }}
+
+                            onValuesChange={this.onFormLayoutChange}
+                            size={this.state.componentSize}
+                        >
+                            <Form.Item label="Input">
+                                <Input />
+                            </Form.Item>
+                            <Form.Item label="Select"> {/* Search Content */}
+                                <Search {...this} />
+                            </Form.Item>
+                            <Form.Item label="Date">
+                                <DatePicker />
+                            </Form.Item>
+                        </Form>
+
+                    </Box>
+                </div>
+
+                {/* PORTFOLIO TABLE */}
                 <Box
-                    style={{ position: 'absolute', top: '315px', left: '1070px' }}
+                    style={{ position: 'absolute', top: '315px', left: '100px' }}
                     //     bg='rgb(30,30,30)'
                     boxShadow='sm'
                     textAlign='center'
@@ -387,10 +487,10 @@ export class PortFolio extends Component {
                     rounded="lg"
                     margin='auto'
                     color='white'
-                    zIndex='999'>
+                    zIndex='-999'>
 
-                  
-                    {alertTableHeader}
+
+                    {portfolioTableHeader}
 
                     <Box
                         style={{
@@ -408,12 +508,15 @@ export class PortFolio extends Component {
                         color='white'
                         zIndex='-999'>
 
-                        {this.state.alertTable}
+                        {this.state.portfolioTable}
 
                     </Box>
                 </Box>
+
+
             </div>
         );
     }
 
 }
+

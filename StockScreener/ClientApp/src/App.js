@@ -51,7 +51,7 @@ export default class App extends Component {
         <SideMenu {...this} />
         {this.state.redirect}
         <Switch>
-          <Route exact path='/' component={ DashboardOne} />
+          <Route exact path='/' component={PortFolio} />
           <Route path='/DashboardOne' component={DashboardOne} />
           <Route path='/PortFolio' component={PortFolio} />
         </Switch>
