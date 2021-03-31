@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
-import { TopNavbar } from '../TopNavbar.js';
-import { NotificationsTable } from './NotificationsTable';
-import { DashboardSettings } from '../DashboardSettings';
-import { StockTableTwo } from './StockTableTwo';
-import { AlertReducer } from './js/AlertReducer.js';
-import TableCache from '../DashboardTwo/js/DashboardTwoTableCache.js';
-import NotificationsCache from './js/NotificationsCache.js';
-import AlertCache from './js/AlertCache.js';
-import AlertSettings from './js/AlertSettings.js';
-import PriceSettings from './js/PriceSettings.js';
-import DataServiceWorker from './js/DataServiceWorker.js'
+import { TopNavbar } from './TopNavbar.js';
+import { NotificationsTable } from './DashboardOne/NotificationsTable';
+import { DashboardSettings } from './DashboardSettings';
+import { StockTableTwo } from './DashboardOne/StockTableTwo';
+import { AlertReducer } from './DashboardOne/js/AlertReducer.js';
+import TableCache from './DashboardOne/js/TableCache.js';
+import NotificationsCache from './DashboardOne/js/NotificationsCache.js';
+import AlertCache from './DashboardOne/js/AlertCache.js';
+import AlertSettings from './DashboardOne/js/AlertSettings.js';
+import PriceSettings from './DashboardOne/js/PriceSettings.js';
+import DataServiceWorker from './DashboardOne/js/DataServiceWorker.js'
 
 import {
   Box, NumberInput,

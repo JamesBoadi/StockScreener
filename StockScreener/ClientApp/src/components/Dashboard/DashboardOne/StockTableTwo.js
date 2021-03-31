@@ -14,7 +14,7 @@ import throttle from 'lodash.throttle';
 import * as HashMap from 'hashmap';
 import * as cache from 'cache-base';
 
-import TableCache from '../DashboardTwo/js/DashboardTwoTableCache.js';
+import TableCache from './js/TableCache.js';
 import AlertSettings from './js/AlertSettings.js';
 import PriceSettings from './js/PriceSettings.js';
 

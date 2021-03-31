@@ -6,6 +6,7 @@ import { DashboardInterface } from './components/DashboardInterface';
 import { Router, Route, Switch } from 'react-router';
 import { PortFolio } from './components/Dashboard/DashboardTwo/PortFolio';
 import { SideMenu } from './components/Dashboard/SideMenu';
+import { DataFeed } from './components/Dashboard/DataFeed';
 import './custom.css'
 import 'antd/dist/antd.css';
 
@@ -19,25 +20,23 @@ export default class App extends Component {
     };
   }
 
-  componentDidMount()
-  {
+  componentDidMount() {
     /*<Redirect to='/' />;*/
   }
 
-  redirect(key)
-  {
+  redirect(key) {
     console.log('key ' + key);
     let redirect = [];
     switch (key) {
       case 1:
         redirect.push(<Redirect to='/PortFolio' />);
-        this.setState({redirect: redirect});
+        this.setState({ redirect: redirect });
       default:
         break;
     }
   }
 
-  
+
 
   render() {
     /*
@@ -49,6 +48,7 @@ export default class App extends Component {
     return (
       <div>
         <SideMenu {...this} />
+        <DataFeed />
         {this.state.redirect}
         <Switch>
           <Route exact path='/' component={PortFolio} />

@@ -9,7 +9,7 @@ import { Menu, Dropdown } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import PriceSettings from './js/PriceSettings.js';
 import AlertSettings from './js/AlertSettings.js';
-import TableCache from '../TableCache.js';
+import TableCache from './js/TableCache.js';
 
 export class DashboardNavbar extends Component {
     constructor(props) {

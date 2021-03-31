@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import DashboardTwoTableCache from '../Dashboard/DashboardTwo/js/DashboardTwoTableCache';
+import * as signalR from '@aspnet/signalr';
 
 
 export class DataFeed extends Component {
