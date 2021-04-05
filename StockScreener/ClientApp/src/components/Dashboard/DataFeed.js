@@ -1,33 +1,43 @@
 import React, { Component } from 'react';
 
-import DashboardTwoTableCache from '../Dashboard/DashboardTwo/js/DashboardTwoTableCache';
+import PortfolioCache from './Portfolio/js/PortfolioCache';
 import * as signalR from '@aspnet/signalr';
 
 
 export class DataFeed extends Component {
-
     static hubConnection = new signalR.HubConnectionBuilder()
         .withUrl('https://localhost:44362/stockfeed')
         .configureLogging(signalR.LogLevel.Information)
         .build();
+    constructor(props) {
+        super(props);
 
-    state = {
-        stockTableTwo: [],
-        isStreaming: false,
-        lock: true,
-        hubConnection: null,
-        request_Calls: -1,
-        MAX_CALLS: 896,
-        called: true,
-        updateCache: false,
-    };
+        // this.updateCache = false;
+        this.lock = false;
+        this.connected = false;
+        this.keyCount = 0;
+        this.updateStockInfo = false;
+
+        this.state = {
+            stockTableTwo: [],
+            isStreaming: false,
+            lock: false,
+            hubConnection: null,
+            request_Calls: -1,
+            MAX_CALLS: 896,
+            called: true,
+            
+        };
+    }
+
 
     componentDidMount() {
+        console.log('START THE FEED!')
         this.startDataFeed();
     }
 
     componentDidUpdate = (prevProps, prevState, snapshot) => {
-      
+
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -45,17 +55,24 @@ export class DataFeed extends Component {
                 // Number of retries allowed: 3
                 if (this.connected == true) {
                     clearInterval(this.interval)
-                    resolve(true)
+                    resolve(false)
                 }
                 else if (count >= 3) {
                     clearInterval(this.interval)
-                    resolve(false)
+                    resolve(true)
                 }
                 count++;
             }, 8000);
         });
     }
 
+    /**
+     * Starts the data feed and subscribes to a method on
+     * the server which will retrieve the data. All Caches will
+     * be populated through this method, if there is a faliure
+     * the caches will be populated with the last successfully
+     * fetched data.
+     */
     async startDataFeed() {
         var count = 0;
 
@@ -69,10 +86,9 @@ export class DataFeed extends Component {
                 })
                 DataFeed.hubConnection.on('requestData', (key, data) => {
                     let item = JSON.parse(data);
-                    DashboardTwoTableCache.set(key, item);
-                   // AlertCache.set(key, item);
-                   // NotificationsCache.set(key, item);
-
+                    PortfolioCache.set(key, item);
+                    // AlertCache.set(key, item);
+                    // NotificationsCache.set(key, item);
                     if (count < 897) {
                         count += 1;
                     }
@@ -89,11 +105,9 @@ export class DataFeed extends Component {
             }); // Redirect to 404 page
 
         const res = await this.connectionTimeout();
-        this.setState({ ...this.state, updateCache: res, lock: res });
+        this.props.getUpdateCache(!res);
+        this.setState({ ...this.state, updateCache: !res, lock: res });
     }
-
-
-
 
     render() {
         return null;

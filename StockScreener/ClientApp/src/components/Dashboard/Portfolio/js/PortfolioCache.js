@@ -1,8 +1,6 @@
 import * as cache from 'cache-base';
 
-
-
-export default class TableCache {
+export default class PortfolioCache {
     static cache_ = new cache();
     static cacheOp_ = new cache();
     static endMod = 47;
@@ -13,7 +11,7 @@ export default class TableCache {
     static priceDetection = false;
     static update_hideStocks = false;
     static disableUpdate = false;
-   
+
     static item =
         {
             StockCode: "",

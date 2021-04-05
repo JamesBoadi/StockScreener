@@ -2,20 +2,41 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { render } from 'react-dom';
 import {
-    Box, Button, NumberInput,
+    Box, NumberInput,
     NumberInputField, NumberInputStepper,
     NumberIncrementStepper, NumberDecrementStepper,
-    Input, InputGroup, InputRightElement, InputLeftElement,
+    InputGroup, InputRightElement, InputLeftElement,
     Menu, MenuButton, MenuList, MenuItem, MenuItemOption,
     MenuGroup, MenuOptionGroup, MenuIcon, MenuCommand, MenuDivider
 } from '@chakra-ui/react';
+import 'antd/dist/antd.css';
+
+import {
+    Form,
+    Input,
+    Button,
+    Radio,
+    Select,
+    Cascader,
+    DatePicker,
+    InputNumber,
+    TreeSelect,
+    Switch,
+    AutoComplete
+} from 'antd';
+
+import { Search } from './Search';
+import DashboardTwoTableCache from './js/DashboardTwoTableCache';
 
 
-/* Table for adding Alerts */
-export class NotificationsTable extends Component {
+/**
+* LiveAlerts Table that adds a stock to the table. 
+* Includes live information for that stock and also
+* includes live alerts and mathematical calculations
+*/
+export class LiveAlertsTable extends Component {
     constructor(props) {
         super(props);
-
         this.searchDatabase = this.searchDatabase.bind(this);
         this.selectRecords = this.selectRecords.bind(this);
         this.searchRecords = this.searchRecords.bind(this);
@@ -28,9 +49,12 @@ export class NotificationsTable extends Component {
         this.newTable = this.newTable.bind(this);
         this.getDisplay = this.getDisplay.bind(this);
         this.removeRow = this.removeRow.bind(this);
+        this.setSelectedRecord = this.setSelectedRecord.bind(this);
 
-
-
+        this.setShares = this.setShares.bind(this);
+        this.setPrice = this.setPrice.bind(this);
+        this.setClearRecord = this.setClearRecord.bind(this);
+        this.addStock = this.addStock.bind(this);
 
         let style = { color: "white;" };
         this.timeout = null;
@@ -57,25 +81,36 @@ export class NotificationsTable extends Component {
 
             // Alert Table States
             alertTableStack: [],
-            alertTable: [],
+            portfolioTable: [],
+
             isScrolled: false,
             scrollUp_: 0,
             scrollDown_: 0,
+            componentSize: 'default',
 
-            // **************************************************
-            // Portfolio Table Variables
-            // **************************************************
-            target: 0,
-            addPortfolioTableRowBool: false,
-            removePortfolioTableRowBool: false,
-            portfolioTableStocks: [],
-            portfolioTableStack: [],
-            clickedPortfolioTableRowID: 0,
-            maxNumberOfPortfolioTableRows: 0
+            // Form
+            formIsVisible: true,
+            selectedRecordValue: "",
+            clearRecord: false,
+
+            shares: 0,
+            price: 0
         };
     }
 
+    onFormLayoutChange = ({ size }) => {
+        this.setState({ componentSize: size })
+    };
+
     componentDidMount() {
+
+        this.interval = setInterval(() => {
+            if (this.props.state.updateCache) {
+                clearInterval(this.interval);
+            }
+        }, 1000);
+
+
         /* this.createTable()
          this.updateTable()
  
@@ -87,19 +122,24 @@ export class NotificationsTable extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.props.state.addAlertTableRowBool) {
-            this.newTable();
-            this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
-                this.updateTable(this.state.start);
-            });
-            this.props.setAlertTableRowBool(false);
-        }
-        if (this.props.state.removeAlertTableRowBool) {
-            this.removeRow();
-            this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
-                this.updateTable(this.state.start);
-            });
-            this.props.setRemoveAlertTableRowBool(false);
+        /*    if (this.props.state.addAlertTableRowBool) {
+                this.newTable();
+                this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
+                    this.updateTable(this.state.start);
+                });
+                this.props.setAlertTableRowBool(false);
+            }
+            if (this.props.state.removeAlertTableRowBool) {
+                this.removeRow();
+                this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
+                    this.updateTable(this.state.start);
+                });
+                this.props.setRemoveAlertTableRowBool(false);
+            }*/
+
+        if (this.state.validInput) {
+            this.setState({ validInput: false });
+            this.setState({ queryRes: false });
         }
 
         // Update table
@@ -125,27 +165,40 @@ export class NotificationsTable extends Component {
               this.setState({ validInput: false })
           }*/
     }
+
     shouldComponentUpdate(nextProps, nextState) {
-        if (this.props.state.addAlertTableRowBool !== nextProps.addAlertTableRowBool) {
+        if (!nextProps.state.updateCache) {
+            return false;
+        }
+        else if (this.state.validInput || this.state.queryRes
+            || nextState.selectedRecordValue !== this.state.selectedRecordValue) {
             // console.log('NEXT ')
+
             return true;
         }
         return false;
     }
-
+    // Search box retrieves stocks from database
     async searchDatabase(e) {
-        e.preventDefault();
+        // e.preventDefault();
         let input = new String(e.target.value);
 
         if (input.length < 1) {
-            this.setState({ display: "No Stocks Found" });
+            this.setState({ queryRes: false });
+            this.setState({
+                display: <div
+                    style={{ color: 'wheat' }}>
+                    No Stocks Found
+            </div>
+            });
         }
-        // Buggy, fix nulls
+
         if (!(!input || /^\s*$/.test(input))) {
-            await fetch('test/'.concat(input))
+            await fetch('searchstock/'.concat(input))
                 .then(response => response.text())
                 .then(data =>
                     this.setState({ query: JSON.parse(data) }),
+                    this.setState({ queryRes: true }),
                     this.searchRecords()
                 ).catch(error =>
                     console.log("error " + error),
@@ -154,7 +207,12 @@ export class NotificationsTable extends Component {
         }
         else {
             this.setState({ validInput: false })
-            this.setState({ display: "No Stocks Found" })
+            this.setState({
+                display: <div
+                    style={{ color: 'wheat' }}>
+                    No Stocks Found
+                </div>
+            })
         }
     }
 
@@ -162,11 +220,49 @@ export class NotificationsTable extends Component {
         return this.state.display;
     }
 
+    setShares(value) {
+        this.setState({ shares: value });
+    }
+
+    setPrice(value) {
+        this.setState({ price: value });
+    }
+
+    setClearRecord(bool) {
+        this.setState({ selectedRecordValue: "" });
+        this.setState({ clearRecord: bool });
+    }
+
+    addStock(e) {
+        let alertPostfix = " is missing!"
+        let alertPrefix = "";
+        if (this.state.selectedRecordValue == null || this.state.selectedRecordValue == undefined
+            || this.state.selectedRecordValue.length < 1) {
+            alertPrefix += "Stock";
+        }
+        else if ((this.state.price == null) || (this.state.price == undefined)) {
+            alertPrefix += "Price";
+        } //else if  (!((this.state.price !== null) || (this.state.price !== undefined))  ) {
+            //alertPrefix += "";
+        //}
+        if (alertPrefix !== "") {
+            console.log("PREFIX")
+            window.alert(alertPrefix + alertPostfix);
+        }
+       
+
+    }
+
+
     // select record from dropdown list
     selectRecords(e) {
         var id = new Number(e.target.id);
         this.setState({ stockRecord: id });
         this.setState({ validInput: true });
+
+        const stockName = DashboardTwoTableCache.get(id).StockName;
+        this.setState({ selectedRecordValue: stockName });
+        this.setState({ clearRecord: false });
     }
 
     // create searchable records from dropdown list
@@ -186,6 +282,7 @@ export class NotificationsTable extends Component {
                     <div
                         id={id}
                         class="record"
+                        style={{ color: 'wheat', cursor: 'pointer' }}
                         onClick={this.selectRecords}>
                         {value}
                         <br />
@@ -194,11 +291,18 @@ export class NotificationsTable extends Component {
             }
         }
         else {
-            string.push("No Stocks Found");
+            string.push(<div
+                style={{ color: 'wheat' }}>
+                No Stocks Found
+                </div>);
             this.setState({ validInput: false });
         }
 
         this.setState({ display: string });
+    }
+
+    setSelectedRecord(value) {
+        this.setState({ selectedRecordValue: value });
     }
 
     // Units to scroll by to find record in search stocks
@@ -207,9 +311,7 @@ export class NotificationsTable extends Component {
         const scroll = 34;
 
         const stockRecord = this.state.stockRecord;
-
         let heightUnits = (stockRecord / scroll);
-
         let count = height * heightUnits;
 
         return count;
@@ -347,7 +449,7 @@ export class NotificationsTable extends Component {
         let t = <div>
             <div id="stack-wrapper">
                 <div id="stack-scroll">
-                    <table class="alertTable" aria-labelledby="tabelLabel">
+                    <table class="portfolioTable" aria-labelledby="tabelLabel">
                         <thead>
                             {/* <tr>
                                 <th id={id} onClick={this.props.selectAlertTableRow}>
@@ -372,12 +474,12 @@ export class NotificationsTable extends Component {
 
 
         // console.log('UPDATE ');
-        this.setState({ alertTable: t });
+        this.setState({ portfolioTable: t });
 
     }
 
     render() {
-        let alertTableHeader = <table class="alertTableHeader" aria-labelledby="tabelLabel">
+        let portfolioTableHeader = <table class="portfolioTableHeader" aria-labelledby="tabelLabel">
             <thead>
                 <tr>
                     <th>Stock <br /> Name</th>
@@ -391,9 +493,74 @@ export class NotificationsTable extends Component {
 
         return (
             <div>
-                {/* ALERT TABLE */}
+                <div class="dropdown-content" style={{
+                    position: 'absolute'
+                    , top: '315px', left: '700px', zIndex: '999'
+                }}>
+                    <Box
+                        min-width='12.25rem'
+                        width='20rem'
+                        height='22rem'
+                        overflowY='auto'
+                        bg='#f9f9f9'
+                        top='0px'
+                        justifyContent='center'
+                        visibility={this.state.formIsVisible}
+
+                        backgroundColor='whiteAlpha.508'
+                    >
+                        <h4 style={{ position: 'absolute', color: 'black', float: 'left' }}>Add Stock </h4>
+                        <Form
+                            style={{ transform: "translate(10px, 60px)" }}
+                            labelCol={{
+                                span: 4,
+                            }}
+                            wrapperCol={{
+                                span: 14,
+                            }}
+                            layout="horizontal"
+                            initialValues={{
+                                size: this.state.componentSize,
+                            }}
+
+                            onValuesChange={this.onFormLayoutChange}
+                            size={this.state.componentSize}
+                        >
+                            <Form.Item label="Select"> {/* Search Content */}
+                                <Search {...this} />
+                            </Form.Item>
+                            <Form.Item label="Date">
+                                <DatePicker />
+                            </Form.Item>
+                            <Form.Item label="Shares">
+                                <InputNumber
+                                    min={0}
+                                    defaultValue={0}
+                                    onChange={this.setShares} />
+                            </Form.Item>
+                            <Form.Item label="Price">
+                                <InputNumber
+                                    min={0}
+                                    step={0.25}
+                                    defaultValue={0}
+                                    onChange={this.setPrice} />
+                            </Form.Item>
+
+                            <Button style={{
+                                position: 'absolute', bottom: '4px', right: '20px',
+                                zIndex: '999'
+                            }}
+                                onClick={this.addStock}
+                            >Add Stock</Button>
+                        </Form>
+
+
+                    </Box>
+                </div>
+
+                {/* PORTFOLIO TABLE */}
                 <Box
-                    style={{ position: 'absolute', top: '315px', left: '1070px' }}
+                    style={{ position: 'absolute', top: '315px', left: '100px' }}
                     //     bg='rgb(30,30,30)'
                     boxShadow='sm'
                     textAlign='center'
@@ -402,10 +569,9 @@ export class NotificationsTable extends Component {
                     rounded="lg"
                     margin='auto'
                     color='white'
-                    zIndex='999'>
+                    zIndex='-999'>
 
-
-                    {alertTableHeader}
+                    {portfolioTableHeader}
 
                     <Box
                         style={{
@@ -423,12 +589,15 @@ export class NotificationsTable extends Component {
                         color='white'
                         zIndex='-999'>
 
-                        {this.state.alertTable}
+                        {this.state.portfolioTable}
 
                     </Box>
                 </Box>
+
+
             </div>
         );
     }
 
 }
+

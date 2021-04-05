@@ -4,7 +4,7 @@ import { Redirect } from "react-router-dom";
 import { DashboardOne } from './components/Dashboard/DashboardOne/DashboardOne';
 import { DashboardInterface } from './components/DashboardInterface';
 import { Router, Route, Switch } from 'react-router';
-import { PortFolio } from './components/Dashboard/DashboardTwo/PortFolio';
+import { PortFolio } from './components/Dashboard/Portfolio/PortFolio';
 import { SideMenu } from './components/Dashboard/SideMenu';
 import { DataFeed } from './components/Dashboard/DataFeed';
 import './custom.css'
@@ -14,9 +14,14 @@ export default class App extends Component {
   static displayName = App.name;
   constructor(props) {
     super();
+
     this.redirect = this.redirect.bind(this);
+    this.getUpdateCache = this.getUpdateCache.bind(this);
+
+
     this.state = {
       redirect: [],
+      updateCache: false,
     };
   }
 
@@ -36,6 +41,10 @@ export default class App extends Component {
     }
   }
 
+  getUpdateCache(update) {
+    this.setState({ updateCache: update });
+  }
+
 
 
   render() {
@@ -48,12 +57,12 @@ export default class App extends Component {
     return (
       <div>
         <SideMenu {...this} />
-        <DataFeed />
+        <DataFeed {...this} />
         {this.state.redirect}
         <Switch>
-          <Route exact path='/' component={PortFolio} />
+          <Route exact path='/' component={() => <PortFolio {...this}/>} />
           <Route path='/DashboardOne' component={DashboardOne} />
-          <Route path='/PortFolio' component={PortFolio} />
+          <Route path='/PortFolio' component={() => <PortFolio {...this}/>} />
         </Switch>
       </div>
     );

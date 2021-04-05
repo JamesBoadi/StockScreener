@@ -4,7 +4,7 @@ import PriorityQueue from 'priority-q';
 import throttle from 'lodash.throttle';
 import * as cache from 'cache-base';
 import AlertCache from './js/AlertCache.js';
-import TableCache from '../DashboardTwo/js/DashboardTwoTableCache.js';
+import TableCache from './js/TableCache.js';
 import AlertSettings from './js/AlertSettings.js';
 import PriceSettings from './js/PriceSettings.js';
 

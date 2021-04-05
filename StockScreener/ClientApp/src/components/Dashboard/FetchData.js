@@ -107,7 +107,6 @@ export class FetchData extends Component {
       query: {},
       _updateCache: false,
 
-      
       addAlertTableRowBool: false,
       removeAlertTableRowBool: false,
       alertTableStocks: [],
@@ -203,18 +202,9 @@ export class FetchData extends Component {
     // Override local prices
     // this.overrideLocalPrices(this.props.state.globalStartPrice, this.props.state.globalTargetPrice);
 
-
-
-
-
-
-
-
     this.hubConnection_(); // iF FALSE 404 PAGE
 
-
     // Data Service Worker
-
     // this.addToNotificationsMenu();
   }
 
@@ -249,7 +239,6 @@ export class FetchData extends Component {
       t = [];
       this.setState({ lock: false })
     }
-
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -264,7 +253,7 @@ export class FetchData extends Component {
     }
     return false;
   }
-
+  
   updateCache(bool) {
     this.setState({ updateCache: bool });
   }
@@ -363,7 +352,7 @@ export class FetchData extends Component {
     });
   }
 
-  // Add a Row to Alert Table
+  // Add a Row to Notifications table
   async addAlertTableRow(e) {
     var t = this.state.alertTableStack;
     var alertTableStocks = this.state.alertTableStocks;
@@ -376,7 +365,7 @@ export class FetchData extends Component {
       return;
     // Read from Database
 
-    // Stocks to be displayed in alert table
+    // Stocks to be displayed in the Notifications table
     alertTableStocks.push(TableCache.get(target))
     let pointer = alertTableStocks.length - 1;
 
@@ -405,10 +394,6 @@ export class FetchData extends Component {
     this.setState({ addAlertTableRowBool: true });
   }
 
-  triggerAnimation(param) {
-    console.log('CALL ACK HELL ' + param)
-  }
-
   // Are you sure you want to remove this stock?
   removeAlertTableRow() {
     if (this.state.maxNumberOfAlertTableRows < 1)
@@ -433,6 +418,11 @@ export class FetchData extends Component {
     this.setState({ maxNumberOfAlertTableRows: this.state.maxNumberOfAlertTableRows - 1 });
     this.setState({ alertTableStocks: alertTableStocks });
     this.setState({ removeAlertTableRowBool: true });
+  }
+
+
+  triggerAnimation(param) {
+    console.log('CALL ACK HELL ' + param)
   }
 
   setAlertTableRowBool(bool) {
@@ -558,9 +548,6 @@ export class FetchData extends Component {
   onNotifReceived(res) {
     console.info('Yayyyyy, I just received a notification!!!', res);
   }
-
-
- 
 
   render() {
     // Create multiple fetch datas for each dashboard

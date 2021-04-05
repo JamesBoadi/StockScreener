@@ -71,14 +71,15 @@ export class Search extends Component {
                                     width: '12.25rem',
                                     color: 'black'
                                 }}
-
+                               // onChange={() => this.props.setSelectedRecord("")}
                                 onInput={this.props.searchDatabase}
                                 placeholder="Search "
-                                value={this.props.state.selectedRecordValue}
-                                onChange={() => this.props.setSelectedRecord("")}
+                                value={(this.props.state.clearRecord) ? undefined : 
+                                    this.props.state.selectedRecordValue}
+                                onChange={() => this.props.setClearRecord(true)}
                             />
 
-                            <InputRightElement children={<img style={{top: '-15px', left: '-23px'}} id="searchIcon" />} />
+                         {/*  <InputRightElement children={<img style={{top: '-15px', left: '-23px'}} id="searchIcon" />} /> */}
                         </InputGroup>
 
                         {/* Drop down Menu */}
