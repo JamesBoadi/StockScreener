@@ -91,10 +91,12 @@ export class DataFeed extends Component {
                     // NotificationsCache.set(key, item);
                     if (count < 897) {
                         count += 1;
+
                     }
                     else {
                         count = 0;
                         console.log("Ok")
+                        PortfolioCache.updateDataCallback();
                         this.connected = true;
                     }
                 })

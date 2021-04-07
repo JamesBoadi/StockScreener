@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { render } from 'react-dom';
+
 import {
     Box, NumberInput,
     NumberInputField, NumberInputStepper,
@@ -25,9 +26,12 @@ import {
     AutoComplete
 } from 'antd';
 
+import { TopNavbar } from '../TopNavbar.js';
 import { Search } from './Search';
 import PortfolioCache from './js/PortfolioCache';
+import PortfolioCalc from './js/PortfolioCalc';
 import * as HashMap from 'hashmap';
+import throttle from 'lodash.throttle';
 
 /**
 * Portfolio Table that adds a stock to the table 
@@ -51,21 +55,27 @@ export class PortFolio extends Component {
         this.removeRow = this.removeRow.bind(this);
         this.setSelectedRecord = this.setSelectedRecord.bind(this);
 
+        this.updateTableData = this.updateTableData.bind(this);
 
-        // Add, remove Table Rows
-
+        // **************************************************
+        // Form Functions
+        // **************************************************
 
         this.addPortfolioTableRow = this.addPortfolioTableRow.bind(this);
         this.removePortfolioTableRow = this.removePortfolioTableRow.bind(this);
         this.selectPortfolioTableRow = this.selectPortfolioTableRow.bind(this);
         this.keyExists = this.keyExists.bind(this);
 
-        // **************************************************
-        // Form Functions
+        // Setters
         // **************************************************
 
         this.setShares = this.setShares.bind(this);
         this.setPrice = this.setPrice.bind(this);
+        this.setDate = this.setDate.bind(this);
+        this.setFormVisibility = this.setFormVisibility.bind(this);
+
+        // **************************************************
+
         this.setClearRecord = this.setClearRecord.bind(this);
         this.validateForm = this.validateForm.bind(this);
 
@@ -107,9 +117,10 @@ export class PortFolio extends Component {
             componentSize: 'default',
 
             // Form
-            formIsVisible: true,
+            formIsVisible: "visible",
             selectedRecordValue: "",
             clearRecord: false,
+            date: "",
             shares: 0,
             price: 0,
 
@@ -121,11 +132,13 @@ export class PortFolio extends Component {
             // **************************************************
 
             addPortfolioTableRowBool: false,
+            updatePortfolioTableData: false,
             removePortfolioTableRowBool: false,
             portfolioTableStocks: [],
             portfolioTableStack: [],
             clickedPortfolioTableRowID: 0,
             maxNumberOfPortfolioTableRows: 0
+
         };
     }
 
@@ -134,13 +147,14 @@ export class PortFolio extends Component {
     };
 
     componentDidMount() {
-
+        // Add to database initialise
         this.interval = setInterval(() => {
             if (this.props.state.updateCache) {
                 clearInterval(this.interval);
             }
         }, 1000);
 
+        PortfolioCache.setUpdateData(this.updateTableData);
 
         /* this.createTable()
          this.updateTable()
@@ -160,6 +174,11 @@ export class PortFolio extends Component {
             });
 
             this.setState({ addPortfolioTableRowBool: false });
+        }
+        else if (this.state.updatePortfolioTableData) {
+
+            this.updateTable();
+            this.setState({ updatePortfolioTableData: false });
         }
         /* if (this.state.removeAlertTableRowBool) {
              this.removeRow();
@@ -202,7 +221,8 @@ export class PortFolio extends Component {
         if (!nextProps.state.updateCache) {
             return false;
         }
-        else if (this.state.addPortfolioTableRowBool !== nextProps.addPortfolioTableRowBool) {
+        else if (this.state.addPortfolioTableRowBool !== nextProps.addPortfolioTableRowBool
+            || this.state.updatePortfolioTableData !== nextState.updatePortfolioTableData) {
             return true;
         }
         else if (this.state.validInput || this.state.queryRes
@@ -249,7 +269,10 @@ export class PortFolio extends Component {
     }
 
 
-    // Checks if the key was added to the map
+    /* Checks if the key was added to the map
+    * Iterates through map and determines 
+    * if a stock was added to the table
+    */
     async keyExists(e, target) {
         //  e.persist();
         return new Promise(resolve => {
@@ -284,20 +307,33 @@ export class PortFolio extends Component {
         if (exists || this.state.maxNumberOfAlertTableRows >= maxRows)
             return;
 
+        PortfolioCalc.setPortfolio(this.state.price, this.state.shares,
+            this.state.price * this.state.shares);
+
         console.log('target ' + target)
 
         // Stocks to be displayed in the Portfolio table
-        portfolioTableStocks.push(PortfolioCache.get(target))
+        portfolioTableStocks.push(PortfolioCache.get(target));
         let pointer = portfolioTableStocks.length - 1;
 
         t.push(
             <tbody>
                 <tr key={pointer}>
+
                     <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].StockName.toString()}</td>
                     <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].StockCode.toString()}</td>
-                    <td id={pointer} onClick={this.selectPortfolioTableRow}>{this.state.shares} </td>
-                    <td id={pointer} onClick={this.selectPortfolioTableRow}>{this.state.date}</td>
                     <td id={pointer} onClick={this.selectPortfolioTableRow}>{this.state.price}</td>
+                    <td id={pointer} onClick={this.selectPortfolioTableRow}>{this.state.shares} </td>
+                    <td id={pointer} onClick={this.selectPortfolioTableRow}>{PortfolioCalc.getExpenditure()}</td>
+                    <td id={pointer} onClick={this.selectPortfolioTableRow}>{this.state.date}</td>
+
+                    <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].PrevOpen.toString()}</td>
+                    <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
+                    <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].Change.toString()}</td>
+
+                    <td id={pointer} onClick={this.selectPortfolioTableRow}>{PortfolioCalc.getProfitLoss()}</td>
+                    <td id={pointer} onClick={this.selectPortfolioTableRow}>{PortfolioCalc.getProfitLossPercentage()}</td>
+
                 </tr>
             </tbody>
         )
@@ -385,12 +421,20 @@ export class PortFolio extends Component {
         return this.state.display;
     }
 
+    setFormVisibility(value) {
+        this.setState({ formIsVisible: value })
+    }
+
     setShares(value) {
         this.setState({ shares: value });
     }
 
     setPrice(value) {
         this.setState({ price: value });
+    }
+
+    setDate(date, dateString) {
+        this.setState({ date: dateString });
     }
 
     setClearRecord(bool) {
@@ -536,7 +580,7 @@ export class PortFolio extends Component {
         let pointer;
         let start = 0;
         let end = this.state.portfolioTableStocks.length - 1;
-
+        var portfolioTableStocks = this.state.portfolioTableStocks;
         // console.log('UPDATE ' );
 
         for (pointer = start; pointer <= end; pointer++) {
@@ -547,17 +591,21 @@ export class PortFolio extends Component {
 
             t.push(
                 <tbody>
-                    <tr key={pointer} style={style}>
-                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
-                            {this.state.portfolioTableStocks[pointer].StockCode.toString()}</td>
-                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
-                            {this.state.portfolioTableStocks[pointer].TimeStamp.toString()}</td>
-                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
-                            {this.state.portfolioTableStocks[pointer].CurrentPrice.toString()} </td>
-                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
-                            {this.state.portfolioTableStocks[pointer].ChangeP.toString()}</td>
-                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
-                            {this.state.portfolioTableStocks[pointer].Volume.toString()}</td>
+                    <tr key={pointer}>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].StockName.toString()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].StockCode.toString()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{this.state.price}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{this.state.shares} </td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{PortfolioCalc.getExpenditure()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{this.state.date}</td>
+
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].PrevOpen.toString()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].Change.toString()}</td>
+
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{PortfolioCalc.getProfitLoss()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{PortfolioCalc.getProfitLossPercentage()}</td>
+
                     </tr>
                 </tbody>);
         }
@@ -569,7 +617,7 @@ export class PortFolio extends Component {
     removeRow() {
         let t = [];
         let style = {};
-
+        var portfolioTableStocks = this.state.portfolioTableStocks;
         let pointer = 0;
         let start = 0;
         let end = this.state.portfolioTableStocks.length - 1;
@@ -578,17 +626,21 @@ export class PortFolio extends Component {
             //      console.log('POINTER ' + pointer + ' TARGET ' + this.props.state.target);
             t.push(
                 <tbody>
-                    <tr key={pointer} style={style}>
-                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
-                            {this.state.portfolioTableStocks[pointer].StockCode.toString()}</td>
-                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
-                            {this.state.portfolioTableStocks[pointer].TimeStamp.toString()}</td>
-                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
-                            {this.state.portfolioTableStocks[pointer].CurrentPrice.toString()} </td>
-                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
-                            {this.state.portfolioTableStocks[pointer].ChangeP.toString()}</td>
-                        <td id={pointer} onClick={this.props.selectAlertTableRow}>
-                            {this.state.portfolioTableStocks[pointer].Volume.toString()}</td>
+                    <tr key={pointer}>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].StockName.toString()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].StockCode.toString()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{this.state.price}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{this.state.shares} </td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{PortfolioCalc.getExpenditure()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{this.state.date}</td>
+
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].PrevOpen.toString()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].Change.toString()}</td>
+
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{PortfolioCalc.getProfitLoss()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{PortfolioCalc.getProfitLossPercentage()}</td>
+
                     </tr>
                 </tbody>);
         }
@@ -631,6 +683,46 @@ export class PortFolio extends Component {
         this.setState({ portfolioTable: t });
     }
 
+    updateTableData() {
+        let portfolioTableStocks = [];
+        let t = [];
+
+        if (this.map.size === 0)
+            return;
+
+        for (let pointer = 0; pointer < this.map.size; pointer++) {
+            let target = this.map.get(pointer);
+            portfolioTableStocks.push(PortfolioCache.get(target));
+
+            t.push(
+                <tbody>
+                    <tr key={pointer}>
+
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].StockName.toString()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].StockCode.toString()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{this.state.price}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{this.state.shares} </td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{PortfolioCalc.getExpenditure()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{this.state.date}</td>
+
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].PrevOpen.toString()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{portfolioTableStocks[pointer].Change.toString()}</td>
+
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{PortfolioCalc.getProfitLoss()}</td>
+                        <td id={pointer} onClick={this.selectPortfolioTableRow}>{PortfolioCalc.getProfitLossPercentage()}</td>
+
+                    </tr>
+                </tbody>
+            )
+        }
+
+        this.setState({ portfolioTableStack: t });
+        this.setState({ portfolioTableStocks: portfolioTableStocks });
+        this.setState({ updatePortfolioTableData: true });
+    }
+
+
     // **************************************************
 
     render() {
@@ -639,9 +731,18 @@ export class PortFolio extends Component {
                 <tr>
                     <th>Stock <br /> Name</th>
                     <th>Stock <br /> Code</th>
-                    <th>Date </th>
-                    <th>Shares</th>
                     <th>Price</th>
+                    <th>Shares</th>
+                    <th>Expenditure</th>
+                    <th>Date </th>
+
+                    <th>Close <br />(Previous)</th>
+                    <th>Current <br /> Price</th>
+                    <th>Change</th>
+
+                    <th>Net Gain / Loss <br /> (Est)</th>
+                    <th>Net Gain / Loss <br /> % (Est)</th>
+
                 </tr>
             </thead>
         </table>;
@@ -661,64 +762,91 @@ export class PortFolio extends Component {
                         top='0px'
                         justifyContent='center'
                         visibility={this.state.formIsVisible}
-
                         backgroundColor='whiteAlpha.508'
                     >
-                        <h4 style={{ position: 'absolute', color: 'black', float: 'left' }}>Add Stock </h4>
-                        <Form
-                            style={{ transform: "translate(10px, 60px)" }}
-                            labelCol={{
-                                span: 4,
-                            }}
-                            wrapperCol={{
-                                span: 14,
-                            }}
-                            layout="horizontal"
-                            initialValues={{
-                                size: this.state.componentSize,
-                            }}
 
-                            onValuesChange={this.onFormLayoutChange}
-                            size={this.state.componentSize}
-                        >
-                            <Form.Item label="Select"> {/* Search Content */}
-                                <Search {...this} />
-                            </Form.Item>
-                            <Form.Item label="Date">
-                                <DatePicker />
-                            </Form.Item>
-                            <Form.Item label="Shares">
-                                <InputNumber
-                                    min={0}
-                                    defaultValue={0}
-                                    onChange={this.setShares} />
-                            </Form.Item>
-                            <Form.Item label="Price">
-                                <InputNumber
-                                    min={0}
-                                    step={0.25}
-                                    defaultValue={0}
-                                    onChange={this.setPrice} />
-                            </Form.Item>
+                        <h4 style={{ position: 'absolute', color: 'black' }}>Add Stock </h4>
+                        <p style={{
+                            position: 'absolute', color: 'black', fontWeight: 'bold',
+                            fontSize: '15px', top: '5px', right: '20px', cursor: 'pointer'
+                        }}
+                            onClick={() => this.setFormVisibility("hidden")}>Close</p>
 
-                            <Button style={{
-                                position: 'absolute', bottom: '4px', right: '20px',
-                                zIndex: '999'
-                            }}
-                                onClick={this.addPortfolioTableRow}
-                            >Add Stock</Button>
-                        </Form>
+                        <div visibility={
+                            this.state.formIsVisible}>
+                            <Form
+                                style={{ transform: "translate(10px, 60px)" }}
+                                labelCol={{
+                                    span: 4,
+                                }}
+                                wrapperCol={{
+                                    span: 14,
+                                }}
+                                layout="horizontal"
+                                initialValues={{
+                                    size: this.state.componentSize,
+                                }}
+
+                                onValuesChange={this.onFormLayoutChange}
+                                size={this.state.componentSize}
+
+                            >
+                                <Form.Item label="Select"> {/* Search Content */}
+                                    <Search {...this} />
+                                </Form.Item>
+                                <Form.Item label="Date">
+                                    <DatePicker onChange={this.setDate} />
+                                </Form.Item>
+                                <Form.Item label="Shares">
+                                    <InputNumber
+                                        min={0}
+                                        defaultValue={0}
+                                        onChange={this.setShares} />
+                                </Form.Item>
+                                <Form.Item label="Price">
+                                    <InputNumber
+                                        min={0}
+                                        step={0.25}
+                                        defaultValue={0}
+                                        onChange={this.setPrice} />
+                                </Form.Item>
+
+                                <Button style={{
+                                    position: 'absolute', bottom: '4px', right: '20px',
+                                    zIndex: '999'
+                                }}
+                                    onClick={this.addPortfolioTableRow}
+                                    visibility={
+                                        this.state.formIsVisible
+                                    }
+                                >Add Stock</Button>
+                            </Form>
+                        </div>
+
+
                     </Box>
                 </div>
 
+                {/* TOP NAVBAR */}
+                <TopNavbar />
+                <Box style={{position: 'absolute' }}>
+                    <Button style={{ position: 'relative', top: '130px', left: '1010px' }}
+                        onClick={this.addPortfolioTableRow}>Edit</Button>
+
+                    <Button style={{ position: 'relative', top: '130px', left: '1030px' }}
+                        onClick={() => this.setFormVisibility("visible")}>Add a Stock</Button>
+                    <Button style={{ position: 'relative', top: '130px', left: '1080px' }}
+                        onClick={this.addPortfolioTableRow}>Remove</Button>
+                </Box>
+
                 {/* PORTFOLIO TABLE */}
                 <Box
-                    style={{ position: 'absolute', top: '315px', left: '100px' }}
+                    style={{ position: 'absolute', top: '125px', left: '80px' }}
                     //     bg='rgb(30,30,30)'
                     boxShadow='sm'
                     textAlign='center'
                     height='45px'
-                    width='50rem'
+                    width='78rem'
                     rounded="lg"
                     margin='auto'
                     color='white'
@@ -736,11 +864,12 @@ export class PortFolio extends Component {
                         boxShadow='sm'
                         textAlign='center'
                         height='1110px'
-                        width='52rem'
+                        width='78rem'
                         rounded="lg"
                         margin='auto'
                         color='white'
                         zIndex='-999'>
+
 
                         {this.state.portfolioTable}
 

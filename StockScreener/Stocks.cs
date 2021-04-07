@@ -13,6 +13,7 @@ using System.Text.Json;
 
 namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_server For the database (https://gist.github.com/kevinswiber/1390198)
 {
+    // Change to singleton class
     public class Stocks
     {
         internal static readonly String API_TOKEN = ConfigurationManager.AppSettings["API_TOKEN"];

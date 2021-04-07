@@ -796,8 +796,8 @@ export class StockTableTwo extends React.Component {
                     <th>High</th>
 
                     <th>Low</th>
-                    <th>P / L</th>
-                    <th>P / L %</th>
+                    <th>Change</th>
+                    <th>ChangeP %</th>
                     <th>Volume</th>
                 </tr>
             </thead>

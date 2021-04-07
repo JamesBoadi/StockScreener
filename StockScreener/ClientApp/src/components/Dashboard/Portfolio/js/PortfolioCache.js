@@ -12,6 +12,8 @@ export default class PortfolioCache {
     static update_hideStocks = false;
     static disableUpdate = false;
 
+    static updateDataCallback;
+
     static item =
         {
             StockCode: "",
@@ -28,31 +30,37 @@ export default class PortfolioCache {
             Change: ""
         }
 
+    // **************************************************
+    // Getters and Setters
+    // **************************************************
+
     static set(key, value) {
         this.cache_.set(key.toString(), value);
+    }
+    /* Do not allow scrolling while Updating */
+    static setDisableScroll(bool) {
+        this.disableUpdate = bool;
     }
 
     static setUpdateHideStocks(bool) {
         this.update_hideStocks = bool;
     }
 
-    static getUpdateHideStocks() {
-        return this.update_hideStocks;
-    }
-
     static setResetScrollPosition(bool) {
         this.resetScrollPosition = bool;
+    }
+
+    static setPriceDetection(enable) {
+        this.priceDetection = enable;
     }
 
     static getResetScrollPosition() {
         return this.resetScrollPosition;
     }
 
-    /* Do not allow scrolling while Updating */
-    static setDisableScroll(bool) {
-        this.disableUpdate = bool;
+    static getUpdateHideStocks() {
+        return this.update_hideStocks;
     }
-
     static getDisableScroll() {
         return this.disableUpdate;
     }
@@ -93,23 +101,29 @@ export default class PortfolioCache {
         return this.end;
     }
 
-    static setPriceDetection(enable) {
-        this.priceDetection = enable;
-    }
-
     static getPriceDetection() {
         return this.priceDetection;
     }
 
-    static getPreviousPrice(key)
-    {
+    static getPreviousPrice(key) {
         return (this.get(key).CurrentPrice + this.get(key).Change);
     }
 
-    static getCurrentPrice(key)
-    {
+    static getCurrentPrice(key) {
         return this.get(key).CurrentPrice;
     }
+    // **************************************************
+
+    static setUpdateData(callback)
+    {
+        this.updateDataCallback = callback;
+    }
+
+    static getUpdateData()
+    {
+        this.updateDataCallback();
+    }
+
 
     static hideBearishStocks() {
         this.cacheOp_.clear();
@@ -117,17 +131,17 @@ export default class PortfolioCache {
         let size = 0;
 
         this.disableUpdate = true;
-      
+
         for (let index = 0; index < 897; index++) {
             const item = this.get(index);
-          //  console.log("Bullish Stocks 1 " + item.CurrentPrice);
+            //  console.log("Bullish Stocks 1 " + item.CurrentPrice);
             // Filter Stocks
 
             if (item.ChangeArray[0] > 0) {
                 ++pointer;
                 let key = pointer.toString();
                 this.cacheOp_.set(key, item);
-               
+
                 size++;
             }
         }
@@ -147,7 +161,7 @@ export default class PortfolioCache {
             // Fill Cache with empty columns
             this.max = 0;
             this.end = size; // Set the end
-         
+
             //console.log("less than 50 " + max);
         } else {
             this.endMod = parseInt(size % 50);
@@ -164,9 +178,9 @@ export default class PortfolioCache {
             }
         }
 
-       /* console.log("SIZE " + size);
-        console.log("MAX " + this.max);
-        console.log("ENDMOD " + this.endMod);*/
+        /* console.log("SIZE " + size);
+         console.log("MAX " + this.max);
+         console.log("ENDMOD " + this.endMod);*/
 
         this.priceDetection = true;
         this.update_hideStocks = true;
@@ -178,17 +192,17 @@ export default class PortfolioCache {
         let size = 0;
 
         this.disableUpdate = true;
-      
+
         for (let index = 0; index < 897; index++) {
             const item = this.get(index);
-          //  console.log("Bullish Stocks 1 " + item.CurrentPrice);
+            //  console.log("Bullish Stocks 1 " + item.CurrentPrice);
             // Filter Stocks
 
             if (item.ChangeArray[0] < 0) {
                 ++pointer;
                 let key = pointer.toString();
                 this.cacheOp_.set(key, item);
-               
+
                 size++;
             }
         }
@@ -223,9 +237,9 @@ export default class PortfolioCache {
             }
         }
 
-       /* console.log("SIZE " + size);
-        console.log("MAX " + this.max);
-        console.log("ENDMOD " + this.endMod);*/
+        /* console.log("SIZE " + size);
+         console.log("MAX " + this.max);
+         console.log("ENDMOD " + this.endMod);*/
 
         this.priceDetection = true;
         this.update_hideStocks = true;
