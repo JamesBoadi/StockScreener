@@ -472,11 +472,11 @@ export class PortFolio extends Component {
                         id={id}
                         class="record"
                         style={{ color: 'wheat', cursor: 'pointer' }}
-                        onClick={this.selectRecords}>
-                        {value}
+                        onClick={this.selectRecords} >
+                        {(value.length > 8) ? `${value}` : `${value}`}
                         <br />
                     </div>
-                );
+                );// Seperate spaces
             }
         }
         else {
@@ -829,15 +829,29 @@ export class PortFolio extends Component {
 
                 {/* TOP NAVBAR */}
                 <TopNavbar />
-                <Box style={{position: 'absolute' }}>
-                    <Button style={{ position: 'relative', top: '130px', left: '1010px' }}
-                        onClick={this.addPortfolioTableRow}>Edit</Button>
 
-                    <Button style={{ position: 'relative', top: '130px', left: '1030px' }}
-                        onClick={() => this.setFormVisibility("visible")}>Add a Stock</Button>
-                    <Button style={{ position: 'relative', top: '130px', left: '1080px' }}
-                        onClick={this.addPortfolioTableRow}>Remove</Button>
-                </Box>
+                <div class="editStock">
+                    <Button onClick={this.addPortfolioTableRow}>Edit</Button>
+                </div>
+
+                <div class="addStock">
+                    <Button onClick={this.addPortfolioTableRow}>Add</Button>
+                </div>
+
+                <div class="removeStock">
+                    <Button onClick={this.addPortfolioTableRow}>Remove</Button>
+                </div>
+
+              
+
+
+
+                {/*     
+                    
+                    <Button class="addStock" style={{ position: 'absolute', top: '130px', left: '1030px' }}
+                                onClick={() => this.setFormVisibility("visible")}>Add a Stock</Button>*/}
+
+
 
                 {/* PORTFOLIO TABLE */}
                 <Box

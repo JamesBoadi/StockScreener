@@ -1,10 +1,4 @@
 
- @media (min-width: 768px) {
-    html {
-      font-size: 16px;
-    }
-  }
-  
   /**************** App ******************/
   /***************************************/
 
@@ -42,11 +36,7 @@
 
   */
 
-  @media screen and (max-width: 600px) { /* min width */
-   
 
-
-  }
 
   @media screen and (max-width: 320px) { 
     
@@ -297,12 +287,16 @@
   
   /************** PortFolio Table ******************/
   /*********************************************/
+
+
+
   .portfolioTableHeader
   {
     position: absolute;
     table-layout: fixed;
     border-collapse: collapse;
     font-family: sans-serif;
+    min-width: 78rem;
     min-height: 1200px;
     height: 1rem;
     font-weight: 100;
@@ -325,6 +319,7 @@
     border-collapse: collapse;
     font-family: sans-serif;
     font-size: 14px;
+    min-width: 78rem;
   /*  min-height: 1200px;*/
     width: 78rem;
     left: 0px;
@@ -348,6 +343,168 @@
     z-index: 999;
   }
 
+  
+  /* **************************************************
+  // Table buttons
+  // **************************************************/
+
+  .removeStock {
+    position: absolute;
+    top: 130px;
+    left: 1243px;
+  }
+
+  .addStock {
+    position: absolute;
+    top: 130px;
+    left: 1170px;
+  }
+
+  .editStock {
+    position: absolute;
+    top: 130px;
+    left: 1103px;
+  }
+  
+
+  @media screen and (min-width: 320px) { 
+    
+    .removeStock {
+      position: absolute;
+      top: 130px;
+      left: 1240px;
+    }
+
+    .addStock {
+      position: absolute;
+      top: 130px;
+      left: 1170px;
+    }
+
+    .editStock {
+      position: absolute;
+      top: 130px;
+      left: 1103px;
+    }
+
+    .side-bar 
+    {
+      min-height: 100%;
+  
+    }
+  
+ /*   #tableContainer
+    {
+      position: absolute;
+      display: flex;
+      left: 0;
+    }
+
+
+    #ox
+    {
+      min-width: 70rem;
+      min-height: auto;
+      margin: auto;
+    }*/
+  }
+
+  
+  @media screen and (min-width: 691px) and (max-width: 691px) { 
+
+    .removeStock {
+      position: absolute;
+      top: 130px;
+      left: 1090px;
+    }
+      
+    .addStock {
+      position: absolute;
+      top: 130px;
+      left: 1020px;
+    }
+
+    .editStock {
+      position: absolute;
+      top: 130px;
+      left: 953px;
+    }
+
+    .side-bar 
+    {
+      min-height: 100%;
+  
+    }
+  }
+
+  @media screen and (min-width: 640px) and (max-width: 691px) { 
+
+    .portfolio .removeStock {
+      position: absolute;
+      top: 130px;
+      left: 1090px;
+    }
+
+    .addStock {
+      position: absolute;
+      top: 130px;
+      left: 1020px;
+    }
+
+    .editStock {
+      position: absolute;
+      top: 130px;
+      left: 953px;
+    }
+
+    .side-bar 
+    {
+      min-height: 100%;
+    }
+  }
+
+  @media screen and (min-width: 578px) and (max-width: 800px) { 
+
+    .removeStock {
+      position: absolute;
+      top: 130px;
+      left: 1090px;
+    }
+
+    .addStock {
+      position: absolute;
+      top: 130px;
+      left: 1020px;
+    }
+
+    .editStock {
+      position: absolute;
+      top: 130px;
+      left: 953px;
+    }
+  }
+  
+  @media screen and (min-width: 100px) and (max-width: 578px) { 
+
+    .removeStock {
+      position: absolute;
+      top: 130px;
+      left: 1090px;
+    }
+
+    .addStock {
+      position: absolute;
+      top: 130px;
+      left: 1020px;
+    }
+
+    .editStock {
+      position: absolute;
+      top: 130px;
+      left: 953px;
+    }
+  }
+  
   /************** Alert Table ******************/
   /*********************************************/
 
@@ -1238,27 +1395,3 @@
   }
 
 
-  @media screen and (max-width: 800px) { 
-
-    
-    .side-bar 
-    {
-      min-height: 100%;
-  
-    }
- /*   #tableContainer
-    {
-      position: absolute;
-      display: flex;
-      left: 0;
-    }
-
-
-    #ox
-    {
-      min-width: 70rem;
-      min-height: auto;
-      margin: auto;
-    }*/
-  }
-  
