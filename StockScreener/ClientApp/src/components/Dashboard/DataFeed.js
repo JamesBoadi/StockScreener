@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-
 import PortfolioCache from './Portfolio/js/PortfolioCache';
 import * as signalR from '@aspnet/signalr';
 
@@ -26,7 +25,7 @@ export class DataFeed extends Component {
             request_Calls: -1,
             MAX_CALLS: 896,
             called: true,
-            
+
         };
     }
 
@@ -88,15 +87,19 @@ export class DataFeed extends Component {
                     let item = JSON.parse(data);
                     PortfolioCache.set(key, item);
                     // AlertCache.set(key, item);
-                    // NotificationsCache.set(key, item);
+                    // NotificationsCache.set(key, item); // Replace with factory, or something
+                    if (!this.state.updateCache)
+                        this.setState({ updateCache: false});
+                    
                     if (count < 897) {
                         count += 1;
-
                     }
                     else {
                         count = 0;
                         console.log("Ok")
-                        PortfolioCache.updateDataCallback();
+                        PortfolioCache.updateDataCallback(); // Updates data in portfolioo
+                        
+                        this.setState({ updateCache: true });
                         this.connected = true;
                     }
                 })

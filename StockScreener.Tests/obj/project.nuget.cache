@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "GDLCIeyWgjDbxlqlEL4Uoe/e33yRqYeY4ss5DBFYZZp6oMsaHEKjaOusR9DUflE1hJXH3j3qVR+sXGJNpq7+Tw==",
+  "dgSpecHash": "0i40WwmFrnrIXDz9LE0h7MfLdxv4jdQ7Iz6rXBGfGz2FDP4HmX7serLykV+4y0S6PpvgE6EC6sAW1ImTAEo0sQ==",
   "success": true,
   "projectFilePath": "c:\\Users\\Peek\\Music\\StockScreener\\StockScreener.Tests\\StockScreener.Tests.csproj",
   "expectedPackageFiles": [
@@ -132,6 +132,7 @@
     "C:\\Users\\Peek\\.nuget\\packages\\system.reflection.typeextensions\\4.3.0\\system.reflection.typeextensions.4.3.0.nupkg.sha512",
     "C:\\Users\\Peek\\.nuget\\packages\\system.resources.resourcemanager\\4.3.0\\system.resources.resourcemanager.4.3.0.nupkg.sha512",
     "C:\\Users\\Peek\\.nuget\\packages\\system.runtime\\4.3.0\\system.runtime.4.3.0.nupkg.sha512",
+    "C:\\Users\\Peek\\.nuget\\packages\\system.runtime.caching\\5.0.0\\system.runtime.caching.5.0.0.nupkg.sha512",
     "C:\\Users\\Peek\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.7.0\\system.runtime.compilerservices.unsafe.4.7.0.nupkg.sha512",
     "C:\\Users\\Peek\\.nuget\\packages\\system.runtime.extensions\\4.3.0\\system.runtime.extensions.4.3.0.nupkg.sha512",
     "C:\\Users\\Peek\\.nuget\\packages\\system.runtime.handles\\4.3.0\\system.runtime.handles.4.3.0.nupkg.sha512",

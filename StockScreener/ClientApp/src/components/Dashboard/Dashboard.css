@@ -294,7 +294,6 @@
   {
     position: absolute;
     table-layout: fixed;
-    border-collapse: collapse;
     font-family: sans-serif;
     min-width: 78rem;
     min-height: 1200px;
@@ -316,8 +315,8 @@
   .portfolioTable  {
     position: absolute;
     table-layout: fixed;
-    border-collapse: collapse;
     font-family: sans-serif;
+    height: 30px;
     font-size: 14px;
     min-width: 78rem;
   /*  min-height: 1200px;*/

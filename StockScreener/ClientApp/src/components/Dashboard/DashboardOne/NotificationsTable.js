@@ -29,9 +29,6 @@ export class NotificationsTable extends Component {
         this.getDisplay = this.getDisplay.bind(this);
         this.removeRow = this.removeRow.bind(this);
 
-
-
-
         let style = { color: "white;" };
         this.timeout = null;
 

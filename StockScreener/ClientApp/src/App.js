@@ -45,8 +45,7 @@ export default class App extends Component {
     this.setState({ updateCache: update });
   }
 
-
-
+  
   render() {
     /*
             <Route exact path='/' component={DashboardInterface} />
