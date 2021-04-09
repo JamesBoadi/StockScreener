@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import HistoryCache from './Portfolio/js/PortfolioCache';
 import PortfolioCache from './Portfolio/js/PortfolioCache';
 import * as signalR from '@aspnet/signalr';
 
@@ -86,6 +87,7 @@ export class DataFeed extends Component {
                 DataFeed.hubConnection.on('requestData', (key, data) => {
                     let item = JSON.parse(data);
                     PortfolioCache.set(key, item);
+                    HistoryCache.set(key, item);
                     // AlertCache.set(key, item);
                     // NotificationsCache.set(key, item); // Replace with factory, or something
                     if (!this.state.updateCache)

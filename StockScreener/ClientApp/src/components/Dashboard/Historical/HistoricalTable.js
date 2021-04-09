@@ -29,7 +29,7 @@ import { TopNavbar } from '../TopNavbar.js';
 import { AddStockForm } from './AddStockForm';
 import { EditStockForm } from './EditStockForm';
 import { Search } from './Search';
-import PortfolioCache from './js/PortfolioCache';
+import HistoryCache from './js/HistoryCache';
 import PortfolioCalc from './js/HistoryCalc';
 import * as HashMap from 'hashmap';
 
@@ -166,7 +166,7 @@ export class HistoricalTable extends Component {
             }
         }, 1000);
 
-        //PortfolioCache.setUpdateData(this.updateTableData);
+        //HistoryCache.setUpdateData(this.updateTableData);
 
         /* this.createTable()
          this.updateTable()
@@ -212,7 +212,7 @@ export class HistoricalTable extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (true) {
+        if (!nextProps.state.updateCache) {
             return false;
         }
         else {
@@ -324,11 +324,11 @@ export class HistoricalTable extends Component {
             return
         }
 
-        PortfolioCalc.setPortfolio(this.state.price, this.state.shares,
-            this.state.price * this.state.shares);
+      /*  PortfolioCalc.setPortfolio(this.state.price, this.state.shares,
+            this.state.price * this.state.shares);*/
 
         // Stocks to be displayed in the Portfolio table
-        portfolioTableStocks.push(PortfolioCache.get(target));
+        portfolioTableStocks.push(HistoryCache.get(target));
         let pointer = parseInt(portfolioTableStocks.length - 1);
 
         this.data.set(pointer, { price: this.state.price, shares: this.state.shares, date: this.state.date });
@@ -392,7 +392,7 @@ export class HistoricalTable extends Component {
                 this.data.set(pointer, { price: this.state.price, shares: this.state.shares, date: this.state.date });
                 this.map.set(pointer, this.state.stockFormID);
 
-                new_portfolioTableStocks[pointer] = PortfolioCache.get(this.state.stockFormID); // New information
+                new_portfolioTableStocks[pointer] = HistoryCache.get(this.state.stockFormID); // New information
                 console.log("Update state " + new_portfolioTableStocks[pointer].StockName.toString());
 
                 new_stack[pointer] =
@@ -447,6 +447,19 @@ export class HistoricalTable extends Component {
           this.setState({ maxNumberOfAlertTableRows: this.state.maxNumberOfAlertTableRows - 1 });
           this.setState({ alertTableStocks: alertTableStocks });
           this.setState({ removeAlertTableRowBool: true });*/
+
+
+          var txt;
+          if (window.confirm("Confirm to delete this stock")) {
+            txt = "Yes";
+          } else {
+            txt = "No";
+          }
+
+         /* if (txt === "Yes") {
+              
+          }*/
+
     }
 
     // Search box retrieves stocks from database
@@ -530,7 +543,7 @@ export class HistoricalTable extends Component {
         if (this.map.has(this.state.stockRecordID))
             this.setState({ stockFormID: id });
 
-        const stockName = PortfolioCache.get(id).StockName;
+        const stockName = HistoryCache.get(id).StockName;
         this.setState({ selectedRecordValue: stockName });
         this.setState({ clearRecord: false });
     }
@@ -751,7 +764,7 @@ export class HistoricalTable extends Component {
 
         for (let pointer = 0; pointer < this.map.size; pointer++) {
             let target = parseInt(this.map.get(pointer));
-            portfolioTableStocks.push(PortfolioCache.get(target));
+            portfolioTableStocks.push(HistoryCache.get(target));
 
             /*     t.push(
                      <tbody>
@@ -804,16 +817,13 @@ export class HistoricalTable extends Component {
                     <th>UpperBand</th>
                     <th>MiddleBand</th>
                     <th>LowerBand</th>
-                    <th>Simple Moving <br /> Average </th>
+                    <th>SMA </th>
                     <th>Signal</th>
                     <th>Volume</th>
                     <th>RSI</th>
                 </tr>
             </thead>
         </table>;
-
-
-
 
         return (
             <div>
@@ -831,7 +841,7 @@ export class HistoricalTable extends Component {
                         justifyContent='center'
                         visibility={this.state.addStockFormVisible}
                         backgroundColor='whiteAlpha.508'
-                        style={{ position: 'absolute', left: '1000px', top: '220px' }}
+                        style={{ position: 'absolute', left: '845px', top: '230px' }}
                         zIndex='999'
                     >
                         <h4 style={{ position: 'absolute', color: 'black' }}>Filter </h4>
@@ -853,7 +863,7 @@ export class HistoricalTable extends Component {
                         justifyContent='center'
                         visibility={this.state.editStockFormVisible}
                         backgroundColor='whiteAlpha.508'
-                        style={{ position: 'absolute', left: '1000px', top: '220px' }}
+                        style={{ position: 'absolute', left: '800px', top: '220px' }}
                         zIndex='999'
                     >
                         <h4 style={{ position: 'absolute', color: 'black' }}>Edit Stock </h4>
@@ -869,22 +879,15 @@ export class HistoricalTable extends Component {
                     {/* TOP NAVBAR */}
                     <TopNavbar />
 
-                    <div class="editStock" style={{ zIndex: '999' }}>
-                        <Button onClick={() => {
-                            this.setEditFormVisibility("visible")
-                            this.setAddFormVisibility("hidden")
-                        }}>Edit</Button>
-                    </div>
-
                     <div class="addStock" style={{ zIndex: '999', transform: 'translateX(20px)' }}>
                         <Button onClick={() => {
                             this.setAddFormVisibility("visible")
                             this.setEditFormVisibility("hidden")
-                        }}>Add</Button>
+                        }}>Filter</Button>
                     </div>
 
                     <div class="removeStock" style={{ zIndex: '999' }}>
-                        <Button onClick={() => this.setAddFormVisibility("visible")}>Remove</Button>
+                        <Button onClick={() => this.removePortfolioTableRow()}>Remove</Button>
                     </div>
 
                     {/* <Button class="addStock" style={{ position: 'absolute', top: '130px', left: '1030px' }}

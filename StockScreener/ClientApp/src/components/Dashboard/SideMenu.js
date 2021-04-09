@@ -30,10 +30,13 @@ export class SideMenu extends Component {
   };
 
 
+  
+
+
+
+
 
   render() {
-
-  
     // switch
     return (
 
@@ -45,7 +48,10 @@ export class SideMenu extends Component {
   RedirectToPortFolio = () => {
      <Redirect to='/PortFolio' />;
   };
-
+ <SubMenu key="sub3" title="Submenu">
+                <Menu.Item key="11">Option 11</Menu.Item>
+                <Menu.Item key="12">Option 12</Menu.Item>
+              </SubMenu>
           />
 
       Navigation Menu */}
@@ -56,12 +62,22 @@ export class SideMenu extends Component {
 
           <Menu
             style={{ position: 'absolute', minHeight: '1600px', width: '55px', height: '100vh', margin: 0, zIndex: '999' }}
-            defaultSelectedKeys={['1']}
-            defaultOpenKeys={['sub1']}
+         
             mode="inline"
             theme="rgb(0.00,0.00,0.55)"
             inlineCollapsed={this.state.collapsed}
           >
+
+            <SubMenu key="sub2" icon={<AppstoreOutlined />} title="Navigation Two">
+              <Menu.Item key="9">Dashboard One</Menu.Item>
+              <Menu.Item key="10">Dashboard Two</Menu.Item>
+              <Menu.Item key="11">Dashboard Three</Menu.Item>
+              <Menu.Item key="12">Dashboard Four</Menu.Item>
+              <Menu.Item key="13">Historical Table</Menu.Item>
+              <Menu.Item key="14">My Portfolio</Menu.Item>
+            </SubMenu>
+
+
             <Menu.Item key="1" icon={<PieChartOutlined />} onClick={() => this.props.redirect(1)}>
               Option 1
           </Menu.Item>
@@ -77,14 +93,7 @@ export class SideMenu extends Component {
               <Menu.Item key="7">Option 7</Menu.Item>
               <Menu.Item key="8">Option 8</Menu.Item>
             </SubMenu>
-            <SubMenu key="sub2" icon={<AppstoreOutlined />} title="Navigation Two">
-              <Menu.Item key="9">Option 9</Menu.Item>
-              <Menu.Item key="10">Option 10</Menu.Item>
-              <SubMenu key="sub3" title="Submenu">
-                <Menu.Item key="11">Option 11</Menu.Item>
-                <Menu.Item key="12">Option 12</Menu.Item>
-              </SubMenu>
-            </SubMenu>
+           
           </Menu>
 
 
