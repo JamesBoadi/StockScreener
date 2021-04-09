@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { render } from 'react-dom';
-
 import {
     Box, NumberInput,
     NumberInputField, NumberInputStepper,
@@ -31,16 +30,17 @@ import { AddStockForm } from './AddStockForm';
 import { EditStockForm } from './EditStockForm';
 import { Search } from './Search';
 import PortfolioCache from './js/PortfolioCache';
-import PortfolioCalc from './js/PortfolioCalc';
+import PortfolioCalc from './js/HistoryCalc';
 import * as HashMap from 'hashmap';
 
 
 /**
-* Portfolio Table that adds a stock to the table 
-* Includes live information for that stock but does
-* not send live alerts
+* Historical Table that adds a stock to the table. 
+* Includes live information for that stock and also
+* includes live alerts and mathematical calculations
 */
-export class PortFolio extends Component {
+
+export class HistoricalTable extends Component {
     constructor(props) {
         super(props);
         this.searchDatabase = this.searchDatabase.bind(this);
@@ -91,7 +91,6 @@ export class PortFolio extends Component {
         this.timeout = null;
         this.map = new HashMap();
         this.data = new HashMap();
-
 
         this.state = {
             green: false,
@@ -167,7 +166,7 @@ export class PortFolio extends Component {
             }
         }, 1000);
 
-        PortfolioCache.setUpdateData(this.updateTableData);
+        //PortfolioCache.setUpdateData(this.updateTableData);
 
         /* this.createTable()
          this.updateTable()
@@ -213,7 +212,7 @@ export class PortFolio extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (!nextProps.state.updateCache) {
+        if (true) {
             return false;
         }
         else {
@@ -426,28 +425,28 @@ export class PortFolio extends Component {
 
     // Are you sure you want to remove this stock?
     removePortfolioTableRow() {
-      /*  if (this.state.maxNumberOfAlertTableRows < 1)
-            return;
-
-        let pointer;
-        let start = 0;
-        let end = this.state.alertTableStocks.length - 1;
-        let target = parseInt(this.state.target);
-        let portfolioTableStack = [];
-
-        for (pointer = start; pointer <= end; pointer++) {
-            // console.log('alertTableId ' + pointer + ' target ' + target);
-            if (pointer === target) {
-                this.map.delete(pointer);
-                continue;
-            }
-            else
-                portfolioTableStack.push(this.state.portfolioTableStack[pointer]);
-        }
-
-        this.setState({ maxNumberOfAlertTableRows: this.state.maxNumberOfAlertTableRows - 1 });
-        this.setState({ alertTableStocks: alertTableStocks });
-        this.setState({ removeAlertTableRowBool: true });*/
+        /*  if (this.state.maxNumberOfAlertTableRows < 1)
+              return;
+  
+          let pointer;
+          let start = 0;
+          let end = this.state.alertTableStocks.length - 1;
+          let target = parseInt(this.state.target);
+          let portfolioTableStack = [];
+  
+          for (pointer = start; pointer <= end; pointer++) {
+              // console.log('alertTableId ' + pointer + ' target ' + target);
+              if (pointer === target) {
+                  this.map.delete(pointer);
+                  continue;
+              }
+              else
+                  portfolioTableStack.push(this.state.portfolioTableStack[pointer]);
+          }
+  
+          this.setState({ maxNumberOfAlertTableRows: this.state.maxNumberOfAlertTableRows - 1 });
+          this.setState({ alertTableStocks: alertTableStocks });
+          this.setState({ removeAlertTableRowBool: true });*/
     }
 
     // Search box retrieves stocks from database
@@ -733,7 +732,7 @@ export class PortFolio extends Component {
     // Update the table
     updateTable() {
         let t = <div>
-            <table class="portfolioTable" aria-labelledby="tabelLabel">
+            <table class="historicalTable" aria-labelledby="tabelLabel">
                 <thead></thead>
                 {this.state.portfolioTableStack}
             </table>
@@ -782,7 +781,7 @@ export class PortFolio extends Component {
     // **************************************************
 
     render() {
-        let portfolioTableHeader = <table class="portfolioTableHeader" aria-labelledby="tabelLabel"
+        let portfolioTableHeader = <table class="historicalTableHeader" aria-labelledby="tabelLabel"
             style={{ zIndex: '999' }}>
             <thead>
                 <tr>
@@ -803,123 +802,126 @@ export class PortFolio extends Component {
 
         return (
             <div>
-                <div class="portfolio">
-                {/* TOP NAVBAR */}
-                <Box
-                    min-width='12.25rem'
-                    width='20rem'
-                    height='22rem'
-                    overflowY='auto'
-                    bg='#f9f9f9'
-                    top='0px'
-                    justifyContent='center'
-                    visibility={this.state.addStockFormVisible}
-                    backgroundColor='whiteAlpha.508'
-                    style={{ position: 'absolute', left: '1000px', top: '220px' }}
-                    zIndex='999'
-                >
+                <div class="historical">
+               
 
-                    <h4 style={{ position: 'absolute', color: 'black' }}>Add Stock </h4>
-                    <p style={{
-                        position: 'absolute', color: 'black', fontWeight: 'bold',
-                        fontSize: '15px', top: '5px', right: '20px', cursor: 'pointer'
-                    }}
-                        onClick={() => this.setAddFormVisibility("hidden")}>Close</p>
-                    <AddStockForm {...this} />
-                </Box>
+                        {/* TOP NAVBAR */}
+                        <Box
+                            min-width='12.25rem'
+                            width='40rem'
+                            height='32rem'
+                            overflowY='auto'
+                            bg='#f9f9f9'
+                            top='0px'
+                            justifyContent='center'
+                            visibility={this.state.addStockFormVisible}
+                            backgroundColor='whiteAlpha.508'
+                            style={{ position: 'absolute', left: '1000px', top: '220px' }}
+                            zIndex='999'
+                        >
 
-                <Box
-                    min-width='12.25rem'
-                    width='20rem'
-                    height='22rem'
-                    overflowY='auto'
-                    bg='#f9f9f9'
-                    top='0px'
-                    justifyContent='center'
-                    visibility={this.state.editStockFormVisible}
-                    backgroundColor='whiteAlpha.508'
-                    style={{ position: 'absolute', left: '1000px', top: '220px' }}
-                    zIndex='999'
-                >
+                            <h4 style={{ position: 'absolute', color: 'black' }}>Add Stock </h4>
+                            <p style={{
+                                position: 'absolute', color: 'black', fontWeight: 'bold',
+                                fontSize: '15px', top: '5px', right: '20px', cursor: 'pointer'
+                            }}
+                                onClick={() => this.setAddFormVisibility("hidden")}>Close</p>
+                            <AddStockForm {...this} />
+                        </Box>
 
-                    <h4 style={{ position: 'absolute', color: 'black' }}>Edit Stock </h4>
-                    <p style={{
-                        position: 'absolute', color: 'black', fontWeight: 'bold',
-                        fontSize: '15px', top: '5px', right: '20px', cursor: 'pointer'
-                    }}
-                        onClick={() => this.setEditFormVisibility("hidden")}>Close</p>
+                        <Box
+                            min-width='12.25rem'
+                            width='20rem'
+                            height='22rem'
+                            overflowY='auto'
+                            bg='#f9f9f9'
+                            top='0px'
+                            justifyContent='center'
+                            visibility={this.state.editStockFormVisible}
+                            backgroundColor='whiteAlpha.508'
+                            style={{ position: 'absolute', left: '1000px', top: '220px' }}
+                            zIndex='999'
+                        >
 
-                    <EditStockForm {...this} />
-                </Box>
+                            <h4 style={{ position: 'absolute', color: 'black' }}>Edit Stock </h4>
+                            <p style={{
+                                position: 'absolute', color: 'black', fontWeight: 'bold',
+                                fontSize: '15px', top: '5px', right: '20px', cursor: 'pointer'
+                            }}
+                                onClick={() => this.setEditFormVisibility("hidden")}>Close</p>
 
-                {/* TOP NAVBAR */}
-                <TopNavbar />
+                            <EditStockForm {...this} />
+                        </Box> 
 
-                <div class="editStock" style={{ zIndex: '999' }}>
-                    <Button onClick={() => {
-                        this.setEditFormVisibility("visible")
-                        this.setAddFormVisibility("hidden")
-                    }}>Edit</Button>
-                </div>
+                        {/* TOP NAVBAR */}
+                        <TopNavbar />
 
-                <div class="addStock" style={{ zIndex: '999' }}>
-                    <Button onClick={() => {
-                        this.setAddFormVisibility("visible")
-                        this.setEditFormVisibility("hidden")
-                    }}>Add</Button>
-                </div>
+                        <div class="editStock" style={{ zIndex: '999' }}>
+                            <Button onClick={() => {
+                                this.setEditFormVisibility("visible")
+                                this.setAddFormVisibility("hidden")
+                            }}>Edit</Button>
+                        </div>
 
-                <div class="removeStock" style={{ zIndex: '999' }}>
-                    <Button onClick={() => this.setAddFormVisibility("visible")}>Remove</Button>
-                </div>
+                        <div class="addStock" style={{ zIndex: '999' }}>
+                            <Button onClick={() => {
+                                this.setAddFormVisibility("visible")
+                                this.setEditFormVisibility("hidden")
+                            }}>Add</Button>
+                        </div>
 
-                {/*     
+                        <div class="removeStock" style={{ zIndex: '999' }}>
+                            <Button onClick={() => this.setAddFormVisibility("visible")}>Remove</Button>
+                        </div>
+
+                        {/*     
                     
                     <Button class="addStock" style={{ position: 'absolute', top: '130px', left: '1030px' }}
                                 onClick={() => this.setAddFormVisibility("visible")}>Add a Stock</Button>*/}
 
-                <h2 style={{ position: 'absolute', top: '100px', left: '80px', color: 'wheat' }}>My Portfolio</h2>
+                        <h2 style={{ position: 'absolute', top: '100px', left: '80px', color: 'wheat' }}>My Portfolio</h2>
 
-                {/* PORTFOLIO TABLE */}
-                <Box
-                    style={{ position: 'absolute', top: '125px', left: '80px' }}
-                    //     bg='rgb(30,30,30)'
-                    boxShadow='sm'
-                    textAlign='center'
-                    height='45px'
-                    width='78rem'
-                    rounded="lg"
-                    margin='auto'
-                    color='white'
-                >
-                    {portfolioTableHeader}
+                        {/* PORTFOLIO TABLE */}
 
-                    <Box
-                        style={{
-                            position: 'absolute',
-                            overflowY: 'auto',
-                            top: '45px'
-                        }}
-                        overflowX='hidden'
-                        boxShadow='sm'
-                        textAlign='center'
-                        height='1110px'
-                        width='78rem'
-                        rounded="lg"
-                        margin='auto'
-                        color='white'
-                    >
+                        <Box
+                            style={{ position: 'absolute', top: '125px', left: '80px' }}
+                            //     bg='rgb(30,30,30)'
+                            boxShadow='sm'
+                            textAlign='center'
+                            height='45px'
+                            width='78rem'
+                            rounded="lg"
+                            margin='auto'
+                            color='white'
+                        >
+                            {portfolioTableHeader}
 
+                            <Box
+                                style={{
+                                    position: 'absolute',
+                                    overflowY: 'auto',
+                                    top: '45px'
+                                }}
+                                overflowX='hidden'
+                                boxShadow='sm'
+                                textAlign='center'
+                                height='1110px'
+                                width='78rem'
+                                rounded="lg"
+                                margin='auto'
+                                color='white'
+                            >
 
-                        {this.state.portfolioTable}
+                                {this.state.portfolioTable}
 
-                    </Box>
-                </Box>
+                            </Box>
+                        </Box>
+             
+
 
                 </div>
             </div>
         );
     }
-
 }
 

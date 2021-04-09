@@ -4,6 +4,7 @@ import { Redirect } from "react-router-dom";
 import { DashboardOne } from './components/Dashboard/DashboardOne/DashboardOne';
 import { DashboardInterface } from './components/DashboardInterface';
 import { Router, Route, Switch } from 'react-router';
+import { HistoricalTable } from './components/Dashboard/Historical/HistoricalTable';
 import { PortFolio } from './components/Dashboard/Portfolio/PortFolio';
 import { SideMenu } from './components/Dashboard/SideMenu';
 import { DataFeed } from './components/Dashboard/DataFeed';
@@ -34,7 +35,7 @@ export default class App extends Component {
     let redirect = [];
     switch (key) {
       case 1:
-        redirect.push(<Redirect to='/PortFolio' />);
+        redirect.push(<Redirect to='/HistoricalTable' />);
         this.setState({ redirect: redirect });
       default:
         break;
@@ -59,9 +60,9 @@ export default class App extends Component {
         <DataFeed {...this} />
         {this.state.redirect}
         <Switch>
-          <Route exact path='/' component={() => <PortFolio {...this}/>} />
+          <Route exact path='/' component={() => <HistoricalTable {...this}/>} />
           <Route path='/DashboardOne' component={DashboardOne} />
-          <Route path='/PortFolio' component={() => <PortFolio {...this}/>} />
+          <Route path='/HistoricalTable' component={() => <HistoricalTable {...this}/>} />
         </Switch>
       </div>
     );

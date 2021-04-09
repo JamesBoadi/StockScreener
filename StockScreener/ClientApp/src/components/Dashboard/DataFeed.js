@@ -97,7 +97,7 @@ export class DataFeed extends Component {
                     else {
                         count = 0;
                         console.log("Ok")
-                        PortfolioCache.updateDataCallback(); // Updates data in portfolioo
+                     //   PortfolioCache.updateDataCallback(); // Updates data in portfolioo
                         
                         this.setState({ updateCache: true });
                         this.connected = true;
