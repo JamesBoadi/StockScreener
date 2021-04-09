@@ -787,136 +787,148 @@ export class HistoricalTable extends Component {
                 <tr>
                     <th>Stock <br /> Name</th>
                     <th>Stock <br /> Code</th>
-                    <th>Price</th>
-                    <th>Shares</th>
-                    <th>Expenditure</th>
+                    <th>Current <br /> Price</th>
                     <th>Date </th>
                     <th>Close <br />(Previous)</th>
-                    <th>Current <br /> Price</th>
                     <th>Change</th>
-                    <th>Net Gain / Loss <br /> (Est)</th>
-                    <th>Net Gain / Loss <br /> % (Est)</th>
+                    <th>ChangeP</th>
+
                 </tr>
             </thead>
         </table>;
 
+        let filterTableHeader = <table class="historicalTableHeader" aria-labelledby="tabelLabel"
+            style={{ zIndex: '999', position: 'absolute', left: '700px' }}>
+            <thead>
+                <tr>
+                    <th>UpperBand</th>
+                    <th>MiddleBand</th>
+                    <th>LowerBand</th>
+                    <th>Simple Moving <br /> Average </th>
+                    <th>Signal</th>
+                    <th>Volume</th>
+                    <th>RSI</th>
+                </tr>
+            </thead>
+        </table>;
+
+
+
+
         return (
             <div>
                 <div class="historical">
-               
 
-                        {/* TOP NAVBAR */}
+
+                    {/* TOP NAVBAR */}
+                    <Box
+                        min-width='12.25rem'
+                        width='36rem'
+                        height='22rem'
+                        overflowY='auto'
+                        bg='#f9f9f9'
+                        top='0px'
+                        justifyContent='center'
+                        visibility={this.state.addStockFormVisible}
+                        backgroundColor='whiteAlpha.508'
+                        style={{ position: 'absolute', left: '1000px', top: '220px' }}
+                        zIndex='999'
+                    >
+                        <h4 style={{ position: 'absolute', color: 'black' }}>Filter </h4>
+                        <p style={{
+                            position: 'absolute', color: 'black', fontWeight: 'bold',
+                            fontSize: '15px', top: '5px', right: '20px', cursor: 'pointer'
+                        }}
+                            onClick={() => this.setAddFormVisibility("hidden")}>Close</p>
+                        <AddStockForm {...this} />
+                    </Box>
+
+                    <Box
+                        min-width='12.25rem'
+                        width='20rem'
+                        height='6rem'
+                        overflowY='auto'
+                        bg='#f9f9f9'
+                        top='0px'
+                        justifyContent='center'
+                        visibility={this.state.editStockFormVisible}
+                        backgroundColor='whiteAlpha.508'
+                        style={{ position: 'absolute', left: '1000px', top: '220px' }}
+                        zIndex='999'
+                    >
+                        <h4 style={{ position: 'absolute', color: 'black' }}>Edit Stock </h4>
+                        <p style={{
+                            position: 'absolute', color: 'black', fontWeight: 'bold',
+                            fontSize: '15px', top: '5px', right: '20px', cursor: 'pointer'
+                        }}
+                            onClick={() => this.setEditFormVisibility("hidden")}>Close</p>
+
+                        <EditStockForm {...this} />
+                    </Box>
+
+                    {/* TOP NAVBAR */}
+                    <TopNavbar />
+
+                    <div class="editStock" style={{ zIndex: '999' }}>
+                        <Button onClick={() => {
+                            this.setEditFormVisibility("visible")
+                            this.setAddFormVisibility("hidden")
+                        }}>Edit</Button>
+                    </div>
+
+                    <div class="addStock" style={{ zIndex: '999', transform: 'translateX(20px)' }}>
+                        <Button onClick={() => {
+                            this.setAddFormVisibility("visible")
+                            this.setEditFormVisibility("hidden")
+                        }}>Add</Button>
+                    </div>
+
+                    <div class="removeStock" style={{ zIndex: '999' }}>
+                        <Button onClick={() => this.setAddFormVisibility("visible")}>Remove</Button>
+                    </div>
+
+                    {/* <Button class="addStock" style={{ position: 'absolute', top: '130px', left: '1030px' }}
+                         onClick={() => this.setAddFormVisibility("visible")}>Add a Stock</Button>*/}
+
+                    <h2 style={{ position: 'absolute', top: '100px', left: '80px', color: 'wheat' }}>Historical Information</h2>
+
+                    {/* PORTFOLIO TABLE */}
+
+                    <Box
+                        style={{ position: 'absolute', top: '125px', left: '80px' }}
+                        //     bg='rgb(30,30,30)'
+                        boxShadow='sm'
+                        textAlign='center'
+                        height='45px'
+                        width='78rem'
+                        rounded="lg"
+                        margin='auto'
+                        color='white'
+                    >
+                        {portfolioTableHeader}
+                        {filterTableHeader}
+
                         <Box
-                            min-width='12.25rem'
-                            width='40rem'
-                            height='32rem'
-                            overflowY='auto'
-                            bg='#f9f9f9'
-                            top='0px'
-                            justifyContent='center'
-                            visibility={this.state.addStockFormVisible}
-                            backgroundColor='whiteAlpha.508'
-                            style={{ position: 'absolute', left: '1000px', top: '220px' }}
-                            zIndex='999'
-                        >
-
-                            <h4 style={{ position: 'absolute', color: 'black' }}>Add Stock </h4>
-                            <p style={{
-                                position: 'absolute', color: 'black', fontWeight: 'bold',
-                                fontSize: '15px', top: '5px', right: '20px', cursor: 'pointer'
+                            style={{
+                                position: 'absolute',
+                                overflowY: 'auto',
+                                top: '45px'
                             }}
-                                onClick={() => this.setAddFormVisibility("hidden")}>Close</p>
-                            <AddStockForm {...this} />
-                        </Box>
-
-                        <Box
-                            min-width='12.25rem'
-                            width='20rem'
-                            height='22rem'
-                            overflowY='auto'
-                            bg='#f9f9f9'
-                            top='0px'
-                            justifyContent='center'
-                            visibility={this.state.editStockFormVisible}
-                            backgroundColor='whiteAlpha.508'
-                            style={{ position: 'absolute', left: '1000px', top: '220px' }}
-                            zIndex='999'
-                        >
-
-                            <h4 style={{ position: 'absolute', color: 'black' }}>Edit Stock </h4>
-                            <p style={{
-                                position: 'absolute', color: 'black', fontWeight: 'bold',
-                                fontSize: '15px', top: '5px', right: '20px', cursor: 'pointer'
-                            }}
-                                onClick={() => this.setEditFormVisibility("hidden")}>Close</p>
-
-                            <EditStockForm {...this} />
-                        </Box> 
-
-                        {/* TOP NAVBAR */}
-                        <TopNavbar />
-
-                        <div class="editStock" style={{ zIndex: '999' }}>
-                            <Button onClick={() => {
-                                this.setEditFormVisibility("visible")
-                                this.setAddFormVisibility("hidden")
-                            }}>Edit</Button>
-                        </div>
-
-                        <div class="addStock" style={{ zIndex: '999' }}>
-                            <Button onClick={() => {
-                                this.setAddFormVisibility("visible")
-                                this.setEditFormVisibility("hidden")
-                            }}>Add</Button>
-                        </div>
-
-                        <div class="removeStock" style={{ zIndex: '999' }}>
-                            <Button onClick={() => this.setAddFormVisibility("visible")}>Remove</Button>
-                        </div>
-
-                        {/*     
-                    
-                    <Button class="addStock" style={{ position: 'absolute', top: '130px', left: '1030px' }}
-                                onClick={() => this.setAddFormVisibility("visible")}>Add a Stock</Button>*/}
-
-                        <h2 style={{ position: 'absolute', top: '100px', left: '80px', color: 'wheat' }}>My Portfolio</h2>
-
-                        {/* PORTFOLIO TABLE */}
-
-                        <Box
-                            style={{ position: 'absolute', top: '125px', left: '80px' }}
-                            //     bg='rgb(30,30,30)'
+                            overflowX='hidden'
                             boxShadow='sm'
                             textAlign='center'
-                            height='45px'
+                            height='1110px'
                             width='78rem'
                             rounded="lg"
                             margin='auto'
                             color='white'
                         >
-                            {portfolioTableHeader}
 
-                            <Box
-                                style={{
-                                    position: 'absolute',
-                                    overflowY: 'auto',
-                                    top: '45px'
-                                }}
-                                overflowX='hidden'
-                                boxShadow='sm'
-                                textAlign='center'
-                                height='1110px'
-                                width='78rem'
-                                rounded="lg"
-                                margin='auto'
-                                color='white'
-                            >
+                            {this.state.portfolioTable}
 
-                                {this.state.portfolioTable}
-
-                            </Box>
                         </Box>
-             
+                    </Box>
+
 
 
                 </div>

@@ -541,10 +541,8 @@
       left: 50%;
       transform: translate(-50%, -50%);
     }
-    
   }
 
-    
   /************** Historical Table ******************/
   /*********************************************/
 
@@ -553,12 +551,12 @@
     position: absolute;
     table-layout: fixed;
     font-family: sans-serif;
-    min-width: 78rem;
+    min-width: 40rem;
     min-height: 1200px;
     height: 1rem;
     font-weight: 100;
     font-size: 14px;
-    width: 78rem;
+    width: 40rem;
     left: 0px;
     top: 45px;
     background-color:  rgb(40,40,40); 
@@ -570,9 +568,9 @@
     font-family: sans-serif;
     height: 30px;
     font-size: 14px;
-    min-width: 78rem;
+    min-width: 40rem;
   /*  min-height: 1200px;*/
-    width: 78rem;
+    width: 40rem;
     left: 0px;
     top: 45px;
   }

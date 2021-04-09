@@ -26,16 +26,22 @@ export class AddStockForm extends Component {
     }
 
     render() {
-        const plainOptions = ['Apple', 'Pear', 'Orange'];
-        const options = [
-            { label: 'Apple', value: 'Apple' },
-            { label: 'Pear', value: 'Pear' },
-            { label: 'Orange', value: 'Orange' },
+        const plainOptions = [
+            { label: 'High Momentum', value: 'High Momentum' },
+            { label: 'Low Momentum', value: 'Low Momentum' },
+            { label: 'Growth Stocks', value: 'Growth Stocks' },  // Link to volume
+            { label: 'Shorted Stocks', value: 'Shorted Stocks' },
         ];
+
+        const options = [
+            { label: 'Golden Cross', value: 'Golden Cross' },
+            { label: 'Custom MACD', value: 'MACD' },
+        ];
+
         const optionsWithDisabled = [
-            { label: 'AppleJellyTimePinnaple', value: 'Apple' },
-            { label: 'Pear', value: 'Pear' },
-            { label: 'Orange', value: 'Orange', disabled: false },
+            { label: 'UpperBand', value: 'UpperBand' },
+            { label: 'MiddleBand', value: 'MiddleBand' },
+            { label: 'LowerBand', value: 'LowerBand' }
         ];
 
         return (
@@ -44,30 +50,39 @@ export class AddStockForm extends Component {
                     this.props.state.formIsVisible}>
 
                     <Form>
-                        <div style={{transform: "translateY(60px)"}}>
-                        <Checkbox.Group options={plainOptions} defaultValue={['Apple']} onChange={this.onChange} />
-                        <br />
-                        <br />
-                        <Checkbox.Group options={options} defaultValue={['Pear']} onChange={this.onChange} />
-                        <br />
-                        <br />
-                        
-                        <Checkbox.Group
-                            options={optionsWithDisabled}
-                            disabled
-                            defaultValue={['Apple']}
-                            onChange={this.onChange}
-                        />
+                        <div style={{ transform: "translateY(60px)" }}>
+                            <p>Performance Stocks</p>
+                            <Checkbox.Group options={plainOptions} onChange={this.onChange} />
+                            <br />
+                            <br />
+                            <p>Moving Average Convergence/Divergence</p>
+                            <Checkbox.Group options={options} onChange={this.onChange} />
 
-                        <Button style={{
-                            position: 'absolute', bottom: '4px', right: '20px',
-                            zIndex: '999'
-                        }}
-                            onClick={this.props.addPortfolioTableRow}
-                            visibility={
-                                this.props.state.formIsVisible
-                            }
-                        >Add Stock</Button>
+                            <br />
+                            <br />
+                            <p>Bollinger Bands</p>
+                            <Checkbox.Group
+                                options={optionsWithDisabled}
+                                onChange={this.onChange}
+                            />
+                            <br />
+                            <br />
+
+                            <Checkbox
+                                style={{ position: 'absolute', top: '211.5px', right: '90px'}}
+                            >
+                                Apply to All
+                            </Checkbox>
+
+                            <Button style={{
+                                position: 'absolute', bottom: '4px', right: '20px',
+                                zIndex: '999'
+                            }}
+                                onClick={this.props.addPortfolioTableRow}
+                                visibility={
+                                    this.props.state.formIsVisible
+                                }
+                            >Apply</Button>
                         </div>
                     </Form>
                 </div>

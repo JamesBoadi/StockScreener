@@ -18,7 +18,8 @@ export default class HistoryCalc {
     static firstMACD = 0;
     static secondMACD = 0;
 
-    static signal = 0;
+    static signal = 0; // For macd line
+    static relativeStrengthIndex = 0;
 
     // **************************************************
     // User Set Variables
@@ -28,6 +29,9 @@ export default class HistoryCalc {
     static firstMovingAverageDays = 0; // For MACD
     static secondMovingAverageDays = 0; // For MACD
     static smoothing = 0.2;
+    static rsiWeight = 0;
+    static volume = 250000;
+
 
     static setHistory(_currentPrice, _shares, _expenditure) {
         this.currentPrice = _currentPrice;
@@ -83,21 +87,19 @@ export default class HistoryCalc {
     // MACD Functions
     // **************************************************
 
-    static calculateFirstMACD()
-    {
+    static calculateFirstMACD() {
         let firstMACD = 0;
-          for (let index = 0; index < this.firstMovingAverageDays; index++) {
+        for (let index = 0; index < this.firstMovingAverageDays; index++) {
             firstMACD += this.prevCloseArr[index]; // += (get(i))
         }
 
         this.firstMACD = firstMACD / this.firstMovingAverageDays;
     }
 
-    
-    static calculateSecondMACD()
-    {
+
+    static calculateSecondMACD() {
         let secondMACD = 0;
-          for (let index = 0; index < this.secondMovingAverageDays; index++) {
+        for (let index = 0; index < this.secondMovingAverageDays; index++) {
             secondMACD += this.prevCloseArr[index]; // += (get(i))
         }
 
@@ -105,8 +107,8 @@ export default class HistoryCalc {
     }
 
     // Whether or not it crosses the boundary
-    static calculateSignal()
-    {
+
+    static calculateSignal() {
         return this.firstMACD - this.secondMACD;
     }
 
@@ -115,17 +117,22 @@ export default class HistoryCalc {
     // **************************************************
     // RSI Functions
     // **************************************************
-    static calculateRSI()
-    {
-        
-        
+    static calculateRSI() {
+        // Quarters of the year
+        const q1 = ((this.prevCloseArr[149] - this.prevCloseArr[199]) / this.prevCloseArr[199] * 100) * this.rsiWeight;
+        const q2 = ((this.prevCloseArr[99] - this.prevCloseArr[149]) / this.prevCloseArr[149] * 100) * this.rsiWeight;
+        const q3 = ((this.prevCloseArr[49] - this.prevCloseArr[99]) / this.prevCloseArr[99] * 100) * this.rsiWeight;
+        const q4 = ((this.prevCloseArr[0] - this.prevCloseArr[49]) / this.prevCloseArr[49] * 100) * this.rsiWeight;
+
+        this.relativeStrengthIndex = (q1 + q2 + q3 + q4);
     }
 
-
-
-
-
     // **************************************************
+
+
+
+
+
     static getProfitLoss() {
         return this.profitLoss;
     }
