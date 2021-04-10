@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import HistoryCache from './Portfolio/js/PortfolioCache';
 import PortfolioCache from './Portfolio/js/PortfolioCache';
+import TableCache from './DashboardOne/js/TableCache.js';
+import NotificationsCache from './DashboardOne/js/NotificationsCache.js';
+import AlertCache from './DashboardOne/js/AlertCache.js';
 import * as signalR from '@aspnet/signalr';
 
 
@@ -26,13 +29,13 @@ export class DataFeed extends Component {
             request_Calls: -1,
             MAX_CALLS: 896,
             called: true,
-
         };
     }
 
 
     componentDidMount() {
         console.log('START THE FEED!')
+        localStorage.setItem('_connectionEstablished', false);
         this.startDataFeed();
     }
 
@@ -88,8 +91,12 @@ export class DataFeed extends Component {
                     let item = JSON.parse(data);
                     PortfolioCache.set(key, item);
                     HistoryCache.set(key, item);
-                    // AlertCache.set(key, item);
-                    // NotificationsCache.set(key, item); // Replace with factory, or something
+
+                    // Dashboard One
+                    TableCache.set(key, item);
+                    AlertCache.set(key, item);
+                    NotificationsCache.set(key, item);
+
                     if (!this.state.updateCache)
                         this.setState({ updateCache: false});
                     
@@ -100,7 +107,7 @@ export class DataFeed extends Component {
                         count = 0;
                         console.log("Ok")
                      //   PortfolioCache.updateDataCallback(); // Updates data in portfolioo
-                        
+                        TableCache.setFill(true);
                         this.setState({ updateCache: true });
                         this.connected = true;
                     }
@@ -114,6 +121,7 @@ export class DataFeed extends Component {
         const res = await this.connectionTimeout();
         this.props.getUpdateCache(!res);
         this.setState({ ...this.state, updateCache: !res, lock: res });
+        localStorage.setItem('_connectionEstablished', !res);
     }
 
     render() {

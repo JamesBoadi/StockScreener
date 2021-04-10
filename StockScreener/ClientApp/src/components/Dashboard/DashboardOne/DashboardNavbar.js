@@ -202,7 +202,7 @@ export class DashboardNavbar extends Component {
             } else if (currentPrice >= targetPrice) {
                 state = 1;
             }
-            console.log('Equal ');
+
         }
         /*   console.log('POINTER ' + stock + ' STATE ' + state + ' current 150 ' + ' startPrice ' + localStartPrice
                + ' targetPrice ' + localTargetPrice);*/
@@ -630,7 +630,7 @@ export class DashboardNavbar extends Component {
                     </div>
                 </Box>
 
-                <FetchData {...this} />
+                <FetchData {...this} updateCache={this.props.updateCache} />
             </div>
         );
     }

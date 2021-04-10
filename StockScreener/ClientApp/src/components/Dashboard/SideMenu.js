@@ -30,7 +30,26 @@ export class SideMenu extends Component {
   };
 
 
-  
+  onMenuClick(e) {
+    switch (e.key) {
+      case "9":
+        this.props.redirect(9);
+        break;
+      case "13":
+        this.props.redirect(13);
+        break;
+      case "14":
+        this.props.redirect(14);
+        break;
+
+      default:
+        console.log("default " + e.key)
+        break;
+    }
+
+
+  }
+
 
 
 
@@ -42,7 +61,7 @@ export class SideMenu extends Component {
 
       <div>
 
-       {/*  <Route path='/PortFolio' component={Portfolio} />
+        {/*  <Route path='/PortFolio' component={Portfolio} />
           <Route path='/fetch-data' component={FetchData}
           
   RedirectToPortFolio = () => {
@@ -62,7 +81,7 @@ export class SideMenu extends Component {
 
           <Menu
             style={{ position: 'absolute', minHeight: '1600px', width: '55px', height: '100vh', margin: 0, zIndex: '999' }}
-         
+            onClick={this.onMenuClick.bind(this)}
             mode="inline"
             theme="rgb(0.00,0.00,0.55)"
             inlineCollapsed={this.state.collapsed}
@@ -93,7 +112,7 @@ export class SideMenu extends Component {
               <Menu.Item key="7">Option 7</Menu.Item>
               <Menu.Item key="8">Option 8</Menu.Item>
             </SubMenu>
-           
+
           </Menu>
 
 

@@ -13,7 +13,9 @@ export default class TableCache {
     static priceDetection = false;
     static update_hideStocks = false;
     static disableUpdate = false;
-   
+
+    static cacheNotNull = false;
+
     static item =
         {
             StockCode: "",
@@ -67,6 +69,17 @@ export default class TableCache {
         return this.cacheOp_.get(key.toString());
     }
 
+    
+    static setFill(value) {
+        this.cacheNotNull = value;
+    }
+
+    static getFill() {
+        return this.cacheNotNull;
+    }
+
+
+
     static getMultiplier() {
         return this.multiplier;
     }
@@ -103,13 +116,11 @@ export default class TableCache {
         return this.priceDetection;
     }
 
-    static getPreviousPrice(key)
-    {
+    static getPreviousPrice(key) {
         return (this.get(key).CurrentPrice + this.get(key).Change);
     }
 
-    static getCurrentPrice(key)
-    {
+    static getCurrentPrice(key) {
         return this.get(key).CurrentPrice;
     }
 
@@ -119,17 +130,17 @@ export default class TableCache {
         let size = 0;
 
         this.disableUpdate = true;
-      
+
         for (let index = 0; index < 897; index++) {
             const item = this.get(index);
-          //  console.log("Bullish Stocks 1 " + item.CurrentPrice);
+            //  console.log("Bullish Stocks 1 " + item.CurrentPrice);
             // Filter Stocks
 
             if (item.ChangeArray[0] > 0) {
                 ++pointer;
                 let key = pointer.toString();
                 this.cacheOp_.set(key, item);
-               
+
                 size++;
             }
         }
@@ -149,7 +160,7 @@ export default class TableCache {
             // Fill Cache with empty columns
             this.max = 0;
             this.end = size; // Set the end
-         
+
             //console.log("less than 50 " + max);
         } else {
             this.endMod = parseInt(size % 50);
@@ -166,9 +177,9 @@ export default class TableCache {
             }
         }
 
-       /* console.log("SIZE " + size);
-        console.log("MAX " + this.max);
-        console.log("ENDMOD " + this.endMod);*/
+        /* console.log("SIZE " + size);
+         console.log("MAX " + this.max);
+         console.log("ENDMOD " + this.endMod);*/
 
         this.priceDetection = true;
         this.update_hideStocks = true;
@@ -180,17 +191,17 @@ export default class TableCache {
         let size = 0;
 
         this.disableUpdate = true;
-      
+
         for (let index = 0; index < 897; index++) {
             const item = this.get(index);
-          //  console.log("Bullish Stocks 1 " + item.CurrentPrice);
+            //  console.log("Bullish Stocks 1 " + item.CurrentPrice);
             // Filter Stocks
 
             if (item.ChangeArray[0] < 0) {
                 ++pointer;
                 let key = pointer.toString();
                 this.cacheOp_.set(key, item);
-               
+
                 size++;
             }
         }
@@ -225,9 +236,9 @@ export default class TableCache {
             }
         }
 
-       /* console.log("SIZE " + size);
-        console.log("MAX " + this.max);
-        console.log("ENDMOD " + this.endMod);*/
+        /* console.log("SIZE " + size);
+         console.log("MAX " + this.max);
+         console.log("ENDMOD " + this.endMod);*/
 
         this.priceDetection = true;
         this.update_hideStocks = true;

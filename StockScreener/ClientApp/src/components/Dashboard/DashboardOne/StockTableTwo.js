@@ -109,21 +109,29 @@ export class StockTableTwo extends React.Component {
             this.styleMap.set(id, {});
         }
 
-        this.interval = setInterval(() => {
+       /* this.interval = setInterval(() => {
+         
             if (this.props.state.updateCache) {
-
+                
+                console.log('SJ ' + this.props.state.updateCache);
                 this.setState({ cache: TableCache.cache() }); // Cannot access value immediately
 
                 if (this.updateTableData === false) {
+                    console.log('props ' + this.props.state.updateCache
+                    + '   ' + this.updateTableData);
+
                     this.createTable()
                     this.updateTable(15)
                     this.updateTableData = true;
 
                     this.setState({ enableAlerts: true });
+                  
                 }
+
                 this.props.updateCache(false);
+                clearInterval(this.interval);
             }
-        });
+        });*/
 
         /* // }
                // this.setState({ disableScrolling: false});
@@ -135,12 +143,30 @@ export class StockTableTwo extends React.Component {
 
     componentWillUnmount() {
         // Clear the interval right before component unmount
-        clearInterval(this.interval);
+      
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         const scroll = this.scrollBy();
+        if (this.props.state.updateCache) {
+                
+            /*   else if (this.updateTableData === false)
+            return false; */
+            console.log('SJ ' + this.props.state.updateCache);
+            this.setState({ cache: TableCache.cache() }); // Cannot access value immediately
 
+            if (this.updateTableData === false) {
+                console.log('props ' + this.props.state.updateCache
+                + '   ' + this.updateTableData);
+
+                this.createTable()
+                this.updateTable(15)
+                this.updateTableData = true;
+                this.setState({ enableAlerts: true });
+            }
+
+            this.props.updateCache(false);
+        }else
         // Trigger if Hide Bullish/Bearish Stocks Enabled
         if (TableCache.getUpdateHideStocks()) {
             console.log('  ---->  ' + 'THESE ARE MAH STOCKS!');
@@ -183,9 +209,12 @@ export class StockTableTwo extends React.Component {
                 this.textInput.current.scrollTop = 25;
 
 
-            this.setState({ scrollUpdated: true })
+            this.props.resetTableID(null); // Reset id
+            this.setState({ scrollUpdated: true });
             this.setState({ tb2_count: 0 });
+
         }
+        // Search for a stock
         else if (this.state.validInput) {
 
             this.setState({
@@ -201,20 +230,21 @@ export class StockTableTwo extends React.Component {
             else
                 this.textInput.current.scrollTop = 25;
 
+            this.props.resetTableID(this.state.stockRecord); // Reset id
             this.setState({ validInput: false });
             this.setState({ queryRes: false });
         }
+        // Animation
         else if (this.state.updateStyleMap) {
-
             if (AlertSettings.getAuto()) {
                 this.setState({
                     tb2_scrollPosition: (this.getUnits(scroll) <= 17) ? this.getUnits(scroll) : 17
                 }, () => {
                     this.newTable()
                     this.setState({ start: this.state.tb2_scrollPosition * 50 })
-                    this.updateTable(this.state.start)
+                    this.updateTable(this.state.start);
                 });
-                console.log('AUTO');
+               
                 // Top half or Bottom Half
                 const stockRecord = this.state.stockRecord;
                 let rem = stockRecord % 50;
@@ -222,8 +252,7 @@ export class StockTableTwo extends React.Component {
             }
             else if (AlertSettings.getManual()) {
                 this.newTable()
-                this.updateTable(this.state.start)
-                console.log('Manual');
+                this.updateTable(this.state.start);
             }
 
             this.setState({ updateStyleMap: false })
@@ -234,15 +263,15 @@ export class StockTableTwo extends React.Component {
         if (TableCache.getUpdateHideStocks()) {
             return true;
         }
-        else if (this.updateTableData === false)
-            return false;
+        else if (this.props.state.updateCache !== nextProps.state.updateCache) {
+            return true;
+        }
         else if (nextState.tb2_count !== this.state.tb2_count)
             return true;
         else if (this.state.validInput || this.state.queryRes
             || this.state.isUpdating === false
             || this.state.isSelected !== nextState.isSelected
             || this.state.updateStyleMap !== nextState.updateStyleMap
-            || this.props.state.updateCache !== nextProps.state.updateCache
         )
             return true;
         return false;

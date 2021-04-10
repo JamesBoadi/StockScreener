@@ -90,7 +90,7 @@ export class PortFolio extends Component {
         let style = { color: "white;" };
         this.timeout = null;
         this.map = new HashMap();
-        this.data = new HashMap();
+        this.data = new HashMap(); //
 
 
         this.state = {
@@ -213,7 +213,8 @@ export class PortFolio extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (!nextProps.state.updateCache) {
+        if (!nextProps.updateCache) {
+            console.log('NEXTPROPS ' + nextProps.state.updateCache)
             return false;
         }
         else {

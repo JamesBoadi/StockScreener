@@ -1,3 +1,4 @@
+import * as HashMap from 'hashmap';
 import * as cache from 'cache-base';
 
 export default class PortfolioCache {
@@ -13,23 +14,10 @@ export default class PortfolioCache {
     static disableUpdate = false;
 
     static updateDataCallback;
+    static updateTable = false;
+    static tableID = null;
 
-    static item =
-        {
-            StockCode: "",
-            TimeStamp: "",
-            CurrentPrice: "",
-            PrevOpen: "",
-            Close: "",
-            High: "",
-            Low: "",
-            Signal: "",
-            ChangeArray: [0, 0, 0, 0, 0, 0],
-            Volume: "",
-            ChangeP: "",
-            Change: ""
-        }
-
+ 
     // **************************************************
     // Getters and Setters
     // **************************************************
@@ -37,212 +25,41 @@ export default class PortfolioCache {
     static set(key, value) {
         this.cache_.set(key.toString(), value);
     }
-    /* Do not allow scrolling while Updating */
-    static setDisableScroll(bool) {
-        this.disableUpdate = bool;
-    }
-
-    static setUpdateHideStocks(bool) {
-        this.update_hideStocks = bool;
-    }
-
-    static setResetScrollPosition(bool) {
-        this.resetScrollPosition = bool;
-    }
-
-    static setPriceDetection(enable) {
-        this.priceDetection = enable;
-    }
-
-    static getResetScrollPosition() {
-        return this.resetScrollPosition;
-    }
-
-    static getUpdateHideStocks() {
-        return this.update_hideStocks;
-    }
-    static getDisableScroll() {
-        return this.disableUpdate;
-    }
 
     static get(key) {
         return this.cache_.get(key.toString());
     }
 
-    static getOp(key) {
-        return this.cacheOp_.get(key.toString());
+
+
+    /* Do not allow scrolling while Updating */
+    static setDisableScroll(bool) {
+        this.disableUpdate = bool;
     }
 
-    static getMultiplier() {
-        return this.multiplier;
+    // Set if a new row needs to be added to this table
+    static setUpdate(updateTable, tableID) {
+        this.updateTable = updateTable;
+        this.tableID = tableID;
     }
 
-    static cache() {
-        return this.cache_;
+    // Determines if a row is added
+    static getUpdateTable() {
+        return this.updateTable;
     }
 
-    static size() {
-        return this.cache_.size;
-    }
-
-    static cacheOpSize() {
-        return this.cacheOp_.size;
-    }
-
-    static getEndMod() {
-        return this.endMod;
-    }
-
-    static getMax() {
-        return this.max;
-    }
-
-    static getEnd() {
-        return this.end;
-    }
-
-    static getPriceDetection() {
-        return this.priceDetection;
-    }
-
-    static getPreviousPrice(key) {
-        return (this.get(key).CurrentPrice + this.get(key).Change);
-    }
-
-    static getCurrentPrice(key) {
-        return this.get(key).CurrentPrice;
+    // Gets ID of the added row
+    static getTableID() {
+        return this.tableID;
     }
     // **************************************************
 
-    static setUpdateData(callback)
-    {
+    static setUpdateData(callback) {
         this.updateDataCallback = callback;
     }
 
-    static getUpdateData()
-    {
+    static getUpdateData() {
         this.updateDataCallback();
-    }
-
-
-    static hideBearishStocks() {
-        this.cacheOp_.clear();
-        let pointer = -1;
-        let size = 0;
-
-        this.disableUpdate = true;
-
-        for (let index = 0; index < 897; index++) {
-            const item = this.get(index);
-            //  console.log("Bullish Stocks 1 " + item.CurrentPrice);
-            // Filter Stocks
-
-            if (item.ChangeArray[0] > 0) {
-                ++pointer;
-                let key = pointer.toString();
-                this.cacheOp_.set(key, item);
-
-                size++;
-            }
-        }
-
-        // Disable Detection test
-        if (pointer === -1) {
-            this.priceDetection = false;
-            this.max = 0;
-            this.endMod = 0;
-            return;
-        }
-
-        let count = size;
-        // Calculate endMod
-        if (size < 50) {
-            this.endMod = 0;
-            // Fill Cache with empty columns
-            this.max = 0;
-            this.end = size; // Set the end
-
-            //console.log("less than 50 " + max);
-        } else {
-            this.endMod = parseInt(size % 50);
-            this.max = parseInt((size - this.endMod) / 50);
-            this.multiplier = this.endMod;
-
-            // Fill Cache with empty columns
-            let max = parseInt(((this.max * 50) + 50) - this.endMod);
-            //console.log("more than 50 " + max);
-            while (count < max) {
-                count++;
-                let key = count.toString();
-                this.cacheOp_.set(key, this.item);
-            }
-        }
-
-        /* console.log("SIZE " + size);
-         console.log("MAX " + this.max);
-         console.log("ENDMOD " + this.endMod);*/
-
-        this.priceDetection = true;
-        this.update_hideStocks = true;
-    }
-
-    static hideBullishStocks() {
-        this.cacheOp_.clear();
-        let pointer = -1;
-        let size = 0;
-
-        this.disableUpdate = true;
-
-        for (let index = 0; index < 897; index++) {
-            const item = this.get(index);
-            //  console.log("Bullish Stocks 1 " + item.CurrentPrice);
-            // Filter Stocks
-
-            if (item.ChangeArray[0] < 0) {
-                ++pointer;
-                let key = pointer.toString();
-                this.cacheOp_.set(key, item);
-
-                size++;
-            }
-        }
-
-        // Disable Detection test
-        if (pointer === -1) {
-            this.priceDetection = false;
-            this.max = 0;
-            this.endMod = 0;
-            return;
-        }
-
-        let count = size;
-        // Calculate endMod
-        if (size < 50) {
-            this.endMod = 0;
-            // Fill Cache with empty columns
-            this.max = 0;
-            this.end = size; // Set the end
-        } else {
-            this.endMod = parseInt(size % 50);
-            this.max = parseInt((size - this.endMod) / 50);
-            this.multiplier = this.endMod;
-
-            // Fill Cache with empty columns
-            let max = parseInt(((this.max * 50) + 50) - this.endMod);
-            //console.log("more than 50 " + max);
-            while (count < max) {
-                count++;
-                let key = count.toString();
-                this.cacheOp_.set(key, this.item);
-            }
-        }
-
-        /* console.log("SIZE " + size);
-         console.log("MAX " + this.max);
-         console.log("ENDMOD " + this.endMod);*/
-
-        this.priceDetection = true;
-        this.update_hideStocks = true;
     }
 
 

@@ -34,19 +34,26 @@ export default class App extends Component {
     console.log('key ' + key);
     let redirect = [];
     switch (key) {
-      case 1:
+      case 9:
+        redirect.push(<Redirect to='/DashboardOne' />);
+        break;
+      case 13:
         redirect.push(<Redirect to='/HistoricalTable' />);
-        this.setState({ redirect: redirect });
+        break;
+      case 14:
+        redirect.push(<Redirect to='/Portfolio' />);
+        break;
       default:
         break;
     }
+    this.setState({ redirect: redirect });
   }
 
   getUpdateCache(update) {
     this.setState({ updateCache: update });
   }
 
-  
+
   render() {
     /*
             <Route exact path='/' component={DashboardInterface} />
@@ -60,9 +67,10 @@ export default class App extends Component {
         <DataFeed {...this} />
         {this.state.redirect}
         <Switch>
-          <Route exact path='/' component={() => <HistoricalTable {...this}/>} />
-          <Route path='/DashboardOne' component={DashboardOne} />
-          <Route path='/HistoricalTable' component={() => <HistoricalTable {...this}/>} />
+          <Route exact path='/' component={() => <HistoricalTable {...this} />} />
+          <Route path='/DashboardOne' component={() => <DashboardOne {...this} />} />
+          <Route path='/HistoricalTable' component={() => <HistoricalTable {...this} />} />
+          <Route path='/Portfolio' component={() => <PortFolio {...this} />} />
         </Switch>
       </div>
     );

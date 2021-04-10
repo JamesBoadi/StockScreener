@@ -166,6 +166,11 @@ export class HistoricalTable extends Component {
             }
         }, 1000);
 
+        
+
+         // setHistorical( , , )   Set Historical Data
+
+
         //HistoryCache.setUpdateData(this.updateTableData);
 
         /* this.createTable()
@@ -280,7 +285,9 @@ export class HistoricalTable extends Component {
     * if a stock was added to the table
     */
     async keyExists(e, target) {
-        //  e.persist();
+        if (isNaN(target) || (target === null || target === undefined))
+            resolve(false);
+
         return new Promise(resolve => {
             setTimeout(() => {
                 //    e.stopPropagation();
@@ -307,31 +314,27 @@ export class HistoricalTable extends Component {
         if (!res)
             return;
 
-        this.setState({ editStockFormVisible: "hidden" });
-
         var t = this.state.portfolioTableStack;
         var portfolioTableStocks = this.state.portfolioTableStocks;
-        let target = parseInt(this.state.stockRecordID);
+        let target = parseInt(HistoryCache.getTableID());
 
         const exists = await this.keyExists(e, target);
         const maxRows = 45;
 
         if (exists) {
+            window.alert('Key already added to the table ');
             return;
         }
         else if (this.state.maxNumberOfAlertTableRows >= maxRows) {
             window.alert('Maximum stocks for portfolio exceeded, limit: 200 ');
             return
         }
-
-      /*  PortfolioCalc.setPortfolio(this.state.price, this.state.shares,
-            this.state.price * this.state.shares);*/
+        /*  PortfolioCalc.setPortfolio(this.state.price, this.state.shares,
+              this.state.price * this.state.shares);*/
 
         // Stocks to be displayed in the Portfolio table
         portfolioTableStocks.push(HistoryCache.get(target));
         let pointer = parseInt(portfolioTableStocks.length - 1);
-
-        this.data.set(pointer, { price: this.state.price, shares: this.state.shares, date: this.state.date });
 
         t.push(
             <tbody key={pointer}>
@@ -449,16 +452,16 @@ export class HistoricalTable extends Component {
           this.setState({ removeAlertTableRowBool: true });*/
 
 
-          var txt;
-          if (window.confirm("Confirm to delete this stock")) {
+        var txt;
+        if (window.confirm("Confirm to delete this stock")) {
             txt = "Yes";
-          } else {
+        } else {
             txt = "No";
-          }
+        }
 
-         /* if (txt === "Yes") {
-              
-          }*/
+        /* if (txt === "Yes") {
+             
+         }*/
 
     }
 
@@ -678,8 +681,6 @@ export class HistoricalTable extends Component {
         // console.log('UPDATE ' );
 
         for (pointer = start; pointer <= end; pointer++) {
-
-
             if (parseInt(this.state.stockRecordID) == parseInt(pointer)) {
 
                 style = { backgroundColor: "rgb(21,100,111)" };
@@ -790,7 +791,6 @@ export class HistoricalTable extends Component {
         this.setState({ updatePortfolioTableData: true });
     }
 
-
     // **************************************************
 
     render() {
@@ -805,7 +805,6 @@ export class HistoricalTable extends Component {
                     <th>Close <br />(Previous)</th>
                     <th>Change</th>
                     <th>ChangeP</th>
-
                 </tr>
             </thead>
         </table>;

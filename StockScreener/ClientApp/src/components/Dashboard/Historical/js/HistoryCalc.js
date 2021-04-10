@@ -21,6 +21,16 @@ export default class HistoryCalc {
     static signal = 0; // For macd line
     static relativeStrengthIndex = 0;
 
+    static dataHashMap = new HashMap();
+
+    static upperBand = 0;
+    static middleBand = 0;
+    static lowerBand = 0;
+    static SMA = 0;
+    static signal = 0;
+    static volume = 0;
+    static RSI = 0;
+
     // **************************************************
     // User Set Variables
     // **************************************************
@@ -40,6 +50,50 @@ export default class HistoryCalc {
 
         // Add to database and map
     }
+
+    static initialiseHashMap(
+        tableID,
+        upperBand,
+        middleBand,
+        lowerBand,
+        SMA,
+        signal,
+        volume,
+        RSI) {
+
+        this.dataHashMap.set(
+            tableID,
+            {
+                upperBand: upperBand, middleBand: middleBand,
+                lowerBand: lowerBand, SMA: SMA, signal: signal,
+                volume: volume, RSI: RSI
+            }
+        );
+    }
+
+    static updateHashMap() {
+
+        
+
+        this.dataHashMap.set(
+            tableID,
+            {
+                upperBand: upperBand, middleBand: middleBand,
+                lowerBand: lowerBand, SMA: SMA, signal: signal,
+                volume: volume, RSI: RSI
+            }
+        );
+    }
+
+
+
+
+    static get(key) {
+        return this.dataHashMap.get();
+    }
+
+
+
 
     // Read previous closes from database
     static setPreviousCloses() {
@@ -63,7 +117,6 @@ export default class HistoryCalc {
 
         this.standardDeviation = Math.sqrt(standardDeviation / this.bollingerBandsNo);
     }
-
 
     // **************************************************
     // Bollinger Bands Functions
@@ -96,7 +149,6 @@ export default class HistoryCalc {
         this.firstMACD = firstMACD / this.firstMovingAverageDays;
     }
 
-
     static calculateSecondMACD() {
         let secondMACD = 0;
         for (let index = 0; index < this.secondMovingAverageDays; index++) {
@@ -128,10 +180,6 @@ export default class HistoryCalc {
     }
 
     // **************************************************
-
-
-
-
 
     static getProfitLoss() {
         return this.profitLoss;

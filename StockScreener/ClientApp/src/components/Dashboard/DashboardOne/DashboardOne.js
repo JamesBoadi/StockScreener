@@ -7,31 +7,14 @@ import '../Dashboard.css';
 export class DashboardOne extends Component {
     constructor(props) {
         super(props);
-        this.cache = new Map();
-        // this.redirect = this.redirect.bind(this);
-        this.state = {
-            lock: false,
-            redirect: 0
-        };
     }
-
-    /* redirect = (num) => {
-         switch (num) {
-             case 6:
-                 <Redirect to="/dashboardSettings" />
-                 break;
-         }
-     }*/
-
+    
     render() {
-        //  FetchData.sendRequest("I have a message", "of glory");
         return (
             <div>
-                
                 <header class="App-header">
-                <DashboardNavbar style={{transform: 'translateX(20px)'}}/>
+                    <DashboardNavbar updateCache={this.props.state.updateCache} style={{ transform: 'translateX(20px)' }} />
                 </header>
-
             </div>
         );
     }

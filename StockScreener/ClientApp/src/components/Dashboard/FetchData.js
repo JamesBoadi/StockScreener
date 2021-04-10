@@ -42,7 +42,7 @@ export class FetchData extends Component {
     // Add, remove Table Rows
     this.addAlertTableRow = this.addAlertTableRow.bind(this);
     this.removeAlertTableRow = this.removeAlertTableRow.bind(this);
-    this.addToPortfolio = this.addToPortfolio.bind(this);
+    this.addToHistorical = this.addToHistorical.bind(this);
 
     this.setAlertTableRowBool = this.setAlertTableRowBool.bind(this);
     this.getAlertTableRowBool = this.getAlertTableRowBool.bind(this);
@@ -51,6 +51,7 @@ export class FetchData extends Component {
 
     this.selectAlertTableRow = this.selectAlertTableRow.bind(this);
     this.selectStockTableRow = this.selectStockTableRow.bind(this);
+    this.resetTableID = this.resetTableID.bind(this);
     this.setEnd = this.setEnd.bind(this);
     this.setStart = this.setStart.bind(this);
     this.setRemoveAlertTableRowBool = this.setRemoveAlertTableRowBool.bind(this);
@@ -65,8 +66,6 @@ export class FetchData extends Component {
     this.setCache = this.setCache.bind(this);
     this.updateCache = this.updateCache.bind(this);
     this.setUpdateNotifications = this.setUpdateNotifications.bind(this);
-    this.connectionTimeout = this.connectionTimeout.bind(this);
-    this.hubConnection_ = this.hubConnection_.bind(this);
     this.addToCache = this.addToCache.bind(this);
 
     //this.updateAll = this.updateAll.bind(this);
@@ -89,6 +88,7 @@ export class FetchData extends Component {
     this.keyCount = 0;
     this.updateStockInfo = false;
 
+
     this.state = {
       stockTableTwo: [],
       isStreaming: false,
@@ -106,12 +106,13 @@ export class FetchData extends Component {
       scroll: 0,
       query: {},
       _updateCache: false,
+      updateCache: false,
 
       addAlertTableRowBool: false,
       removeAlertTableRowBool: false,
       alertTableStocks: [],
       alertTableStack: [],
-      clickedAlertTableRowID: 0,
+      clickedAlertTableRowID: null,
       target: 0,
       maxNumberOfAlertTableRows: 0,
 
@@ -126,7 +127,7 @@ export class FetchData extends Component {
       stockInfoCode: [],
 
       updateStockInfo: false,
-      
+
       cache: new cache(),
 
       collapsed: false,
@@ -151,65 +152,20 @@ export class FetchData extends Component {
   }
 
   componentDidMount = () => {
-    /*  this.intervalID = setInterval(() => {
-       let state = [-1, 2];
-       var cache_ = new cache();
-       var count;
-       for (count = 0; count < 897; count++) {
-         let start2 = parseInt(Math.floor(Math.random() * state.length));
-         let changeArr = [state[start2], state[start2], state[start2],
-         state[start2], state[start2], state[start2]];
- 
-         const item = {
-           StockCode: count,
-           Change: 91,
-           ChangeP: 1,
-           Volume: 11,
-           CurrentPrice: 102,
-           ProfitLoss: 1,
-           ProfitLoss_Percentage: 99,
-           High: 10,
-           Low: 14,
-           Open: 76,
-           Close: 10,
- 
-           ChangeArray: changeArr,
-           /*  DateTime time = DateTime.Today.Add(service.ReturnTime());
-             string _currentTime = time.ToString("HH:mmttss");
-           //stock.timestamp = _currentTime
-           Request_Calls: 5,
-           TimeStamp: "9:00",
- 
-           Request_Calls: "1"
-         }
-         //cache_.set(count.toString(), item);
-         TableCache.set(count, item);
-         AlertCache.set(count, item);
- 
-         console.log(' count ' + TableCache.get(count));
-       }
- 
-   //    this.cache = cache_;
- 
-       //this.setState({ cache: cache_ })
-       this.setState({ updateCache: true });
-       this.setState({ lock: true });
-    
-    //   this.forceUpdate()
-     }, 5000); */
+    const connectionEstablished = localStorage.getItem('_connectionEstablished');
+    this.intervalID = setInterval(() => {
+      if (connectionEstablished && TableCache.getFill()) {
+        console.log('ID ' + connectionEstablished)
+        this.setState({ lock: true });
+        this.setState({ updateCache: true });
+        clearInterval(this.intervalID);
+      }
+    }, 3000);
 
-
-    // Override local prices
-    // this.overrideLocalPrices(this.props.state.globalStartPrice, this.props.state.globalTargetPrice);
-
-    this.hubConnection_(); // iF FALSE 404 PAGE
-
-    // Data Service Worker
-    // this.addToNotificationsMenu();
   }
 
   componentWillUnmount() {
-    clearInterval(this.intervalID);
+
   }
 
   // Replace with event listener
@@ -225,7 +181,7 @@ export class FetchData extends Component {
 
       this.updateStockInfo = false;
     }
-    else if (this.state.lock === true && this.called === false) {
+    else if (this.state.lock === true) {
       t.push(<StockTableTwo
         {...this}
         alertInterval={this.props.state.alertInterval}
@@ -237,23 +193,26 @@ export class FetchData extends Component {
       this.setState({ stockTableTwo: t });
       this.called = true;
       t = [];
+
       this.setState({ lock: false })
+      this.forceUpdate();
     }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.state.lock !== nextState.lock || this.updateStockInfo) {
-      return true;
-    }
-    else if (this.state.addAlertTableRowBool !== nextState.addAlertTableRowBool
+
+    if (this.state.lock !== nextState.lock
+      || this.updateStockInfo ||
+      this.state.addAlertTableRowBool !== nextState.addAlertTableRowBool
       || this.state.removeAlertTableRowBool !== nextState.removeAlertTableRow
       || this.state.end !== nextState.end) {
       //   || nextProps.state.setNotifications !== this.props.state.setNotifications)
       return true;
     }
+
     return false;
   }
-  
+
   updateCache(bool) {
     this.setState({ updateCache: bool });
   }
@@ -361,7 +320,8 @@ export class FetchData extends Component {
     const exists = await this.keyExists(e, target);
     const maxRows = 45;
 
-    if (exists || this.state.maxNumberOfAlertTableRows >= maxRows)
+    if (exists || this.state.maxNumberOfAlertTableRows >= maxRows || 
+      isNaN(target) || (target === null || target === undefined))
       return;
     // Read from Database
 
@@ -396,13 +356,15 @@ export class FetchData extends Component {
 
   // Are you sure you want to remove this stock?
   removeAlertTableRow() {
-    if (this.state.maxNumberOfAlertTableRows < 1)
+    let target = parseInt(this.state.target);
+
+    if (this.state.maxNumberOfAlertTableRows < 1 
+      || isNaN(target) || (target === null || target === undefined))
       return;
 
     let pointer;
     let start = 0;
     let end = this.state.alertTableStocks.length - 1;
-    let target = parseInt(this.state.target);
     let alertTableStocks = [];
 
     for (pointer = start; pointer <= end; pointer++) {
@@ -420,10 +382,40 @@ export class FetchData extends Component {
     this.setState({ removeAlertTableRowBool: true });
   }
 
+  // Add to History Table
+  addToHistorical() {
+    let target = parseInt(this.state.clickedAlertTableRowID);
+    console.log('target '+ target);
+    let txt;
+    if (isNaN(target) || (target === null || target === undefined) ) {
+      window.alert("No target is clicked ");
+    }
+    else
+    {
+      var r = window.confirm("Add to Historical Table?");
+      if (r == true) {
+        txt = "Yes";
+      } else {
+        txt = "Cancel";
+      }
+
+      if(txt === "Yes")
+      {
+        
+      }
+    
+    }
+  }
 
   triggerAnimation(param) {
     console.log('CALL ACK HELL ' + param)
   }
+
+  resetTableID(id)
+  {
+    this.setState({ clickedAlertTableRowID: id });
+  }
+
 
   setAlertTableRowBool(bool) {
     this.setState({ addAlertTableRowBool: bool });
@@ -439,10 +431,6 @@ export class FetchData extends Component {
 
   getRemoveAlertTableRowBool() {
     return this.state.removeAlertTableRowBool;
-  }
-
-  addToPortfolio() {
-
   }
 
   set(bool) {
@@ -470,75 +458,13 @@ export class FetchData extends Component {
     return this.state.cache;
   }
 
-  async connectionTimeout() {
-    var count = 0;
 
-    return new Promise(resolve => {
-      this.interval = setInterval(() => {
-        // Number of retries allowed: 3
-        if (this.connected == true) {
-          clearInterval(this.interval)
-          resolve(true)
-        }
-        else if (count >= 3) {
-          clearInterval(this.interval)
-          resolve(false)
-        }
-        count++;
-      }, 8000);
-    });
-  }
+
 
   async addToCache() {
     var count = 0;
-
-    return new Promise(resolve => {
-    });
   }
 
-  // this.hubConnection.invoke() timeout 60 * 5, must reach 897 by 5 minutes or return error
-  // Max wait per value 60 seconds
-  /** Establish a Signal R connection */
-  async hubConnection_() {
-    var count = 0;
-
-    await this.hubConnection
-      .start()
-      .then(() => {
-        console.log('Successfully connected');
-        this.hubConnection.on('lockStream', function (request_Calls) {
-          // Add Timeout
-          this.request_Calls = request_Calls;
-        })
-        this.hubConnection.on('requestData', (key, data) => {
-          let item = JSON.parse(data);
-          TableCache.set(key, item);
-          AlertCache.set(key, item);
-          NotificationsCache.set(key, item);
-
-          //  console.log(key + "  " + AlertCache.get(key) + "  " + TableCache.get(key));
-          if (count < 897) {
-            count += 1;
-            // count - key !== 1 --> 404 reconnect the whole thing
-          }
-          else {
-            count = 0;
-            console.log("Ok")
-            this.connected = true;
-          }
-        })
-      }) // Bind to constructor
-      .catch(err => {
-        console.log('Error while establishing hubConnection :( ')
-        this.connected = false;
-      }); // Redirect to 404 page
-
-    const res = await this.connectionTimeout();
-
-    console.log('res  ' + this.connected);
-    this.setState({ updateCache: res });
-    this.setState({ lock: res });
-  }
 
   sendRequest(hubConnection) {
     var cache_ = new cache();
@@ -554,7 +480,7 @@ export class FetchData extends Component {
     //Dashboard
     return (
       <div>
-     
+
 
         {/* Stock Dashboard */}
         <Box
@@ -609,7 +535,7 @@ export class FetchData extends Component {
             style={{ position: 'absolute', bottom: '20px', right: '50px', width: '90px' }}>
             Remove  <br /> from Table</Button>
 
-          <Button onClick={this.addToPortfolio}
+          <Button onClick={this.addToHistorical}
             style={{ position: 'absolute', bottom: '20px', left: '40px', width: '90px' }}>
             Add  <br /> to Portfolio</Button>
         </Box>
