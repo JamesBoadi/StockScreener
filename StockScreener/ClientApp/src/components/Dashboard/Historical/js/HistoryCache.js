@@ -30,8 +30,6 @@ export default class PortfolioCache {
         return this.cache_.get(key.toString());
     }
 
-
-
     /* Do not allow scrolling while Updating */
     static setDisableScroll(bool) {
         this.disableUpdate = bool;

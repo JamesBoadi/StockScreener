@@ -30,6 +30,7 @@ import { AddStockForm } from './AddStockForm';
 import { EditStockForm } from './EditStockForm';
 import { Search } from './Search';
 import HistoryCache from './js/HistoryCache';
+import HistoryCalc from './js/HistoryCalc';
 import PortfolioCalc from './js/HistoryCalc';
 import * as HashMap from 'hashmap';
 
@@ -166,6 +167,9 @@ export class HistoricalTable extends Component {
             }
         }, 1000);
 
+
+
+        // Window onload -> Initalise hashmap from database
         
 
          // setHistorical( , , )   Set Historical Data
@@ -221,7 +225,10 @@ export class HistoricalTable extends Component {
             return false;
         }
         else {
-            if (this.state.highlightTableRow !== nextState.highlightTableRow ||
+            if (condition) {
+                
+            }
+            else if (this.state.highlightTableRow !== nextState.highlightTableRow ||
                 this.state.editPortfolioTable !== nextState.editPortfolioTable ||
                 this.state.closeForm !== nextState.closeForm ||
                 this.state.addPortfolioTableRowBool !== nextProps.addPortfolioTableRowBool

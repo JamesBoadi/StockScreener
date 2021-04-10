@@ -6,6 +6,7 @@ import { StockTableTwo } from './DashboardOne/StockTableTwo';
 import { AlertReducer } from './DashboardOne/js/AlertReducer.js';
 import TableCache from './DashboardOne/js/TableCache.js';
 import NotificationsCache from './DashboardOne/js/NotificationsCache.js';
+import HistoryCalc from './Historical/js/HistoryCalc';
 import AlertCache from './DashboardOne/js/AlertCache.js';
 import AlertSettings from './DashboardOne/js/AlertSettings.js';
 import PriceSettings from './DashboardOne/js/PriceSettings.js';
@@ -401,7 +402,7 @@ export class FetchData extends Component {
 
       if(txt === "Yes")
       {
-        
+        HistoryCalc.setUpdateHistoricalTable()
       }
     
     }
