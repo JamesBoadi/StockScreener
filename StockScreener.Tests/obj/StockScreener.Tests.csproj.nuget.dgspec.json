@@ -162,6 +162,10 @@
               "target": "Package",
               "version": "[5.0.0, )"
             },
+            "Microsoft.Extensions.Options.ConfigurationExtensions": {
+              "target": "Package",
+              "version": "[5.0.0, )"
+            },
             "Microsoft.Owin.Cors": {
               "target": "Package",
               "version": "[4.1.1, )"
@@ -173,6 +177,10 @@
             "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
               "target": "Package",
               "version": "[5.0.0, )"
+            },
+            "MongoDB.Driver": {
+              "target": "Package",
+              "version": "[2.12.2, )"
             },
             "NUnit3TestAdapter": {
               "target": "Package",

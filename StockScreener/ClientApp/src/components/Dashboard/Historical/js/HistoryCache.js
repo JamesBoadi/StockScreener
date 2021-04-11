@@ -1,4 +1,4 @@
-import * as HashMap from 'hashmap';
+
 import * as cache from 'cache-base';
 
 export default class PortfolioCache {

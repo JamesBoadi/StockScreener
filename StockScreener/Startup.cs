@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using System.Net.WebSockets;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.Certificate;
@@ -37,6 +38,17 @@ namespace StockScreener
                 configuration.RootPath = "ClientApp/build";
             });
 
+            // requires using Microsoft.Extensions.Options
+            services.Configure<StockScreenerDatabaseSettings>(
+                Configuration.GetSection(nameof(StockScreenerDatabaseSettings)));
+
+            services.AddSingleton<IStockScreenerDatabaseSettings>(sp =>
+                sp.GetRequiredService<IOptions<StockScreenerDatabaseSettings>>().Value);
+
+            services.AddControllers();
+
+            services.AddSingleton<StockScreenerService>();
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 options.CheckConsentNeeded = context => true;
@@ -45,15 +57,15 @@ namespace StockScreener
 
             services.AddCors(options =>
             {
-            options.AddPolicy(MyAllowSpecificOrigins,
-                              builder =>
-                              {
-                                  builder.WithOrigins("https://localhost:5000",
-                                                      "https://localhost:44362")
-                                                      .SetIsOriginAllowedToAllowWildcardSubdomains()
-                                                      .AllowAnyHeader();
+                options.AddPolicy(MyAllowSpecificOrigins,
+                                  builder =>
+                                  {
+                                      builder.WithOrigins("https://localhost:5000",
+                                                          "https://localhost:44362")
+                                                          .SetIsOriginAllowedToAllowWildcardSubdomains()
+                                                          .AllowAnyHeader();
 
-                              });
+                                  });
             });
 
             services.AddHttpsRedirection(options =>

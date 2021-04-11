@@ -23,19 +23,28 @@ namespace StockScreener.Controllers
     [ApiController]
     [Route("/")]
     [Route("[controller]/[action]")]
-    public class WeatherForecastController : ControllerBase
+    public class DataController : ControllerBase
     {
         // At compile time
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly ILogger<DataController> _logger;
+
+        private readonly StockScreenerService _stockScreenerService;
+
+        /*
+            add to app settings   
+
+            mongodb+srv://<username>:<password>@cluster0.w2zx6.mongodb.net/
+            myFirstDatabase?retryWrites=true&w=majority
+        */
 
         User user = new User();
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public DataController(ILogger<DataController> logger)
         {
             _logger = logger;
         }
 
-     
+
         // Return stock names in order of subsequence
         [Route("searchstock/{query?}")]   // Attribute route   HttpResponseMessage 
         public string transmitData(string query) // convert to json
@@ -85,30 +94,65 @@ namespace StockScreener.Controllers
             string data = JsonSerializer.Serialize(stockCode);
             return data;
         }
-/*
-        [HttpGet("{page}")] // Conventional route (For pages that do not exist)
-        public ContentResult DummyOne(int page)
+
+
+        [Route("saveNotifications")]
+        public void saveNotifications(string query) // convert to json
         {
-            return new ContentResult
+            User user = new User();
+            StockCode stockCode = new StockCode();
+            List<Database> stockList = user.readDatabase();
+            List<String> list = new List<String>();
+            OrderedDictionary dict = new OrderedDictionary();
+
+            // Remove Whitespaces and double entries
+            for (int id = 0; id < stockList.Count; id++)
             {
-                ContentType = "text/html",
-                Content = "<div>We are sorry this page does not exist</div>"
-            };
+
+            }
         }
 
+        public void getNotifications(string query) // convert to json
+        {
+            User user = new User();
+            StockCode stockCode = new StockCode();
+            List<Database> stockList = user.readDatabase();
+            List<String> list = new List<String>();
+            OrderedDictionary dict = new OrderedDictionary();
+
+            // Remove Whitespaces and double entries
+            for (int id = 0; id < stockList.Count; id++)
+            {
+
+            }
+        }
+
+
+
         /*
-         public IEnumerable<WeatherForecast> Get()
-         {
-             Console.WriteLine("Am I alive, yes?");
-             var rng = new Random();
-             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-             {
-                 Date = DateTime.Now.AddDays(index),
-                 TemperatureC = rng.Next(-20, 55),
-                 Summary = Summaries[rng.Next(Summaries.Length)]
-             })
-             .ToArray();
-         }*/
+                [HttpGet("{page}")] // Conventional route (For pages that do not exist)
+                public ContentResult DummyOne(int page)
+                {
+                    return new ContentResult
+                    {
+                        ContentType = "text/html",
+                        Content = "<div>We are sorry this page does not exist</div>"
+                    };
+                }
+
+                /*
+                 public IEnumerable<WeatherForecast> Get()
+                 {
+                     Console.WriteLine("Am I alive, yes?");
+                     var rng = new Random();
+                     return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+                     {
+                         Date = DateTime.Now.AddDays(index),
+                         TemperatureC = rng.Next(-20, 55),
+                         Summary = Summaries[rng.Next(Summaries.Length)]
+                     })
+                     .ToArray();
+                 }*/
 
 
         /*Stocks stocks = new Stocks();

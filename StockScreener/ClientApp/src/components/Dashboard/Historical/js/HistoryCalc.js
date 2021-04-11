@@ -1,3 +1,4 @@
+import * as HashMap from 'hashmap';
 /**
 * Calculations for Portfolio, includes a set of mathematical 
 * functions that query a database for saved informaion
@@ -25,14 +26,14 @@ export default class HistoryCalc {
     static idHashMap = new HashMap();
     static settings = new HashMap();
 
-    /*
+    
     static upperBand = 0;
     static middleBand = 0;
     static lowerBand = 0;
     static SMA = 0;
     static signal = 0;
     static volume = 0;
-    static RSI = 0; */
+    static RSI = 0; 
 
     static updateHistoricalTable = false;
     static id = null;
@@ -95,9 +96,9 @@ export default class HistoryCalc {
             this.dataHashMap.set(
                 tableID,
                 {
-                    upperBand: upperBand, middleBand: middleBand,
-                    lowerBand: lowerBand, SMA: SMA, signal: signal,
-                    RSI: RSI
+                    upperBand: null, middleBand: null,
+                    lowerBand: null, SMA: null, signal: null,
+                    RSI: null
                 }
             );
 
@@ -124,9 +125,9 @@ export default class HistoryCalc {
             this.dataHashMap.set( // Perform Update
                 tableID,
                 {
-                    upperBand: upperBand, middleBand: middleBand,
-                    lowerBand: lowerBand, SMA: SMA, signal: signal,
-                    RSI: RSI
+                    upperBand: this.upperBand, middleBand: this.middleBand,
+                    lowerBand: this.lowerBand, SMA: this.SMA, signal: this.signal,
+                    RSI: this.RSI
                 }
             );
         }
@@ -265,7 +266,7 @@ export default class HistoryCalc {
     // **************************************************
     // RSI Functions
     // **************************************************
-    static calculateRSI() {
+    static calculateRSI(tableID) {
         // Quarters of the year
         this.rsiWeight = this.settings.get(tableID).rsiWeight;
         const q1 = ((this.prevCloseArr[149] - this.prevCloseArr[199]) / this.prevCloseArr[199] * 100) * this.rsiWeight;
