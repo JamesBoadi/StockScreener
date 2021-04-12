@@ -15,6 +15,7 @@ using System.Text.Json;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Web.Helpers;
+using System.Net;
 
 // https://stackoverflow.com/questions/54815199/newtonsoft-json-serialize-deserialize-nested-property
 
@@ -39,9 +40,11 @@ namespace StockScreener.Controllers
 
         User user = new User();
 
-        public DataController(ILogger<DataController> logger)
+        public DataController(ILogger<DataController> logger, 
+        StockScreenerService service)
         {
             _logger = logger;
+             _stockScreenerService = service;
         }
 
 
@@ -96,36 +99,19 @@ namespace StockScreener.Controllers
         }
 
 
-        [Route("saveNotifications")]
-        public void saveNotifications(string query) // convert to json
+        [Route("savenotifications/{query?}")]
+        public HttpStatusCode saveNotifications(string query) // convert to json
         {
-            User user = new User();
-            StockCode stockCode = new StockCode();
-            List<Database> stockList = user.readDatabase();
-            List<String> list = new List<String>();
-            OrderedDictionary dict = new OrderedDictionary();
+        
+             var response = new HttpResponseMessage();
+            // Deserialize
+            Notifications notifications = Notifications.Deserialize(query);
+            // Create Collection
+            _stockScreenerService.Create(notifications);
 
-            // Remove Whitespaces and double entries
-            for (int id = 0; id < stockList.Count; id++)
-            {
-
-            }
+            return response.StatusCode;
         }
 
-        public void getNotifications(string query) // convert to json
-        {
-            User user = new User();
-            StockCode stockCode = new StockCode();
-            List<Database> stockList = user.readDatabase();
-            List<String> list = new List<String>();
-            OrderedDictionary dict = new OrderedDictionary();
-
-            // Remove Whitespaces and double entries
-            for (int id = 0; id < stockList.Count; id++)
-            {
-
-            }
-        }
 
 
 

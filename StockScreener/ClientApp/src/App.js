@@ -21,7 +21,7 @@ export default class App extends Component {
 
 
     this.state = {
-      redirect: [],
+      redirect: [<Redirect to='/DashboardOne' />],
       updateCache: false,
     };
   }
@@ -63,14 +63,15 @@ export default class App extends Component {
      */
     return (
       <div>
+        
         <SideMenu {...this} />
         <DataFeed {...this} />
         {this.state.redirect}
         <Switch>
-          <Route exact path='/' component={() => <HistoricalTable {...this} />} />
+          <Route exact path='/' component={() => <DashboardOne {...this} />} />
           <Route path='/DashboardOne' component={() => <DashboardOne {...this} />} />
           <Route path='/HistoricalTable' component={() => <HistoricalTable {...this} />} />
-          <Route path='/Portfolio' component={() => <PortFolio {...this} />} />
+    <Route path='/Portfolio' component={() => <PortFolio {...this} />} />
         </Switch>
       </div>
     );

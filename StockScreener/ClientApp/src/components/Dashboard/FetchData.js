@@ -316,18 +316,55 @@ export class FetchData extends Component {
   async addAlertTableRow(e) {
     var t = this.state.alertTableStack;
     var alertTableStocks = this.state.alertTableStocks;
-    let target = parseInt(this.state.clickedAlertTableRowID);
+    const target = parseInt(this.state.clickedAlertTableRowID);
 
     const exists = await this.keyExists(e, target);
     const maxRows = 45;
 
-    if (exists || this.state.maxNumberOfAlertTableRows >= maxRows || 
+    // Change from defensive to error class (call from errorr class) 
+    if (exists || this.state.maxNumberOfAlertTableRows >= maxRows ||
       isNaN(target) || (target === null || target === undefined))
       return;
-    // Read from Database
+
+
+    // Check if target is in notifications
+
+
+    if (true) {
+
+    }
+    // Save to Database
+    const json = TableCache.get(target);
+
+    const obj =
+    {
+      Id: json.Id,
+      StockCode: json.StockCode,
+      TimeStamp: json.TimeStamp,
+      CurrentPrice: json.CurrentPrice,
+      ChangeP: json.ChangeP,
+      Volume: json.Volume,
+    };
+
+    var jsonString = JSON.stringify(obj);
+
+    await fetch('savenotifications/'.concat(jsonString))
+      .then(response =>{ 
+        if (!response.ok) {
+          console.log("error no shite" + response);
+        }
+        else
+        {
+          console.log("good " + response);
+        }
+      })
+      .catch(error =>
+        console.log("error " + error)
+      );
+
 
     // Stocks to be displayed in the Notifications table
-    alertTableStocks.push(TableCache.get(target))
+    alertTableStocks.push(json);
     let pointer = alertTableStocks.length - 1;
 
     t.push(
@@ -359,7 +396,7 @@ export class FetchData extends Component {
   removeAlertTableRow() {
     let target = parseInt(this.state.target);
 
-    if (this.state.maxNumberOfAlertTableRows < 1 
+    if (this.state.maxNumberOfAlertTableRows < 1
       || isNaN(target) || (target === null || target === undefined))
       return;
 
@@ -386,13 +423,12 @@ export class FetchData extends Component {
   // Add to History Table
   addToHistorical() {
     let target = parseInt(this.state.clickedAlertTableRowID);
-    console.log('target '+ target);
+    console.log('target ' + target);
     let txt;
-    if (isNaN(target) || (target === null || target === undefined) ) {
+    if (isNaN(target) || (target === null || target === undefined)) {
       window.alert("No target is clicked ");
     }
-    else
-    {
+    else {
       var r = window.confirm("Add to Historical Table?");
       if (r == true) {
         txt = "Yes";
@@ -400,11 +436,10 @@ export class FetchData extends Component {
         txt = "Cancel";
       }
 
-      if(txt === "Yes")
-      {
-        HistoryCalc.setUpdateHistoricalTable()
+      if (txt === "Yes") {
+        // HistoryCalc.setUpdateHistoricalTable()
       }
-    
+
     }
   }
 
@@ -412,8 +447,7 @@ export class FetchData extends Component {
     console.log('CALL ACK HELL ' + param)
   }
 
-  resetTableID(id)
-  {
+  resetTableID(id) {
     this.setState({ clickedAlertTableRowID: id });
   }
 

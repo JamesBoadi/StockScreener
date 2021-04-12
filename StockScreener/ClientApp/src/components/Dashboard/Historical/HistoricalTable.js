@@ -400,13 +400,13 @@ export class HistoricalTable extends Component {
                 new_stack[pointer] =
                     <tbody>
                         <tr>
-                            <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockName.toString()}</td>
-                            <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockCode.toString()}</td>
-                            <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
-                            <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].TimeStamp.toString()}</td>
-                            <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].PrevOpen.toString()}</td>
-                            <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].Change.toString()}</td>
-                            <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].ChangeP.toString()}</td>
+                            <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].StockName.toString()}</td>
+                            <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].StockCode.toString()}</td>
+                            <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
+                            <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].TimeStamp.toString()}</td>
+                            <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].PrevOpen.toString()}</td>
+                            <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].Change.toString()}</td>
+                            <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].ChangeP.toString()}</td>
                         </tr>
                     </tbody>;
             }

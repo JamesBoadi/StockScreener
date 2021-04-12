@@ -64,8 +64,13 @@ namespace StockScreener
                                                           "https://localhost:44362")
                                                           .SetIsOriginAllowedToAllowWildcardSubdomains()
                                                           .AllowAnyHeader();
+                                       builder.WithOrigins("mongodb+srv://dbJames:mn9BfsBg3peDI88L@cluster0.w2zx6.mongodb.net/test?authSource=admin&replicaSet=atlas-cipvc2-shard-0&readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=true"
+                                                          )
+                                                          .SetIsOriginAllowedToAllowWildcardSubdomains()
+                                                          .AllowAnyHeader();
 
                                   });
+               
             });
 
             services.AddHttpsRedirection(options =>
@@ -77,9 +82,13 @@ namespace StockScreener
             services.AddSignalRCore();
             services.AddMemoryCache();
             services.AddMvc();
+            services.AddConnections();
+           
 
             // Add Signal R as a Hosted Service
             services.AddHostedService<Worker>();
+
+    
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -94,7 +103,7 @@ namespace StockScreener
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             }
-
+   
 
 
             //CorsOptions.AllowAll
