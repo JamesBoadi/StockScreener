@@ -67,7 +67,6 @@ export class HistoricalTable extends Component {
         this.addToHistoricalTable = this.addToHistoricalTable.bind(this);
         this.editPortfolioTableRow = this.editPortfolioTableRow.bind(this);
         this.removePortfolioTableRow = this.removePortfolioTableRow.bind(this);
-        this.selectmad = this.selectmad.bind(this);
         this.keyExists = this.keyExists.bind(this);
 
         // Setters
@@ -83,6 +82,9 @@ export class HistoricalTable extends Component {
 
         this.setClearRecord = this.setClearRecord.bind(this);
         this.validateForm = this.validateForm.bind(this);
+
+        this.initialiseHistoricalTable = this.initialiseHistoricalTable.bind(this);
+        this.addFirstRows = this.addFirstRows.bind(this);
 
         // **************************************************
         // Static Variables
@@ -167,26 +169,9 @@ export class HistoricalTable extends Component {
             }
         }, 1000);
 
-        console.log(' -- HISTORICAL REMOUNT -- ' )
+        this.initialiseHistoricalTable();
 
-
-
-        // Window onload -> Initalise hashmap from database
-
-
-        // setHistorical( , , )   Set Historical Data
-
-
-        //HistoryCache.setUpdateData(this.updateTableData);
-
-        /* this.createTable()
-         this.updateTable()
- 
-         setInterval(() => {
-             window.location.reload();
-         }, 20000000);
- 
-         this.setState({ scroll: this.scrollBy() })*/
+        console.log(' -- HISTORICAL REMOUNT -- ')
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -194,10 +179,6 @@ export class HistoricalTable extends Component {
             this.newTable();
             this.updateTable(this.state.start);
             this.setState({ highlightTableRow: false });
-        }
-        else if (HistoryCalc.getUpdateHistoricalTable()) {
-            this.addToHistoricalTable();
-            HistoryCalc.setUpdateHistoricalTable(false, null);
         }
         else if (this.state.addToHistoricalTableBool) {
             this.newTable();
@@ -216,7 +197,7 @@ export class HistoricalTable extends Component {
             this.updateTable();
             this.setState({ editPortfolioTable: false });
         }
-       
+
 
         if (this.state.validInput) {
             this.setState({ validInput: false });
@@ -229,10 +210,7 @@ export class HistoricalTable extends Component {
             return false;
         }
         else {
-            if (HistoryCalc.getUpdateHistoricalTable()) {
-                return true;
-            }
-            else if (this.state.highlightTableRow !== nextState.highlightTableRow ||
+            if (this.state.highlightTableRow !== nextState.highlightTableRow ||
                 this.state.editPortfolioTable !== nextState.editPortfolioTable ||
                 this.state.closeForm !== nextState.closeForm ||
                 this.state.addToHistoricalTableBool !== nextProps.addToHistoricalTableBool
@@ -246,11 +224,46 @@ export class HistoricalTable extends Component {
         }
         return false;
     }
-    selectmad(e) {
-        const portfolioTableId = parseInt(e.target.id);
-        //   console.log('portfolio ' + portfolioTableId);
 
+    // **************************************************
+    // Initialise Historical Data
+    // **************************************************
+
+    // Initialise alert rows from database
+    async initialiseHistoricalTable() {
+        // Read notifications from database
+        await fetch('gethistoricaldata')
+            .then(response => response.json())
+            .then(response =>
+                this.addFirstRows(response)
+            )
+            .catch(error => {
+                console.log("error " + error) // 404
+                return;
+            }
+            );
     }
+
+    addFirstRows(response) {
+        var t = [];
+        var portfolioTableStocks = this.state.portfolioTableStocks;
+
+        for (var i = 0; i < response.length; i++) {
+            const item = JSON.parse(response[i]);
+            const pointer = parseInt(item.Id);
+            const json = HistoryCache.get(pointer);
+            t.push(json);
+            portfolioTableStocks.push(json);
+            this.map.set(i, pointer);
+        }
+
+        this.setState({ maxNumberOfPortfolioRows: this.state.maxNumberOfPortfolioTableRows + 1 });
+        this.setState({ portfolioTableStack: t });
+        this.setState({ portfolioTableStocks: portfolioTableStocks });
+        this.setState({ addToHistoricalTableBool: true });
+    }
+
+    // **************************************************
 
     // **************************************************
     // Form Functionality Methods
@@ -319,10 +332,10 @@ export class HistoricalTable extends Component {
     async addToHistoricalTable(target) {
         this.setState({ closeForm: false });
         this.setState({ editStockFormVisible: "hidden" });
-        
+
         var t = this.state.portfolioTableStack;
         var portfolioTableStocks = this.state.portfolioTableStocks;
-        
+
         const exists = await this.keyExists(target);
         const maxRows = 45;
 
@@ -334,7 +347,7 @@ export class HistoricalTable extends Component {
         }
 
         console.log('HISTORICAL CACHE code ' + HistoryCache.get(target).StockCode);
-        
+
         // Stocks to be displayed in the Portfolio table
         portfolioTableStocks.push(HistoryCache.get(target));
         let pointer = parseInt(portfolioTableStocks.length - 1);
@@ -680,13 +693,13 @@ export class HistoricalTable extends Component {
             t.push(
                 <tbody>
                     <tr style={style} >
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockName.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockCode.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].TimeStamp.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].PrevOpen.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].Change.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].ChangeP.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockName.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockCode.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].TimeStamp.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].PrevOpen.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].Change.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].ChangeP.toString()}</td>
                     </tr>
                 </tbody>);
         }
@@ -708,13 +721,13 @@ export class HistoricalTable extends Component {
             t.push(
                 <tbody>
                     <tr>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockName.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockCode.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].TimeStamp.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].PrevOpen.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].Change.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].ChangeP.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockName.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockCode.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].TimeStamp.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].PrevOpen.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].Change.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].ChangeP.toString()}</td>
                     </tr>
                 </tbody>);
         }

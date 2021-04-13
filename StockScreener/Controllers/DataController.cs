@@ -205,8 +205,7 @@ namespace StockScreener.Controllers
             try
             {
                 Historical historical = Historical.Deserialize(id);
-                string _id = JsonSerializer.Deserialize<int>(id).ToString();
-                bool idExists = _stockScreenerService.HistoricalIdExists(_id);
+                bool idExists = _stockScreenerService.HistoricalIdExists(historical.Id);
 
                 if (idExists)
                 {

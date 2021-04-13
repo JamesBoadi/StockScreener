@@ -165,9 +165,6 @@ export class FetchData extends Component {
         console.log('ID ' + connectionEstablished)
         this.setState({ lock: true });
         this.setState({ updateCache: true });
-
-
-
         clearInterval(this.intervalID);
       }
     }, 3000);
@@ -487,6 +484,10 @@ export class FetchData extends Component {
     this.setState({ removeAlertTableRowBool: true });
   }
 
+  // **************************************************
+  // Add to Historical Table
+  // **************************************************
+
   // Add to History Table
   async addToHistorical() {
     const target = parseInt(this.state.clickedAlertTableRowID);
@@ -504,16 +505,17 @@ export class FetchData extends Component {
         txt = "Cancel";
       }
 
+      let obj = {Id: json.Id};
+      var jsonString = JSON.stringify(obj);
       if (txt === "Yes") {
-       const res = await this.saveHistoricalData(json);
+        const res = await this.saveHistoricalData(jsonString);
+        console.log('Historical data added? ' + res);
         // window.alert(returned message)             window.alert('Maximum stocks for portfolio exceeded, limit: 200 ');
       }
     }
   }
 
-
-  async saveHistoricalData(data)
-  {
+  async saveHistoricalData(data) {
     await fetch('savehistoricaldata/'.concat(data))
       .then(response => response.status)
       .then(response => {
@@ -524,13 +526,16 @@ export class FetchData extends Component {
         else return true;
       })
       .catch(error => {
-          console.log("error " + error) // 404
-          return false;
-        }
+        console.log("error " + error) // 404
+        return false;
+      }
       );
 
-      return false;
+    return false;
   }
+
+  // **************************************************
+
 
   triggerAnimation(param) {
     console.log('CALL ACK HELL ' + param)
