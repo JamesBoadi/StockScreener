@@ -13,7 +13,7 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
 
         
         // int Pointer = 0;
-        public Stock(int id,
+        public Stock(string id,
         string StockCode, string StockName, string TimeStamp, double CurrentPrice,
          double Change, double ChangeP, double Volume, int[] ChangeArray,
         double High, double Low, int Signal, double PrevOpen, double Close)
@@ -37,7 +37,7 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         }
 
         // Contains all the stocks information
-        public int Id { get; set; }
+        public string Id { get; set; }
         public double CurrentPrice{ get; set; }
         public string StockCode { get; set; }
         public string StockName { get; set; }

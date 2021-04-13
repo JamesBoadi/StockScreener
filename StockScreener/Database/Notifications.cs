@@ -14,9 +14,10 @@ namespace StockScreener
 
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public string _Id { get; set; }
 
        // [BsonElement("Name")]
+        public string Id { get; set; }
         public string StockCode { get; set; }
 
         public string TimeStamp { get; set; }
@@ -32,7 +33,7 @@ namespace StockScreener
             Notifications data = JsonSerializer.
             Deserialize<Notifications>(query, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            Console.WriteLine("data " + data.Id + " stockcode " + data.StockCode);
+            //Console.WriteLine("data " + data.Id + " stockcode " + data.StockCode);
             return data;
         }
     }

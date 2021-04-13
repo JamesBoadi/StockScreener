@@ -19,7 +19,6 @@ export default class App extends Component {
     this.redirect = this.redirect.bind(this);
     this.getUpdateCache = this.getUpdateCache.bind(this);
 
-
     this.state = {
       redirect: [<Redirect to='/DashboardOne' />],
       updateCache: false,

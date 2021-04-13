@@ -89,6 +89,9 @@ export class FetchData extends Component {
     this.keyCount = 0;
     this.updateStockInfo = false;
 
+    this.initialiseAlertTable = this.initialiseAlertTable.bind(this);
+    this.addFirstRows = this.addFirstRows.bind(this);
+
 
     this.state = {
       stockTableTwo: [],
@@ -112,7 +115,7 @@ export class FetchData extends Component {
       addAlertTableRowBool: false,
       removeAlertTableRowBool: false,
       alertTableStocks: [],
-      alertTableStack: [],
+      alertTableStack: [], // remove later on (ambigious with notifications)
       clickedAlertTableRowID: null,
       target: 0,
       maxNumberOfAlertTableRows: 0,
@@ -128,6 +131,8 @@ export class FetchData extends Component {
       stockInfoCode: [],
 
       updateStockInfo: false,
+
+      alertMessagePopUp: "",
 
       cache: new cache(),
 
@@ -159,14 +164,15 @@ export class FetchData extends Component {
         console.log('ID ' + connectionEstablished)
         this.setState({ lock: true });
         this.setState({ updateCache: true });
+
+
+
         clearInterval(this.intervalID);
       }
     }, 3000);
-
   }
 
   componentWillUnmount() {
-
   }
 
   // Replace with event listener
@@ -195,6 +201,7 @@ export class FetchData extends Component {
       this.called = true;
       t = [];
 
+      this.initialiseAlertTable(); // Populate Alert Table
       this.setState({ lock: false })
       this.forceUpdate();
     }
@@ -213,6 +220,45 @@ export class FetchData extends Component {
 
     return false;
   }
+
+  // **************************************************
+  // Initialise Alert Rows
+  // **************************************************
+
+  // Initialise alert rows from database
+  async initialiseAlertTable() {
+    // Read notifications from database
+    await fetch('getallnotifications')
+      .then(response => response.json())
+      .then(response =>
+        this.addFirstRows(response)
+      )
+      .catch(error => {
+        console.log("error " + error) // 404
+        return;
+      }
+      );
+  }
+
+  addFirstRows(response) {
+    var t = [];
+    var alertTableStocks = this.state.alertTableStocks;
+
+    for (var i = 0; i < response.length; i++) {
+      const item = JSON.parse(response[i]);
+      const pointer = parseInt(item.Id);
+      t.push(item);
+      alertTableStocks.push(item);
+      this.map.set(i, pointer);
+    }
+
+    this.setState({ maxNumberOfAlertTableRows: response.length });
+    this.setState({ alertTableStack: t });
+    this.setState({ alertTableStocks: alertTableStocks });
+    this.setState({ addAlertTableRowBool: true });
+  }
+
+  // **************************************************
 
   updateCache(bool) {
     this.setState({ updateCache: bool });
@@ -289,7 +335,8 @@ export class FetchData extends Component {
   // Select Row Setter
   selectAlertTableRow(e) {
     const alertTableId = parseInt(e.target.id);
-    console.log('ALERT ID ' + alertTableId)
+    console.log('ALERT ID ' + alertTableId);
+
     this.setState({ target: alertTableId });
     this.setState({ addAlertTableRowBool: true });
   }
@@ -323,16 +370,12 @@ export class FetchData extends Component {
 
     // Change from defensive to error class (call from errorr class) 
     if (exists || this.state.maxNumberOfAlertTableRows >= maxRows ||
-      isNaN(target) || (target === null || target === undefined))
+      isNaN(target) || (target === null || target === undefined)) {
+      window.alert('This stock already exists ');
       return;
 
-
-    // Check if target is in notifications
-
-
-    if (true) {
-
     }
+
     // Save to Database
     const json = TableCache.get(target);
 
@@ -349,17 +392,17 @@ export class FetchData extends Component {
     var jsonString = JSON.stringify(obj);
 
     await fetch('savenotifications/'.concat(jsonString))
-      .then(response =>{ 
+      .then(response => response.status)
+      .then(response => {
         if (!response.ok) {
-          console.log("error no shite" + response);
-        }
-        else
-        {
-          console.log("good " + response);
+          // 404 
+          return;
         }
       })
-      .catch(error =>
-        console.log("error " + error)
+      .catch(error => {
+        console.log("error " + error) // 404
+        return;
+      }
       );
 
 

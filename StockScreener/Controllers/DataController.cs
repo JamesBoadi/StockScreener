@@ -16,6 +16,7 @@ using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Web.Helpers;
 using System.Net;
+using MongoDB.Driver;
 
 // https://stackoverflow.com/questions/54815199/newtonsoft-json-serialize-deserialize-nested-property
 
@@ -40,11 +41,10 @@ namespace StockScreener.Controllers
 
         User user = new User();
 
-        public DataController(ILogger<DataController> logger, 
-        StockScreenerService service)
+        public DataController(StockScreenerService service, ILogger<DataController> logger)
         {
             _logger = logger;
-             _stockScreenerService = service;
+            _stockScreenerService = service;
         }
 
 
@@ -99,19 +99,96 @@ namespace StockScreener.Controllers
         }
 
 
+        private IMongoCollection<Notifications> _notifications;
+
         [Route("savenotifications/{query?}")]
         public HttpStatusCode saveNotifications(string query) // convert to json
         {
-        
-             var response = new HttpResponseMessage();
-            // Deserialize
-            Notifications notifications = Notifications.Deserialize(query);
-            // Create Collection
-            _stockScreenerService.Create(notifications);
+            var response = new HttpResponseMessage();
+            HttpStatusCode res;
+            try
+            {
+                Notifications notifications = Notifications.Deserialize(query);
+                bool idExists = _stockScreenerService.Exists(notifications.StockCode);
 
-            return response.StatusCode;
+                if (idExists)
+                {
+                    return HttpStatusCode.Ambiguous;
+                }
+
+                Notifications list = _stockScreenerService.Create(notifications);
+                res = response.StatusCode;
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+
+                res = response.StatusCode;
+            }
+
+            return HttpStatusCode.Ambiguous;
         }
 
+        [Route("getallnotifications")]
+        public string[] getAllNotifications() // convert to json
+        {
+            string[] jsonArray;
+            List<Notifications> list;
+            try
+            {
+                list = _stockScreenerService.Get();
+                jsonArray = new string[list.Count];
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+                return null;
+            }
+
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                Console.WriteLine("list " + list[i].Id);
+                jsonArray[i] = JsonSerializer.Serialize(list[i]);
+            }
+           
+            return jsonArray;
+        }
+
+        [Route("deletenotification/{id?}")]
+        public string[] deleteNotification(string id) // convert to json
+        {
+            string[] jsonArray;
+            List<Notifications> list;
+            
+            try
+            {
+                list = _stockScreenerService.Get();
+                jsonArray = new string[list.Count];
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+                return null;
+            }
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                Console.WriteLine("list " + list[i].Id);
+                jsonArray[i] = JsonSerializer.Serialize(list[i]);
+            }
+
+            return jsonArray;
+        }
 
 
 
