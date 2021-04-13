@@ -436,27 +436,51 @@ export class FetchData extends Component {
   }
 
   // Are you sure you want to remove this stock?
-  removeAlertTableRow() {
+  async removeAlertTableRow() {
     let target = parseInt(this.state.target);
 
     if (this.state.maxNumberOfAlertTableRows < 1
       || isNaN(target) || (target === null || target === undefined))
       return;
 
+
     let pointer;
     let start = 0;
     let end = this.state.alertTableStocks.length - 1;
     let alertTableStocks = [];
 
+    let deleteId;
+
     for (pointer = start; pointer <= end; pointer++) {
       // console.log('alertTableId ' + pointer + ' target ' + target);
       if (pointer === target) {
-        this.map.delete(pointer);
+        deleteId = pointer;
         continue;
       }
       else
         alertTableStocks.push(this.state.alertTableStocks[pointer]);
     }
+
+    await fetch('deletenotification/'.concat(this.map.get(target)))
+      .then(response => response.status)
+      .then(response => {
+        if (!response.ok) {
+          // 404 
+          return;
+        }
+      })
+      .catch(error => {
+        console.log("error " + error) // 404
+        return;
+      }
+      );
+
+    console.log('delete id ' + deleteId);
+
+    if ((deleteId !== null || deleteId !== undefined))
+      this.map.delete(deleteId);
+    else
+        return;
 
     this.setState({ maxNumberOfAlertTableRows: this.state.maxNumberOfAlertTableRows - 1 });
     this.setState({ alertTableStocks: alertTableStocks });

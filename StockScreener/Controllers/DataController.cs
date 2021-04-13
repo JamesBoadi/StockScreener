@@ -109,7 +109,7 @@ namespace StockScreener.Controllers
             try
             {
                 Notifications notifications = Notifications.Deserialize(query);
-                bool idExists = _stockScreenerService.Exists(notifications.StockCode);
+                bool idExists = _stockScreenerService.StockCodeExists(notifications.StockCode);
 
                 if (idExists)
                 {
@@ -154,23 +154,38 @@ namespace StockScreener.Controllers
 
             for (int i = 0; i < list.Count; i++)
             {
-                Console.WriteLine("list " + list[i].Id);
                 jsonArray[i] = JsonSerializer.Serialize(list[i]);
             }
-           
+
             return jsonArray;
         }
 
         [Route("deletenotification/{id?}")]
-        public string[] deleteNotification(string id) // convert to json
+        public HttpStatusCode deleteNotification(string id) // convert to json
         {
-            string[] jsonArray;
-            List<Notifications> list;
-            
+            var response = new HttpResponseMessage();
+            HttpStatusCode res;
+
             try
             {
-                list = _stockScreenerService.Get();
-                jsonArray = new string[list.Count];
+                string _id = JsonSerializer.Deserialize<int>(id).ToString();
+
+                bool idExists = _stockScreenerService.IdExists(_id);
+
+                if (idExists)
+                {
+                    _stockScreenerService.Remove(_id);
+
+                    Console.WriteLine("id " + _id);
+
+                }
+                else
+                {
+                    return HttpStatusCode.Ambiguous;
+                }
+
+
+                res = response.StatusCode;
             }
             catch (Exception ex)
             {
@@ -178,16 +193,10 @@ namespace StockScreener.Controllers
                     Console.WriteLine("Exception " + ex);
 
                 Console.WriteLine("Exception " + ex);
-                return null;
+                res = response.StatusCode;
             }
 
-            for (int i = 0; i < list.Count; i++)
-            {
-                Console.WriteLine("list " + list[i].Id);
-                jsonArray[i] = JsonSerializer.Serialize(list[i]);
-            }
-
-            return jsonArray;
+            return res;
         }
 
 

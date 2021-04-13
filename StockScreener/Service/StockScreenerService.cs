@@ -28,9 +28,15 @@ namespace StockScreener
         public Notifications Get(string id) =>
             _notifications.Find<Notifications>(notifications => notifications.Id == id).FirstOrDefault();
 
-        public bool Exists(string stockCode)
+        public bool StockCodeExists(string stockCode)
         {
             var query = _notifications.Find<Notifications>(notifications => notifications.StockCode.Equals(stockCode)).Any();
+            return query;
+        }
+
+        public bool IdExists(string id)
+        {
+            var query = _notifications.Find<Notifications>(notifications => notifications.Id.Equals(id)).Any();
             return query;
         }
 
@@ -45,7 +51,7 @@ namespace StockScreener
             _notifications.DeleteOne(notifications => notifications.Id == notifcations.Id);
 
         public void Remove(string id) =>
-            _notifications.DeleteOne(notifications => notifications.Id == id);
+            _notifications.DeleteOne(notifications => notifications.Id.Equals(id));
 
 
     }
