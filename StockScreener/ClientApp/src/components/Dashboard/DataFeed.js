@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import HistoryCache from './Portfolio/js/PortfolioCache';
+import HistoryCache from './Historical/js/HistoryCache';
 import PortfolioCache from './Portfolio/js/PortfolioCache';
 import TableCache from './DashboardOne/js/TableCache.js';
 import NotificationsCache from './DashboardOne/js/NotificationsCache.js';
@@ -79,6 +79,7 @@ export class DataFeed extends Component {
     async startDataFeed() {
         var count = 0;
 
+        // Create a Manager class
         await DataFeed.hubConnection
             .start()
             .then(() => {

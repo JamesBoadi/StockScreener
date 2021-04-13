@@ -1,7 +1,7 @@
 
 import * as cache from 'cache-base';
 
-export default class PortfolioCache {
+export default class HistoryCache {
     static cache_ = new cache();
     static cacheOp_ = new cache();
     static endMod = 47;
@@ -12,11 +12,9 @@ export default class PortfolioCache {
     static priceDetection = false;
     static update_hideStocks = false;
     static disableUpdate = false;
-
     static updateDataCallback;
     static updateTable = false;
     static tableID = null;
-
  
     // **************************************************
     // Getters and Setters

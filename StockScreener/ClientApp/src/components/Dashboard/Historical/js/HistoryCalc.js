@@ -26,14 +26,14 @@ export default class HistoryCalc {
     static idHashMap = new HashMap();
     static settings = new HashMap();
 
-    
+
     static upperBand = 0;
     static middleBand = 0;
     static lowerBand = 0;
     static SMA = 0;
     static signal = 0;
     static volume = 0;
-    static RSI = 0; 
+    static RSI = 0;
 
     static updateHistoricalTable = false;
     static id = null;
@@ -59,22 +59,26 @@ export default class HistoryCalc {
     }
 
 
-    static setUpdateHistoricalTable(bool, id)
-    {
+
+    // **************************************************
+    // Get and Set Variables for updating table
+    // **************************************************
+    
+    static setUpdateHistoricalTable(bool, id) {
         this.updateHistoricalTable = bool;
         this.id = id;
     }
 
-    static getUpdateHistoricalTable()
-    {
+    static getUpdateHistoricalTable() {
         return this.updateHistoricalTable;
     }
 
-    static getID()
-    {
+    static getID() {
         return this.id;
     }
-    
+
+    // **************************************************
+
 
     // Initialised when the button is clicked
     static initialiseHashMap(
@@ -157,8 +161,6 @@ export default class HistoryCalc {
             );
         }
     }
-
-  
 
     static get(tableID) {
         return this.dataHashMap.get(tableID);

@@ -62,7 +62,7 @@ export default class App extends Component {
      */
     return (
       <div>
-        
+
         <SideMenu {...this} />
         <DataFeed {...this} />
         {this.state.redirect}
@@ -70,7 +70,7 @@ export default class App extends Component {
           <Route exact path='/' component={() => <DashboardOne {...this} />} />
           <Route path='/DashboardOne' component={() => <DashboardOne {...this} />} />
           <Route path='/HistoricalTable' component={() => <HistoricalTable {...this} />} />
-    <Route path='/Portfolio' component={() => <PortFolio {...this} />} />
+          <Route path='/Portfolio' component={() => <PortFolio {...this} />} />
         </Switch>
       </div>
     );

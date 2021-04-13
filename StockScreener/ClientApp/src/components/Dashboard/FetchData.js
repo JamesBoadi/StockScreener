@@ -91,6 +91,7 @@ export class FetchData extends Component {
 
     this.initialiseAlertTable = this.initialiseAlertTable.bind(this);
     this.addFirstRows = this.addFirstRows.bind(this);
+    this.saveHistoricalData = this.saveHistoricalData.bind(this);
 
 
     this.state = {
@@ -405,7 +406,6 @@ export class FetchData extends Component {
       }
       );
 
-
     // Stocks to be displayed in the Notifications table
     alertTableStocks.push(json);
     let pointer = alertTableStocks.length - 1;
@@ -480,7 +480,7 @@ export class FetchData extends Component {
     if ((deleteId !== null || deleteId !== undefined))
       this.map.delete(deleteId);
     else
-        return;
+      return;
 
     this.setState({ maxNumberOfAlertTableRows: this.state.maxNumberOfAlertTableRows - 1 });
     this.setState({ alertTableStocks: alertTableStocks });
@@ -488,8 +488,9 @@ export class FetchData extends Component {
   }
 
   // Add to History Table
-  addToHistorical() {
-    let target = parseInt(this.state.clickedAlertTableRowID);
+  async addToHistorical() {
+    const target = parseInt(this.state.clickedAlertTableRowID);
+    const json = TableCache.get(target);
     console.log('target ' + target);
     let txt;
     if (isNaN(target) || (target === null || target === undefined)) {
@@ -504,10 +505,31 @@ export class FetchData extends Component {
       }
 
       if (txt === "Yes") {
-        // HistoryCalc.setUpdateHistoricalTable()
+       const res = await this.saveHistoricalData(json);
+        // window.alert(returned message)             window.alert('Maximum stocks for portfolio exceeded, limit: 200 ');
       }
-
     }
+  }
+
+
+  async saveHistoricalData(data)
+  {
+    await fetch('savehistoricaldata/'.concat(data))
+      .then(response => response.status)
+      .then(response => {
+        if (!response.ok) {
+          // 404 
+          return false;
+        }
+        else return true;
+      })
+      .catch(error => {
+          console.log("error " + error) // 404
+          return false;
+        }
+      );
+
+      return false;
   }
 
   triggerAnimation(param) {
@@ -639,7 +661,7 @@ export class FetchData extends Component {
 
           <Button onClick={this.addToHistorical}
             style={{ position: 'absolute', bottom: '20px', left: '40px', width: '90px' }}>
-            Add  <br /> to Portfolio</Button>
+            Add  <br /> to Historical</Button>
         </Box>
 
         {/* <SideBar isStreaming={() => { return this.state.isStreaming }}/>  */}

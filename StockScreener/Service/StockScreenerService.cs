@@ -10,6 +10,8 @@ namespace StockScreener
         // Establish Collection
         private readonly IMongoCollection<Notifications> _notifications;
 
+        private readonly IMongoCollection<Historical> _historicalData;
+
 
         public StockScreenerService(IStockScreenerDatabaseSettings settings)
         {
@@ -18,7 +20,12 @@ namespace StockScreener
 
             // Get Collection
             _notifications = database.GetCollection<Notifications>("Notifications");
+            _historicalData = database.GetCollection<Historical>("HistoricalData");
         }
+
+        // **************************************************
+        // Notifications
+        // **************************************************
 
         // Return all documents in a collection
         public List<Notifications> Get() =>
@@ -53,6 +60,31 @@ namespace StockScreener
         public void Remove(string id) =>
             _notifications.DeleteOne(notifications => notifications.Id.Equals(id));
 
+        // **************************************************
+
+        // **************************************************
+        // Historical
+        // **************************************************
+        public List<Historical> GetHistoricalData() =>
+            _historicalData.Find(historical => true).ToList();
+
+        public Historical Create(Historical historical)
+        {
+            // Insert document in collection
+            _historicalData.InsertOne(historical);
+            return historical;
+        }
+
+        public bool HistoricalIdExists(string id)
+        {
+            var query = _historicalData.Find<Historical>(historical => historical.Id.Equals(id)).Any();
+            return query;
+        }
+
+        public void RemoveHistoricalId(string id) =>
+           _historicalData.DeleteOne(historical => historical.Id.Equals(id));
+
+        // **************************************************
 
     }
 }

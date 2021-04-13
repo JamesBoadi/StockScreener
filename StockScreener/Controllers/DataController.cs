@@ -99,8 +99,6 @@ namespace StockScreener.Controllers
         }
 
 
-        private IMongoCollection<Notifications> _notifications;
-
         [Route("savenotifications/{query?}")]
         public HttpStatusCode saveNotifications(string query) // convert to json
         {
@@ -129,7 +127,7 @@ namespace StockScreener.Controllers
                 res = response.StatusCode;
             }
 
-            return HttpStatusCode.Ambiguous;
+            return res;
         }
 
         [Route("getallnotifications")]
@@ -197,6 +195,67 @@ namespace StockScreener.Controllers
             }
 
             return res;
+        }
+
+        [Route("savehistoricaldata/{id?}")]
+        public HttpStatusCode saveHistoricalData(string id) // convert to json
+        {
+            var response = new HttpResponseMessage();
+            HttpStatusCode res;
+            try
+            {
+                Historical historical = Historical.Deserialize(id);
+                string _id = JsonSerializer.Deserialize<int>(id).ToString();
+                bool idExists = _stockScreenerService.HistoricalIdExists(_id);
+
+                if (idExists)
+                {
+                    return HttpStatusCode.Ambiguous;
+                }
+
+                _stockScreenerService.Create(historical);
+
+                res = response.StatusCode;
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+
+                res = response.StatusCode;
+            }
+
+            return res;
+        }
+
+        [Route("gethistoricaldata")]
+        public string[] getHistoricalData(string id) // convert to json
+        {
+            string[] jsonArray;
+            List<Historical> list;
+            try
+            {
+                list = _stockScreenerService.GetHistoricalData();
+                jsonArray = new string[list.Count];
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+                return null;
+            }
+
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                jsonArray[i] = JsonSerializer.Serialize(list[i]);
+            }
+
+            return jsonArray;
         }
 
 

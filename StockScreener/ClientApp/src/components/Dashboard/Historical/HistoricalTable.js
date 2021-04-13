@@ -167,6 +167,8 @@ export class HistoricalTable extends Component {
             }
         }, 1000);
 
+        console.log(' -- HISTORICAL REMOUNT -- ' )
+
 
 
         // Window onload -> Initalise hashmap from database
@@ -193,6 +195,10 @@ export class HistoricalTable extends Component {
             this.updateTable(this.state.start);
             this.setState({ highlightTableRow: false });
         }
+        else if (HistoryCalc.getUpdateHistoricalTable()) {
+            this.addToHistoricalTable();
+            HistoryCalc.setUpdateHistoricalTable(false, null);
+        }
         else if (this.state.addToHistoricalTableBool) {
             this.newTable();
             this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
@@ -210,11 +216,7 @@ export class HistoricalTable extends Component {
             this.updateTable();
             this.setState({ editPortfolioTable: false });
         }
-        else if (HistoryCalc.getUpdateHistoricalTable()) {
-            this.addToHistoricalTable();
-
-            HistoryCalc.setUpdateHistoricalTable(false, null);
-        }
+       
 
         if (this.state.validInput) {
             this.setState({ validInput: false });
@@ -314,32 +316,25 @@ export class HistoricalTable extends Component {
     }
 
     // Add a Row to Portfolio table
-    async addToHistoricalTable() {
+    async addToHistoricalTable(target) {
         this.setState({ closeForm: false });
         this.setState({ editStockFormVisible: "hidden" });
-        const res = this.validateForm();
-
-        if (!res)
-            return;
-
+        
         var t = this.state.portfolioTableStack;
         var portfolioTableStocks = this.state.portfolioTableStocks;
-        let target = parseInt(HistoryCache.getTableID());
-
+        
         const exists = await this.keyExists(target);
         const maxRows = 45;
 
         if (exists) {
-            window.alert('Key already added to the table ');
             return;
         }
         else if (this.state.maxNumberOfAlertTableRows >= maxRows) {
-            window.alert('Maximum stocks for portfolio exceeded, limit: 200 ');
             return;
         }
-        /*  PortfolioCalc.setPortfolio(this.state.price, this.state.shares,
-              this.state.price * this.state.shares);*/
 
+        console.log('HISTORICAL CACHE code ' + HistoryCache.get(target).StockCode);
+        
         // Stocks to be displayed in the Portfolio table
         portfolioTableStocks.push(HistoryCache.get(target));
         let pointer = parseInt(portfolioTableStocks.length - 1);
