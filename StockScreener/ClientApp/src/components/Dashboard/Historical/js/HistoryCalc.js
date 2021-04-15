@@ -14,7 +14,7 @@ export default class HistoryCalc {
     static expenditure = 0;
     static currentPrice;
     static prevCloseSum;
-    static prevCloseArr = []; // fill to 200 (max)
+    static prevCloseArr = []; // fill to 200 (max) // Retrieve historical data from file
 
     static firstMACD = 0;
     static secondMACD = 0;
@@ -27,28 +27,32 @@ export default class HistoryCalc {
     static settings = new HashMap();
 
 
+    static signalMessage = "";
+    static signal = 0;
+    static firstMACD = 0;
+    static secondMACD = 0;
     static upperBand = 0;
     static middleBand = 0;
     static lowerBand = 0;
     static SMA = 0;
-    static signal = 0;
-    static volume = 0;
     static RSI = 0;
+    static volume = 0;
 
     static updateHistoricalTable = false;
     static id = null;
+
+
 
     // **************************************************
     // User Set Variables
     // **************************************************
     static bollingerBandsNo = 0;
     static deviations = 0;
-    static firstMovingAverageDays = 0; // For MACD
-    static secondMovingAverageDays = 0; // For MACD
+    static firstMovingAverageDays = 25; // For MACD
+    static secondMovingAverageDays = 200; // For MACD
     static smoothing = 0.2;
     static rsiWeight = 0;
     static volume = 250000;
-
 
     static setHistory(_currentPrice, _shares, _expenditure) {
         this.currentPrice = _currentPrice;
@@ -58,12 +62,10 @@ export default class HistoryCalc {
         // Add to database and map
     }
 
-
-
     // **************************************************
     // Get and Set Variables for updating table
     // **************************************************
-    
+
     static setUpdateHistoricalTable(bool, id) {
         this.updateHistoricalTable = bool;
         this.id = id;
@@ -80,7 +82,7 @@ export default class HistoryCalc {
     // **************************************************
 
 
-    // Initialised when the button is clicked
+    // Initialised when apply changes button is clicked
     static initialiseHashMap(
         tableID,
         bollingerBandsNo,
@@ -121,7 +123,6 @@ export default class HistoryCalc {
 
     // Updated periodically
     static updateDataHashMap() {
-
         for (let index = 0; index < this.idHashMap.count(); index++) {
             const tableID = this.idHashMap.get(index);
             this.updateVariables(tableID); // Update Variables 
@@ -137,6 +138,7 @@ export default class HistoryCalc {
         }
     }
 
+    // Set at the very beggining
     static updateSettingsHashMap(
         tableID,
         bollingerBandsNo,
@@ -186,7 +188,7 @@ export default class HistoryCalc {
     // Read previous closes from database
     static setPreviousCloses() {
         for (let index = 0; index < 200; index++) {
-            this.prevCloseArr[index] = 0;   // += (get(i))
+            this.prevCloseArr[index] = 1;   // += (get(i))
         }
     }
 
@@ -261,6 +263,18 @@ export default class HistoryCalc {
 
     static calculateSignal() {
         this.signal = this.firstMACD - this.secondMACD;
+    }
+
+
+    static calculateSignalMessage() {
+        if (this.relativeStrengthIndex >= 70)
+            this.signalMessage = "High momentum";
+        else if (this.relativeStrengthIndex >= 31 && this.relativeStrengthIndex <= 69) {
+            this.signalMessage = "Growth Stock";
+        }
+        else if (this.relativeStrengthIndex <= 30) {
+            this.signalMessage = "Low momentum";
+        }
     }
 
     // **************************************************

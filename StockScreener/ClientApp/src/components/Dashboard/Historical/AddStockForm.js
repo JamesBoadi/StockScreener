@@ -21,24 +21,34 @@ export class AddStockForm extends Component {
 
     }
 
-    onChange(checkedValues) {
-        console.log('checked = ', checkedValues);
+    performanceStocksSettings(checkedValues)
+    {
+        this.props.setPerformanceStocksSettings(checkedValues);
+    }
+
+    macdStocksSettings(checkedValues) {
+        this.props.setMacdStocksSettings(checkedValues);
+    }
+    
+    bollingerBandSettings(checkedValues) {
+        this.props.setBollingerBandSettings(checkedValues);
     }
 
     render() {
-        const plainOptions = [
+        const performanceOptions = [
             { label: 'High Momentum', value: 'High Momentum' },
             { label: 'Low Momentum', value: 'Low Momentum' },
             { label: 'Growth Stocks', value: 'Growth Stocks' },  // Link to volume
             { label: 'Shorted Stocks', value: 'Shorted Stocks' },
         ];
 
-        const options = [
+        const macdOptions = [
             { label: 'Golden Cross', value: 'Golden Cross' },
-            { label: 'Custom MACD', value: 'MACD' },
+            { label: 'MACD', value: 'MACD' },
+            // Add custom MACD checkbox
         ];
 
-        const optionsWithDisabled = [
+        const bandsOptions = [
             { label: 'UpperBand', value: 'UpperBand' },
             { label: 'MiddleBand', value: 'MiddleBand' },
             { label: 'LowerBand', value: 'LowerBand' }
@@ -52,18 +62,18 @@ export class AddStockForm extends Component {
                     <Form>
                         <div style={{ transform: "translateY(60px)" }}>
                             <p>Performance Stocks</p>
-                            <Checkbox.Group options={plainOptions} onChange={this.onChange} />
+                            <Checkbox.Group macdOptions={performanceOptions} onChange={this.performanceStocksSettings} />
                             <br />
                             <br />
                             <p>Moving Average Convergence/Divergence</p>
-                            <Checkbox.Group options={options} onChange={this.onChange} />
+                            <Checkbox.Group macdOptions={macdOptions} onChange={this.macdStocksSettings} />
 
                             <br />
                             <br />
                             <p>Bollinger Bands</p>
                             <Checkbox.Group
-                                options={optionsWithDisabled}
-                                onChange={this.onChange}
+                                macdOptions={bandsOptions}
+                                onChange={this.bollingerBandSettings}
                             />
                             <br />
                             <br />
@@ -78,7 +88,7 @@ export class AddStockForm extends Component {
                                 position: 'absolute', bottom: '4px', right: '20px',
                                 zIndex: '999'
                             }}
-                                onClick={this.props.addPortfolioTableRow}
+                                onClick={this.props.applyChanges}
                                 visibility={
                                     this.props.state.formIsVisible
                                 }

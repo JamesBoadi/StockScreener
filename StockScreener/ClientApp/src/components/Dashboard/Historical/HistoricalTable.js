@@ -40,7 +40,6 @@ import * as HashMap from 'hashmap';
 * Includes live information for that stock and also
 * includes live alerts and mathematical calculations
 */
-
 export class HistoricalTable extends Component {
     constructor(props) {
         super(props);
@@ -95,7 +94,39 @@ export class HistoricalTable extends Component {
         this.map = new HashMap();
         this.data = new HashMap();
 
+        // **************************************************
+        // History Calc Table
+        // **************************************************
+
+        this.HistoryCalcMap = new HashMap();
+        this.HistoryCalcBool = [];
+
+
+
+        this.applyChanges = this.applyChanges.bind(this);
+        this.setPerformanceStocksSettings = this.setPerformanceStocksSettings.bind(this);
+        this.setMacdStocksSettings = this.setMacdStocksSettings.bind(this);
+        this.setBollingerBandSettings = this.setBollingerBandSettings.bind(this);
+        this.updateHistoryCalc = this.updateHistoryCalc.bind(this);
+
+
+        // **************************************************
+
         this.state = {
+
+            // **************************************************
+            // History calc states
+            // **************************************************
+            // Check Box
+            performanceStocksSettings: [],
+            macdStocksSettings: [],
+            bollingerBandSettings: [],
+
+
+            updateHistoryCalc: false,
+
+
+            // **************************************************
             green: false,
             red: false,
             priceChangeUp: false,
@@ -152,7 +183,8 @@ export class HistoricalTable extends Component {
             portfolioTableStocks: [],
             portfolioTableStack: [],
             clickedPortfolioTableRowID: 0,
-            maxNumberOfPortfolioTableRows: 0
+            maxNumberOfPortfolioTableRows: 0,
+
 
         };
     }
@@ -197,7 +229,11 @@ export class HistoricalTable extends Component {
             this.updateTable();
             this.setState({ editPortfolioTable: false });
         }
-
+        // History Calc Update
+        else if (this.state.updateHistoryCalc) {
+            this.updateHistoryCalc()
+            this.setState({ updateHistoryCalc: false });
+        }
 
         if (this.state.validInput) {
             this.setState({ validInput: false });
@@ -210,7 +246,9 @@ export class HistoricalTable extends Component {
             return false;
         }
         else {
-            if (this.state.highlightTableRow !== nextState.highlightTableRow ||
+            if (
+                this.state.updateHistoryCalc !== nextState.updateHistoryCalc ||
+                this.state.highlightTableRow !== nextState.highlightTableRow ||
                 this.state.editPortfolioTable !== nextState.editPortfolioTable ||
                 this.state.closeForm !== nextState.closeForm ||
                 this.state.addToHistoricalTableBool !== nextProps.addToHistoricalTableBool
@@ -251,11 +289,15 @@ export class HistoricalTable extends Component {
         for (var i = 0; i < response.length; i++) {
             const item = JSON.parse(response[i]);
             const pointer = parseInt(item.Id);
+
+            // History Cache Calculations
             const json = HistoryCache.get(pointer);
             t.push(json);
             portfolioTableStocks.push(json);
             this.map.set(i, pointer);
         }
+
+        HistoryCalc.setPreviousCloses(); // Set Once Per day (Lagging 1 day)
 
         this.setState({ maxNumberOfPortfolioRows: this.state.maxNumberOfPortfolioTableRows + 1 });
         this.setState({ portfolioTableStack: t });
@@ -266,16 +308,138 @@ export class HistoricalTable extends Component {
     // **************************************************
 
     // **************************************************
-    // Form Functionality Methods
+    // History Calc 
+    // **************************************************
+
+    // Checked Options
+    //...................................................
+
+    setPerformanceStocksSettings(checked) {
+        this.setState({ performanceStocksSettings: checked });
+    }
+
+    setMacdStocksSettings(checked) {
+        this.setState({ macdStocksSettings: checked });
+    }
+
+    setBollingerBandSettings(checked) {
+        this.setState({ bollingerBandSettings: checked });
+    }
+
+    //....................................................
+
+    applyChanges() {
+        this.setState({ updateHistoryCalc: true });
+    }
+
+    updateHistoryCalc() {
+        // Initialise History Calculations
+        const id = this.state.stockRecordID;
+
+
+        /*
+        Index | Bool
+
+        array[0] = bollingerBandsNo
+        array[1] = deviations 
+        array[2] = firstMovingAverageDays 
+        array[3] = secondMovingAverageDays 
+        array[4] = smoothing 
+        array[5] = rsiWeight 
+        array[6] = volume 
+
+        */
+
+        // Checked options
+        const performanceStocksSettings = this.state.performanceStocksSettings;
+        for (let index = 0; index < performanceStocksSettings.length; index++) {
+            const element = performanceStocksSettings[index];
+            switch (element) {
+                case 'High Momentum':
+
+                    break;
+
+                case 'Low Momentum':
+
+                    break;
+
+                case 'Growth Stocks':
+
+                    break;
+                case 'Shorted Stocks':
+
+                    break;
+            }
+        }
+
+        // Checked options
+        const macdStocksSettings = this.state.macdStocksSettings;
+        for (let index = 0; index < macdStocksSettings.length; index++) {
+            const element = macdStocksSettings[index];
+            switch (element) {
+                case 'Golden Cross':
+
+                    break;
+
+                case 'MACD':
+
+                    break;
+            }
+        }
+
+        // Checked options
+        const bollingerBandSettings = this.state.bollingerBandSettings;
+        for (let index = 0; index < bollingerBandSettings.length; index++) {
+            const element = bollingerBandSettings[index];
+            switch (element) {
+                case 'UpperBand':
+
+                    break;
+
+                case 'MiddleBand':
+
+                    break;
+
+                case 'LowerBand':
+
+                    break;
+            }
+        }
+
+        // Set regardless of settings
+        HistoryCalc.initialiseHashMap(id, 2, 2, 25, 199, 0.2, 1, 250000);
+
+        // Save to database
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // **************************************************
+
+    // **************************************************
+    // Table Functionality Methods
     // **************************************************
 
     // Triggered and highlighted when a row is clicked
     select(e) {
         const portfolioTableId = parseInt(e.target.id);
-        //  console.log('portfolio ' + portfolioTableId);
+        // console.log('portfolio ' + portfolioTableId);
         this.setState({ stockRecordID: portfolioTableId });
         this.setState({ highlightTableRow: true });
-
     }
 
     // Validates the Form before adding a stock to the table 
@@ -399,7 +563,7 @@ export class HistoricalTable extends Component {
             if (parseInt(this.state.stockRecordID) == parseInt(pointer)) {
 
                 // Update maps
-                this.data.set(pointer, { price: this.state.price, shares: this.state.shares, date: this.state.date });
+
                 this.map.set(pointer, this.state.stockFormID);
 
                 new_portfolioTableStocks[pointer] = HistoryCache.get(this.state.stockFormID); // New information
@@ -805,13 +969,16 @@ export class HistoricalTable extends Component {
             style={{ zIndex: '999', position: 'absolute', left: '700px' }}>
             <thead>
                 <tr>
+                    <th>Signal <br /> Message </th>
+                    <th>Signal <br /> Line</th>
+                    <th>First <br /> MACD</th>
+                    <th>Second <br /> MACD</th>
                     <th>UpperBand</th>
                     <th>MiddleBand</th>
                     <th>LowerBand</th>
                     <th>SMA </th>
-                    <th>Signal</th>
-                    <th>Volume</th>
                     <th>RSI</th>
+                    <th>Volume</th>
                 </tr>
             </thead>
         </table>;
@@ -822,7 +989,7 @@ export class HistoricalTable extends Component {
 
 
                     {/* TOP NAVBAR */}
-                    <Box
+                    {/* <Box
                         min-width='12.25rem'
                         width='36rem'
                         height='22rem'
@@ -865,9 +1032,9 @@ export class HistoricalTable extends Component {
                             onClick={() => this.setEditFormVisibility("hidden")}>Close</p>
 
                         <EditStockForm {...this} />
-                    </Box>
+                    </Box>*/}
 
-                    {/* TOP NAVBAR */}
+                    {/* TOP NAVBAR 
                     <TopNavbar />
 
                     <div class="addStock" style={{ zIndex: '999', transform: 'translateX(20px)' }}>
@@ -879,7 +1046,7 @@ export class HistoricalTable extends Component {
 
                     <div class="removeStock" style={{ zIndex: '999' }}>
                         <Button onClick={() => this.removePortfolioTableRow()}>Remove</Button>
-                    </div>
+                    </div>*/}
 
                     {/* <Button class="addStock" style={{ position: 'absolute', top: '130px', left: '1030px' }}
                          onClick={() => this.setAddFormVisibility("visible")}>Add a Stock</Button>*/}
