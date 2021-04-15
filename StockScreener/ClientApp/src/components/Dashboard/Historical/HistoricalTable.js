@@ -29,11 +29,12 @@ import { TopNavbar } from '../TopNavbar.js';
 import { AddStockForm } from './AddStockForm';
 import { EditStockForm } from './EditStockForm';
 import { Search } from './Search';
+import { FilterTable } from './FilterTable';
 import HistoryCache from './js/HistoryCache';
 import HistoryCalc from './js/HistoryCalc';
 import PortfolioCalc from './js/HistoryCalc';
 import * as HashMap from 'hashmap';
-
+import * as cache from 'cache-base';
 
 /**
 * Historical Table that adds a stock to the table. 
@@ -41,6 +42,17 @@ import * as HashMap from 'hashmap';
 * includes live alerts and mathematical calculations
 */
 export class HistoricalTable extends Component {
+    static signalMessage = "";
+    static signal = 0;
+    static firstMACD = 0;
+    static secondMACD = 0;
+    static upperBand = 0;
+    static middleBand = 0;
+    static lowerBand = 0;
+    static SMA = 0;
+    static RSI = 0;
+    static Volume = 0;
+
     constructor(props) {
         super(props);
         this.searchDatabase = this.searchDatabase.bind(this);
@@ -102,13 +114,28 @@ export class HistoricalTable extends Component {
         this.HistoryCalcBool = [];
 
 
-
+        // Settings
         this.applyChanges = this.applyChanges.bind(this);
         this.setPerformanceStocksSettings = this.setPerformanceStocksSettings.bind(this);
         this.setMacdStocksSettings = this.setMacdStocksSettings.bind(this);
         this.setBollingerBandSettings = this.setBollingerBandSettings.bind(this);
         this.updateHistoryCalc = this.updateHistoryCalc.bind(this);
 
+        // Update Hash Map
+        this.initialiseHashMap = this.initialiseHashMap.bind(this);
+        this.updateDataHashMap = this.updateDataHashMap.bind(this);
+        this.updateSettingsHashMap = this.updateSettingsHashMap.bind(this);
+
+        // Update Table
+        this.updateFilterTable = this.updateFilterTable.bind(this);
+        this.addToFilterTable = this.addToFilterTable.bind(this);
+
+
+        this.filterCache = new cache(); // Set in database
+        this.idHashMap = new HashMap();
+        this.settings = new HashMap();
+
+        this.called = false;
 
         // **************************************************
 
@@ -121,12 +148,14 @@ export class HistoricalTable extends Component {
             performanceStocksSettings: [],
             macdStocksSettings: [],
             bollingerBandSettings: [],
-
-
             updateHistoryCalc: false,
+
+            filterTableStack: [],
+            filterTable: [],
 
 
             // **************************************************
+
             green: false,
             red: false,
             priceChangeUp: false,
@@ -184,8 +213,9 @@ export class HistoricalTable extends Component {
             portfolioTableStack: [],
             clickedPortfolioTableRowID: 0,
             maxNumberOfPortfolioTableRows: 0,
+            maxNumberOfPortfolioRows: 0,
 
-
+            updateFilterTable: false
         };
     }
 
@@ -194,20 +224,15 @@ export class HistoricalTable extends Component {
     };
 
     componentDidMount() {
-        // Add to database initialise
-        this.interval = setInterval(() => {
-            if (this.props.state.updateCache) {
-                clearInterval(this.interval);
-            }
-        }, 1000);
-
-        this.initialiseHistoricalTable();
-
-        console.log(' -- HISTORICAL REMOUNT -- ')
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.state.highlightTableRow) {
+        // Initialise Table
+        if (this.props.state.called && !this.called) {
+            this.initialiseHistoricalTable();
+            this.called = true;
+        }
+       else if (this.state.highlightTableRow) {
             this.newTable();
             this.updateTable(this.state.start);
             this.setState({ highlightTableRow: false });
@@ -242,26 +267,129 @@ export class HistoricalTable extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (!nextProps.state.updateCache) {
-            return false;
+        if (this.props.state.called !== nextProps.state.called)
+            return true;
+        else if(
+            this.state.updateFilterTable !== nextState.updateFilterTable ||
+            this.state.updateHistoryCalc !== nextState.updateHistoryCalc ||
+            this.state.highlightTableRow !== nextState.highlightTableRow ||
+            this.state.editPortfolioTable !== nextState.editPortfolioTable ||
+            this.state.closeForm !== nextState.closeForm ||
+            this.state.addToHistoricalTableBool !== nextProps.addToHistoricalTableBool
+            || this.state.updatePortfolioTableData !== nextState.updatePortfolioTableData ||
+            this.state.validInput || this.state.queryRes
+            || nextState.selectedRecordValue !== this.state.selectedRecordValue) {
+            return true;
         }
-        else {
-            if (
-                this.state.updateHistoryCalc !== nextState.updateHistoryCalc ||
-                this.state.highlightTableRow !== nextState.highlightTableRow ||
-                this.state.editPortfolioTable !== nextState.editPortfolioTable ||
-                this.state.closeForm !== nextState.closeForm ||
-                this.state.addToHistoricalTableBool !== nextProps.addToHistoricalTableBool
-                || this.state.updatePortfolioTableData !== nextState.updatePortfolioTableData ||
-                this.state.validInput || this.state.queryRes
-                || nextState.selectedRecordValue !== this.state.selectedRecordValue) {
-                // console.log('NEXT ')
 
-                return true;
-            }
-        }
         return false;
     }
+
+    // **************************************************
+    // Update Hash Map
+    // **************************************************
+
+    // Initialised when apply changes button is clicked
+    initialiseHashMap(
+        tableID,
+        bollingerBandsNo,
+        deviations,
+        firstMovingAverageDays,
+        secondMovingAverageDays,
+        smoothing,
+        rsiWeight,
+        Volume) {
+
+        // Hash map for displaying data in table
+        this.filterCache.set(
+            tableID.toString(),
+            {
+                signalMessage: "pain",
+                signal: "4",
+                firstMACD: "",
+                secondMACD: "",
+                upperBand: "", middleBand: "",
+                lowerBand: "", SMA: "",
+                RSI: "", Volume: "4"
+            }
+        );
+
+        //   console.log('id ' + this.filterCache.get(tableID).signalMessage);
+
+        // User settings (to be added)
+        this.settings.set(
+            tableID,
+            {
+                bollingerBandsNo: bollingerBandsNo, deviations: deviations,
+                firstMovingAverageDays: firstMovingAverageDays,
+                secondMovingAverageDays: secondMovingAverageDays,
+                smoothing: smoothing, rsiWeight: rsiWeight
+                , Volume: Volume
+            }
+        );
+
+    }
+
+    // Updated periodically
+    updateDataHashMap() {
+        for (let index = 0; index < this.idHashMap.count(); index++) {
+            const tableID = this.idHashMap.get(index);
+            // this.updateVariables(tableID); // Update Variables 
+
+            this.filterCache.set( // Perform Update
+                tableID,
+                {
+                    upperBand: this.upperBand, middleBand: this.middleBand,
+                    lowerBand: this.lowerBand, SMA: this.SMA, signal: this.signal,
+                    RSI: this.RSI
+                }
+            );
+        }
+    }
+
+    // Set at the very beggining
+    updateSettingsHashMap(
+        tableID,
+        bollingerBandsNo,
+        deviations,
+        firstMovingAverageDays,
+        secondMovingAverageDays,
+        smoothing,
+        rsiWeight,
+        Volume) {
+
+        if (this.settings.has(tableID)) {
+
+            this.settings.set(
+                tableID,
+                {
+                    bollingerBandsNo: bollingerBandsNo, deviations: deviations,
+                    firstMovingAverageDays: firstMovingAverageDays,
+                    secondMovingAverageDays: secondMovingAverageDays,
+                    smoothing: smoothing, rsiWeight: rsiWeight
+                    , Volume: Volume
+                }
+            );
+        }
+    }
+
+    /*static updateVariables(tableID) {
+        this.prevCloseSum(tableID);
+        this.setSMA();
+        this.caclualteStandardDeviation();
+
+        this.setUpperBands();
+        this.middleBand();
+        this.setLowerBands();
+
+        this.calculateFirstMACD(tableID);
+        this.calculateSecondMACD(tableID);
+
+        this.calculateSignal();
+        this.calculateRSI();
+    }*/
+
+    // **************************************************
 
     // **************************************************
     // Initialise Historical Data
@@ -297,9 +425,13 @@ export class HistoricalTable extends Component {
             this.map.set(i, pointer);
         }
 
-        HistoryCalc.setPreviousCloses(); // Set Once Per day (Lagging 1 day)
+        // Add filter rows to filter table
+        this.props.setUpdateFilterTable(true);
+        this.props.setMaxNumberOfPortfolioRows(response.length);
 
-        this.setState({ maxNumberOfPortfolioRows: this.state.maxNumberOfPortfolioTableRows + 1 });
+        // HistoryCalc.setPreviousCloses(); // Set Once Per day (Lagging 1 day)
+
+        this.setState({ maxNumberOfPortfolioRows: response.length });
         this.setState({ portfolioTableStack: t });
         this.setState({ portfolioTableStocks: portfolioTableStocks });
         this.setState({ addToHistoricalTableBool: true });
@@ -407,7 +539,7 @@ export class HistoricalTable extends Component {
         }
 
         // Set regardless of settings
-        HistoryCalc.initialiseHashMap(id, 2, 2, 25, 199, 0.2, 1, 250000);
+        this.initialiseHashMap(id, 2, 2, 25, 199, 0.2, 1, 250000);
 
         // Save to database
 
@@ -416,16 +548,53 @@ export class HistoricalTable extends Component {
     }
 
 
+    // Fill the whole table (called on component did mount)
+    addToFilterTable() {
+        var t = [];
+        let pointer;
+        let start = 0;
+        const end = this.state.maxNumberOfPortfolioRows;
 
+        for (pointer = start; pointer < end; pointer++) {
+            const item = this.filterCache.get(pointer.toString());
 
+            t.push(
+                <tbody key={pointer}>
+                    <tr>
+                        <td id={pointer}>{item.signalMessage}</td>
+                        <td id={pointer}>{item.signal}</td>
+                        <td id={pointer}>{item.firstMACD}</td>
+                        <td id={pointer}>{item.secondMACD}</td>
+                        <td id={pointer}>{item.upperBand}</td>
+                        <td id={pointer}>{item.middleBand}</td>
+                        <td id={pointer}>{item.lowerBand}</td>
+                        <td id={pointer}>{item.SMA}</td>
+                        <td id={pointer}>{item.RSI}</td>
+                        <td id={pointer}>{item.Volume}</td>
+                    </tr>
+                </tbody>
+            );
+        }
 
+        this.setState({ filterTableStack: t });
+        this.setState({ updateFilterTable: true });
+    }
 
-
-
-
-
-
-
+    // Update the historical table
+    updateFilterTable() {
+        let t =
+            <div class="filter">
+                <div>
+                    <table class="filterTable" aria-labelledby="tabelLabel">
+                        <thead></thead>
+                        {this.state.filterTableStack}
+                    </table>
+                </div>
+            </div>;
+        // console.log('UPDATE ');
+        this.setState({ filterTable: t });
+        this.setState({ updateFilterTable: true });
+    }
 
 
     // **************************************************
@@ -901,14 +1070,18 @@ export class HistoricalTable extends Component {
 
     // Update the table
     updateTable() {
-        let t = <div>
-            <table class="historicalTable" aria-labelledby="tabelLabel">
-                <thead></thead>
-                {this.state.portfolioTableStack}
-            </table>
-        </div>;
+        let t =
+            <div class="historical">
+                <div>
+                    <table class="historicalTable" aria-labelledby="tabelLabel">
+                        <thead></thead>
+                        {this.state.portfolioTableStack}
+                    </table>
+                </div>
+            </div>;
         // console.log('UPDATE ');
         this.setState({ portfolioTable: t });
+        this.setState({ updateFilterTable: true });
         this.forceUpdate();
     }
 
@@ -950,44 +1123,28 @@ export class HistoricalTable extends Component {
     // **************************************************
 
     render() {
-        let portfolioTableHeader = <table class="historicalTableHeader" aria-labelledby="tabelLabel"
-            style={{ zIndex: '999' }}>
-            <thead>
-                <tr>
-                    <th>Stock <br /> Name</th>
-                    <th>Stock <br /> Code</th>
-                    <th>Current <br /> Price</th>
-                    <th>Time </th>
-                    <th>Close <br />(Previous)</th>
-                    <th>Change</th>
-                    <th>ChangeP</th>
-                </tr>
-            </thead>
-        </table>;
+        let portfolioTableHeader =
 
-        let filterTableHeader = <table class="historicalTableHeader" aria-labelledby="tabelLabel"
-            style={{ zIndex: '999', position: 'absolute', left: '700px' }}>
-            <thead>
-                <tr>
-                    <th>Signal <br /> Message </th>
-                    <th>Signal <br /> Line</th>
-                    <th>First <br /> MACD</th>
-                    <th>Second <br /> MACD</th>
-                    <th>UpperBand</th>
-                    <th>MiddleBand</th>
-                    <th>LowerBand</th>
-                    <th>SMA </th>
-                    <th>RSI</th>
-                    <th>Volume</th>
-                </tr>
-            </thead>
-        </table>;
+            <table class="historicalTableHeader" aria-labelledby="tabelLabel"
+                style={{ zIndex: '999' }}>
+                <thead>
+                    <tr>
+                        <th>Stock <br /> Name</th>
+                        <th>Stock <br /> Code</th>
+                        <th>Current <br /> Price</th>
+                        <th>Time </th>
+                        <th>Close <br />(Previous)</th>
+                        <th>Change</th>
+                        <th>ChangeP</th>
+                    </tr>
+                </thead>
+            </table>
+
 
         return (
             <div>
+
                 <div class="historical">
-
-
                     {/* TOP NAVBAR */}
                     {/* <Box
                         min-width='12.25rem'
@@ -1061,13 +1218,14 @@ export class HistoricalTable extends Component {
                         boxShadow='sm'
                         textAlign='center'
                         height='45px'
-                        width='78rem'
+                        width='48rem'
                         rounded="lg"
                         margin='auto'
                         color='white'
+                        zIndex='999'
                     >
                         {portfolioTableHeader}
-                        {filterTableHeader}
+
 
                         <Box
                             style={{
@@ -1079,20 +1237,22 @@ export class HistoricalTable extends Component {
                             boxShadow='sm'
                             textAlign='center'
                             height='1110px'
-                            width='78rem'
+                            width='48rem'
                             rounded="lg"
                             margin='auto'
                             color='white'
+                            zIndex='999'
                         >
 
                             {this.state.portfolioTable}
 
                         </Box>
                     </Box>
-
-
-
                 </div>
+
+
+
+
             </div>
         );
     }

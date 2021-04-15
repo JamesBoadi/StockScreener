@@ -3,7 +3,10 @@ import * as HashMap from 'hashmap';
 * Calculations for Portfolio, includes a set of mathematical 
 * functions that query a database for saved informaion
 */
+
 export default class HistoryCalc {
+
+    /*
     static profitLoss = 0;
     static profitLossPercentage = 0;
     static standardDeviation = 0;
@@ -22,10 +25,9 @@ export default class HistoryCalc {
     static signal = 0; // For macd line
     static relativeStrengthIndex = 0;
 
-    static dataHashMap = new HashMap(); // Set in database
+
     static idHashMap = new HashMap();
     static settings = new HashMap();
-
 
     static signalMessage = "";
     static signal = 0;
@@ -36,7 +38,7 @@ export default class HistoryCalc {
     static lowerBand = 0;
     static SMA = 0;
     static RSI = 0;
-    static volume = 0;
+    static Volume = 0;
 
     static updateHistoricalTable = false;
     static id = null;
@@ -52,7 +54,7 @@ export default class HistoryCalc {
     static secondMovingAverageDays = 200; // For MACD
     static smoothing = 0.2;
     static rsiWeight = 0;
-    static volume = 250000;
+    static Volume = 250000;
 
     static setHistory(_currentPrice, _shares, _expenditure) {
         this.currentPrice = _currentPrice;
@@ -81,109 +83,14 @@ export default class HistoryCalc {
 
     // **************************************************
 
-
-    // Initialised when apply changes button is clicked
-    static initialiseHashMap(
-        tableID,
-        bollingerBandsNo,
-        deviations,
-        firstMovingAverageDays,
-        secondMovingAverageDays,
-        smoothing,
-        rsiWeight,
-        volume) {
-
-        if (!(this.settings.has(tableID) && this.dataHashMap.has(tableID))) {
-
-            // Add to database
-            let pointer = this.idHashMap.count();
-            this.idHashMap.set(pointer, tableID);
-
-            this.dataHashMap.set(
-                tableID,
-                {
-                    upperBand: null, middleBand: null,
-                    lowerBand: null, SMA: null, signal: null,
-                    RSI: null
-                }
-            );
-
-            this.settings.set(
-                tableID,
-                {
-                    bollingerBandsNo: bollingerBandsNo, deviations: deviations,
-                    firstMovingAverageDays: firstMovingAverageDays,
-                    secondMovingAverageDays: secondMovingAverageDays,
-                    smoothing: smoothing, rsiWeight: rsiWeight
-                    , volume: volume
-                }
-            );
-        }
+    static get() {
+        return dataHashMap;
+        //  return dataHashMap.get(id).signalMessage;
     }
 
-    // Updated periodically
-    static updateDataHashMap() {
-        for (let index = 0; index < this.idHashMap.count(); index++) {
-            const tableID = this.idHashMap.get(index);
-            this.updateVariables(tableID); // Update Variables 
 
-            this.dataHashMap.set( // Perform Update
-                tableID,
-                {
-                    upperBand: this.upperBand, middleBand: this.middleBand,
-                    lowerBand: this.lowerBand, SMA: this.SMA, signal: this.signal,
-                    RSI: this.RSI
-                }
-            );
-        }
-    }
 
-    // Set at the very beggining
-    static updateSettingsHashMap(
-        tableID,
-        bollingerBandsNo,
-        deviations,
-        firstMovingAverageDays,
-        secondMovingAverageDays,
-        smoothing,
-        rsiWeight,
-        volume) {
-
-        if (this.settings.has(tableID)) {
-
-            this.settings.set(
-                tableID,
-                {
-                    bollingerBandsNo: bollingerBandsNo, deviations: deviations,
-                    firstMovingAverageDays: firstMovingAverageDays,
-                    secondMovingAverageDays: secondMovingAverageDays,
-                    smoothing: smoothing, rsiWeight: rsiWeight
-                    , volume: volume
-                }
-            );
-        }
-    }
-
-    static get(tableID) {
-        return this.dataHashMap.get(tableID);
-    }
-
-    static updateVariables(tableID) {
-        this.prevCloseSum(tableID);
-        this.setSMA();
-        this.caclualteStandardDeviation();
-
-        this.setUpperBands();
-        this.middleBand();
-        this.setLowerBands();
-
-        this.calculateFirstMACD(tableID);
-        this.calculateSecondMACD(tableID);
-
-        this.calculateSignal();
-        this.calculateRSI();
-
-    }
+   
 
     // Read previous closes from database
     static setPreviousCloses() {
@@ -296,4 +203,5 @@ export default class HistoryCalc {
     // **************************************************
 
 
+}*/
 }

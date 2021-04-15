@@ -1,0 +1,20 @@
+CREATE table "Employee" (
+    "EmployeeID" NUMBER GENERATED ALWAYS AS IDENTITY,
+    "Lname" CHAR NOT NULL,
+    "Fname" CHAR NOT NULL,
+  "PositionID" NUMBER NOT NULL,
+  "Supervisor" NUMBER NULL,
+   "HireDate" DATE NOT NULL,
+   "Salary" NUMBER NOT NULL,
+   "Commission" NUMBER NULL,
+    constraint  "EMPLOYEE_PK" primary key ("EMPLOYEEID")
+)
+
+CREATE table "Dependent"
+(
+   "EmployeeID" NUMBER NOT NULL,
+   "DependentID" NUMBER GENERATED ALWAYS AS IDENTITY,
+   "DepDOB" DATE NOT NULL,
+   "Relation" CHAR NOT NULL,
+   constraint DEPENDENT_PK primary key ("EMPLOYEEID", "DEPENDENTID")
+);
