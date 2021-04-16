@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using StockScreener.Controllers;
 
 namespace StockScreener
 {
@@ -33,10 +34,9 @@ namespace StockScreener
 
         private static bool _cacheFull = false;
 
+        private static bool _sessionEnded = false;
 
-        DateTime malaysiaTime = DateTime.UtcNow;
-
-        const string easternZoneId = "Singapore Standard Time";
+        private readonly StockScreenerService _stockScreenerService;
 
         BackgroundServiceWorker serviceWorker = new BackgroundServiceWorker();
 
@@ -46,13 +46,44 @@ namespace StockScreener
         {
             _logger = logger;
             _stockHandler = stockHandler;
-            // Http Client // Do a manual call if cache not updated
+
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            // Http Client // Do a manual call if this fails
+            CancellationToken newToken;
             while (!cancellationToken.IsCancellationRequested)
             {
+                Time time = new Time();
+
+                // Time Check
+                if (!(time.ReturnTime().Hours == 9 && time.ReturnTime().Minutes >= 0 &&
+                time.ReturnTime().Minutes <= 5))
+                {
+                    // Save last data to database
+
+
+                    if (_sessionEnded == false)
+                    {
+                        await _stockHandler.Clients.All.lockStream(serviceWorker.API_REQUESTS, true);
+                        _ = serviceWorker.StopAsync(cancellationToken);
+
+                        _sessionEnded = true;
+                    }
+
+                }
+                else
+                {
+                    if (_sessionEnded)
+                        _sessionEnded = false;
+
+
+                    await _stockHandler.Clients.All.lockStream(serviceWorker.API_REQUESTS, false);
+                    newToken = new CancellationToken();
+                    _ = serviceWorker.StartAsync(newToken);
+                    Console.WriteLine("RESTART STREAM  ");
+                }
 
                 // Read Database
                 if (_init_called == false)
@@ -67,48 +98,60 @@ namespace StockScreener
                     _ = initialise_cache();
                     _init_work = !_init_work;
                     // Start the Service Worker
-                     _ = serviceWorker.StartAsync(cancellationToken);
-                }
-
-                // Start Background Service (test)
-             /*   if (ReturnTime().Hours == 9 && ReturnTime().Minutes >= 0
-                && ReturnTime().Minutes <= 5)
-                {
-                    if (serviceWorker._streamStarted)
-                    {
-                        _ = serviceWorker.StartAsync(cacheCancellationToken);
-                    }
-                }*/
-
-                // Cache requests between server and client
-                if (serviceWorker.API_REQUESTS <= serviceWorker.MAX_API_REQUESTS
-                && serviceWorker.API_REQUESTS != -1)
-                {
-                    await _stockHandler.Clients.All.lockStream(serviceWorker.API_REQUESTS);
-                }
-                else
-                {
-                  //  _ = serviceWorker.StopAsync(cacheCancellationToken);
+                    _ = serviceWorker.StartAsync(cancellationToken);
                 }
 
                 if (_cacheFull)
                 {
                     for (int key = 0; key < MAX; key++)
-                    { 
+                    {
                         String JSON = Cache.Get(key).Serialize();
-                        await _stockHandler.Clients.All.requestData(key,JSON );
+                        await _stockHandler.Clients.All.requestData(key, JSON);
                     }
                 }
+                /*
+                                // Cache requests between server and client
+                                if (serviceWorker.API_REQUESTS <= serviceWorker.MAX_API_REQUESTS
+                                && serviceWorker.API_REQUESTS != -1)
+                                {
+                                    await _stockHandler.Clients.All.lockStream(serviceWorker.API_REQUESTS);
+                                }
+                                else
+                                {
+                                    //  _ = serviceWorker.StopAsync(cacheCancellationToken);
+                                }
 
-                await Task.Delay(10000);
+                                /*   if (ReturnTime().Hours == 9 && ReturnTime().Minutes >= 0
+                                 && ReturnTime().Minutes <= 5)
+                                 {
+                                     if (serviceWorker._streamStarted)
+                                     {
+                                         _ = serviceWorker.StartAsync(cacheCancellationToken);
+                                     }
+                                 }*/
+
+                await Task.Delay(5000);
             }
         }
 
-        public TimeSpan ReturnTime()
+        public async Task saveEODdata(string data) // convert to json
         {
-            TimeZoneInfo easternZone = TimeZoneInfo.FindSystemTimeZoneById(easternZoneId);
-            return TimeZoneInfo.ConvertTime(malaysiaTime, easternZone).TimeOfDay;
+            await Task.Delay(100);
+            try
+            {
+                EndOfDayData eodData = EndOfDayData.Deserialize(data);
+                _stockScreenerService.Create(eodData);
+
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+            }
         }
+
 
         private async Task initialise_cache()
         {
@@ -129,7 +172,7 @@ namespace StockScreener
 
                 start += 20;
                 end += 20;
-                Console.WriteLine(start + " " + end);
+                //  Console.WriteLine(start + " " + end);
                 // await Task.Delay(delay, cancellationToken);
             }
 

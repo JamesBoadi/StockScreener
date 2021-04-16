@@ -25,10 +25,9 @@ namespace StockScreener
             await Clients.All.requestData(key, data);
         }
 
-
-        public async Task lockStream(int requests)
+        public async Task lockStream(int requests, bool sessionEnded)
         {
-            await Clients.All.lockStream(requests);
+            await Clients.All.lockStream(requests, sessionEnded);
         }
 
 

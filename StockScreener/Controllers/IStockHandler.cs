@@ -20,7 +20,7 @@ namespace StockScreener
 
         Task requestData(int key, string data);
 
-        Task lockStream(int request_Calls);
+        Task lockStream(int request_Calls, bool sessionEnded);
 
       //  Task requests(int requests);
 

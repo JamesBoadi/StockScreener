@@ -133,7 +133,8 @@ namespace StockScreener
         public Task StopAsync(CancellationToken stoppingToken)
         {
             //  _logger.LogInformation("Timed Hosted Service is stopping.");
-
+            Console.WriteLine("STOP STREAM CHOW  ");
+            
             _timer?.Change(Timeout.Infinite, 0);
 
             return Task.CompletedTask;

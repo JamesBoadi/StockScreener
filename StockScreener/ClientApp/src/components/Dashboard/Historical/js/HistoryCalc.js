@@ -1,12 +1,11 @@
 import * as HashMap from 'hashmap';
+import * as cache from 'cache-base';
+
 /**
-* Calculations for Portfolio, includes a set of mathematical 
+* A set of mathematical 
 * functions that query a database for saved informaion
 */
-
 export default class HistoryCalc {
-
-
     static profitLoss = 0;
     static profitLossPercentage = 0;
     static standardDeviation = 0;
@@ -21,6 +20,8 @@ export default class HistoryCalc {
     static signal = 0; // For macd line
     static relativeStrengthIndex = 0;
 
+    // Retrieve historical data from file
+    static previousCloses = new cache();
 
     static idHashMap = new HashMap();
     static settings = new HashMap();
@@ -36,8 +37,7 @@ export default class HistoryCalc {
     static RSI = 0;
     static Volume = 0;
 
-    // Retrieve historical data from file
-    static prevCloseArr = []; // fill to 200 (max) 
+
 
     // **************************************************
     // User Set Variables
@@ -56,13 +56,13 @@ export default class HistoryCalc {
 
     static getJSON() {
         const json = {
-            signalMessage: this.signalMessage,
-            signal: this.signal,
-            firstMACD: this.firstMACD,
-            secondMACD: this.secondMACD,
-            upperBand: this.upperBand, middleBand: this.middleBand,
-            lowerBand: this.lowerBand, SMA: this.SMA,
-            RSI: this.RSI, Volume: this.Volume
+            signalMessage: this.signalMessage.toString(),
+            signal: this.signal.toString(),
+            firstMACD: this.firstMACD.toString(),
+            secondMACD: this.secondMACD.toString(),
+            upperBand: this.upperBand.toString(), middleBand: this.middleBand.toString(),
+            lowerBand: this.lowerBand.toString(), SMA: this.SMA.toString(),
+            RSI: this.RSI.toString(), Volume: this.Volume.toString()
         }
         return json;
     }
@@ -87,19 +87,21 @@ export default class HistoryCalc {
     // **************************************************
 
     // Read previous closes from database
-    static setPreviousCloses() {
+    static setPreviousCloses(tableID) {
+        let prevCloseArr = [];
         for (let index = 0; index < 200; index++) {
-            this.prevCloseArr[index] = 1;   // += (get(i))
+            prevCloseArr[index] = 1;   // += (get(i))
         }
+
+        this.previousCloses.set(tableID.toString(), prevCloseArr);
     }
 
     // Previous close sum
     static setPreviousCloseSum(tableID) {
-        this.bollingerBandsNo = this.settings.get(tableID).bollingerBandsNo; // check
+        const prevCloseArr = this.previousCloses.get(tableID.toString());
 
-        this.prevCloseSum += 0; // += (get(i))
         for (let index = 0; index < this.bollingerBandsNo; index++) {
-            this.prevCloseSum += this.prevCloseArr[index]; // += (get(i))
+            this.prevCloseSum += prevCloseArr[index]; // += (get(i))
         }
     }
 
@@ -107,17 +109,17 @@ export default class HistoryCalc {
     // SMA and Standard Deviation
     // **************************************************
 
-
     // Calculate simple moving average
     static setSMA() {
         this.simpleMovingAverage = this.prevCloseSum / this.bollingerBandsNo; // += (get(i))
     }
 
     // Calculate standard deviation
-    static caclualteStandardDeviation() {
+    static caclualteStandardDeviation(tableID) {
+        const prevCloseArr = this.previousCloses.get(tableID.toString());
         let standardDeviation;
         for (let index = 0; index < this.bollingerBandsNo; index++) {
-            standardDeviation += Math.pow(this.prevCloseArr[index] - this.simpleMovingAverage, 2); // += (get(i))
+            standardDeviation += Math.pow(prevCloseArr[index] - this.simpleMovingAverage, 2); // += (get(i))
         }
 
         this.standardDeviation = Math.sqrt(standardDeviation / this.bollingerBandsNo);
@@ -131,7 +133,7 @@ export default class HistoryCalc {
         this.upperBand = this.simpleMovingAverage + (this.deviations * this.standardDeviation)
     }
 
-    static setSimpleBands() {
+    static setMiddleBands() {
         this.middleBand = this.simpleMovingAverage;
     }
 
@@ -145,35 +147,30 @@ export default class HistoryCalc {
     // MACD Functions
     // **************************************************
 
-    static calculateFirstMACD(firstMovingAverageDays) {
-        // this.firstMovingAverageDays = this.settings.get(tableID).firstMovingAverageDays; // check
-
+    static calculateFirstMACD(tableID) {
+        const prevCloseArr = this.previousCloses.get(tableID.toString());
         let firstMACD = 0;
-        this.firstMovingAverageDays = firstMovingAverageDays;
         for (let index = 0; index < this.firstMovingAverageDays; index++) {
-            firstMACD += this.prevCloseArr[index]; // += (get(i))
+            firstMACD += prevCloseArr[index]; // += (get(i))
         }
 
         this.firstMACD = firstMACD / this.firstMovingAverageDays;
     }
 
-    static calculateSecondMACD(secondMovingAverageDays) {
-        //   this.secondMovingAverageDays = this.settings.get(tableID).secondMovingAverageDays; // check
+    static calculateSecondMACD(tableID) {
+        const prevCloseArr = this.previousCloses.get(tableID.toString());
         let secondMACD = 0;
-        this.secondMovingAverageDays = secondMovingAverageDays;
         for (let index = 0; index < this.secondMovingAverageDays; index++) {
-            secondMACD += this.prevCloseArr[index]; // += (get(i))
+            secondMACD += prevCloseArr[index]; // += (get(i))
         }
 
         this.secondMACD = secondMACD / this.secondMovingAverageDays;
     }
 
     // Whether or not it crosses the boundary
-
     static calculateSignal() {
         this.signal = this.firstMACD - this.secondMACD;
     }
-
 
     static calculateSignalMessage() {
         if (this.relativeStrengthIndex >= 70)
@@ -187,17 +184,16 @@ export default class HistoryCalc {
     }
 
     // **************************************************
-
     // **************************************************
     // RSI Functions
     // **************************************************
     static calculateRSI(tableID) {
         // Quarters of the year
-        this.rsiWeight = this.settings.get(tableID).rsiWeight;
-        const q1 = ((this.prevCloseArr[149] - this.prevCloseArr[199]) / this.prevCloseArr[199] * 100) * this.rsiWeight;
-        const q2 = ((this.prevCloseArr[99] - this.prevCloseArr[149]) / this.prevCloseArr[149] * 100) * this.rsiWeight;
-        const q3 = ((this.prevCloseArr[49] - this.prevCloseArr[99]) / this.prevCloseArr[99] * 100) * this.rsiWeight;
-        const q4 = ((this.prevCloseArr[0] - this.prevCloseArr[49]) / this.prevCloseArr[49] * 100) * this.rsiWeight;
+        const prevCloseArr = this.previousCloses.get(tableID.toString());
+        const q1 = ((prevCloseArr[149] - prevCloseArr[199]) / prevCloseArr[199] * 100) * this.rsiWeight;
+        const q2 = ((prevCloseArr[99] - prevCloseArr[149]) / prevCloseArr[149] * 100) * this.rsiWeight;
+        const q3 = ((prevCloseArr[49] - prevCloseArr[99]) / prevCloseArr[99] * 100) * this.rsiWeight;
+        const q4 = ((prevCloseArr[0] - prevCloseArr[49]) / prevCloseArr[49] * 100) * this.rsiWeight;
 
         this.relativeStrengthIndex = (q1 + q2 + q3 + q4);
     }

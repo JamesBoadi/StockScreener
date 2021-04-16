@@ -10,8 +10,11 @@ namespace StockScreener
         // Establish Collection
         private readonly IMongoCollection<Notifications> _notifications;
 
-        private readonly IMongoCollection<Historical> _historicalData;
+        private readonly IMongoCollection<TempHistorical> _tempHistoricalData; //Temporary
 
+        private readonly IMongoCollection<Historical> _historicalData; // History saved End Of Day
+
+        private readonly IMongoCollection<EndOfDayData> _eodData; 
 
         public StockScreenerService(IStockScreenerDatabaseSettings settings)
         {
@@ -20,7 +23,9 @@ namespace StockScreener
 
             // Get Collection
             _notifications = database.GetCollection<Notifications>("Notifications");
+            _tempHistoricalData = database.GetCollection<TempHistorical>("TempHistoricalData");
             _historicalData = database.GetCollection<Historical>("HistoricalData");
+            _eodData = database.GetCollection<EndOfDayData>("EODdata");
         }
 
         // **************************************************
@@ -63,8 +68,33 @@ namespace StockScreener
         // **************************************************
 
         // **************************************************
+        // Temp Historical
+        // **************************************************
+        public List<TempHistorical> GetTempHistoricalData() =>
+            _tempHistoricalData.Find(historical => true).ToList();
+
+        public TempHistorical Create(TempHistorical historical)
+        {
+            // Insert document in collection
+            _tempHistoricalData.InsertOne(historical);
+            return historical;
+        }
+
+        public bool TempHistoricalIdExists(string id)
+        {
+            var query = _tempHistoricalData.Find<TempHistorical>(historical => historical.Id.Equals(id)).Any();
+            return query;
+        }
+
+        public void RemoveTempHistoricalId(string id) =>
+           _tempHistoricalData.DeleteOne(historical => historical.Id.Equals(id));
+
+        // **************************************************
+
+        // **************************************************
         // Historical
         // **************************************************
+
         public List<Historical> GetHistoricalData() =>
             _historicalData.Find(historical => true).ToList();
 
@@ -85,6 +115,26 @@ namespace StockScreener
            _historicalData.DeleteOne(historical => historical.Id.Equals(id));
 
         // **************************************************
+
+         // **************************************************
+        // EOD data
+        // **************************************************
+
+        public List<EndOfDayData> GetEODdata() =>
+            _eodData.Find(historical => true).ToList();
+
+        public EndOfDayData Create(EndOfDayData historical)
+        {
+            // Insert document in collection
+            _eodData.InsertOne(historical);
+            return historical;
+        }
+
+        public void ClearEODdata(string id) =>
+           _eodData.DeleteOne(historical => historical.Id.Equals(id));
+
+        // **************************************************
+
 
     }
 }

@@ -516,7 +516,7 @@ export class FetchData extends Component {
   }
 
   async saveHistoricalData(data) {
-    await fetch('savehistoricaldata/'.concat(data))
+    await fetch('savehistoricaldata/temp/'.concat(data))
       .then(response => response.status)
       .then(response => {
         if (!response.ok) {

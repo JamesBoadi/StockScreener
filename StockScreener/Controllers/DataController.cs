@@ -32,6 +32,7 @@ namespace StockScreener.Controllers
 
         private readonly StockScreenerService _stockScreenerService;
 
+
         /*
             add to app settings   
 
@@ -197,6 +198,69 @@ namespace StockScreener.Controllers
             return res;
         }
 
+        [Route("savehistoricaldata/temp/{id?}")]
+        public HttpStatusCode saveTempHistoricalData(string id) // convert to json
+        {
+            var response = new HttpResponseMessage();
+            HttpStatusCode res;
+            try
+            {
+                TempHistorical historical = TempHistorical.Deserialize(id);
+                bool idExists = _stockScreenerService.TempHistoricalIdExists(historical.Id);
+
+                if (idExists)
+                {
+                    return HttpStatusCode.Ambiguous;
+                }
+
+                _stockScreenerService.Create(historical);
+
+                res = response.StatusCode;
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+
+                res = response.StatusCode;
+            }
+
+            return res;
+        }
+
+        [Route("gethistoricaldata/temp")]
+        public string[] getTempHistoricalData() // convert to json
+        {
+            string[] jsonArray;
+            List<TempHistorical> list;
+            try
+            {
+
+                list = _stockScreenerService.GetTempHistoricalData();
+                jsonArray = new string[list.Count];
+                Console.WriteLine("Try " + list.Count);
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+                return null;
+            }
+
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                Console.WriteLine("Exception " + list[i].Id);
+                jsonArray[i] = JsonSerializer.Serialize(list[i]);
+            }
+
+            return jsonArray;
+        }
+
         [Route("savehistoricaldata/{id?}")]
         public HttpStatusCode saveHistoricalData(string id) // convert to json
         {
@@ -230,7 +294,7 @@ namespace StockScreener.Controllers
         }
 
         [Route("gethistoricaldata")]
-        public string[] getHistoricalData(string id) // convert to json
+        public string[] getHistoricalData() // convert to json
         {
             string[] jsonArray;
             List<Historical> list;
@@ -256,6 +320,41 @@ namespace StockScreener.Controllers
 
             return jsonArray;
         }
+
+
+
+        [Route("geteod/data")]
+        public string[] getEODdata() // convert to json
+        {
+            string[] jsonArray;
+            List<EndOfDayData> list;
+            try
+            {
+                list = _stockScreenerService.GetEODdata();
+                jsonArray = new string[list.Count];
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+                return null;
+            }
+
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                jsonArray[i] = JsonSerializer.Serialize(list[i]);
+            }
+
+            return jsonArray;
+        }
+
+
+
+
+
 
 
 

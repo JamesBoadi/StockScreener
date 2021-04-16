@@ -37,6 +37,8 @@ export class FilterTable extends Component {
     constructor(props) {
         super(props);
 
+        this.date = new Date();
+
         // **************************************************
         // Static Variables
         // **************************************************
@@ -62,7 +64,6 @@ export class FilterTable extends Component {
 
         // Update Hash Map
         this.initialiseHashMap = this.initialiseHashMap.bind(this);
-        this.updateData = this.updateData.bind(this);
         this.updateSettingsHashMap = this.updateSettingsHashMap.bind(this);
 
         // Update Table
@@ -75,8 +76,6 @@ export class FilterTable extends Component {
         this.updateVariables = this.updateVariables.bind(this);
 
         this.filterCache = new cache(); // Set in database
-        this.historyCalc = new cache(); 
-
 
         this.idHashMap = new HashMap();
         this.settings = new HashMap();
@@ -171,12 +170,26 @@ export class FilterTable extends Component {
     };
 
     componentDidMount() {
+        
         this.interval = setInterval(() => {
             if (this.props.state.updateCache) {
                 this.setState({ called: true })
                 clearInterval(this.interval);
             }
         }, 1000);
+      /* window.onload(() => {
+
+
+
+
+            this.updateData = setInterval(() => {
+                if (this.date.getHours() + 8 >= 9) {
+                   
+                    clearInterval(this.interval);
+                }
+            }, 60000);
+        }*/
+      
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -185,12 +198,11 @@ export class FilterTable extends Component {
             this.setFilterCache();
             
             this.setState({ updateFilterCache: false });
-         
-
         }
-        if (this.state.updateFilterTable) {
+        if (this.state.updateFilterTable || prevState.updateFilterTable) {
             this.addToFilterTable();
             this.updateFilterTable();
+       
             this.setState({ updateFilterTable: false });
         }
     }
@@ -218,9 +230,35 @@ export class FilterTable extends Component {
     }
 
     // **************************************************
-    // Update Filter Cache
+    // Initalise Cache
+    // **************************************************
+
+    // Initialised when the page is loaded
+    initialiseHashMap(
+        tableID) {
+
+        // Update Data
+        this.updateVariables(tableID);
+
+        // User settings (to be added)
+        /*    this.settings.set(
+                tableID,
+                {
+                    bollingerBandsNo: bollingerBandsNo, deviations: deviations,
+                    firstMovingAverageDays: firstMovingAverageDays,
+                    secondMovingAverageDays: secondMovingAverageDays,
+                    smoothing: smoothing, rsiWeight: rsiWeight
+                    , Volume: Volume
+                }
+            );*/
+    }
+
     // **************************************************
     
+    // **************************************************
+    // Update Filter Cache
+    // **************************************************
+
     setMaxNumberOfPortfolioRows(length) {
         this.setState({ maxNumberOfPortfolioRows: length });
     }
@@ -229,92 +267,58 @@ export class FilterTable extends Component {
         this.setState({ updateFilterCache: update });
     }
 
+    // Called Once
     setFilterCache() {
         let count;
         for (count = 0; count < this.state.maxNumberOfPortfolioRows; count++) {
             this.initialiseHashMap(count);
         }
+
+        console.log('  count  ' + this.state.maxNumberOfPortfolioRows)
+
         this.setState({ updateFilterTable: true });
     }
 
-    // Initialised when the page is loaded
-    initialiseHashMap(
-        tableID,
-        bollingerBandsNo,
-        deviations,
-        firstMovingAverageDays,
-        secondMovingAverageDays,
-        smoothing,
-        rsiWeight,
-        Volume) {
-
-        // Update Data
-
-
-        // Return Json
-        const json = HistoryCalc.getJSON();
-            
-        // Cache for displaying data
-        this.filterCache.set(tableID.toString(), json);
-
-        //   console.log('id ' + this.filterCache.get(tableID).signalMessage);
-
-        // User settings (to be added)
-        this.settings.set(
-            tableID,
-            {
-                bollingerBandsNo: bollingerBandsNo, deviations: deviations,
-                firstMovingAverageDays: firstMovingAverageDays,
-                secondMovingAverageDays: secondMovingAverageDays,
-                smoothing: smoothing, rsiWeight: rsiWeight
-                , Volume: Volume
-            }
-        );
-
-        HistoryCalc.setPreviousCloses();
-    }
-
-    // Updates the data in History Calc Cache
-    updateData() {
-        this.props.updateFilterCache(); 
-    }
 
     // Utility for setting cache
-    updateFilterCache(tableID, price)
-    {
+    updateFilterCache(tableID, json) {
         this.filterCache.set(
             tableID.toString(),
             {
-                signalMessage: price,
-                signal: "",
-                firstMACD: HistoryCalc.firstMACD,
-                secondMACD: HistoryCalc.secondMACD,
-                upperBand: "", middleBand: "",
-                lowerBand: "", SMA: "",
-                RSI: "", Volume: ""
+                signalMessage: json.signalMessage,
+                signal: json.signal,
+                firstMACD: json.firstMACD,
+                secondMACD: json.secondMACD,
+                upperBand: json.upperBand, middleBand: json.middleBand,
+                lowerBand: json.lowerBand, SMA: json.SMA,
+                RSI: json.RSI, Volume: json.Volume
             }
         );
     }
 
-    // Update variables (save to another cache which contains data)
-    updateVariables(firstMovingAverageDays, secondMovingAverageDays) {
-     /*   this.prevCloseSum(tableID);
-        this.setSMA();
-        this.caclualteStandardDeviation();
+    // Update variables and set 
+    updateVariables(tableID) {
+        HistoryCalc.setPreviousCloses(tableID); // Data in this function saved to database
+        HistoryCalc.setPreviousCloseSum(tableID);
 
-        this.setUpperBands();
-        this.middleBand();
-        this.setLowerBands();*/
+        HistoryCalc.setSMA();
+        HistoryCalc.caclualteStandardDeviation(tableID);
 
-        HistoryCalc.calculateFirstMACD(firstMovingAverageDays);
-        HistoryCalc.calculateSecondMACD(secondMovingAverageDays);
+        HistoryCalc.setUpperBands();
+        HistoryCalc.setMiddleBands();
+        HistoryCalc.setLowerBands();
 
-     /*   this.calculateSignal();
-        this.calculateRSI();*/
+        HistoryCalc.calculateFirstMACD(tableID);
+        HistoryCalc.calculateSecondMACD(tableID);
+
+        HistoryCalc.calculateRSI(tableID);
+        HistoryCalc.calculateSignal();
+        HistoryCalc.calculateSignalMessage();
+
+        // Set variables
+        const json = HistoryCalc.getJSON();
+        this.updateFilterCache(tableID, json);
     }
-
-
-
 
     // Set at the very beggining
     updateSettingsHashMap(
@@ -455,7 +459,7 @@ export class FilterTable extends Component {
 
         for (pointer = start; pointer < end; pointer++) {
             const item = this.filterCache.get(pointer.toString());
-
+            
             t.push(
                 <tbody key={pointer}>
                     <tr>
@@ -481,16 +485,19 @@ export class FilterTable extends Component {
     // Update the historical table
     updateFilterTable() {
         let t =
-            <div>
+            <div class="filter">
+                <div>
                 <table class="filterTable" aria-labelledby="tabelLabel">
                     <thead></thead>
                     {this.state.filterTableStack}
                 </table>
+                </div>
             </div>;
+
 
         this.setState({ filterTable: t });
         this.setState({ updateFilterTable: true });
-        //this.forceUpdate();
+        this.forceUpdate();
     }
 
 
@@ -516,7 +523,7 @@ export class FilterTable extends Component {
                         <th>Volume</th>
                     </tr>
                 </thead>
-            </table>;
+            </table>
 
 
         return (
@@ -543,7 +550,7 @@ export class FilterTable extends Component {
                             style={{
                                 position: 'absolute',
                                 overflowY: 'auto',
-                                left: '0px',
+
                                 top: '45px'
                             }}
                             overflowX='hidden'
@@ -556,10 +563,8 @@ export class FilterTable extends Component {
                             color='white'
                             zIndex='999'
                         >
-
-                         
-
                         </Box>
+                     
                         {this.state.filterTable}
                     </Box>
                 </div>

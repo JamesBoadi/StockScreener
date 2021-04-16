@@ -122,7 +122,6 @@ export class HistoricalTable extends Component {
         this.updateHistoryCalc = this.updateHistoryCalc.bind(this);
 
         // Update Hash Map
-        this.initialiseHashMap = this.initialiseHashMap.bind(this);
         this.updateFilterCache = this.updateFilterCache.bind(this);
         this.updateSettingsHashMap = this.updateSettingsHashMap.bind(this);
 
@@ -133,7 +132,7 @@ export class HistoricalTable extends Component {
 
         this.filterCache = new cache(); // Set in database
         this.idHashMap = new HashMap();
-        
+
         this.settings = new HashMap();
         this.called = false;
 
@@ -224,9 +223,9 @@ export class HistoricalTable extends Component {
     };
 
     componentDidMount() {
-   /*     this.interval = setInterval(() => {
-           this.updateFilterCache();
-        }, 20000);*/
+        /*     this.interval = setInterval(() => {
+                this.updateFilterCache();
+             }, 20000);*/
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -287,19 +286,72 @@ export class HistoricalTable extends Component {
 
         return false;
     }
+    // **************************************************
+    // Initialise Historical Data
+    // **************************************************
 
-    // Updated periodically
+    // Initialise alert rows from database
+    async initialiseHistoricalTable() {
+      
+        // Add dial to change dates
+    
+        // Read temp from database
+        await fetch('gethistoricaldata/temp')
+            .then(response => response.json())
+            .then(response =>
+                this.addFirstRows(response)
+            )
+            .catch(error => {
+                console.log("error " + error) // 404
+                return;
+            }
+            );
+    }
+
+    addFirstRows(response) {
+        var t = [];
+        var portfolioTableStocks = this.state.portfolioTableStocks;
+
+        for (var i = 0; i < response.length; i++) {
+            const item = JSON.parse(response[i]);
+            const pointer = parseInt(item.Id);
+
+            console.log(item.Id);
+            // History Cache Calculations
+            const json = HistoryCache.get(pointer);
+            t.push(json);
+            portfolioTableStocks.push(json);
+            this.map.set(i, pointer);
+        }
+
+        // Add filter rows to filter table
+
+        this.props.setMaxNumberOfPortfolioRows(response.length);
+        this.props.setUpdateFilterCache(true);
+        // HistoryCalc.setPreviousCloses(); // Set Once Per day (Lagging 1 day)
+        
+        this.setState({ maxNumberOfPortfolioRows: response.length });
+        this.setState({ portfolioTableStack: t });
+        this.setState({ portfolioTableStocks: portfolioTableStocks });
+        this.setState({ addToHistoricalTableBool: true });
+    }
+
+    // **************************************************
+
+    // **************************************************
+    // Base Function for updating Filter Table Data
+    // **************************************************
+
+    // Base Function for updating the Filter Table Data
     updateFilterCache() {
         for (let index = 0; index < this.state.maxNumberOfPortfolioRows; index++) {
             //  const tableID = this.idHashMap.get(index);
             // this.updateVariables(tableID); // Update Variables 
-            const stockID = this.map.get(index);
-            const price = HistoryCache.get(stockID);
-
-            this.props.updateVariables(10, 25, price);
-            const json = HistoryCalc.getJSON();
-            this.props.updateFilterCache(index, json);
-            
+            // const stockID = this.map.get(index);
+            // const price = HistoryCache.get(stockID);
+            this.props.updateVariables(index);
+            setTimeout(100);
+    
         }
 
         this.props.setUpdateFilterCache(true);
@@ -349,53 +401,7 @@ export class HistoricalTable extends Component {
 
     // **************************************************
 
-    // **************************************************
-    // Initialise Historical Data
-    // **************************************************
-
-    // Initialise alert rows from database
-    async initialiseHistoricalTable() {
-        // Read notifications from database
-        await fetch('gethistoricaldata')
-            .then(response => response.json())
-            .then(response =>
-                this.addFirstRows(response)
-            )
-            .catch(error => {
-                console.log("error " + error) // 404
-                return;
-            }
-            );
-    }
-
-    addFirstRows(response) {
-        var t = [];
-        var portfolioTableStocks = this.state.portfolioTableStocks;
-
-        for (var i = 0; i < response.length; i++) {
-            const item = JSON.parse(response[i]);
-            const pointer = parseInt(item.Id);
-
-            // History Cache Calculations
-            const json = HistoryCache.get(pointer);
-            t.push(json);
-            portfolioTableStocks.push(json);
-            this.map.set(i, pointer);
-        }
-
-        // Add filter rows to filter table
-
-        this.props.setMaxNumberOfPortfolioRows(response.length);
-        this.props.setUpdateFilterCache(true);
-        // HistoryCalc.setPreviousCloses(); // Set Once Per day (Lagging 1 day)
-
-        this.setState({ maxNumberOfPortfolioRows: response.length });
-        this.setState({ portfolioTableStack: t });
-        this.setState({ portfolioTableStocks: portfolioTableStocks });
-        this.setState({ addToHistoricalTableBool: true });
-    }
-
-    // **************************************************
+    
 
     // **************************************************
     // History Calc 
@@ -495,14 +501,6 @@ export class HistoricalTable extends Component {
                     break;
             }
         }
-
-        // Set regardless of settings
-        this.initialiseHashMap(id, 2, 2, 25, 199, 0.2, 1, 250000);
-
-        // Save to database
-
-
-
     }
 
     // Fill the whole table (called on component did mount)

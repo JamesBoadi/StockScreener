@@ -84,9 +84,11 @@ export class DataFeed extends Component {
             .start()
             .then(() => {
                 console.log('Successfully connected');
-                DataFeed.hubConnection.on('lockStream', function (request_Calls) {
+                DataFeed.hubConnection.on('lockStream', (request_Calls, sessionEnded) => {
                     // Add Timeout
                     this.request_Calls = request_Calls;
+
+                    console.log('session ENDED' + sessionEnded) 
                 })
                 DataFeed.hubConnection.on('requestData', (key, data) => {
                     let item = JSON.parse(data);
