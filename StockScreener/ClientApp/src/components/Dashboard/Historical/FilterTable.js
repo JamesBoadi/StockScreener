@@ -36,7 +36,7 @@ export class FilterTable extends Component {
 
     constructor(props) {
         super(props);
-        
+
         // **************************************************
         // Static Variables
         // **************************************************
@@ -53,7 +53,6 @@ export class FilterTable extends Component {
         this.HistoryCalcMap = new HashMap();
         this.HistoryCalcBool = [];
 
-
         // Settings
         this.applyChanges = this.applyChanges.bind(this);
         this.setPerformanceStocksSettings = this.setPerformanceStocksSettings.bind(this);
@@ -63,16 +62,22 @@ export class FilterTable extends Component {
 
         // Update Hash Map
         this.initialiseHashMap = this.initialiseHashMap.bind(this);
-        this.updateDataHashMap = this.updateDataHashMap.bind(this);
+        this.updateData = this.updateData.bind(this);
         this.updateSettingsHashMap = this.updateSettingsHashMap.bind(this);
 
         // Update Table
         this.updateFilterTable = this.updateFilterTable.bind(this);
         this.addToFilterTable = this.addToFilterTable.bind(this);
-        this.setUpdateFilterTable = this.setUpdateFilterTable.bind(this);
+        this.setUpdateFilterCache = this.setUpdateFilterCache.bind(this);
         this.setMaxNumberOfPortfolioRows = this.setMaxNumberOfPortfolioRows.bind(this);
+        this.setFilterCache = this.setFilterCache.bind(this);
+        this.updateFilterCache = this.updateFilterCache.bind(this);
+        this.updateVariables = this.updateVariables.bind(this);
 
         this.filterCache = new cache(); // Set in database
+        this.historyCalc = new cache(); 
+
+
         this.idHashMap = new HashMap();
         this.settings = new HashMap();
         this.called = false;
@@ -156,7 +161,7 @@ export class FilterTable extends Component {
             maxNumberOfPortfolioRows: 0,
 
             updateFilterTable: false,
-
+            updateFilterCache: false,
             called: false
         };
     }
@@ -176,10 +181,16 @@ export class FilterTable extends Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
 
+        if (this.state.updateFilterCache) {
+            this.setFilterCache();
+            
+            this.setState({ updateFilterCache: false });
+         
+
+        }
         if (this.state.updateFilterTable) {
             this.addToFilterTable();
             this.updateFilterTable();
-            console.log('update dawg ' + this.state.updateFilterTable)
             this.setState({ updateFilterTable: false });
         }
     }
@@ -190,6 +201,7 @@ export class FilterTable extends Component {
         }
         else {
             if (
+                this.state.updateFilterCache !== nextState.updateFilterCache ||
                 this.state.updateFilterTable !== nextState.updateFilterTable ||
                 this.state.updateHistoryCalc !== nextState.updateHistoryCalc ||
                 this.state.highlightTableRow !== nextState.highlightTableRow ||
@@ -206,10 +218,26 @@ export class FilterTable extends Component {
     }
 
     // **************************************************
-    // Update Hash Map
+    // Update Filter Cache
     // **************************************************
+    
+    setMaxNumberOfPortfolioRows(length) {
+        this.setState({ maxNumberOfPortfolioRows: length });
+    }
 
-    // Initialised when apply changes button is clicked
+    setUpdateFilterCache(update) {
+        this.setState({ updateFilterCache: update });
+    }
+
+    setFilterCache() {
+        let count;
+        for (count = 0; count < this.state.maxNumberOfPortfolioRows; count++) {
+            this.initialiseHashMap(count);
+        }
+        this.setState({ updateFilterTable: true });
+    }
+
+    // Initialised when the page is loaded
     initialiseHashMap(
         tableID,
         bollingerBandsNo,
@@ -220,20 +248,73 @@ export class FilterTable extends Component {
         rsiWeight,
         Volume) {
 
-        this.props.initialiseHashMap(tableID,
-            bollingerBandsNo,
-            deviations,
-            firstMovingAverageDays,
-            secondMovingAverageDays,
-            smoothing,
-            rsiWeight,
-            Volume);
+        // Update Data
+
+
+        // Return Json
+        const json = HistoryCalc.getJSON();
+            
+        // Cache for displaying data
+        this.filterCache.set(tableID.toString(), json);
+
+        //   console.log('id ' + this.filterCache.get(tableID).signalMessage);
+
+        // User settings (to be added)
+        this.settings.set(
+            tableID,
+            {
+                bollingerBandsNo: bollingerBandsNo, deviations: deviations,
+                firstMovingAverageDays: firstMovingAverageDays,
+                secondMovingAverageDays: secondMovingAverageDays,
+                smoothing: smoothing, rsiWeight: rsiWeight
+                , Volume: Volume
+            }
+        );
+
+        HistoryCalc.setPreviousCloses();
     }
 
-    // Updated periodically
-    updateDataHashMap() {
-        this.props.updateDataHashMap();
+    // Updates the data in History Calc Cache
+    updateData() {
+        this.props.updateFilterCache(); 
     }
+
+    // Utility for setting cache
+    updateFilterCache(tableID, price)
+    {
+        this.filterCache.set(
+            tableID.toString(),
+            {
+                signalMessage: price,
+                signal: "",
+                firstMACD: HistoryCalc.firstMACD,
+                secondMACD: HistoryCalc.secondMACD,
+                upperBand: "", middleBand: "",
+                lowerBand: "", SMA: "",
+                RSI: "", Volume: ""
+            }
+        );
+    }
+
+    // Update variables (save to another cache which contains data)
+    updateVariables(firstMovingAverageDays, secondMovingAverageDays) {
+     /*   this.prevCloseSum(tableID);
+        this.setSMA();
+        this.caclualteStandardDeviation();
+
+        this.setUpperBands();
+        this.middleBand();
+        this.setLowerBands();*/
+
+        HistoryCalc.calculateFirstMACD(firstMovingAverageDays);
+        HistoryCalc.calculateSecondMACD(secondMovingAverageDays);
+
+     /*   this.calculateSignal();
+        this.calculateRSI();*/
+    }
+
+
+
 
     // Set at the very beggining
     updateSettingsHashMap(
@@ -255,22 +336,6 @@ export class FilterTable extends Component {
             rsiWeight,
             Volume);
     }
-
-    /*static updateVariables(tableID) {
-        this.prevCloseSum(tableID);
-        this.setSMA();
-        this.caclualteStandardDeviation();
-
-        this.setUpperBands();
-        this.middleBand();
-        this.setLowerBands();
-
-        this.calculateFirstMACD(tableID);
-        this.calculateSecondMACD(tableID);
-
-        this.calculateSignal();
-        this.calculateRSI();
-    }*/
 
     // **************************************************
 
@@ -381,27 +446,12 @@ export class FilterTable extends Component {
 
     }
 
-    setMaxNumberOfPortfolioRows(length) {
-        this.setState({ maxNumberOfPortfolioRows: length });
-    }
-
-    setUpdateFilterTable(update) {
-
-        this.setState({ updateFilterTable: update });
-    }
-
-
     // Fill the whole table (called on component did mount)
     addToFilterTable() {
         var t = [];
         let pointer;
         let start = 0;
         const end = this.state.maxNumberOfPortfolioRows;
-
-        let count;
-        for (count = start; count < end; count++) {
-            this.initialiseHashMap(count, 2, 2, 25, 50, 0.2, 1, 250000);
-        }
 
         for (pointer = start; pointer < end; pointer++) {
             const item = this.filterCache.get(pointer.toString());
@@ -431,17 +481,16 @@ export class FilterTable extends Component {
     // Update the historical table
     updateFilterTable() {
         let t =
-            <div class="filter">
-                <div>
-                    <table class="filterTable" aria-labelledby="tabelLabel">
-                        <thead></thead>
-                        {this.state.filterTableStack}
-                    </table>
-                </div>
+            <div>
+                <table class="filterTable" aria-labelledby="tabelLabel">
+                    <thead></thead>
+                    {this.state.filterTableStack}
+                </table>
             </div>;
-        // console.log('UPDATE ');
+
         this.setState({ filterTable: t });
         this.setState({ updateFilterTable: true });
+        //this.forceUpdate();
     }
 
 
@@ -467,12 +516,11 @@ export class FilterTable extends Component {
                         <th>Volume</th>
                     </tr>
                 </thead>
-            </table>
+            </table>;
 
 
         return (
             <div>
-
 
                 <div class="filter">
                     {/* PORTFOLIO TABLE */}
@@ -487,14 +535,15 @@ export class FilterTable extends Component {
                         rounded="lg"
                         margin='auto'
                         color='white'
+                        zIndex='999'
                     >
                         {filterTableHeader}
-
 
                         <Box
                             style={{
                                 position: 'absolute',
                                 overflowY: 'auto',
+                                left: '0px',
                                 top: '45px'
                             }}
                             overflowX='hidden'
@@ -505,11 +554,13 @@ export class FilterTable extends Component {
                             rounded="lg"
                             margin='auto'
                             color='white'
+                            zIndex='999'
                         >
 
-                            {this.state.filterTable}
+                         
 
                         </Box>
+                        {this.state.filterTable}
                     </Box>
                 </div>
 

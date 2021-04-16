@@ -123,7 +123,7 @@ export class HistoricalTable extends Component {
 
         // Update Hash Map
         this.initialiseHashMap = this.initialiseHashMap.bind(this);
-        this.updateDataHashMap = this.updateDataHashMap.bind(this);
+        this.updateFilterCache = this.updateFilterCache.bind(this);
         this.updateSettingsHashMap = this.updateSettingsHashMap.bind(this);
 
         // Update Table
@@ -133,8 +133,8 @@ export class HistoricalTable extends Component {
 
         this.filterCache = new cache(); // Set in database
         this.idHashMap = new HashMap();
+        
         this.settings = new HashMap();
-
         this.called = false;
 
         // **************************************************
@@ -224,6 +224,9 @@ export class HistoricalTable extends Component {
     };
 
     componentDidMount() {
+   /*     this.interval = setInterval(() => {
+           this.updateFilterCache();
+        }, 20000);*/
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -232,7 +235,7 @@ export class HistoricalTable extends Component {
             this.initialiseHistoricalTable();
             this.called = true;
         }
-       else if (this.state.highlightTableRow) {
+        else if (this.state.highlightTableRow) {
             this.newTable();
             this.updateTable(this.state.start);
             this.setState({ highlightTableRow: false });
@@ -269,7 +272,7 @@ export class HistoricalTable extends Component {
     shouldComponentUpdate(nextProps, nextState) {
         if (this.props.state.called !== nextProps.state.called)
             return true;
-        else if(
+        else if (
             this.state.updateFilterTable !== nextState.updateFilterTable ||
             this.state.updateHistoryCalc !== nextState.updateHistoryCalc ||
             this.state.highlightTableRow !== nextState.highlightTableRow ||
@@ -285,66 +288,21 @@ export class HistoricalTable extends Component {
         return false;
     }
 
-    // **************************************************
-    // Update Hash Map
-    // **************************************************
-
-    // Initialised when apply changes button is clicked
-    initialiseHashMap(
-        tableID,
-        bollingerBandsNo,
-        deviations,
-        firstMovingAverageDays,
-        secondMovingAverageDays,
-        smoothing,
-        rsiWeight,
-        Volume) {
-
-        // Hash map for displaying data in table
-        this.filterCache.set(
-            tableID.toString(),
-            {
-                signalMessage: "pain",
-                signal: "4",
-                firstMACD: "",
-                secondMACD: "",
-                upperBand: "", middleBand: "",
-                lowerBand: "", SMA: "",
-                RSI: "", Volume: "4"
-            }
-        );
-
-        //   console.log('id ' + this.filterCache.get(tableID).signalMessage);
-
-        // User settings (to be added)
-        this.settings.set(
-            tableID,
-            {
-                bollingerBandsNo: bollingerBandsNo, deviations: deviations,
-                firstMovingAverageDays: firstMovingAverageDays,
-                secondMovingAverageDays: secondMovingAverageDays,
-                smoothing: smoothing, rsiWeight: rsiWeight
-                , Volume: Volume
-            }
-        );
-
-    }
-
     // Updated periodically
-    updateDataHashMap() {
-        for (let index = 0; index < this.idHashMap.count(); index++) {
-            const tableID = this.idHashMap.get(index);
+    updateFilterCache() {
+        for (let index = 0; index < this.state.maxNumberOfPortfolioRows; index++) {
+            //  const tableID = this.idHashMap.get(index);
             // this.updateVariables(tableID); // Update Variables 
+            const stockID = this.map.get(index);
+            const price = HistoryCache.get(stockID);
 
-            this.filterCache.set( // Perform Update
-                tableID,
-                {
-                    upperBand: this.upperBand, middleBand: this.middleBand,
-                    lowerBand: this.lowerBand, SMA: this.SMA, signal: this.signal,
-                    RSI: this.RSI
-                }
-            );
+            this.props.updateVariables(10, 25, price);
+            const json = HistoryCalc.getJSON();
+            this.props.updateFilterCache(index, json);
+            
         }
+
+        this.props.setUpdateFilterCache(true);
     }
 
     // Set at the very beggining
@@ -426,9 +384,9 @@ export class HistoricalTable extends Component {
         }
 
         // Add filter rows to filter table
-        this.props.setUpdateFilterTable(true);
-        this.props.setMaxNumberOfPortfolioRows(response.length);
 
+        this.props.setMaxNumberOfPortfolioRows(response.length);
+        this.props.setUpdateFilterCache(true);
         // HistoryCalc.setPreviousCloses(); // Set Once Per day (Lagging 1 day)
 
         this.setState({ maxNumberOfPortfolioRows: response.length });
@@ -546,7 +504,6 @@ export class HistoricalTable extends Component {
 
 
     }
-
 
     // Fill the whole table (called on component did mount)
     addToFilterTable() {

@@ -6,22 +6,18 @@ import * as HashMap from 'hashmap';
 
 export default class HistoryCalc {
 
-    /*
+
     static profitLoss = 0;
     static profitLossPercentage = 0;
     static standardDeviation = 0;
     static simpleMovingAverage = 0;
-
     static day = 0; // Set by database reset by 5
     static shares;
     static expenditure = 0;
     static currentPrice;
     static prevCloseSum;
-    static prevCloseArr = []; // fill to 200 (max) // Retrieve historical data from file
-
     static firstMACD = 0;
     static secondMACD = 0;
-
     static signal = 0; // For macd line
     static relativeStrengthIndex = 0;
 
@@ -40,33 +36,36 @@ export default class HistoryCalc {
     static RSI = 0;
     static Volume = 0;
 
-    static updateHistoricalTable = false;
-    static id = null;
-
-
+    // Retrieve historical data from file
+    static prevCloseArr = []; // fill to 200 (max) 
 
     // **************************************************
     // User Set Variables
     // **************************************************
-    static bollingerBandsNo = 0;
-    static deviations = 0;
+    static bollingerBandsNo = 2;
+    static deviations = 2;
     static firstMovingAverageDays = 25; // For MACD
-    static secondMovingAverageDays = 200; // For MACD
+    static secondMovingAverageDays = 50; // For MACD
     static smoothing = 0.2;
-    static rsiWeight = 0;
+    static rsiWeight = 1;
     static Volume = 250000;
-
-    static setHistory(_currentPrice, _shares, _expenditure) {
-        this.currentPrice = _currentPrice;
-        this.shares = _shares;
-        this.expenditure = _expenditure;
-
-        // Add to database and map
-    }
 
     // **************************************************
     // Get and Set Variables for updating table
     // **************************************************
+
+    static getJSON() {
+        const json = {
+            signalMessage: this.signalMessage,
+            signal: this.signal,
+            firstMACD: this.firstMACD,
+            secondMACD: this.secondMACD,
+            upperBand: this.upperBand, middleBand: this.middleBand,
+            lowerBand: this.lowerBand, SMA: this.SMA,
+            RSI: this.RSI, Volume: this.Volume
+        }
+        return json;
+    }
 
     static setUpdateHistoricalTable(bool, id) {
         this.updateHistoricalTable = bool;
@@ -83,14 +82,9 @@ export default class HistoryCalc {
 
     // **************************************************
 
-    static get() {
-        return dataHashMap;
-        //  return dataHashMap.get(id).signalMessage;
-    }
-
-
-
-   
+    // **************************************************
+    // Previous Closes
+    // **************************************************
 
     // Read previous closes from database
     static setPreviousCloses() {
@@ -108,6 +102,11 @@ export default class HistoryCalc {
             this.prevCloseSum += this.prevCloseArr[index]; // += (get(i))
         }
     }
+
+    // **************************************************
+    // SMA and Standard Deviation
+    // **************************************************
+
 
     // Calculate simple moving average
     static setSMA() {
@@ -146,9 +145,11 @@ export default class HistoryCalc {
     // MACD Functions
     // **************************************************
 
-    static calculateFirstMACD(tableID) {
-        this.firstMovingAverageDays = this.settings.get(tableID).firstMovingAverageDays; // check
+    static calculateFirstMACD(firstMovingAverageDays) {
+        // this.firstMovingAverageDays = this.settings.get(tableID).firstMovingAverageDays; // check
+
         let firstMACD = 0;
+        this.firstMovingAverageDays = firstMovingAverageDays;
         for (let index = 0; index < this.firstMovingAverageDays; index++) {
             firstMACD += this.prevCloseArr[index]; // += (get(i))
         }
@@ -156,9 +157,10 @@ export default class HistoryCalc {
         this.firstMACD = firstMACD / this.firstMovingAverageDays;
     }
 
-    static calculateSecondMACD(tableID) {
-        this.secondMovingAverageDays = this.settings.get(tableID).secondMovingAverageDays; // check
+    static calculateSecondMACD(secondMovingAverageDays) {
+        //   this.secondMovingAverageDays = this.settings.get(tableID).secondMovingAverageDays; // check
         let secondMACD = 0;
+        this.secondMovingAverageDays = secondMovingAverageDays;
         for (let index = 0; index < this.secondMovingAverageDays; index++) {
             secondMACD += this.prevCloseArr[index]; // += (get(i))
         }
@@ -203,5 +205,5 @@ export default class HistoryCalc {
     // **************************************************
 
 
-}*/
+
 }
