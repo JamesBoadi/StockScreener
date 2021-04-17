@@ -136,6 +136,7 @@ export default class TableCache {
             //  console.log("Bullish Stocks 1 " + item.CurrentPrice);
             // Filter Stocks
 
+            // > 0 Bullish or Bearish
             if (item.ChangeArray[0] > 0) {
                 ++pointer;
                 let key = pointer.toString();
@@ -180,7 +181,6 @@ export default class TableCache {
         /* console.log("SIZE " + size);
          console.log("MAX " + this.max);
          console.log("ENDMOD " + this.endMod);*/
-
         this.priceDetection = true;
         this.update_hideStocks = true;
     }
@@ -197,11 +197,11 @@ export default class TableCache {
             //  console.log("Bullish Stocks 1 " + item.CurrentPrice);
             // Filter Stocks
 
+             // > 0 Bullish or Bearish
             if (item.ChangeArray[0] < 0) {
                 ++pointer;
                 let key = pointer.toString();
                 this.cacheOp_.set(key, item);
-
                 size++;
             }
         }

@@ -149,12 +149,10 @@ export class StockTableTwo extends React.Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         const scroll = this.scrollBy();
         if (this.props.state.updateCache) {
-                
-            /*   else if (this.updateTableData === false)
-            return false; */
             console.log('SJ ' + this.props.state.updateCache);
             this.setState({ cache: TableCache.cache() }); // Cannot access value immediately
 
+            // Update table data (fix)
             if (this.updateTableData === false) {
                 console.log('props ' + this.props.state.updateCache
                 + '   ' + this.updateTableData);

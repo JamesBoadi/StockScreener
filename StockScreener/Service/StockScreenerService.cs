@@ -14,11 +14,13 @@ namespace StockScreener
 
         private readonly IMongoCollection<Historical> _historicalData; // History saved End Of Day
 
-        private readonly IMongoCollection<EndOfDayData> _eodData; 
+        private readonly IMongoCollection<EndOfDayData> _eodData;
 
         public StockScreenerService(IStockScreenerDatabaseSettings settings)
         {
-            var client = new MongoClient("mongodb+srv://dbJames:mn9BfsBg3peDI88L@cluster0.w2zx6.mongodb.net/StockScreenerDb?retryWrites=true&w=majority");
+            var client = new MongoClient("mongodb+srv://dbJames:mn9BfsBg3peDI88L@cluster0.w2zx6.mongodb.net/StockScreenerDb?socketTimeoutMS=360000&"
+            + "retryWrites=true&w=majority");
+
             var database = client.GetDatabase("StockScreenerDb");
 
             // Get Collection
@@ -116,15 +118,30 @@ namespace StockScreener
 
         // **************************************************
 
-         // **************************************************
+        // **************************************************
         // EOD data
         // **************************************************
 
         public List<EndOfDayData> GetEODdata() =>
             _eodData.Find(historical => true).ToList();
 
+        public bool EODIdExists(string id)
+        {
+            var query = _eodData.Find<EndOfDayData>(historical => historical.Id.Equals(id)).Any();
+            return query;
+        }
+
+        public EndOfDayData Update(string id, EndOfDayData historical)
+        {
+            var query = _eodData.FindOneAndReplace<EndOfDayData>(historical => historical.Id.Equals(id), historical);
+            return query;
+        }
+
+        
+
         public EndOfDayData Create(EndOfDayData historical)
         {
+
             // Insert document in collection
             _eodData.InsertOne(historical);
             return historical;

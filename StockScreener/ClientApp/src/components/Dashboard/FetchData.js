@@ -159,6 +159,9 @@ export class FetchData extends Component {
   }
 
   componentDidMount = () => {
+    
+
+
     const connectionEstablished = localStorage.getItem('_connectionEstablished');
     this.intervalID = setInterval(() => {
       if (connectionEstablished && TableCache.getFill()) {
@@ -206,7 +209,6 @@ export class FetchData extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-
     if (this.state.lock !== nextState.lock
       || this.updateStockInfo ||
       this.state.addAlertTableRowBool !== nextState.addAlertTableRowBool

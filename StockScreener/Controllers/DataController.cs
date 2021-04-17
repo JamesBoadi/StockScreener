@@ -321,8 +321,6 @@ namespace StockScreener.Controllers
             return jsonArray;
         }
 
-
-
         [Route("geteod/data")]
         public string[] getEODdata() // convert to json
         {

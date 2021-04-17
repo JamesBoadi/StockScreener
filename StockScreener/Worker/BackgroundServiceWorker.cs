@@ -69,7 +69,7 @@ namespace StockScreener
             int length = Stocks.StocksCode.Value.Length;
             try
             {
-                if (API_REQUESTS == MAX_API_REQUESTS)
+               /* if (API_REQUESTS == MAX_API_REQUESTS)
                 {
                     API_REQUESTS = -1;
                     _streamStarted = false;
@@ -83,7 +83,7 @@ namespace StockScreener
                     {
                         API_REQUESTS = 0;
                     }
-                }
+                }*/
 
                 /*  TimeSpan time = ReturnTime();
                   int count = -1;

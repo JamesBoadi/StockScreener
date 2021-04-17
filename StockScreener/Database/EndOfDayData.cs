@@ -1,9 +1,11 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace StockScreener
 {
+    
     public class EndOfDayData
     {
         [BsonId]
@@ -20,7 +22,7 @@ namespace StockScreener
         public double Low { get; set; }
         public double Change { get; set; }
         public double ChangeP { get; set; }
-        public double Volume { get; set; }
+        public double Volume { get; set; }       
         public int[] ChangeArray { get; set; }       
         public int Signal { get; set; }
 

@@ -42,11 +42,12 @@ namespace StockScreener
 
         CancellationToken cacheCancellationToken;
 
-        public Worker(ILogger<Worker> logger, IHubContext<StockHandler, IStockHandler> stockHandler)
+        public Worker(StockScreenerService service, ILogger<Worker> logger,
+        IHubContext<StockHandler, IStockHandler> stockHandler)
         {
             _logger = logger;
+            _stockScreenerService = service;
             _stockHandler = stockHandler;
-
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -55,80 +56,72 @@ namespace StockScreener
             CancellationToken newToken;
             while (!cancellationToken.IsCancellationRequested)
             {
-                Time time = new Time();
 
-                // Time Check
-                if (!(time.ReturnTime().Hours == 9 && time.ReturnTime().Minutes >= 0 &&
-                time.ReturnTime().Minutes <= 5))
-                {
-                    // Save last data to database
-
-
-                    if (_sessionEnded == false)
-                    {
-                        await _stockHandler.Clients.All.lockStream(serviceWorker.API_REQUESTS, true);
-                        _ = serviceWorker.StopAsync(cancellationToken);
-
-                        _sessionEnded = true;
-                    }
-
-                }
-                else
-                {
-                    if (_sessionEnded)
-                        _sessionEnded = false;
-
-
-                    await _stockHandler.Clients.All.lockStream(serviceWorker.API_REQUESTS, false);
-                    newToken = new CancellationToken();
-                    _ = serviceWorker.StartAsync(newToken);
-                    Console.WriteLine("RESTART STREAM  ");
-                }
+                // Put on a seperate thread
 
                 // Read Database
                 if (_init_called == false)
                 {
-                    Stocks.stocks.init();
+                    Stocks.stocks.init(); // Change to singleton
+                    _ = initialise_cache();
                     _init_called = !_init_called;
                 }
 
-                // Initialise writer and cancellation tokens
-                if (_init_work == false)
-                {
-                    _ = initialise_cache();
-                    _init_work = !_init_work;
-                    // Start the Service Worker
-                    _ = serviceWorker.StartAsync(cancellationToken);
-                }
+                Time time = new Time();
 
-                if (_cacheFull)
+                // Time Check
+             /*   if (time.ReturnTime().Hours >= 17 && time.ReturnTime().Hours <= 8)
                 {
-                    for (int key = 0; key < MAX; key++)
+                    if (_cacheFull)
                     {
-                        String JSON = Cache.Get(key).Serialize();
-                        await _stockHandler.Clients.All.requestData(key, JSON);
+                        if (_sessionEnded == false ) // && getState sessionEnded=true
+                        {
+                            // Save last data to database
+                            for (int key = 0; key < MAX; key++)
+                            {
+                                String JSON = Cache.Get(key).Serialize();
+                                _ = saveEODdata(JSON);
+                            }
+
+                            // Indicate lock stream
+                            await _stockHandler.Clients.All.lockStream(serviceWorker.API_REQUESTS, true);
+
+                            // Stop the stream
+                            _ = serviceWorker.StopAsync(cancellationToken);
+
+                            newToken = new CancellationToken();
+                            cancellationToken = newToken;
+
+                            Console.WriteLine("STOP STREAM  ");
+
+                            _sessionEnded = true;
+                            _init_work = false;
+                        }
                     }
                 }
-                /*
-                                // Cache requests between server and client
-                                if (serviceWorker.API_REQUESTS <= serviceWorker.MAX_API_REQUESTS
-                                && serviceWorker.API_REQUESTS != -1)
-                                {
-                                    await _stockHandler.Clients.All.lockStream(serviceWorker.API_REQUESTS);
-                                }
-                                else
-                                {
-                                    //  _ = serviceWorker.StopAsync(cacheCancellationToken);
-                                }
+                else
+                {*/
+                    if (_sessionEnded)
+                        _sessionEnded = false;
 
-                                /*   if (ReturnTime().Hours == 9 && ReturnTime().Minutes >= 0
-                                 && ReturnTime().Minutes <= 5)
-                                 {
-                                     if (serviceWorker._streamStarted)
-                                     {
-                                         _ = serviceWorker.StartAsync(cacheCancellationToken);
-                                     }
-                                 }*/
+                    if (_init_work == false)
+                    {
+                        // Start the Service Worker
+                        await _stockHandler.Clients.All.lockStream(serviceWorker.API_REQUESTS, false);
+                        _ = serviceWorker.StartAsync(cancellationToken);
+                        Console.WriteLine("START STREAM");
+                        _init_work = !_init_work;
+                    }
+
+                    if (_cacheFull)
+                    {
+                        for (int key = 0; key < MAX; key++)
+                        {
+                            String JSON = Cache.Get(key).Serialize();
+                            await _stockHandler.Clients.All.requestData(key, JSON);
+                        }
+                    }
+              //  }
 
                 await Task.Delay(5000);
             }
@@ -140,25 +133,28 @@ namespace StockScreener
             try
             {
                 EndOfDayData eodData = EndOfDayData.Deserialize(data);
-                _stockScreenerService.Create(eodData);
+                bool idExists = _stockScreenerService.EODIdExists(eodData.Id);
 
+                if (idExists)
+                    _stockScreenerService.ClearEODdata(eodData.Id);
+                
+                _stockScreenerService.Create(eodData);
+                        
             }
             catch (Exception ex)
             {
-                if (ex is System.ArgumentNullException)
+                if (ex is System.ArgumentNullException || ex is System.TimeoutException)
                     Console.WriteLine("Exception " + ex);
 
                 Console.WriteLine("Exception " + ex);
             }
         }
 
-
         private async Task initialise_cache()
         {
             int start = 0;
             int end = 19;
 
-            await Task.Delay(100);
 
             for (int pointer = 0; pointer <= Stocks.stocks.MAX_CALLS; pointer++)
             {
@@ -177,10 +173,30 @@ namespace StockScreener
             }
 
             _cacheFull = true; // Cache is populated
-
-            Console.WriteLine("Finished ");
+            await Task.Delay(1000);
         }
 
+
+        /*
+                        // Cache requests between server and client
+                        if (serviceWorker.API_REQUESTS <= serviceWorker.MAX_API_REQUESTS
+                        && serviceWorker.API_REQUESTS != -1)
+                        {
+                            await _stockHandler.Clients.All.lockStream(serviceWorker.API_REQUESTS);
+                        }
+                        else
+                        {
+                            //  _ = serviceWorker.StopAsync(cacheCancellationToken);
+                        }
+
+                        /*   if (ReturnTime().Hours == 9 && ReturnTime().Minutes >= 0
+                         && ReturnTime().Minutes <= 5)
+                         {
+                             if (serviceWorker._streamStarted)
+                             {
+                                 _ = serviceWorker.StartAsync(cacheCancellationToken);
+                             }
+                         }*/
 
 
 

@@ -6,7 +6,6 @@ import NotificationsCache from './DashboardOne/js/NotificationsCache.js';
 import AlertCache from './DashboardOne/js/AlertCache.js';
 import * as signalR from '@aspnet/signalr';
 
-
 export class DataFeed extends Component {
     static hubConnection = new signalR.HubConnectionBuilder()
         .withUrl('https://localhost:44362/stockfeed')
@@ -31,7 +30,6 @@ export class DataFeed extends Component {
             called: true,
         };
     }
-
 
     componentDidMount() {
         console.log('START THE FEED!')
@@ -69,12 +67,35 @@ export class DataFeed extends Component {
         });
     }
 
+    async eodData() {
+        // Fill Cache with EOD data
+        await fetch('geteod/data')
+            .then(response => response.json())
+            .then(response => {
+                for (var key = 0; key < response.length; key++) {
+                    const item = JSON.parse(response[key]);
+                    PortfolioCache.set(key, item);
+                    HistoryCache.set(key, item);
+
+                    // Dashboard One
+                    TableCache.set(key, item);
+                    AlertCache.set(key, item);
+                    NotificationsCache.set(key, item);
+                }
+            })
+            .catch(error => {
+                console.log("error " + error) // 404
+                return;
+            }
+            );
+    }
+
     /**
      * Starts the data feed and subscribes to a method on
      * the server which will retrieve the data. All Caches will
      * be populated through this method, if there is a faliure
      * the caches will be populated with the last successfully
-     * fetched data.
+     * fetched data, or EOD data when the session ends.
      */
     async startDataFeed() {
         var count = 0;
@@ -88,10 +109,21 @@ export class DataFeed extends Component {
                     // Add Timeout
                     this.request_Calls = request_Calls;
 
-                    console.log('session ENDED' + sessionEnded) 
+                    const exists = localStorage.getItem('sessionEnded')
+                    if (exists === null || exists === undefined) {
+                        localStorage.setItem('sessionEnded', sessionEnded);
+                    }
+                    else if (exists !== sessionEnded) {
+                        localStorage.removeItem('sessionEnded');
+                        localStorage.setItem('sessionEnded', sessionEnded)
+                    }
+
+                    this.eodData(); // EOD data
+
+                    console.log('session ENDED' + sessionEnded)
                 })
                 DataFeed.hubConnection.on('requestData', (key, data) => {
-                    let item = JSON.parse(data);
+                    const item = JSON.parse(data);
                     PortfolioCache.set(key, item);
                     HistoryCache.set(key, item);
 
@@ -101,15 +133,15 @@ export class DataFeed extends Component {
                     NotificationsCache.set(key, item);
 
                     if (!this.state.updateCache)
-                        this.setState({ updateCache: false});
-                    
+                        this.setState({ updateCache: false });
+
                     if (count < 897) {
                         count += 1;
                     }
                     else {
                         count = 0;
                         console.log("Ok")
-                     //   PortfolioCache.updateDataCallback(); // Updates data in portfolioo
+                        //   PortfolioCache.updateDataCallback(); // Updates data in portfolioo
                         TableCache.setFill(true);
                         this.setState({ updateCache: true });
                         this.connected = true;
@@ -118,6 +150,7 @@ export class DataFeed extends Component {
             }) // Bind to constructor
             .catch(err => {
                 console.log('Error while establishing hubConnection :( ')
+                this.eodData();
                 this.connected = false;
             }); // Redirect to 404 page
 
