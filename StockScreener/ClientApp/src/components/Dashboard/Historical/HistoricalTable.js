@@ -128,10 +128,16 @@ export class HistoricalTable extends Component {
         // Update Table
         this.updateFilterTable = this.updateFilterTable.bind(this);
         this.addToFilterTable = this.addToFilterTable.bind(this);
+        this.loadHistory = this.loadHistory.bind(this);
+        this.displayHistory = this.displayHistory.bind(this);
+        this._getDate = this._getDate.bind(this);
+        this.setHistory = this.setHistory.bind(this);
+        this.getDisplay = this.getDisplay.bind(this);
 
 
         this.filterCache = new cache(); // Set in database
         this.idHashMap = new HashMap();
+
 
         this.settings = new HashMap();
         this.called = false;
@@ -144,14 +150,13 @@ export class HistoricalTable extends Component {
             // History calc states
             // **************************************************
             // Check Box
+
             performanceStocksSettings: [],
             macdStocksSettings: [],
             bollingerBandSettings: [],
             updateHistoryCalc: false,
-
             filterTableStack: [],
             filterTable: [],
-
 
             // **************************************************
 
@@ -213,8 +218,12 @@ export class HistoricalTable extends Component {
             clickedPortfolioTableRowID: 0,
             maxNumberOfPortfolioTableRows: 0,
             maxNumberOfPortfolioRows: 0,
+            updateFilterTable: false,
 
-            updateFilterTable: false
+            text: "",
+            displayText: "",
+            dateString: "",
+            updateHistory: false
         };
     }
 
@@ -234,6 +243,8 @@ export class HistoricalTable extends Component {
             this.initialiseHistoricalTable();
             this.called = true;
         }
+        // Update history
+
         else if (this.state.highlightTableRow) {
             this.newTable();
             this.updateTable(this.state.start);
@@ -272,6 +283,7 @@ export class HistoricalTable extends Component {
         if (this.props.state.called !== nextProps.state.called)
             return true;
         else if (
+            this.state.updateHistory !== nextState.updateHistory ||
             this.state.updateFilterTable !== nextState.updateFilterTable ||
             this.state.updateHistoryCalc !== nextState.updateHistoryCalc ||
             this.state.highlightTableRow !== nextState.highlightTableRow ||
@@ -282,8 +294,8 @@ export class HistoricalTable extends Component {
             this.state.validInput || this.state.queryRes
             || nextState.selectedRecordValue !== this.state.selectedRecordValue) {
             return true;
-        }
 
+        }
         return false;
     }
     // **************************************************
@@ -292,9 +304,6 @@ export class HistoricalTable extends Component {
 
     // Initialise alert rows from database
     async initialiseHistoricalTable() {
-      
-        // Add dial to change dates
-    
         // Read temp from database
         await fetch('gethistoricaldata/temp')
             .then(response => response.json())
@@ -308,33 +317,77 @@ export class HistoricalTable extends Component {
             );
     }
 
-    addFirstRows(response) {
-        var t = [];
-        var portfolioTableStocks = this.state.portfolioTableStocks;
+    async addFirstRows(response) {
+        var portfolioTableStocks = [];
+        //console.log('exists ' + response.length);
 
         for (var i = 0; i < response.length; i++) {
+            console.log('RESPONSE LENGTH ' + response.length);
             const item = JSON.parse(response[i]);
             const pointer = parseInt(item.Id);
 
-            console.log(item.Id);
             // History Cache Calculations
             const json = HistoryCache.get(pointer);
-            t.push(json);
             portfolioTableStocks.push(json);
             this.map.set(i, pointer);
         }
 
         // Add filter rows to filter table
-
         this.props.setMaxNumberOfPortfolioRows(response.length);
         this.props.setUpdateFilterCache(true);
         // HistoryCalc.setPreviousCloses(); // Set Once Per day (Lagging 1 day)
-        
+
+        this.setState({ displayText: "Displaying stocks for Date: " + this.state.dateString});
         this.setState({ maxNumberOfPortfolioRows: response.length });
-        this.setState({ portfolioTableStack: t });
         this.setState({ portfolioTableStocks: portfolioTableStocks });
         this.setState({ addToHistoricalTableBool: true });
     }
+
+
+    setHistory(response) {
+        const dateString = this._getDate();
+
+        console.log('date ' + this.state.dateString);
+
+        let _dateString = "";
+        for (let index = 0; index < dateString.length; index++) {
+            _dateString += (dateString[index] == "a") ? "-" : dateString[index];
+        }
+
+        if (response.length === 0 || (response === null || response === undefined)) {
+            this.setState({ displayText: "There are no stocks saved for Date: " + this.state.dateString});
+            this.setState({ maxNumberOfPortfolioRows: 0 });
+            this.setState({ portfolioTableStocks: [] });
+            this.props.setMaxNumberOfPortfolioRows(0);
+            this.props.setUpdateFilterCache(true);
+        }
+        else {
+            var portfolioTableStocks = [];
+
+            for (var i = 0; i < response.length; i++) {
+                const item = JSON.parse(response[i]);
+                const pointer = parseInt(item.Id);
+
+                console.log(item.Id);
+                // History Cache Calculations
+                const json = HistoryCache.get(pointer);
+                portfolioTableStocks.push(json);
+                this.map.set(i, pointer);
+            }
+
+            // Add filter rows to filter table
+            this.props.setMaxNumberOfPortfolioRows(response.length);
+            this.props.setUpdateFilterCache(true);
+
+            this.setState({ displayText: "Displaying stocks for Date: " + this.state.dateString });
+            this.setState({ maxNumberOfPortfolioRows: response.length });
+            this.setState({ portfolioTableStocks: portfolioTableStocks });
+        }
+
+        this.setState({ updateHistory: true });
+        this.setState({ addToHistoricalTableBool: true });
+    }
+
 
     // **************************************************
 
@@ -351,7 +404,7 @@ export class HistoricalTable extends Component {
             // const price = HistoryCache.get(stockID);
             this.props.updateVariables(index);
             setTimeout(100);
-    
+
         }
 
         this.props.setUpdateFilterCache(true);
@@ -401,7 +454,7 @@ export class HistoricalTable extends Component {
 
     // **************************************************
 
-    
+
 
     // **************************************************
     // History Calc 
@@ -551,7 +604,6 @@ export class HistoricalTable extends Component {
         this.setState({ updateFilterTable: true });
     }
 
-
     // **************************************************
 
     // **************************************************
@@ -601,13 +653,11 @@ export class HistoricalTable extends Component {
             if (isNaN(target) || (target === null || target === undefined))
                 resolve(false);
             setTimeout(() => {
-                //    e.stopPropagation();
                 const target_ = parseInt(target);
 
                 for (const pair of this.map) {
                     let value = parseInt(pair.value);
                     if (target_ === value) {
-                        window.alert('This stock already exists ');
                         resolve(true);
                     }
                 }
@@ -978,6 +1028,7 @@ export class HistoricalTable extends Component {
             else
                 style = {};
 
+
             t.push(
                 <tbody>
                     <tr style={style} >
@@ -1034,10 +1085,8 @@ export class HistoricalTable extends Component {
                     </table>
                 </div>
             </div>;
-        // console.log('UPDATE ');
         this.setState({ portfolioTable: t });
         this.setState({ updateFilterTable: true });
-        this.forceUpdate();
     }
 
     // Update the table's data
@@ -1049,7 +1098,7 @@ export class HistoricalTable extends Component {
 
         for (let pointer = 0; pointer < this.map.size; pointer++) {
             let target = parseInt(this.map.get(pointer));
-            portfolioTableStocks.push(HistoryCache.get(target));
+            //   portfolioTableStocks.push(HistoryCache.get(target));
 
             /*     t.push(
                      <tbody>
@@ -1071,9 +1120,103 @@ export class HistoricalTable extends Component {
         }
 
 
-        this.setState({ portfolioTableStocks: portfolioTableStocks });
-        this.setState({ updatePortfolioTableData: true });
+        //   this.setState({ portfolioTableStocks: portfolioTableStocks });
+        //  this.setState({ updatePortfolioTableData: true });
     }
+
+    _getDate() {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1;
+
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+
+        var today = yyyy + 'a' + mm + 'a' + dd;
+        return today.toString();
+    }
+
+    // Display the History of Stocks added to History Table
+    displayHistory(date, dateString) {
+        if (dateString == null || dateString == undefined)
+            return;
+
+        let _dateString = "";
+        for (let index = 0; index < dateString.length; index++) {
+            _dateString += (dateString[index] == "-") ? "a" : dateString[index];
+        }
+
+        setTimeout(() => {
+            const _date = this._getDate();
+
+            this.setState({ dateString: dateString });
+            // Temp History
+            if (_date == _dateString) {
+                this.initialiseHistoricalTable();
+            }
+            else {
+                const serialise = JSON.stringify(_date);
+                this.loadHistory(serialise);
+            }
+        }, 1000);
+    }
+
+    async loadHistory(_date) {
+        // Read temp from database
+        await fetch('gethistoricaldata/date/'.concat(_date))
+            .then(response => response.json())
+            .then(response =>
+                this.setHistory(response)
+            )
+            .catch(error => {
+                console.log("error " + error) // 404
+                return;
+            }
+            );
+    }
+
+    /**************************************************
+         
+    addFirstRows(response) {
+    var t = [];
+    var portfolioTableStocks = this.state.portfolioTableStocks;
+    
+    for (var i = 0; i < response.length; i++) {
+       const item = JSON.parse(response[i]);
+       const pointer = parseInt(item.Id);
+    
+       console.log(item.Id);
+       // History Cache Calculations
+       const json = HistoryCache.get(pointer);
+       t.push(json);
+       portfolioTableStocks.push(json);
+       this.map.set(i, pointer);
+    }
+    
+    // Add filter rows to filter table
+    
+    this.props.setMaxNumberOfPortfolioRows(response.length);
+    this.props.setUpdateFilterCache(true);
+    // HistoryCalc.setPreviousCloses(); // Set Once Per day (Lagging 1 day)
+    
+    this.setState({ maxNumberOfPortfolioRows: response.length });
+    this.setState({ portfolioTableStack: t });
+    this.setState({ portfolioTableStocks: portfolioTableStocks });
+    this.setState({ addToHistoricalTableBool: true });
+    }*/
+
+    getDisplay() {
+        return this.state.displayText;
+    }
+
+
+
+
 
     // **************************************************
 
@@ -1100,6 +1243,10 @@ export class HistoricalTable extends Component {
             <div>
 
                 <div class="historical">
+
+
+
+
                     {/* TOP NAVBAR */}
                     {/* <Box
                         min-width='12.25rem'
@@ -1163,10 +1310,10 @@ export class HistoricalTable extends Component {
                     {/* <Button class="addStock" style={{ position: 'absolute', top: '130px', left: '1030px' }}
                          onClick={() => this.setAddFormVisibility("visible")}>Add a Stock</Button>*/}
 
-                    <h2 style={{ position: 'absolute', top: '100px', left: '80px', color: 'wheat' }}>Historical Information</h2>
+                    <h2 style={{ position: 'absolute', top: '40px', left: '80px', color: 'wheat' }}>Historical Information</h2>
+                    <h4 style={{ position: 'absolute', top: '120px', left: '80px', color: 'wheat' }}>{this.getDisplay()}</h4>
 
                     {/* PORTFOLIO TABLE */}
-
                     <Box
                         style={{ position: 'absolute', top: '125px', left: '80px' }}
                         //     bg='rgb(30,30,30)'
@@ -1179,8 +1326,11 @@ export class HistoricalTable extends Component {
                         color='white'
                         zIndex='999'
                     >
-                        {portfolioTableHeader}
+                        <DatePicker
+                            onChange={this.displayHistory}
+                            style={{ position: 'absolute', width: '150px', left: '675px' }} />
 
+                        {portfolioTableHeader}
 
                         <Box
                             style={{

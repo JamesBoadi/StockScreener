@@ -241,7 +241,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         }
 
         // Change array
-
         public void updateStocks(int start, int end)
         {
             try

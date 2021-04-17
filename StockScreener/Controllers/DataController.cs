@@ -48,9 +48,8 @@ namespace StockScreener.Controllers
             _stockScreenerService = service;
         }
 
-
         // Return stock names in order of subsequence
-        [Route("searchstock/{query?}")]   // Attribute route   HttpResponseMessage 
+        [Route("searchstock/{query?}")]
         public string transmitData(string query) // convert to json
         {
             User user = new User();
@@ -98,7 +97,6 @@ namespace StockScreener.Controllers
             string data = JsonSerializer.Serialize(stockCode);
             return data;
         }
-
 
         [Route("savenotifications/{query?}")]
         public HttpStatusCode saveNotifications(string query) // convert to json
@@ -198,14 +196,14 @@ namespace StockScreener.Controllers
             return res;
         }
 
-        [Route("savehistoricaldata/temp/{id?}")]
-        public HttpStatusCode saveTempHistoricalData(string id) // convert to json
+        [Route("savehistoricaldata/temp/{data?}")]
+        public HttpStatusCode saveTempHistoricalData(string data) // convert to json
         {
             var response = new HttpResponseMessage();
             HttpStatusCode res;
             try
             {
-                TempHistorical historical = TempHistorical.Deserialize(id);
+                TempHistorical historical = TempHistorical.Deserialize(data);
                 bool idExists = _stockScreenerService.TempHistoricalIdExists(historical.Id);
 
                 if (idExists)
@@ -321,11 +319,56 @@ namespace StockScreener.Controllers
             return jsonArray;
         }
 
+
+        [Route("gethistoricaldata/date/{date?}")]
+        public string[] getHistoricalData(string date) // convert to json
+        {
+            string[] jsonArray;
+            List<Historical> list;
+            try
+            {
+                string _date = JsonSerializer.Deserialize<String>(date);
+                list = new List<Historical>();
+                List<Historical> tempList = _stockScreenerService.GetHistoricalData();
+
+                for (int i = 0; i < tempList.Count; i++)
+                {
+                    if (tempList[i].Date == _date)
+                    {
+                        // Console.WriteLine("Date 1 " + tempList[i].Date + "  Date 2 " + _date);
+                        list.Add(tempList[i]);
+                    }
+                }
+
+                if(list.Count == 0)
+                {
+                    return new string[0];
+                }
+
+                jsonArray = new string[list.Count];
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException || ex is System.Text.Json.JsonException)
+                    Console.WriteLine("Exception " + ex);
+
+               // Console.WriteLine("Exception " + ex);
+                return null;
+            }
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                jsonArray[i] = JsonSerializer.Serialize(list[i]);
+            }
+
+            return jsonArray;
+        }
         [Route("geteod/data")]
         public string[] getEODdata() // convert to json
         {
             string[] jsonArray;
             List<EndOfDayData> list;
+
             try
             {
                 list = _stockScreenerService.GetEODdata();
@@ -348,7 +391,6 @@ namespace StockScreener.Controllers
 
             return jsonArray;
         }
-
 
 
 

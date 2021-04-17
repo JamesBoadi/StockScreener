@@ -18,6 +18,8 @@ namespace StockScreener
 
         public string Id { get; set; }
 
+        public string Date { get; set; }
+
         public static Historical Deserialize(string query)
         {
             // Case Insensitive (Does not exclude capitals and numbers)

@@ -93,6 +93,7 @@ export class FetchData extends Component {
     this.addFirstRows = this.addFirstRows.bind(this);
     this.saveHistoricalData = this.saveHistoricalData.bind(this);
 
+    this.getJSON = this.getJSON.bind(this);
 
     this.state = {
       stockTableTwo: [],
@@ -159,7 +160,7 @@ export class FetchData extends Component {
   }
 
   componentDidMount = () => {
-    
+
 
 
     const connectionEstablished = localStorage.getItem('_connectionEstablished');
@@ -507,13 +508,14 @@ export class FetchData extends Component {
         txt = "Cancel";
       }
 
-      let obj = {Id: json.Id};
-      var jsonString = JSON.stringify(obj);
-      if (txt === "Yes") {
-        const res = await this.saveHistoricalData(jsonString);
-        console.log('Historical data added? ' + res);
-        // window.alert(returned message)             window.alert('Maximum stocks for portfolio exceeded, limit: 200 ');
-      }
+      const jsonString = await this.getJSON(json);
+
+      
+      // if (txt === "Yes") {
+      const res = await this.saveHistoricalData(jsonString);
+      console.log('Historical data added? ' + res);
+      // window.alert(returned message)             window.alert('Maximum stocks for portfolio exceeded, limit: 200 ');
+      //}
     }
   }
 
@@ -536,9 +538,29 @@ export class FetchData extends Component {
     return false;
   }
 
+  async getJSON(json) {
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1;
+
+    var yyyy = today.getFullYear();
+    if (dd < 10) {
+      dd = '0' + dd;
+    }
+    if (mm < 10) {
+      mm = '0' + mm;
+    }
+
+    var today = yyyy + 'a' + mm + 'a' + dd;
+
+    const obj = { Id: json.Id, Date: today };
+    var jsonString = JSON.stringify(obj);
+
+    return jsonString;
+  }
+
   // **************************************************
-
-
+  
   triggerAnimation(param) {
     console.log('CALL ACK HELL ' + param)
   }

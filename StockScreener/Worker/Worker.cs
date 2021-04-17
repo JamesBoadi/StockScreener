@@ -70,66 +70,62 @@ namespace StockScreener
                 Time time = new Time();
 
                 // Time Check
-             /*   if (time.ReturnTime().Hours >= 17 && time.ReturnTime().Hours <= 8)
+                /*   if (time.ReturnTime().Hours >= 17 && time.ReturnTime().Hours <= 8)
+                   {
+                       if (_cacheFull)
+                       {
+                           if (_sessionEnded == false ) // && getState sessionEnded=true
+                           {
+                               // Save last data to database
+                               for (int key = 0; key < MAX; key++)
+                               {
+                                   String JSON = Cache.Get(key).Serialize();
+                                   _ = saveEODdata(JSON);
+                               }
+
+                               // Stop the stream
+                               _ = serviceWorker.StopAsync(cancellationToken);
+
+                               newToken = new CancellationToken();
+                               cancellationToken = newToken;
+
+                               Console.WriteLine("STOP STREAM  ");
+
+                               _sessionEnded = true;
+                               _init_work = false;
+                           }
+                       }
+                   }
+                   else
+                   {*/
+                if (_sessionEnded)
+                    _sessionEnded = false;
+
+                if (_init_work == false)
                 {
-                    if (_cacheFull)
+                    // Start the Service Worker
+                    await _stockHandler.Clients.All.lockStream(serviceWorker.API_REQUESTS, false);
+                    _ = serviceWorker.StartAsync(cancellationToken);
+                    Console.WriteLine("START STREAM");
+                    _init_work = !_init_work;
+                }
+
+                if (_cacheFull)
+                {
+                    for (int key = 0; key < MAX; key++)
                     {
-                        if (_sessionEnded == false ) // && getState sessionEnded=true
-                        {
-                            // Save last data to database
-                            for (int key = 0; key < MAX; key++)
-                            {
-                                String JSON = Cache.Get(key).Serialize();
-                                _ = saveEODdata(JSON);
-                            }
-
-                            // Indicate lock stream
-                            await _stockHandler.Clients.All.lockStream(serviceWorker.API_REQUESTS, true);
-
-                            // Stop the stream
-                            _ = serviceWorker.StopAsync(cancellationToken);
-
-                            newToken = new CancellationToken();
-                            cancellationToken = newToken;
-
-                            Console.WriteLine("STOP STREAM  ");
-
-                            _sessionEnded = true;
-                            _init_work = false;
-                        }
+                        String JSON = Cache.Get(key).Serialize();
+                        await _stockHandler.Clients.All.requestData(key, JSON);
                     }
                 }
-                else
-                {*/
-                    if (_sessionEnded)
-                        _sessionEnded = false;
-
-                    if (_init_work == false)
-                    {
-                        // Start the Service Worker
-                        await _stockHandler.Clients.All.lockStream(serviceWorker.API_REQUESTS, false);
-                        _ = serviceWorker.StartAsync(cancellationToken);
-                        Console.WriteLine("START STREAM");
-                        _init_work = !_init_work;
-                    }
-
-                    if (_cacheFull)
-                    {
-                        for (int key = 0; key < MAX; key++)
-                        {
-                            String JSON = Cache.Get(key).Serialize();
-                            await _stockHandler.Clients.All.requestData(key, JSON);
-                        }
-                    }
-              //  }
+                //  }
 
                 await Task.Delay(5000);
             }
         }
 
-        public async Task saveEODdata(string data) // convert to json
+        private async Task saveEODdata(string data) // convert to json
         {
-            await Task.Delay(100);
             try
             {
                 EndOfDayData eodData = EndOfDayData.Deserialize(data);
@@ -137,9 +133,9 @@ namespace StockScreener
 
                 if (idExists)
                     _stockScreenerService.ClearEODdata(eodData.Id);
-                
+
                 _stockScreenerService.Create(eodData);
-                        
+
             }
             catch (Exception ex)
             {
@@ -148,7 +144,43 @@ namespace StockScreener
 
                 Console.WriteLine("Exception " + ex);
             }
+
+            await Task.Delay(100);
+            // Indicate lock stream
+            await _stockHandler.Clients.All.lockStream(serviceWorker.API_REQUESTS, true);
         }
+
+        private async Task copyTempToHistory() // convert to json
+        {
+            try
+            {
+                List<TempHistorical> list = _stockScreenerService.GetTempHistoricalData();
+
+                for (int index = 0; index < list.Count; index++)
+                {
+                    _stockScreenerService.Create(list[index]);
+                }
+
+                int length = list.Count;
+                for (int index = 0; index < length; index++)
+                {
+                    _stockScreenerService.Create(list[index]);
+                }
+
+
+
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+            }
+
+            await Task.Delay(100);
+        }
+
 
         private async Task initialise_cache()
         {

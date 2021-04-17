@@ -235,7 +235,6 @@ export class PortFolio extends Component {
     selectmad(e) {
         const portfolioTableId = parseInt(e.target.id);
         //   console.log('portfolio ' + portfolioTableId);
-
     }
 
     // **************************************************
