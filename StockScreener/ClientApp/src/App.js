@@ -4,10 +4,13 @@ import { Redirect } from "react-router-dom";
 import { DashboardOne } from './components/Dashboard/DashboardOne/DashboardOne';
 import { DashboardInterface } from './components/DashboardInterface';
 import { Router, Route, Switch } from 'react-router';
+import { Scanner } from './components/Dashboard/Scanner/Scanner';
 import { FilterTable } from './components/Dashboard/Historical/FilterTable';
 import { PortFolio } from './components/Dashboard/Portfolio/PortFolio';
+
 import { SideMenu } from './components/Dashboard/SideMenu';
 import { DataFeed } from './components/Dashboard/DataFeed';
+
 import './custom.css'
 import 'antd/dist/antd.css';
 
@@ -67,10 +70,11 @@ export default class App extends Component {
         <DataFeed {...this} />
         {this.state.redirect}
         <Switch>
-          <Route exact path='/' component={() => <FilterTable {...this} />} />
+          <Route exact path='/' component={() => <Scanner {...this} />} />
           <Route path='/DashboardOne' component={() => <DashboardOne {...this} />} />
           <Route path='/HistoricalTable' component={() => <FilterTable {...this} />} />
           <Route path='/Portfolio' component={() => <PortFolio {...this} />} />
+          <Route path='/Scanner' component={() => <Scanner {...this} />} />
         </Switch>
       </div>
     );

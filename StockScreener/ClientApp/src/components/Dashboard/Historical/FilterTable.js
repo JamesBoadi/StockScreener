@@ -166,7 +166,8 @@ export class FilterTable extends Component {
             updateFilterCache: false,
             called: false,
 
-            name: []
+            name: [],
+            newName: []
         };
     }
 
@@ -259,14 +260,13 @@ export class FilterTable extends Component {
     // Update Filter Cache
     // **************************************************
 
-    setMaxNumberOfPortfolioRows(length) {
+    setMaxNumberOfPortfolioRows(length, name) {
         this.setState({ maxNumberOfPortfolioRows: length });
-
+        this.setState({ name: name });
     }
 
-    setUpdateFilterCache(update, name) {
+    setUpdateFilterCache(update) {
         this.setState({ updateFilterCache: update });
-        this.setState({ name: name });
     }
 
     // Called Once
@@ -301,7 +301,6 @@ export class FilterTable extends Component {
     // Update variables and set 
     updateVariables(tableID) {
         HistoryCalc.setID(tableID);
-
         // Set variables
         const json = HistoryCalc.getJSON();
         this.updateFilterCache(tableID, json);
@@ -444,6 +443,7 @@ export class FilterTable extends Component {
         let start = 0;
         const end = this.state.maxNumberOfPortfolioRows;
         const name = this.state.name;
+      
         for (pointer = start; pointer < end; pointer++) {
             const item = this.filterCache.get(pointer.toString());
 

@@ -78,7 +78,7 @@ export default class HistoryCalc {
             lowerBand: this.lowerBand.toPrecision(2), SMA: this.SMA.toPrecision(2),
             RSI: this.RSI.toPrecision(2), Volume: this.Volume.toString()
         }
-        
+
         return json;
     }
 
@@ -108,6 +108,7 @@ export default class HistoryCalc {
     // Read previous closes from database
     static setPreviousCloses(tableID) {
         let prevCloseArr = [];
+        // Set 200 previoous in database
         for (let index = 0; index < 200; index++) {
             prevCloseArr[index] = Math.random() * 100;   // += (get(i))
         }

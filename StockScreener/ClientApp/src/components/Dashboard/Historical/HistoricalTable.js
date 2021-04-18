@@ -235,6 +235,8 @@ export class HistoricalTable extends Component {
         /*     this.interval = setInterval(() => {
                 this.updateFilterCache();
              }, 20000);*/
+
+        this.setState({ dateString: new Date().toDateString() });
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -327,18 +329,25 @@ export class HistoricalTable extends Component {
             const ID = parseInt(item.Id);
 
             // History Cache Calculations
-            const json = HistoryCache.get(i);
+            const json = HistoryCache.get(ID);
             portfolioTableStocks.push(json);
             this.map.set(i, ID);
             name[i] = json.StockName;
         }
 
+        //console.log('name ' + name);
         // Add filter rows to filter table
         this.props.setMaxNumberOfPortfolioRows(response.length, name);
         this.props.setUpdateFilterCache(true);
         // HistoryCalc.setPreviousCloses(); // Set Once Per day (Lagging 1 day)
 
-        this.setState({ displayText: "Displaying stocks for Date: " + this.state.dateString });
+        if (response.length == 0 || (response === null || response === undefined)) {
+            this.setState({ displayText: "There are no stocks saved for Date: " + this.state.dateString });
+        }
+        else {
+            this.setState({ displayText: "Displaying stocks for Date: " + this.state.dateString });
+        }
+
         this.setState({ maxNumberOfPortfolioRows: response.length });
         this.setState({ portfolioTableStocks: portfolioTableStocks });
         this.setState({ addToHistoricalTableBool: true });
@@ -347,8 +356,6 @@ export class HistoricalTable extends Component {
 
     setHistory(response) {
         const dateString = this._getDate();
-
-        console.log('date ' + this.state.dateString);
 
         let _dateString = "";
         for (let index = 0; index < dateString.length; index++) {
@@ -1055,7 +1062,7 @@ export class HistoricalTable extends Component {
             || isNaN(target) || (target === null || target === undefined))
             return;
 
-        await fetch('deletenotification/'.concat(this.map.get(target)))
+        await fetch('deletehistoricaldata/temp/'.concat(this.map.get(target)))
             .then(response => response.status)
             .then(response => {
                 if (!response.ok) {
@@ -1069,7 +1076,12 @@ export class HistoricalTable extends Component {
                 console.log("error " + error) // 404
                 return;
             }
-        );
+            );
+
+        // Re add
+        this.initialiseHistoricalTable();
+
+
     }
     // Update the table
     updateTable() {
@@ -1247,8 +1259,8 @@ export class HistoricalTable extends Component {
 
                         <div class="historical">
 
-                        <div class="removeHistoricalStock" style={{ zIndex: '999' }}>
-                                <Button >Remove</Button>
+                            <div class="removeHistoricalStock" style={{ zIndex: '999' }}>
+                                <Button onClick={this.removeRow} >Remove</Button>
                             </div>
 
 

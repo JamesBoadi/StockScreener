@@ -23,6 +23,8 @@ namespace StockScreener
 
             var database = client.GetDatabase("StockScreenerDb");
 
+              //  database.CreateCollection(0001.KLSE, 0002.KLSE ETCCCCCC)
+              
             // Get Collection
             _notifications = database.GetCollection<Notifications>("Notifications");
             _tempHistoricalData = database.GetCollection<TempHistorical>("TempHistoricalData");
@@ -81,6 +83,15 @@ namespace StockScreener
             _tempHistoricalData.InsertOne(historical);
             return historical;
         }
+
+        
+        public bool TempIdExists(string id)
+        {
+            var query = _tempHistoricalData.Find<TempHistorical>(notifications => notifications.Id.Equals(id)).Any();
+            return query;
+        }
+
+
 
         public bool TempHistoricalIdExists(string id)
         {

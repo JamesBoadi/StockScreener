@@ -319,7 +319,6 @@ namespace StockScreener.Controllers
             return jsonArray;
         }
 
-
         [Route("gethistoricaldata/date/{date?}")]
         public string[] getHistoricalData(string date) // convert to json
         {
@@ -340,7 +339,7 @@ namespace StockScreener.Controllers
                     }
                 }
 
-                if(list.Count == 0)
+                if (list.Count == 0)
                 {
                     return new string[0];
                 }
@@ -352,7 +351,7 @@ namespace StockScreener.Controllers
                 if (ex is System.ArgumentNullException || ex is System.Text.Json.JsonException)
                     Console.WriteLine("Exception " + ex);
 
-               // Console.WriteLine("Exception " + ex);
+                // Console.WriteLine("Exception " + ex);
                 return null;
             }
 
@@ -392,9 +391,42 @@ namespace StockScreener.Controllers
             return jsonArray;
         }
 
+        [Route("deletehistoricaldata/temp/{id?}")]
+        public HttpStatusCode deleteTempHistoricalData(string id) // convert to json
+        {
+            var response = new HttpResponseMessage();
+            HttpStatusCode res;
+
+            try
+            {
+                string _id = JsonSerializer.Deserialize<int>(id).ToString();
+                bool idExists = _stockScreenerService.TempIdExists(_id);
+
+                if (idExists)
+                {
+                    _stockScreenerService. RemoveTempHistoricalId(_id);
+                }
+                else
+                {
+                    return HttpStatusCode.Ambiguous;
+                }
+
+                res = response.StatusCode;
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+                res = response.StatusCode;
+            }
+
+            return res;
+        }
 
 
-
+        
 
 
 

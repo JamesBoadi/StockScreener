@@ -297,6 +297,16 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             }
         }
 
+        public void setHistoricalPrices(int start, int end)
+        {
+            // List<HistoricalPrice> prices = client.
+           // GetHistoricalPrices(Consts.TestSymbol, Consts.StartDate, Consts.EndDate);
+           // Serialise HISTORICALDATA.CS
+
+           
+        }
+
+
         public List<Database> readDatabase()
         {
             Database Record = new Database();
