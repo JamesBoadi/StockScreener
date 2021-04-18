@@ -320,24 +320,25 @@ export class HistoricalTable extends Component {
     async addFirstRows(response) {
         var portfolioTableStocks = [];
         //console.log('exists ' + response.length);
-
+        let name = [];
         for (var i = 0; i < response.length; i++) {
             console.log('RESPONSE LENGTH ' + response.length);
             const item = JSON.parse(response[i]);
-            const pointer = parseInt(item.Id);
+            const ID = parseInt(item.Id);
 
             // History Cache Calculations
-            const json = HistoryCache.get(pointer);
+            const json = HistoryCache.get(i);
             portfolioTableStocks.push(json);
-            this.map.set(i, pointer);
+            this.map.set(i, ID);
+            name[i] = json.StockName;
         }
 
         // Add filter rows to filter table
-        this.props.setMaxNumberOfPortfolioRows(response.length);
+        this.props.setMaxNumberOfPortfolioRows(response.length, name);
         this.props.setUpdateFilterCache(true);
         // HistoryCalc.setPreviousCloses(); // Set Once Per day (Lagging 1 day)
 
-        this.setState({ displayText: "Displaying stocks for Date: " + this.state.dateString});
+        this.setState({ displayText: "Displaying stocks for Date: " + this.state.dateString });
         this.setState({ maxNumberOfPortfolioRows: response.length });
         this.setState({ portfolioTableStocks: portfolioTableStocks });
         this.setState({ addToHistoricalTableBool: true });
@@ -355,7 +356,7 @@ export class HistoricalTable extends Component {
         }
 
         if (response.length === 0 || (response === null || response === undefined)) {
-            this.setState({ displayText: "There are no stocks saved for Date: " + this.state.dateString});
+            this.setState({ displayText: "There are no stocks saved for Date: " + this.state.dateString });
             this.setState({ maxNumberOfPortfolioRows: 0 });
             this.setState({ portfolioTableStocks: [] });
             this.props.setMaxNumberOfPortfolioRows(0);
@@ -613,7 +614,7 @@ export class HistoricalTable extends Component {
     // Triggered and highlighted when a row is clicked
     select(e) {
         const portfolioTableId = parseInt(e.target.id);
-        // console.log('portfolio ' + portfolioTableId);
+        //console.log('portfolio ' + portfolioTableId);
         this.setState({ stockRecordID: portfolioTableId });
         this.setState({ highlightTableRow: true });
     }
@@ -1028,7 +1029,6 @@ export class HistoricalTable extends Component {
             else
                 style = {};
 
-
             t.push(
                 <tbody>
                     <tr style={style} >
@@ -1048,32 +1048,29 @@ export class HistoricalTable extends Component {
     }
 
     // Remove row from table
-    removeRow() {
-        let t = [];
-        let style = {};
-        var portfolioTableStocks = this.state.portfolioTableStocks;
-        let pointer = 0;
-        let start = 0;
-        let end = this.state.portfolioTableStocks.length - 1;
+    async removeRow() {
+        const target = parseInt(this.state.stockRecordID);
 
-        for (pointer = start; pointer <= end; pointer++) {
-            t.push(
-                <tbody>
-                    <tr>
-                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockName.toString()}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockCode.toString()}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].TimeStamp.toString()}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].PrevOpen.toString()}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].Change.toString()}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].ChangeP.toString()}</td>
-                    </tr>
-                </tbody>);
-        }
+        if (this.state.maxNumberOfPortfolioRows < 1
+            || isNaN(target) || (target === null || target === undefined))
+            return;
 
-        this.setState({ portfolioTableStack: t });
+        await fetch('deletenotification/'.concat(this.map.get(target)))
+            .then(response => response.status)
+            .then(response => {
+                if (!response.ok) {
+                    return;  // 404 
+                }
+                else {
+                    this.map.clear();
+                }
+            })
+            .catch(error => {
+                console.log("error " + error) // 404
+                return;
+            }
+        );
     }
-
     // Update the table
     updateTable() {
         let t =
@@ -1242,13 +1239,24 @@ export class HistoricalTable extends Component {
         return (
             <div>
 
-                <div class="historical">
+                <div class="wrap">
+
+                    <div class="cell-wrap left">
+
+
+
+                        <div class="historical">
+
+                        <div class="removeHistoricalStock" style={{ zIndex: '999' }}>
+                                <Button >Remove</Button>
+                            </div>
 
 
 
 
-                    {/* TOP NAVBAR */}
-                    {/* <Box
+
+                            {/* TOP NAVBAR */}
+                            {/* <Box
                         min-width='12.25rem'
                         width='36rem'
                         height='22rem'
@@ -1293,7 +1301,7 @@ export class HistoricalTable extends Component {
                         <EditStockForm {...this} />
                     </Box>*/}
 
-                    {/* TOP NAVBAR 
+                            {/* TOP NAVBAR 
                     <TopNavbar />
 
                     <div class="addStock" style={{ zIndex: '999', transform: 'translateX(20px)' }}>
@@ -1307,54 +1315,58 @@ export class HistoricalTable extends Component {
                         <Button onClick={() => this.removePortfolioTableRow()}>Remove</Button>
                     </div>*/}
 
-                    {/* <Button class="addStock" style={{ position: 'absolute', top: '130px', left: '1030px' }}
+                            {/* <Button class="addStock" style={{ position: 'absolute', top: '130px', left: '1030px' }}
                          onClick={() => this.setAddFormVisibility("visible")}>Add a Stock</Button>*/}
 
-                    <h2 style={{ position: 'absolute', top: '40px', left: '80px', color: 'wheat' }}>Historical Information</h2>
-                    <h4 style={{ position: 'absolute', top: '120px', left: '80px', color: 'wheat' }}>{this.getDisplay()}</h4>
+                            <h2 style={{ position: 'absolute', top: '40px', left: '80px', color: 'wheat' }}>Historical Information</h2>
+                            <h4 style={{ position: 'absolute', top: '120px', left: '80px', color: 'wheat' }}>{this.getDisplay()}</h4>
 
-                    {/* PORTFOLIO TABLE */}
-                    <Box
-                        style={{ position: 'absolute', top: '125px', left: '80px' }}
-                        //     bg='rgb(30,30,30)'
-                        boxShadow='sm'
-                        textAlign='center'
-                        height='45px'
-                        width='48rem'
-                        rounded="lg"
-                        margin='auto'
-                        color='white'
-                        zIndex='999'
-                    >
-                        <DatePicker
-                            onChange={this.displayHistory}
-                            style={{ position: 'absolute', width: '150px', left: '675px' }} />
+                            {/* PORTFOLIO TABLE */}
+                            <Box
+                                style={{ position: 'absolute', top: '125px', left: '80px' }}
+                                //     bg='rgb(30,30,30)'
+                                boxShadow='sm'
+                                textAlign='center'
+                                height='45px'
+                                width='48rem'
+                                rounded="lg"
+                                margin='auto'
+                                color='white'
+                                zIndex='999'
+                            >
+                                <DatePicker
+                                    onChange={this.displayHistory}
+                                    style={{ position: 'absolute', width: '150px', left: '675px' }} />
 
-                        {portfolioTableHeader}
+                                {portfolioTableHeader}
 
-                        <Box
-                            style={{
-                                position: 'absolute',
-                                overflowY: 'auto',
-                                top: '45px'
-                            }}
-                            overflowX='hidden'
-                            boxShadow='sm'
-                            textAlign='center'
-                            height='1110px'
-                            width='48rem'
-                            rounded="lg"
-                            margin='auto'
-                            color='white'
-                            zIndex='999'
-                        >
+                                <Box
+                                    style={{
+                                        position: 'absolute',
+                                        overflowY: 'auto',
+                                        top: '45px'
+                                    }}
+                                    overflowX='hidden'
+                                    boxShadow='sm'
+                                    textAlign='center'
+                                    height='1110px'
+                                    width='48rem'
+                                    rounded="lg"
+                                    margin='auto'
+                                    color='white'
+                                    zIndex='999'
+                                >
 
-                            {this.state.portfolioTable}
+                                    {this.state.portfolioTable}
 
-                        </Box>
-                    </Box>
+
+
+                                </Box>
+                            </Box>
+                        </div>
+                    </div>
+
                 </div>
-
 
 
 

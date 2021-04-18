@@ -166,9 +166,6 @@ namespace StockScreener
                 {
                     _stockScreenerService.Create(list[index]);
                 }
-
-
-
             }
             catch (Exception ex)
             {

@@ -42,12 +42,12 @@ export default class HistoryCalc {
     // **************************************************
     // User Set Variables
     // **************************************************
-    static bollingerBandsNo = 2;
-    static deviations = 2;
+    static bollingerBandsNo = 15;
+    static deviations = 10;
     static firstMovingAverageDays = 25; // For MACD
     static secondMovingAverageDays = 50; // For MACD
     static smoothing = 0.2;
-    static rsiWeight = 1;
+    static rsiWeight = 10;
     static Volume = 250000;
 
     // **************************************************
@@ -55,15 +55,30 @@ export default class HistoryCalc {
     // **************************************************
 
     static getJSON() {
+        const tableID = this.getID();
+        this.setPreviousCloses(tableID); // Data in this function saved to database
+        this.setPreviousCloseSum(tableID);
+        this.setSMA();
+        this.caclualteStandardDeviation(tableID);
+        this.setUpperBands();
+        this.setMiddleBands();
+        this.setLowerBands();
+        this.calculateFirstMACD(tableID);
+        this.calculateSecondMACD(tableID);
+        this.calculateRSI(tableID);
+        this.calculateSignal();
+        this.calculateSignalMessage();
+
         const json = {
             signalMessage: this.signalMessage.toString(),
-            signal: this.signal.toString(),
-            firstMACD: this.firstMACD.toString(),
-            secondMACD: this.secondMACD.toString(),
-            upperBand: this.upperBand.toString(), middleBand: this.middleBand.toString(),
-            lowerBand: this.lowerBand.toString(), SMA: this.SMA.toString(),
-            RSI: this.RSI.toString(), Volume: this.Volume.toString()
+            signal: this.signal.toPrecision(2),
+            firstMACD: this.firstMACD.toPrecision(2),
+            secondMACD: this.secondMACD.toPrecision(2),
+            upperBand: this.upperBand.toPrecision(2), middleBand: this.middleBand.toPrecision(2),
+            lowerBand: this.lowerBand.toPrecision(2), SMA: this.SMA.toPrecision(2),
+            RSI: this.RSI.toPrecision(2), Volume: this.Volume.toString()
         }
+        
         return json;
     }
 
@@ -74,6 +89,10 @@ export default class HistoryCalc {
 
     static getUpdateHistoricalTable() {
         return this.updateHistoricalTable;
+    }
+
+    static setID(id) {
+        this.id = id;
     }
 
     static getID() {
@@ -90,7 +109,7 @@ export default class HistoryCalc {
     static setPreviousCloses(tableID) {
         let prevCloseArr = [];
         for (let index = 0; index < 200; index++) {
-            prevCloseArr[index] = 1;   // += (get(i))
+            prevCloseArr[index] = Math.random() * 100;   // += (get(i))
         }
 
         this.previousCloses.set(tableID.toString(), prevCloseArr);
@@ -99,11 +118,13 @@ export default class HistoryCalc {
     // Previous close sum
     static setPreviousCloseSum(tableID) {
         const prevCloseArr = this.previousCloses.get(tableID.toString());
-
+        let prevCloseSum = 0;
         for (let index = 0; index < this.bollingerBandsNo; index++) {
-            this.prevCloseSum += prevCloseArr[index]; // += (get(i))
+            prevCloseSum += prevCloseArr[index]; // += (get(i))
         }
+        this.prevCloseSum = prevCloseSum;
     }
+
 
     // **************************************************
     // SMA and Standard Deviation
@@ -111,18 +132,20 @@ export default class HistoryCalc {
 
     // Calculate simple moving average
     static setSMA() {
-        this.simpleMovingAverage = this.prevCloseSum / this.bollingerBandsNo; // += (get(i))
+        this.simpleMovingAverage = parseFloat(this.prevCloseSum / this.bollingerBandsNo);
+        this.SMA = this.simpleMovingAverage;
     }
 
     // Calculate standard deviation
     static caclualteStandardDeviation(tableID) {
         const prevCloseArr = this.previousCloses.get(tableID.toString());
-        let standardDeviation;
+        let standardDeviation = 0;
         for (let index = 0; index < this.bollingerBandsNo; index++) {
-            standardDeviation += Math.pow(prevCloseArr[index] - this.simpleMovingAverage, 2); // += (get(i))
+            standardDeviation += Math.pow(prevCloseArr[index] - this.simpleMovingAverage, 2);
         }
 
-        this.standardDeviation = Math.sqrt(standardDeviation / this.bollingerBandsNo);
+        this.standardDeviation = parseFloat(Math.sqrt(standardDeviation / this.bollingerBandsNo));
+
     }
 
     // **************************************************
@@ -130,15 +153,15 @@ export default class HistoryCalc {
     // **************************************************
 
     static setUpperBands() {
-        this.upperBand = this.simpleMovingAverage + (this.deviations * this.standardDeviation)
+        this.upperBand = parseFloat(this.simpleMovingAverage + (this.deviations * this.standardDeviation));
     }
 
     static setMiddleBands() {
-        this.middleBand = this.simpleMovingAverage;
+        this.middleBand = parseFloat(this.simpleMovingAverage);
     }
 
     static setLowerBands() {
-        this.lowerBand = this.simpleMovingAverage - (this.deviations * this.standardDeviation);
+        this.lowerBand = parseFloat(this.simpleMovingAverage - (this.deviations * this.standardDeviation));
     }
 
     // **************************************************
@@ -154,7 +177,7 @@ export default class HistoryCalc {
             firstMACD += prevCloseArr[index]; // += (get(i))
         }
 
-        this.firstMACD = firstMACD / this.firstMovingAverageDays;
+        this.firstMACD = parseFloat(firstMACD / this.firstMovingAverageDays);
     }
 
     static calculateSecondMACD(tableID) {
@@ -164,12 +187,12 @@ export default class HistoryCalc {
             secondMACD += prevCloseArr[index]; // += (get(i))
         }
 
-        this.secondMACD = secondMACD / this.secondMovingAverageDays;
+        this.secondMACD = parseFloat(secondMACD / this.secondMovingAverageDays);
     }
 
     // Whether or not it crosses the boundary
     static calculateSignal() {
-        this.signal = this.firstMACD - this.secondMACD;
+        this.signal = parseFloat(this.firstMACD - this.secondMACD);
     }
 
     static calculateSignalMessage() {
@@ -196,6 +219,7 @@ export default class HistoryCalc {
         const q4 = ((prevCloseArr[0] - prevCloseArr[49]) / prevCloseArr[49] * 100) * this.rsiWeight;
 
         this.relativeStrengthIndex = (q1 + q2 + q3 + q4);
+        this.RSI = parseFloat(this.relativeStrengthIndex);
     }
 
     // **************************************************

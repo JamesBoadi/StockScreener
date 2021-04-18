@@ -345,6 +345,14 @@
   // Media Queries
   // **************************************************/
 
+  
+  .historical .removeHistoricalStock {
+    position: absolute;
+    top: 130px;
+    left: 1440px;
+  }
+
+
   .portfolio .removeStock {
     position: absolute;
     top: 130px;
@@ -386,6 +394,12 @@
   
 
   @media screen and (min-width: 320px) { 
+    
+    .historical .removeHistoricalStock {
+      position: absolute;
+      top: 130px;
+      left: 1440px;
+    }
     
     .portfolio .removeStock {
       position: absolute;
@@ -436,6 +450,13 @@
 
   
   @media screen and (min-width: 691px) and (max-width: 691px) { 
+   
+    .historical .removeHistoricalStock {
+      position: absolute;
+      top: 130px;
+      left: 1350px;
+    }
+
 
     .portfolio .removeStock {
       position: absolute;
@@ -484,6 +505,12 @@
   }
 
   @media screen and (min-width: 640px) and (max-width: 691px) { 
+  
+    .historical .removeHistoricalStock {
+      position: absolute;
+      top: 130px;
+      left: 1350px;
+    }
 
     .portfolio .removeStock {
       position: absolute;
@@ -532,6 +559,13 @@
   }
 
   @media screen and (min-width: 578px) and (max-width: 800px) { 
+   
+    .historical .removeHistoricalStock {
+      position: absolute;
+      top: 130px;
+      left: 1350px;
+    }
+
 
     .portfolio .removeStock {
       position: absolute;
@@ -574,6 +608,13 @@
   }
   
   @media screen and (min-width: 100px) and (max-width: 578px) { 
+
+
+    .historical .removeHistoricalStock {
+    position: absolute;
+    top: 130px;
+    left: 1350px;
+  }
 
     .portfolio .removeStock {
       position: absolute;
@@ -618,6 +659,21 @@
   /************** Historical Table ******************/
   /*********************************************/
 
+
+  .wrap {
+    display: table;
+    width: 40rem;
+    height: 100%; /* need to set height for this to work in Chrome */
+  }
+  .cell-wrap {
+    display: table-cell;
+    vertical-align: top;
+    height: 100%;
+  }
+  .cell-wrap.left {
+    padding-right: 10px;  /* if you need some whitespace */
+  }
+
   .historical .historicalTableHeader
   {
     position: absolute;
@@ -638,7 +694,7 @@
     position: absolute;
     table-layout: fixed;
     font-family: sans-serif;
-    height: 30px;
+    height: 100px;
     font-size: 14px;
     min-width: 40rem;
   /*  min-height: 1200px;*/
@@ -702,7 +758,6 @@
     width: 48rem;
     left: 675px;
     top: 85px;
-  
   }
   
   .filter .filterTableHeader thead:nth-child(odd) th
@@ -718,7 +773,6 @@
  
   }
 
-  
   .filter .dropdown-content {
     display: none;
     position: absolute;

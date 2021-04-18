@@ -10,6 +10,10 @@ import {
     MenuGroup, MenuOptionGroup, MenuIcon, MenuCommand, MenuDivider
 } from '@chakra-ui/react';
 import 'antd/dist/antd.css';
+import {
+    Button,
+} from 'antd';
+
 import HistoryCache from './js/HistoryCache';
 import HistoryCalc from './js/HistoryCalc';
 import PortfolioCalc from './js/HistoryCalc';
@@ -158,10 +162,11 @@ export class FilterTable extends Component {
             clickedPortfolioTableRowID: 0,
             maxNumberOfPortfolioTableRows: 0,
             maxNumberOfPortfolioRows: 0,
-
             updateFilterTable: false,
             updateFilterCache: false,
-            called: false
+            called: false,
+
+            name: []
         };
     }
 
@@ -170,39 +175,34 @@ export class FilterTable extends Component {
     };
 
     componentDidMount() {
-        
+
         this.interval = setInterval(() => {
             if (this.props.state.updateCache) {
                 this.setState({ called: true })
                 clearInterval(this.interval);
             }
         }, 1000);
-      /* window.onload(() => {
 
+        /* window.onload(() => {
+              this.updateData = setInterval(() => {
+                  if (this.date.getHours() + 8 >= 9) {
+                     
+                      clearInterval(this.interval);
+                  }
+              }, 60000);
+          }*/
 
-
-
-            this.updateData = setInterval(() => {
-                if (this.date.getHours() + 8 >= 9) {
-                   
-                    clearInterval(this.interval);
-                }
-            }, 60000);
-        }*/
-      
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-
         if (this.state.updateFilterCache) {
             this.setFilterCache();
-            
             this.setState({ updateFilterCache: false });
         }
         if (this.state.updateFilterTable || prevState.updateFilterTable) {
             this.addToFilterTable();
             this.updateFilterTable();
-       
+
             this.setState({ updateFilterTable: false });
         }
     }
@@ -254,17 +254,19 @@ export class FilterTable extends Component {
     }
 
     // **************************************************
-    
+
     // **************************************************
     // Update Filter Cache
     // **************************************************
 
     setMaxNumberOfPortfolioRows(length) {
         this.setState({ maxNumberOfPortfolioRows: length });
+
     }
 
-    setUpdateFilterCache(update) {
+    setUpdateFilterCache(update, name) {
         this.setState({ updateFilterCache: update });
+        this.setState({ name: name });
     }
 
     // Called Once
@@ -298,22 +300,7 @@ export class FilterTable extends Component {
 
     // Update variables and set 
     updateVariables(tableID) {
-        HistoryCalc.setPreviousCloses(tableID); // Data in this function saved to database
-        HistoryCalc.setPreviousCloseSum(tableID);
-
-        HistoryCalc.setSMA();
-        HistoryCalc.caclualteStandardDeviation(tableID);
-
-        HistoryCalc.setUpperBands();
-        HistoryCalc.setMiddleBands();
-        HistoryCalc.setLowerBands();
-
-        HistoryCalc.calculateFirstMACD(tableID);
-        HistoryCalc.calculateSecondMACD(tableID);
-
-        HistoryCalc.calculateRSI(tableID);
-        HistoryCalc.calculateSignal();
-        HistoryCalc.calculateSignalMessage();
+        HistoryCalc.setID(tableID);
 
         // Set variables
         const json = HistoryCalc.getJSON();
@@ -456,13 +443,15 @@ export class FilterTable extends Component {
         let pointer;
         let start = 0;
         const end = this.state.maxNumberOfPortfolioRows;
-
+        const name = this.state.name;
         for (pointer = start; pointer < end; pointer++) {
             const item = this.filterCache.get(pointer.toString());
-            
+
             t.push(
                 <tbody key={pointer}>
                     <tr>
+                        <td id={pointer}>{name[pointer]}</td>
+                        <td id={pointer}>{item.signalMessage}</td>
                         <td id={pointer}>{item.signalMessage}</td>
                         <td id={pointer}>{item.signal}</td>
                         <td id={pointer}>{item.firstMACD}</td>
@@ -487,10 +476,10 @@ export class FilterTable extends Component {
         let t =
             <div class="filter">
                 <div>
-                <table class="filterTable" aria-labelledby="tabelLabel">
-                    <thead></thead>
-                    {this.state.filterTableStack}
-                </table>
+                    <table class="filterTable" aria-labelledby="tabelLabel">
+                        <thead></thead>
+                        {this.state.filterTableStack}
+                    </table>
                 </div>
             </div>;
 
@@ -511,6 +500,7 @@ export class FilterTable extends Component {
                 style={{ zIndex: '999', position: 'absolute', left: '675px' }}>
                 <thead>
                     <tr>
+                        <th>Stock <br /> Name </th>
                         <th>Signal <br /> Message </th>
                         <th>Signal <br /> Line</th>
                         <th>First <br /> MACD</th>
@@ -529,44 +519,52 @@ export class FilterTable extends Component {
         return (
             <div>
 
-                <div class="filter">
-                    {/* PORTFOLIO TABLE */}
+                <div class="wrap" style={{ width: '48rem' }}>
+                    <div class="cell-wrap left">
+                        <div class="filter">
 
-                    <Box
-                        style={{ position: 'absolute', top: '125px', left: '80px' }}
-                        //     bg='rgb(30,30,30)'
-                        boxShadow='sm'
-                        textAlign='center'
-                        height='45px'
-                        width='48rem'
-                        rounded="lg"
-                        margin='auto'
-                        color='white'
-                        zIndex='999'
-                    >
-                        {filterTableHeader}
+                            {/* PORTFOLIO TABLE */}
 
-                        <Box
-                            style={{
-                                position: 'absolute',
-                                overflowY: 'auto',
+                            <Box
+                                style={{ position: 'absolute', top: '125px', left: '80px' }}
+                                //     bg='rgb(30,30,30)'
+                                boxShadow='sm'
+                                textAlign='center'
+                                height='45px'
+                                width='48rem'
+                                rounded="lg"
+                                margin='auto'
+                                color='white'
+                                zIndex='999'
+                            >
 
-                                top: '45px'
-                            }}
-                            overflowX='hidden'
-                            boxShadow='sm'
-                            textAlign='center'
-                            height='1110px'
-                            width='48rem'
-                            rounded="lg"
-                            margin='auto'
-                            color='white'
-                            zIndex='999'
-                        >
-                        </Box>
-                     
-                        {this.state.filterTable}
-                    </Box>
+                                {filterTableHeader}
+
+                                <Box
+                                    style={{
+                                        position: 'absolute',
+                                        overflowY: 'auto',
+
+                                        top: '45px'
+                                    }}
+                                    overflowX='hidden'
+                                    boxShadow='sm'
+                                    textAlign='center'
+                                    height='1110px'
+                                    width='48rem'
+                                    rounded="lg"
+                                    margin='auto'
+                                    color='white'
+                                    zIndex='999'
+                                >
+                                </Box>
+
+                                {this.state.filterTable}
+                            </Box>
+                        </div>
+
+                    </div>
+
                 </div>
 
                 <HistoricalTable {...this} />
