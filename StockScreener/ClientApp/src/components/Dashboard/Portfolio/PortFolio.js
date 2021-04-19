@@ -878,11 +878,11 @@ export class PortFolio extends Component {
                     <Button class="addStock" style={{ position: 'absolute', top: '130px', left: '1030px' }}
                                 onClick={() => this.setAddFormVisibility("visible")}>Add a Stock</Button>*/}
 
-                <h2 style={{ position: 'absolute', top: '100px', left: '80px', color: 'wheat' }}>My Portfolio</h2>
+                <h2 style={{ position: 'absolute', top: '100px', left: '60px', color: 'wheat' }}>My Portfolio</h2>
 
                 {/* PORTFOLIO TABLE */}
                 <Box
-                    style={{ position: 'absolute', top: '125px', left: '80px' }}
+                    style={{ position: 'absolute', top: '125px', left: '60px' }}
                     //     bg='rgb(30,30,30)'
                     boxShadow='sm'
                     textAlign='center'

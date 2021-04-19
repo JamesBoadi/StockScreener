@@ -4,6 +4,7 @@ import PortfolioCache from './Portfolio/js/PortfolioCache';
 import TableCache from './DashboardOne/js/TableCache.js';
 import NotificationsCache from './DashboardOne/js/NotificationsCache.js';
 import AlertCache from './DashboardOne/js/AlertCache.js';
+import ScannerCache from './Scanner/js/ScannerCache.js';
 import * as signalR from '@aspnet/signalr';
 
 export class DataFeed extends Component {
@@ -67,6 +68,7 @@ export class DataFeed extends Component {
         });
     }
 
+    /*End Of Day Data */
     async eodData() {
         // Fill Cache with EOD data
         await fetch('geteod/data')
@@ -74,6 +76,11 @@ export class DataFeed extends Component {
             .then(response => {
                 for (var key = 0; key < response.length; key++) {
                     const item = JSON.parse(response[key]);
+
+
+                    // Scanner
+                    ScannerCache.set(key, item);
+
                     PortfolioCache.set(key, item);
                     HistoryCache.set(key, item);
 
@@ -81,10 +88,12 @@ export class DataFeed extends Component {
                     TableCache.set(key, item);
                     AlertCache.set(key, item);
                     NotificationsCache.set(key, item);
+
                 }
             })
             .catch(error => {
                 console.log("error " + error) // 404
+                // Last successfully catched data
                 return;
             }
             );
@@ -124,6 +133,10 @@ export class DataFeed extends Component {
                 })
                 DataFeed.hubConnection.on('requestData', (key, data) => {
                     const item = JSON.parse(data);
+
+                    // Scanner
+                    ScannerCache.set(key, item);
+
                     PortfolioCache.set(key, item);
                     HistoryCache.set(key, item);
 

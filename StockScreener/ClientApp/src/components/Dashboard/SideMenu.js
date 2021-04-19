@@ -34,7 +34,10 @@ export class SideMenu extends Component {
     switch (e.key) {
       case "9":
         this.props.redirect(9);
-        break;
+        break;  
+      case "12":
+          this.props.redirect(12);
+          break;
       case "13":
         this.props.redirect(13);
         break;
@@ -91,7 +94,7 @@ export class SideMenu extends Component {
               <Menu.Item key="9">Dashboard One</Menu.Item>
               <Menu.Item key="10">Dashboard Two</Menu.Item>
               <Menu.Item key="11">Dashboard Three</Menu.Item>
-              <Menu.Item key="12">Dashboard Four</Menu.Item>
+              <Menu.Item key="12">Screener</Menu.Item>
               <Menu.Item key="13">Historical Table</Menu.Item>
               <Menu.Item key="14">My Portfolio</Menu.Item>
             </SubMenu>

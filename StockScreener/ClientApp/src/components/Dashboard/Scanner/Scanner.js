@@ -97,44 +97,18 @@ export class Scanner extends React.Component {
             cachedRows: [],
             enableAlerts: false,
             cache: new cache(),
-            animationsCache: new cache()
+            animationsCache: new cache(),
+
+            manualUpdateClicked: false // utton
         }
     }
 
     componentDidMount() {
         let id;
+
         for (id = 0; id < 897; id++) {
             this.styleMap.set(id, {});
         }
-
-        /* this.interval = setInterval(() => {
-          
-             if (this.props.state.updateCache) {
-                 
-                 console.log('SJ ' + this.props.state.updateCache);
-                 this.setState({ cache: ScannerCache.cache() }); // Cannot access value immediately
- 
-                 if (this.updateTableData === false) {
-                     console.log('props ' + this.props.state.updateCache
-                     + '   ' + this.updateTableData);
- 
-                     this.createTable()
-                     this.updateTable(15)
-                     this.updateTableData = true;
- 
-                     this.setState({ enableAlerts: true });
-                   
-                 }
- 
-                 this.props.updateCache(false);
-                 clearInterval(this.interval);
-             }
-         });*/
-
-        /* // }
-               // this.setState({ disableScrolling: false});
-       
-               // this.setState({ scroll: (this.textInput.current.scrollTop) ?? 1 })*/
 
         this.setState({ scroll: this.scrollBy() })
     }
@@ -146,107 +120,74 @@ export class Scanner extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         const scroll = this.scrollBy();
-        if (this.props.state.updateCache) {
-            console.log('SJ ' + this.props.state.updateCache);
-            this.setState({ cache: ScannerCache.cache() }); // Cannot access value immediately
 
-            // Update table data (fix)
-            if (this.updateTableData === false) {
-                console.log('props ' + this.props.state.updateCache
-                    + '   ' + this.updateTableData);
+        // Highlight rowtable if selected
+        if (this.state.manualUpdateClicked) {
 
-                this.createTable()
-                this.updateTable(15)
-                this.updateTableData = true;
-                this.setState({ enableAlerts: true });
-            }
+        }
+        else if (this.state.isSelected) {
+            this.newTable()
+            this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
+                this.updateTable(this.state.start)
+                this.forceUpdate()
+            });
 
-            this.props.updateCache(false);
-        } else
-            // Trigger if Hide Bullish/Bearish Stocks Enabled
-            if (ScannerCache.getUpdateHideStocks()) {
-                console.log('  ---->  ' + 'THESE ARE MAH STOCKS!');
+            this.setState({ isSelected: false });
+        }
+        // Update if scrolled
+        else if (prevState.tb2_count === 1) {
+            this.newTable()
+            this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
+                this.updateTable(this.state.start)
+            });
+
+            console.log('SCROLL ');
+
+            if (this.state.start === 0)
+                this.textInput.current.scrollTop = 10;
+            else
+                this.textInput.current.scrollTop = 25;
+
+            this.setState({ scrollUpdated: true });
+            this.setState({ tb2_count: 0 });
+
+        }
+        // Search for a stock
+        else if (this.state.validInput) {
+
+            this.setState({
+                tb2_scrollPosition: (this.state.tb2_scrollPosition <= 17) ? this.getUnits(scroll) : 17
+            }, () => {
                 this.newTable()
-                this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
-                    this.updateTable(this.state.start)
-                });
+                this.setState({ start: this.state.tb2_scrollPosition * 50 })
+                this.updateTable(this.state.start)
+            });
 
-                if (this.state.start === 0)
-                    this.textInput.current.scrollTop = 10;
-                else
-                    this.textInput.current.scrollTop = 25;
+            if (this.state.start === 0)
+                this.textInput.current.scrollTop = 10;
+            else
+                this.textInput.current.scrollTop = 25;
 
-                ScannerCache.setDisableScroll(false);
-                ScannerCache.setDisableScroll(false);
-                ScannerCache.setUpdateHideStocks(false);
-            }
-            // Highlight rowtable if selected
-            else if (this.state.isSelected) {
-                this.newTable()
-                this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
-                    this.updateTable(this.state.start)
-                    this.forceUpdate()
-                });
-
-                this.setState({ isSelected: false });
-            }
-            // Update if scrolled
-            else if (prevState.tb2_count === 1) {
-                this.newTable()
-                this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
-                    this.updateTable(this.state.start)
-                });
-
-                console.log('SCROLL ');
-
-                if (this.state.start === 0)
-                    this.textInput.current.scrollTop = 10;
-                else
-                    this.textInput.current.scrollTop = 25;
-
-
-                this.props.resetTableID(null); // Reset id
-                this.setState({ scrollUpdated: true });
-                this.setState({ tb2_count: 0 });
-
-            }
-            // Search for a stock
-            else if (this.state.validInput) {
-
-                this.setState({
-                    tb2_scrollPosition: (this.state.tb2_scrollPosition <= 17) ? this.getUnits(scroll) : 17
-                }, () => {
-                    this.newTable()
-                    this.setState({ start: this.state.tb2_scrollPosition * 50 })
-                    this.updateTable(this.state.start)
-                });
-
-                if (this.state.start === 0)
-                    this.textInput.current.scrollTop = 10;
-                else
-                    this.textInput.current.scrollTop = 25;
-
-                this.props.resetTableID(this.state.stockRecord); // Reset id
-                this.setState({ validInput: false });
-                this.setState({ queryRes: false });
-            }
+            this.setState({ validInput: false });
+            this.setState({ queryRes: false });
+        }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        /*   if (ScannerCache.getUpdateHideStocks()) {
-               return true;
-           }
-           else if (this.props.state.updateCache !== nextProps.state.updateCache) {
-               return true;
-           }
-           else if (nextState.tb2_count !== this.state.tb2_count)
-               return true;
-           else if (this.state.validInput || this.state.queryRes
-               || this.state.isUpdating === false
-               || this.state.isSelected !== nextState.isSelected
-               || this.state.updateStyleMap !== nextState.updateStyleMap
-           )
-               return true;*/
+        if (!nextProps.state.updateCache) {
+            return false;
+        }
+        else {
+            if (nextState.tb2_count !== this.state.tb2_count)
+                return true;
+            else if (this.state.validInput || this.state.queryRes
+                || this.state.isUpdating === false
+                || this.state.isSelected !== nextState.isSelected
+                || this.state.updateStyleMap !== nextState.updateStyleMap
+            )
+                return true;
+        }
+
         return false;
     }
 
@@ -475,12 +416,11 @@ export class Scanner extends React.Component {
         let mod = 0;
         let endMod = 50;
         let end;
-        const priceDetection = (ScannerCache.getPriceDetection());
-        const max = (priceDetection) ? ScannerCache.getMax() : 17;
+        const max = 17;
         let tb2_scrollPosition = this.state.tb2_scrollPosition;
 
         // Reset Scroll Position (Only done once)
-        if (priceDetection && ScannerCache.getResetScrollPosition()) {
+        if (ScannerCache.getResetScrollPosition()) {
             tb2_scrollPosition = 0;
             this.setState({ tb2_scrollPosition: 0 });
             ScannerCache.setResetScrollPosition(false);
@@ -489,7 +429,7 @@ export class Scanner extends React.Component {
         if (tb2_scrollPosition === 0)
             mod = 0;
         else if (tb2_scrollPosition === max) {
-            endMod = (priceDetection) ? ScannerCache.getEndMod() : 47;
+            endMod = 47;
             mod = 0;
         }
         else
@@ -508,8 +448,8 @@ export class Scanner extends React.Component {
 
         for (id = start; id < end; id++) {
             // Get values from cache this.state.tb2_stack
-            let list = (!priceDetection) ? ScannerCache.get(id) :
-                ScannerCache.getOp(id);
+            const list = ScannerCache.get(id);
+            const item = this.filterCache.get(id.toString());
 
             if (id == target) {
 
@@ -520,11 +460,20 @@ export class Scanner extends React.Component {
                             <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
                             <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
                             <td id={id} onClick={this.selectRow}>{list.High.toString()}</td>
-
                             <td id={id} onClick={this.selectRow}>{list.Low.toString()}</td>
                             <td id={id} onClick={this.selectRow}>{list.Change.toString()}</td>
                             <td id={id} onClick={this.selectRow}>{list.ChangeP.toString()}</td>
                             <td id={id} onClick={this.selectRow}>{list.Volume.toString()}</td>
+                            <td id={id}>{item.signalMessage}</td>
+                            <td id={id}>{item.signalMessage}</td>
+                            <td id={id}>{item.signal}</td>
+                            <td id={id}>{item.firstMACD}</td>
+                            <td id={id}>{item.secondMACD}</td>
+                            <td id={id}>{item.upperBand}</td>
+                            <td id={id}>{item.middleBand}</td>
+                            <td id={id}>{item.lowerBand}</td>
+                            <td id={id}>{item.SMA}</td>
+                            <td id={id}>{item.RSI}</td>
                         </tr>
                     </tbody>)
             }
@@ -537,11 +486,20 @@ export class Scanner extends React.Component {
                             <td id={id} onClick={this.selectRow}>{list.TimeStamp.toString()}</td>
                             <td id={id} onClick={this.selectRow}>{list.CurrentPrice.toString()} </td>
                             <td id={id} onClick={this.selectRow}>{list.High.toString()}</td>
-
                             <td id={id} onClick={this.selectRow}>{list.Low.toString()}</td>
                             <td id={id} onClick={this.selectRow}>{list.Change.toString()}</td>
                             <td id={id} onClick={this.selectRow}>{list.ChangeP.toString()}</td>
                             <td id={id} onClick={this.selectRow}>{list.Volume.toString()}</td>
+                            <td id={id}>{item.signalMessage}</td>
+                            <td id={id}>{item.signalMessage}</td>
+                            <td id={id}>{item.signal}</td>
+                            <td id={id}>{item.firstMACD}</td>
+                            <td id={id}>{item.secondMACD}</td>
+                            <td id={id}>{item.upperBand}</td>
+                            <td id={id}>{item.middleBand}</td>
+                            <td id={id}>{item.lowerBand}</td>
+                            <td id={id}>{item.SMA}</td>
+                            <td id={id}>{item.RSI}</td>
                         </tr>
                     </tbody>)
             }
@@ -560,7 +518,7 @@ export class Scanner extends React.Component {
         let endMod = 50;
         let end;
         const priceDetection = (ScannerCache.getPriceDetection());
-        const max = (priceDetection) ? ScannerCache.getMax() : 17;
+        const max = 17;
         let tb2_scrollPosition = this.state.tb2_scrollPosition;
 
         // Reset Scroll Position (Only done once)
@@ -573,7 +531,7 @@ export class Scanner extends React.Component {
         if (tb2_scrollPosition === 0)
             mod = 0;
         else if (tb2_scrollPosition === max) {
-            endMod = (priceDetection) ? ScannerCache.getEndMod() : 47;
+            endMod = 47;
             mod = 0;
         }
         else
@@ -594,8 +552,7 @@ export class Scanner extends React.Component {
                 style = {};
 
             // Get values from cache
-            let list = (!priceDetection) ? ScannerCache.get(id) :
-                ScannerCache.getOp(id);//this.state.cache.get(id.toString());
+            let list = ScannerCache.get(id);
 
 
             //  console.log( 'WORK WORK ' + id);
@@ -620,7 +577,7 @@ export class Scanner extends React.Component {
     updateTable(start) {
         let mod = 0;
         let endMod = 50;
-        let max = 0;
+        const max = 47;
         let tb2_scrollPosition = this.state.tb2_scrollPosition;
 
         // Reset Scroll Position (Only done once)
@@ -642,8 +599,6 @@ export class Scanner extends React.Component {
         // console.log('tb2 ' + tb2_scrollPosition);
 
         start = (start <= 15 || (start === undefined || start === null)) ? 0 : start - mod;
-
-
 
         // Get values from cache
         let list = ScannerCache.get(start);
@@ -816,7 +771,7 @@ export class Scanner extends React.Component {
 
         return (
             <div>
-                <h2 style={{ position: 'absolute', top: '40px', left: '80px', color: 'wheat' }}>Scan Stocks</h2>
+                <h2 style={{ position: 'absolute', top: '40px', left: '60px', color: 'wheat' }}>Screener</h2>
 
                 {/* STOCK TABLE TWO */}
                 <Box

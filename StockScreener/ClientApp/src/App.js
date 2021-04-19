@@ -39,6 +39,9 @@ export default class App extends Component {
       case 9:
         redirect.push(<Redirect to='/DashboardOne' />);
         break;
+      case 12:
+          redirect.push(<Redirect to='/Scanner' />);
+        break;
       case 13:
         redirect.push(<Redirect to='/HistoricalTable' />);
         break;

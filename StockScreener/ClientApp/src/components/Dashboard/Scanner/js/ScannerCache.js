@@ -1,7 +1,5 @@
 import * as cache from 'cache-base';
 
-
-
 export default class ScannerCache {
     static cache_ = new cache();
     static cacheOp_ = new cache();
@@ -35,6 +33,12 @@ export default class ScannerCache {
     static set(key, value) {
         this.cache_.set(key.toString(), value);
     }
+
+
+
+
+
+
 
     static setUpdateHideStocks(bool) {
         this.update_hideStocks = bool;

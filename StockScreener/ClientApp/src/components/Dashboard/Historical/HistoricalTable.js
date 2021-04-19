@@ -1330,12 +1330,12 @@ export class HistoricalTable extends Component {
                             {/* <Button class="addStock" style={{ position: 'absolute', top: '130px', left: '1030px' }}
                          onClick={() => this.setAddFormVisibility("visible")}>Add a Stock</Button>*/}
 
-                            <h2 style={{ position: 'absolute', top: '40px', left: '80px', color: 'wheat' }}>Historical Information</h2>
-                            <h4 style={{ position: 'absolute', top: '120px', left: '80px', color: 'wheat' }}>{this.getDisplay()}</h4>
+                            <h2 style={{ position: 'absolute', top: '40px', left: '60px', color: 'wheat' }}>Historical Information</h2>
+                            <h4 style={{ position: 'absolute', top: '120px', left: '60px', color: 'wheat' }}>{this.getDisplay()}</h4>
 
                             {/* PORTFOLIO TABLE */}
                             <Box
-                                style={{ position: 'absolute', top: '125px', left: '80px' }}
+                                style={{ position: 'absolute', top: '125px', left: '60px' }}
                                 //     bg='rgb(30,30,30)'
                                 boxShadow='sm'
                                 textAlign='center'
@@ -1348,7 +1348,7 @@ export class HistoricalTable extends Component {
                             >
                                 <DatePicker
                                     onChange={this.displayHistory}
-                                    style={{ position: 'absolute', width: '150px', left: '675px' }} />
+                                    style={{ position: 'absolute', width: '150px', left: '695px' }} />
 
                                 {portfolioTableHeader}
 
