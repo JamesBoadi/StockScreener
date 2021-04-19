@@ -37,11 +37,10 @@ export default class HistoryCalc {
     static RSI = 0;
     static Volume = 0;
 
-
-
     // **************************************************
     // User Set Variables
     // **************************************************
+
     static bollingerBandsNo = 15;
     static deviations = 10;
     static firstMovingAverageDays = 25; // For MACD
