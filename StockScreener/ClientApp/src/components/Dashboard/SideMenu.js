@@ -35,6 +35,9 @@ export class SideMenu extends Component {
       case "9":
         this.props.redirect(9);
         break;  
+        case "10":
+          this.props.redirect(10);
+          break;
       case "12":
           this.props.redirect(12);
           break;
@@ -49,14 +52,7 @@ export class SideMenu extends Component {
         console.log("default " + e.key)
         break;
     }
-
-
   }
-
-
-
-
-
 
   render() {
     // switch

@@ -1,8 +1,6 @@
 
   /**************** App ******************/
   /***************************************/
-
-
   /*
    #tableContainer
     {
@@ -25,21 +23,15 @@
       margin-left: 50%;
       justify-content: center;
     }
-
      .grid-container {
     display: grid;
     margin-left:auto;
     margin-right:auto;
-    width: 100%;
-    
+    width: 100%; 
   }
-
   */
 
-
-
   @media screen and (max-width: 320px) { 
-    
     .side-bar 
     {
       min-height: 100%;
@@ -294,7 +286,7 @@
     table-layout: fixed;
     border-collapse: collapse;
     font-family: sans-serif;
-    font-size: 14px;
+    font-size: 12.5px;
     min-height: 1200px;
     width: 80rem;
     left: 0px;
@@ -316,7 +308,7 @@
     table-layout: fixed;
     border-collapse: collapse;
     font-family: sans-serif;
-    font-size: 14px;
+    font-size: 12.5px;
    /* height: 1200px;
     min-height: 1200px;*/
     width: 80rem;

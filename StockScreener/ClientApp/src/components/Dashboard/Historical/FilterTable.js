@@ -281,7 +281,6 @@ export class FilterTable extends Component {
         this.setState({ updateFilterTable: true });
     }
 
-
     // Utility for setting cache
     updateFilterCache(tableID, json) {
         this.filterCache.set(

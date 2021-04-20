@@ -5,6 +5,7 @@ import TableCache from './DashboardOne/js/TableCache.js';
 import NotificationsCache from './DashboardOne/js/NotificationsCache.js';
 import AlertCache from './DashboardOne/js/AlertCache.js';
 import ScannerCache from './Scanner/js/ScannerCache.js';
+import DashboardTwoCache from './DashboardTwo/js/DashboardTwoCache.js';
 import * as signalR from '@aspnet/signalr';
 
 export class DataFeed extends Component {
@@ -77,9 +78,11 @@ export class DataFeed extends Component {
                 for (var key = 0; key < response.length; key++) {
                     const item = JSON.parse(response[key]);
 
-
                     // Scanner
                     ScannerCache.set(key, item);
+
+                    // DashboardTwo 
+                    DashboardTwoCache.set(key, item);
 
                     PortfolioCache.set(key, item);
                     HistoryCache.set(key, item);
@@ -137,6 +140,9 @@ export class DataFeed extends Component {
                     // Scanner
                     ScannerCache.set(key, item);
 
+                    // DashboardTwo 
+                    DashboardTwoCache.set(key, item);
+
                     PortfolioCache.set(key, item);
                     HistoryCache.set(key, item);
 
@@ -156,6 +162,7 @@ export class DataFeed extends Component {
                         console.log("Ok")
                         //   PortfolioCache.updateDataCallback(); // Updates data in portfolioo
                         TableCache.setFill(true);
+                        DashboardTwoCache.setFill(true);
                         this.setState({ updateCache: true });
                         this.connected = true;
                     }

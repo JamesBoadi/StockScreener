@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Button, ButtonGroup } from "@chakra-ui/react";
 import { Redirect } from "react-router-dom";
 import { DashboardOne } from './components/Dashboard/DashboardOne/DashboardOne';
+import { DashboardTwo } from './components/Dashboard/DashboardTwo/DashboardTwo';
 import { DashboardInterface } from './components/DashboardInterface';
 import { Router, Route, Switch } from 'react-router';
 import { Scanner } from './components/Dashboard/Scanner/Scanner';
@@ -21,26 +22,49 @@ export default class App extends Component {
 
     this.redirect = this.redirect.bind(this);
     this.getUpdateCache = this.getUpdateCache.bind(this);
+    this.sideMenu = this.sideMenu.bind(this);
+    this.update = this.update.bind(this);
 
     this.state = {
       redirect: [],
       updateCache: false,
+      update: true,
+      sidemenu: null
     };
   }
 
   componentDidMount() {
     /*<Redirect to='/' />;*/
+    this.setState({ sidemenu: <SideMenu {...this} /> });
+    this.setState({ update: true });
   }
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this.state.update) {
+      this.setState({ update: false });
+    }
+
+  }
+
+  update(update) {
+    this.setState({ update: update });
+  }
+
+
   redirect(key) {
-    console.log('key ' + key);
+
+    this.sideMenu(key);
+
     let redirect = [];
     switch (key) {
       case 9:
         redirect.push(<Redirect to='/DashboardOne' />);
         break;
+      case 10:
+        redirect.push(<Redirect to='/DashboardTwo' />);
+        break;
       case 12:
-          redirect.push(<Redirect to='/Scanner' />);
+        redirect.push(<Redirect to='/Scanner' />);
         break;
       case 13:
         redirect.push(<Redirect to='/HistoricalTable' />);
@@ -51,13 +75,48 @@ export default class App extends Component {
       default:
         break;
     }
+
     this.setState({ redirect: redirect });
+    this.setState({ update: true });
   }
 
   getUpdateCache(update) {
     this.setState({ updateCache: update });
   }
 
+  sideMenu(key) {
+    switch (key) {
+      case 9:
+        this.setState({
+          sidemenu: <SideMenu {...this}
+            style={{ position: 'absolute', minHeight: '1200px', width: '55px', height: '100vh', margin: 0, zIndex: '999' }}
+          />
+        });
+        this.setState({ update: true });
+        break;
+      case 12:
+        this.setState({
+          sidemenu: <SideMenu {...this}
+
+          />
+
+        });
+        this.setState({ update: true });
+        break;
+      case 13:
+        this.setState({ sidemenu: <SideMenu {...this} /> });
+        this.setState({ update: true });
+        break;
+      case 14:
+        this.setState({ sidemenu: <SideMenu {...this} /> });
+        this.setState({ update: true });
+        break;
+      default:
+        break;
+    }
+
+
+  }
 
   render() {
     /*
@@ -65,16 +124,22 @@ export default class App extends Component {
             <Route path='/counter' component={Counter} />
             <Route path='/fetch-data' component={FetchData} />
             <Route path='/DashboardOne' component={DashboardOne} />
+
+             style={{ position: 'absolute', minHeight: '975px', width: '55px', height: '100vh', margin: 0, zIndex: '999' }}
      */
+
+
+
     return (
       <div>
 
-        <SideMenu {...this} />
+        {this.state.sidemenu}
         <DataFeed {...this} />
         {this.state.redirect}
         <Switch>
-          <Route exact path='/' component={() => <Scanner {...this} />} />
+          <Route exact path='/' component={() => <DashboardTwo {...this} />} />
           <Route path='/DashboardOne' component={() => <DashboardOne {...this} />} />
+          <Route path='/DashboardTwo' component={() => <DashboardTwo {...this} />} />
           <Route path='/HistoricalTable' component={() => <FilterTable {...this} />} />
           <Route path='/Portfolio' component={() => <PortFolio {...this} />} />
           <Route path='/Scanner' component={() => <Scanner {...this} />} />

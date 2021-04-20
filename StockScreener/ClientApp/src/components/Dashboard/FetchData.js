@@ -126,6 +126,7 @@ export class FetchData extends Component {
       start: 0,
       end: 50,
 
+      // Display Stock
       stockInfoName: [],
       stockInfoHeader: [],
       stockInfoPrevPrice: [],
@@ -160,9 +161,6 @@ export class FetchData extends Component {
   }
 
   componentDidMount = () => {
-
-
-
     const connectionEstablished = localStorage.getItem('_connectionEstablished');
     this.intervalID = setInterval(() => {
       if (connectionEstablished && TableCache.getFill()) {
@@ -171,7 +169,7 @@ export class FetchData extends Component {
         this.setState({ updateCache: true });
         clearInterval(this.intervalID);
       }
-    }, 3000);
+    }, 1000);
   }
 
   componentWillUnmount() {
@@ -510,7 +508,7 @@ export class FetchData extends Component {
 
       const jsonString = await this.getJSON(json);
 
-      
+
       // if (txt === "Yes") {
       const res = await this.saveHistoricalData(jsonString);
       console.log('Historical data added? ' + res);
@@ -560,7 +558,7 @@ export class FetchData extends Component {
   }
 
   // **************************************************
-  
+
   triggerAnimation(param) {
     console.log('CALL ACK HELL ' + param)
   }
@@ -650,8 +648,6 @@ export class FetchData extends Component {
           {this.state.stockInfoHeader}
           {this.state.stockInfoPrevPrice}
           {this.state.stockInfoCurrPrice}
-
-
 
 
           {/*   <h4 style={{ position: 'relative', top: '38px', left: '5px', color: 'white' }}>Start Price:  </h4>

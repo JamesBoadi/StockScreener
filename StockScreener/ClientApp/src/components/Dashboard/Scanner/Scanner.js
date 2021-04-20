@@ -159,8 +159,6 @@ export class Scanner extends React.Component {
                 this.updateTable(this.state.start)
             });
 
-            console.log('SCROLL ');
-
             if (this.state.start === 0)
                 this.textInput.current.scrollTop = 10;
             else
@@ -820,7 +818,9 @@ export class Scanner extends React.Component {
     }
 
     render() {
-        let stockTableTwoHeader = <table class="scannerHeader" aria-labelledby="tabelLabel"
+        let stockTableTwoHeader = 
+      
+        <table class="scannerHeader" aria-labelledby="tabelLabel"
             style={{ position: 'absolute', width: '80rem' }}>
             <thead>
                 <tr>
@@ -846,23 +846,20 @@ export class Scanner extends React.Component {
                 </tr>
             </thead>
         </table>;
+      
 
         return (
             <div>
+
                 <h2 style={{ position: 'absolute', top: '40px', left: '60px', color: 'wheat' }}>Screener</h2>
-
-                <div class="scannerTable">
-
 
                     {/* STOCK TABLE TWO */}
                     <Box
                         style={{ position: 'absolute', top: '140px', left: '60px' }}
-                        bg='rgb(30,30,30)'
-
-                        boxShadow='sm'
+                        bg='rgb(30,30,30)'                      
                         textAlign='center'
                         height='35px'
-                        width='81rem'
+                        width='82rem'
                         rounded="lg"
                         maxHeight='35px'
                         margin='auto'
@@ -930,16 +927,16 @@ export class Scanner extends React.Component {
                             boxShadow='sm'
                             textAlign='center'
                             height='800px'
-                            width='83rem'
+                            width='82rem'
                             maxHeight='800px'
                             rounded="lg"
                             color='white'
                             zIndex='-999'>
+                               
                             {this.state.tb2}
+                           
                         </Box>
                     </Box>
-
-                </div>
             </div>
         );
     }
