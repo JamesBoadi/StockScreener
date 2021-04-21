@@ -22,16 +22,18 @@ export class StockTableOne extends React.Component {
         this.selectRecords = this.selectRecords.bind(this);
         this.scrollBy = this.scrollBy.bind(this);
         this.textInput = React.createRef();
-        this.setAlertInterval = this.setAlertInterval.bind(this);
         this.selectRow = this.selectRow.bind(this);
         this.createTable = this.createTable.bind(this);
         this.newTable = this.newTable.bind(this);
         this.getUnits = this.getUnits.bind(this);
-        this.addToStyleMap = this.addToStyleMap.bind(this);
 
-        // Display Stock
+        // Filter Stocks
         this.selectStockTableRow = this.selectStockTableRow.bind(this);
         this.overBoughtStocks = this.overBoughtStocks.bind(this);
+        this.overSoldStocks = this.overSoldStocks.bind(this);
+        this.highestGainers = this.highestGainers.bind(this);
+        this.biggestLosers = this.biggestLosers.bind(this);
+        this.trendingStocks = this.trendingStocks.bind(this);
 
         this.timeout = null;
         this.cache = null;
@@ -100,7 +102,8 @@ export class StockTableOne extends React.Component {
             filterStocks: false,
             tempID: [],
             ID: [],
-            updateTable: false
+            updateTable: false,
+            clearTable: false
 
         }
     }
@@ -133,11 +136,10 @@ export class StockTableOne extends React.Component {
         } else
             if (this.state.filterStocks) {
                 this.setState({ ID: this.state.tempID });
+
                 this.setState({ updateTable: true });
                 this.setState({ filterStocks: false })
             }
-
-
         // Display Stock Info
         if (this.updateStockInfo) {
             this.setState({ stockInfoHeader: this.state.stockInfoName[0] });
@@ -149,18 +151,20 @@ export class StockTableOne extends React.Component {
         }
         // Highlight rowtable if selected
         else if (this.state.isSelected) {
-            this.newTable()
-            this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
-                this.updateTable(this.state.start)
-                this.forceUpdate()
-            });
-
+            this.createTable();
+            this.updateTable(0);
             this.setState({ isSelected: false });
         }
-        else if (this.state.updateTable) {
-            this.newTable();
+        if (this.state.updateTable) {
+            this.createTable();
+            this.updateTable();
             this.setState({ updateTable: false });
         }
+        else if (this.state.clearTable) {
+            this.setState({ tb2: [] });
+            this.setState({ clearTable: false });
+        }
+
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -257,7 +261,7 @@ export class StockTableOne extends React.Component {
             mod = 15;
 
         end = (tb2_scrollPosition * 50) + endMod;
-        let start = (tb2_scrollPosition * 50) - mod;
+        let start = 0;
 
         //....................................
 
@@ -266,10 +270,12 @@ export class StockTableOne extends React.Component {
         };
 
         this.styleMap.set(target, style);
+        const ID = this.state.ID;
 
-        for (id = start; id < end; id++) {
+        for (id = start; id < ID.length; id++) {
             // Get values from cache this.state.tb2_stack
-            const list = DashboardTwoCache.get(id);
+            const _id = ID[id];
+            const list = DashboardTwoCache.get(_id);
 
             if (id == target) {
 
@@ -321,6 +327,9 @@ export class StockTableOne extends React.Component {
 
         var array = [];
         let style;
+
+
+        console.log('  new   TABLE   ')
 
         for (id = start; id < end; id++) {
             if (id == this.state.target) {
@@ -377,11 +386,10 @@ export class StockTableOne extends React.Component {
         // console.log('tb2 ' + tb2_scrollPosition);
 
         start = (start <= 15 || (start === undefined || start === null)) ? 0 : start - mod;
+        const ID = this.state.ID;
 
         // Get values from cache
-        let list = DashboardTwoCache.get(start);
-
-        //this.props.cache.get(start.toString());
+        let list = DashboardTwoCache.get(ID[0]);
 
         let t = <div>
             <div id="stack-wrapper">
@@ -397,8 +405,6 @@ export class StockTableOne extends React.Component {
                                 <th>{list.Change.toString()}</th>
                                 <th>{list.ChangeP.toString()}</th>
                                 <th>{list.Volume.toString()}</th>
-
-
                             </tr>
                         </thead>
                         {this.state.tb2_stack}
@@ -408,18 +414,19 @@ export class StockTableOne extends React.Component {
         </div>;
 
         this.setState({ tb2: t });
+        this.setState({ updateTable: true });
     }
 
     createTable() {
         var table = [];
         let id;
         const end = 100;
+        const ID = this.state.ID;
+        for (id = 0; id < ID.length; id++) {
+            const _id = ID[id];
 
-        for (id = 0; id < end; id++) {
-            const ID = this.state.ID[]
             // Get values from cache
-            let list = DashboardTwoCache.get(id); //this.state.cache.get(id.toString());
-            const item = this.filterCache.get(id.toString());
+            let list = DashboardTwoCache.get(_id);
             this.state.tb2_stack.push(
                 <tbody key={id} style={this.styleMap.get(id)}>
                     <tr>
@@ -436,7 +443,7 @@ export class StockTableOne extends React.Component {
                 </tbody>)
         }
 
-        this.setState({ updateFilterCache: true });
+        this.setState({ updateTable: true });
     }
 
 
@@ -476,46 +483,272 @@ export class StockTableOne extends React.Component {
     // **************************************************
     // Filter Stocks
     // **************************************************
-    overBoughtStocks() {
-        let rsi = Number.MIN_VALUE;
-        let rsiArray = [];
-        
-        for (let index = 0; index < 100; index++) {
-            rsiArray[index] = Number.MIN_VALUE;
-        }
 
+    overBoughtStocks() {
+        let rsiArray = [];
+        let tempID = [];
         let id = [];
-        let pointer = 0;
-        let max = 100;
-        let stack = [];
-        let newStack = [];
 
         // Replace with two pointers
         for (let index = 0; index < 897; index++) {
             HistoryCalc.setID(index);
             const item = HistoryCalc.getJSON();
-            if (item.RSI > 70) {
-                for (let counter = 0; counter < max; counter++) {
-                    if (item.RSI >= rsiArray[counter]) {
-                        rsiArray[counter] = item.RSI; // set rsi
-                        break;
-                    }
+            rsiArray[index] = new Number(item.RSI);
+            tempID[index] = parseInt(index);
+        }
+
+        for (let i = 0; i < 897; i++) {
+            for (let j = 0; j < 897; j++) {
+                if (rsiArray[j] > rsiArray[j + 1]) {
+                    let tmp = rsiArray[j];
+                    rsiArray[j] = rsiArray[j + 1];
+                    rsiArray[j + 1] = tmp;
                 }
             }
         }
 
-        this.setState({ tempID: id });
-        this.setState({ filterStocks: true });
-        /*       stack.push(item.RSI);
-           while (stack.length !== 0) {
-               let value = stack.pop();
+        let pointer = 0;
 
-               if (item.RSI >= value) {
-                   stack.push(item.RSI);
-                   stack.push(value);
-               }
-           }*/
+        for (let index = 0; index < 897; index++) {
+            if (pointer >= 100)
+                break;
+
+            const rsi = rsiArray[index];
+            if (rsi >= 70) {
+                id[pointer++] = tempID[index]; // Save id
+            }
+        }
+
+        for (let index = 0; index < id.length; index++) {
+            console.log(' id ' + id[index]);
+        }
+
+        this.setState({ tb2_stack: [] });
+
+        if (id.length === 0) {
+
+            this.setState({ tempID: [] });
+            this.setState({ clearTable: true });
+        }
+        else {
+            this.setState({ tempID: id });
+            this.setState({ filterStocks: true });
+        }
     }
+
+    overSoldStocks() {
+        let rsiArray = [];
+        let tempID = [];
+        let id = [];
+
+        // Replace with two pointers
+        for (let index = 0; index < 897; index++) {
+            HistoryCalc.setID(index);
+            const item = HistoryCalc.getJSON();
+            rsiArray[index] = new Number(item.RSI);
+            tempID[index] = parseInt(index);
+        }
+
+        for (let i = 0; i < 897; i++) {
+            for (let j = 0; j < 897; j++) {
+                if (rsiArray[j] > rsiArray[j + 1]) {
+                    let tmp = rsiArray[j];
+                    rsiArray[j] = rsiArray[j + 1];
+                    rsiArray[j + 1] = tmp;
+                }
+            }
+        }
+
+        let pointer = 0;
+
+        for (let index = 0; index < 897; index++) {
+            if (pointer >= 100)
+                break;
+
+            const rsi = rsiArray[index];
+            if (rsi <= 30) {
+                id[pointer++] = tempID[index]; // Save id
+            }
+        }
+
+        for (let index = 0; index < id.length; index++) {
+            console.log(' id ' + id[index]);
+        }
+
+        this.setState({ tb2_stack: [] });
+        if (id.length === 0) {
+
+            this.setState({ tempID: [] });
+            this.setState({ clearTable: true });
+        }
+        else {
+            this.setState({ tempID: id });
+            this.setState({ filterStocks: true });
+        }
+    }
+
+    highestGainers() {
+        let gainers = [];
+        let tempID = [];
+        let id = [];
+
+        // Replace with two pointers
+        for (let index = 0; index < 897; index++) {
+            HistoryCalc.setID(index);
+            const item = DashboardTwoCache.get(index);
+            const price_diff = item.CurrentPrice - item.prevOpen;
+            gainers[index] = price_diff;
+            tempID[index] = index;
+        }
+
+        for (let i = 0; i < 897; i++) {
+            for (let j = 0; j < 897; j++) {
+                if (gainers[j] > gainers[j + 1]) {
+                    let tmp = gainers[j];
+                    gainers[j] = gainers[j + 1];
+                    gainers[j + 1] = tmp;
+                }
+            }
+        }
+
+        let pointer = 0;
+
+        for (let index = 0; index < 897; index++) {
+            if (pointer >= 100)
+                break;
+
+            const price_diff = gainers[index];
+            if (price_diff > 0) {
+                id[pointer++] = tempID[index]; // Save id
+            }
+        }
+
+        for (let index = 0; index < id.length; index++) {
+            console.log(' id ' + id[index]);
+        }
+
+        this.setState({ tb2_stack: [] });
+        if (id.length === 0) {
+
+            this.setState({ tempID: [] });
+            this.setState({ clearTable: true });
+        }
+        else {
+
+            this.setState({ tempID: id });
+            this.setState({ filterStocks: true });
+        }
+
+    }
+
+    biggestLosers() {
+        let gainers = [];
+        let tempID = [];
+        let id = [];
+
+        // Replace with two pointers
+        for (let index = 0; index < 897; index++) {
+            HistoryCalc.setID(index);
+            const item = DashboardTwoCache.get(index);
+            const price_diff = item.CurrentPrice - item.prevOpen;
+            gainers[index] = price_diff;
+            tempID[index] = index;
+        }
+
+        for (let i = 0; i < 897; i++) {
+            for (let j = 0; j < 897; j++) {
+                if (gainers[j] > gainers[j + 1]) {
+                    let tmp = gainers[j];
+                    gainers[j] = gainers[j + 1];
+                    gainers[j + 1] = tmp;
+                }
+            }
+        }
+
+        let pointer = 0;
+
+        for (let index = 0; index < 897; index++) {
+            if (pointer >= 100)
+                break;
+
+            const price_diff = gainers[index];
+            if (price_diff < 0) {
+                id[pointer++] = tempID[index]; // Save id
+            }
+        }
+
+        for (let index = 0; index < id.length; index++) {
+            console.log(' id ' + id[index]);
+        }
+
+        this.setState({ tb2_stack: [] });
+        if (id.length === 0) {
+
+            this.setState({ tempID: [] });
+            this.setState({ clearTable: true });
+        }
+        else {
+
+            this.setState({ tempID: id });
+            this.setState({ filterStocks: true });
+        }
+
+    }
+
+    trendingStocks() {
+        let gainers = [];
+        let tempID = [];
+        let id = [];
+
+        // Replace with two pointers
+        for (let index = 0; index < 897; index++) {
+            HistoryCalc.setID(index);
+            const item = DashboardTwoCache.get(index);
+            const price_diff = item.CurrentPrice - item.prevOpen;
+            gainers[index] = price_diff;
+            tempID[index] = index;
+        }
+
+        for (let i = 0; i < 897; i++) {
+            for (let j = 0; j < 897; j++) {
+                if (gainers[j] > gainers[j + 1]) {
+                    let tmp = gainers[j];
+                    gainers[j] = gainers[j + 1];
+                    gainers[j + 1] = tmp;
+                }
+            }
+        }
+
+        let pointer = 0;
+
+        for (let index = 0; index < 897; index++) {
+            if (pointer >= 100)
+                break;
+
+            const price_diff = gainers[index];
+            if (price_diff > 30) {
+                id[pointer++] = tempID[index]; // Save id
+            }
+        }
+
+        for (let index = 0; index < id.length; index++) {
+            console.log(' id ' + id[index]);
+        }
+
+        this.setState({ tb2_stack: [] });
+
+        if (id.length === 0) {
+            this.setState({ tempID: [] });
+            this.setState({ clearTable: true });
+        }
+        else {
+
+            this.setState({ tempID: id });
+            this.setState({ filterStocks: true });
+        }
+
+    }
+
 
     render() {
         const stockTableTwoHeader = <table class="stockTableTwoHeader" aria-labelledby="tabelLabel">
@@ -534,27 +767,31 @@ export class StockTableOne extends React.Component {
             </thead>
         </table>;
 
-
         const menu = (
             <Menu>
                 <Menu.Item>
-                    <a onClick={() => { console.log('1ST MENU') }}>
+                    <a onClick={this.overBoughtStocks}>
                         OverBought
                     </a>
                 </Menu.Item>
                 <Menu.Item>
-                    <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
+                    <a onClick={this.overSoldStocks}>
                         OverSold
                     </a>
                 </Menu.Item>
-                <Menu.Item>
-                    <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
-                        Highest Gainers
+                <Menu.Item >
+                    <a onClick={this.highestGainers}>
+                        Highest Gainers (24 Hours)
+                    </a>
+                </Menu.Item>
+                <Menu.Item >
+                    <a onClick={this.biggestLosers} >
+                        Biggest Losers (24 Hours)
                     </a>
                 </Menu.Item>
                 <Menu.Item>
-                    <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
-                        Biggest Losers
+                    <a onClick={this.trendingStocks}>
+                        Trending Stocks
                     </a>
                 </Menu.Item>
             </Menu>

@@ -11,7 +11,6 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         //private readonly MemoryCache memoryCache = new MemoryCache(_cache);
         public  List<Stock> list = new List<Stock>(); // Might not be needed
 
-        
         // int Pointer = 0;
         public Stock(string id,
         string StockCode, string StockName, string TimeStamp, double CurrentPrice,
