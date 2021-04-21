@@ -800,10 +800,9 @@ export class StockTableOne extends React.Component {
 
         return (
             <div>
-                
-
                 <div class="stockTableOneWrap">
-                {/* STOCK TABLE TWO <h2 style={{ position: 'absolute', top: '355px', left: '1070px', color: 'wheat' }}>Top Stocks</h2>*/}
+             
+                {/* STOCK TABLE TWO */}
                 <Box
                     style={{ position: 'absolute', top: '405px', left: '1070px' }}
                     bg='rgb(30,30,30)'

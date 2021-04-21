@@ -479,21 +479,22 @@
     .stockTableOneWrap
     {
       position: absolute;
-      left: -130px;
+      left: -135px;
     }
+
   }
   @media screen and ( min-width: 200px ) {
     .stockTableOneWrap
     {
       position: absolute;
-      left: -130px;
+      left: -135px;
     }
   }
   @media screen and ( min-width: 300px ) and ( max-width: 690px ){
     .stockTableOneWrap
     {
       position: absolute;
-      left: -130px;
+      left: -135px;
     }
   }
   @media screen and ( min-width: 690px ) and  ( max-width: 1390px ){

@@ -128,8 +128,6 @@ export default class App extends Component {
              style={{ position: 'absolute', minHeight: '975px', width: '55px', height: '100vh', margin: 0, zIndex: '999' }}
      */
 
-
-
     return (
       <div>
 
@@ -137,7 +135,7 @@ export default class App extends Component {
         <DataFeed {...this} />
         {this.state.redirect}
         <Switch>
-          <Route exact path='/' component={() => <DashboardTwo {...this} />} />
+          <Route exact path='/' component={() => <DashboardOne {...this} />} />
           <Route path='/DashboardOne' component={() => <DashboardOne {...this} />} />
           <Route path='/DashboardTwo' component={() => <DashboardTwo {...this} />} />
           <Route path='/HistoricalTable' component={() => <FilterTable {...this} />} />

@@ -442,7 +442,7 @@ export class NotificationsTable extends Component {
                     <th>Stock <br /> Name</th>
                     <th>Alert <br /> Time</th>
                     <th>Price</th>
-                    <th>P / L</th>
+                    <th>ChangeP</th>
                     <th>Volume</th>
                 </tr>
             </thead>

@@ -83,6 +83,11 @@ export class DashboardNavbar extends Component {
             hideBearishStocksDisabled: false,
             hideBullishStocksDisabled: true,
 
+            disableStartTime: false,
+            disableEndTime: false,
+
+            disableSetPrice: true,
+
         };
     }
 
@@ -97,7 +102,8 @@ export class DashboardNavbar extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextState.autoDisabled !== this.state.autoDisabled ||
+        if (nextState.disableSetPrice !== this.state.disableSetPrice ||
+            nextState.autoDisabled !== this.state.autoDisabled ||
             nextState.manualDisabled !== this.state.manualDisabled ||
             nextState.hideBearishStocks !== this.state.hideBearishStocks ||
             nextState.hideBullishStocks !== this.state.hideBullishStocks ||
@@ -219,9 +225,6 @@ export class DashboardNavbar extends Component {
     saveConfiguration() {
         AlertSettings.setAlertInterval(this.alertFrequencyRef.current.value);
 
-        //selectedIndex  )
-        //this.setAlertTrigger(this.state.alertEnabled);
-
         if (this.state.setNotifications) {
             this.setState({ notificationsEnabled: 1 })
         }
@@ -230,15 +233,13 @@ export class DashboardNavbar extends Component {
         // Detect Change in Alert Settings
         if (AlertSettings.getManual() !== this.state.manualAlert
             || AlertSettings.getAuto() !== this.state.autoAlert) {
-            console.log(' CHANGE IN ALERT SETTINGS ');
             AlertSettings.setUpdateAlertSettings(true);
         }
 
         if (!this.state.autoAlert) {
-            console.log('scroll false')
             TableCache.setDisableScroll(false);
         }
-        console.log(this.state.manualAlert+' mn '+this.state.autoAlert);
+      //  console.log(this.state.manualAlert+' mn '+this.state.autoAlert);
         AlertSettings.setManual(this.state.manualAlert);
         AlertSettings.setAuto(this.state.autoAlert);
 
@@ -330,6 +331,7 @@ export class DashboardNavbar extends Component {
     // Enable Price Detection Bool
     setPriceDetectionEnabled(e) {
         this.setState({ enablePriceDetection: e.target.checked });
+        this.setState({ disableSetPrice: !this.state.disableSetPrice });
     }
 
     // Override Global Prices Bool
@@ -351,6 +353,9 @@ export class DashboardNavbar extends Component {
     setManualAlert(e) {
         this.setState({ manualAlert: e.target.checked });
 
+        this.setState({ disableStartTime: e.target.checked });
+        this.setState({ disableEndTime: e.target.checked });
+
         // Disable auto alert checkbox 
         this.setState({ autoDisabled: !this.state.autoDisabled });
     }
@@ -363,7 +368,7 @@ export class DashboardNavbar extends Component {
         this.setState({ manualDisabled: !this.state.manualDisabled });
     }
 
-    // Determine whether or not an alert should be triggered
+    // Determine whether or not an alert should be triggered (FIX)
     setAlertTrigger(bool) {
         if (bool === false)
             return;
@@ -413,7 +418,9 @@ export class DashboardNavbar extends Component {
             </select>;
 
         let alertFrequency =
-            <select class="alertFrequency" name="Frequency" ref={this.alertFrequencyRef}>
+            <select class="alertFrequency" name="Frequency" 
+            ref={this.alertFrequencyRef}
+            disabled={this.state.disableStartTime}>
                 <option value="60000">1 Minute</option>
                 <option value="300000">5 Minutes</option>
                 <option value="600000">10 Minutes</option>
@@ -426,9 +433,11 @@ export class DashboardNavbar extends Component {
         let custom_alertFrequency = <input class="customalertFrequency" type="number" id="quantity"
             name="quantity" min="1" max="240" />
 
-        let startTime = <input class="startTime" type="time" name="time" ref={this.getStartTime} min="09:00" max="17:00" />;
+        let startTime = <input class="startTime" type="time" name="time" 
+        ref={this.getStartTime} min="09:00" max="17:00" disabled={this.state.disableStartTime} />;
 
-        let endTime = <input class="endTime" type="time" name="time" ref={this.getEndTime} />;
+        let endTime = <input class="endTime" type="time" name="time" 
+        ref={this.getEndTime} min="09:00" max="17:00" disabled={this.state.disableEndTime} />;
 
         return (
             <div class="DashboardNavbar">
@@ -513,10 +522,10 @@ export class DashboardNavbar extends Component {
                                 <label id="low">Low</label>
                                 <input class="low" type="checkbox" />
 
-                                <label id="profitLoss">P / L</label>
+                                <label id="profitLoss">Change</label>
                                 <input class="profitLoss" type="checkbox" />
 
-                                <label id="profitLossPercentage">P / L %</label>
+                                <label id="profitLossPercentage">Change %</label>
                                 <input class="profitLossPercentage" type="checkbox" />
 
                                 <label id="volume">Volume</label>
@@ -534,7 +543,7 @@ export class DashboardNavbar extends Component {
                                 <label id="alertPrice">Price</label>
                                 <input class="alertPrice" type="checkbox" />
 
-                                <label id="alertProfitLoss">P / L %</label>
+                                <label id="alertProfitLoss">Change</label>
                                 <input class="alertProfitLoss" type="checkbox" />
 
                                 <label id="alertProfitVolume">Volume</label>
@@ -548,6 +557,7 @@ export class DashboardNavbar extends Component {
                             <div class="startPrice">
                                 <p id="startPriceLabel">Start Price</p>
                                 <NumberInput
+                                    isDisabled={this.state.disableSetPrice}
                                     onChange={this.setGlobalStartPrice}
                                     style={{ top: '5px' }}
                                     size="md" min={0} maxW={70} defaultValue={1} precision={2} step={0.2}>
@@ -562,6 +572,7 @@ export class DashboardNavbar extends Component {
                             <div class="endPrice">
                                 <p id="endPriceLabel">Target Price</p>
                                 <NumberInput
+                                    isDisabled={this.state.disableSetPrice}
                                     onChange={this.setGlobalTargetPrice}
                                     size="md" min={0} maxW={70} defaultValue={1} precision={2} step={0.2}>
                                     <NumberInputField />

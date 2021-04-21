@@ -132,11 +132,8 @@ export class FetchData extends Component {
       stockInfoPrevPrice: [],
       stockInfoCurrPrice: [],
       stockInfoCode: [],
-
       updateStockInfo: false,
-
       alertMessagePopUp: "",
-
       cache: new cache(),
 
       collapsed: false,

@@ -239,7 +239,6 @@ export default class TableCache {
         /* console.log("SIZE " + size);
          console.log("MAX " + this.max);
          console.log("ENDMOD " + this.endMod);*/
-
         this.priceDetection = true;
         this.update_hideStocks = true;
     }
