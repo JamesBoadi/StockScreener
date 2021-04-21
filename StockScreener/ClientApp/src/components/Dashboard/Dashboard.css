@@ -464,7 +464,57 @@
     left: 50%;
     transform: translate(-50%, -50%);
   }
+  /*
+  .stockTableOneWrap
+  {
+    position: absolute;
+    left: -100px;
+  }*/
+
   
+
+/*****************Stock table one**********************/
+
+  @media screen and ( min-width: 100px ) {
+    .stockTableOneWrap
+    {
+      position: absolute;
+      left: -130px;
+    }
+  }
+  @media screen and ( min-width: 200px ) {
+    .stockTableOneWrap
+    {
+      position: absolute;
+      left: -130px;
+    }
+  }
+  @media screen and ( min-width: 300px ) and ( max-width: 690px ){
+    .stockTableOneWrap
+    {
+      position: absolute;
+      left: -130px;
+    }
+  }
+  @media screen and ( min-width: 690px ) and  ( max-width: 1390px ){
+    .stockTableOneWrap
+    {
+      position: absolute;
+      left: -6px;
+    }
+  }
+
+  @media screen and ( min-width: 1400px ) {
+    .stockTableOneWrap
+    {
+      position: absolute;
+      left: -6px;
+    }
+  }
+
+
+/***************************************/
+
 
   @media screen and (min-width: 320px) { 
     
@@ -516,20 +566,20 @@
     .side-bar 
     {
       min-height: 100%;
-  
     }
+
+
 
   }
 
   
-  @media screen and (min-width: 691px) and (max-width: 691px) { 
+  @media screen and (min-width: 800px) and (max-width: 1025px) { 
    
     .historical .removeHistoricalStock {
       position: absolute;
       top: 130px;
       left: 1350px;
     }
-
 
     .portfolio .removeStock {
       position: absolute;
@@ -573,8 +623,10 @@
     .side-bar 
     {
       min-height: 100%;
-  
     }
+
+
+
   }
 
   @media screen and (min-width: 640px) and (max-width: 691px) { 
@@ -630,7 +682,7 @@
       min-height: 100%;
     }
   }
-
+  
   @media screen and (min-width: 578px) and (max-width: 800px) { 
    
     .historical .removeHistoricalStock {
@@ -727,11 +779,13 @@
       left: 50%;
       transform: translate(-50%, -50%);
     }
+
+   
+
   }
 
   /************** Historical Table ******************/
   /*********************************************/
-
 
   .wrap {
     display: table;
@@ -774,7 +828,6 @@
     width: 40rem;
     left: 0px;
     top: 45px;
-
   }
   
   .historical .historicalTableHeader thead:nth-child(odd) th
