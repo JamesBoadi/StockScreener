@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { TopNavbar } from './TopNavbar.js';
-import { NotificationsTable } from './DashboardOne/NotificationsTable';
+import { SavedStockTable } from './DashboardOne/SavedStockTable';
 import { DashboardSettings } from './DashboardSettings';
 import { StockTableTwo } from './DashboardOne/StockTableTwo';
 import { AlertReducer } from './DashboardOne/js/AlertReducer.js';
 import TableCache from './DashboardOne/js/TableCache.js';
-import NotificationsCache from './DashboardOne/js/NotificationsCache.js';
+import SavedStockCache from './DashboardOne/js/SavedStockCache.js';
 import HistoryCalc from './Historical/js/HistoryCalc';
 import AlertCache from './DashboardOne/js/AlertCache.js';
 import AlertSettings from './DashboardOne/js/AlertSettings.js';
@@ -289,10 +289,10 @@ export class FetchData extends Component {
         // const stock = this.stockDashBoardMap.get(pointer).StockCode;
         // const localStartPrice = this.stockDashBoardMap.get(pointer).LocalStartPrice;
         // const localTargetPrice = this.stockDashBoardMap.get(pointer).LocalTargetPrice;
-        const stock = NotificationsCache.get(pointer).StockCode;
-        const currentPrice_state = parseInt(NotificationsCache.get(pointer).ChangeArray[0]);
-        const currentPrice = parseInt(NotificationsCache.get(pointer).CurrentPrice);
-        const previousPrice = parseInt(NotificationsCache.getPreviousPrice(pointer));
+        const stock = SavedStockCache.get(pointer).StockCode;
+        const currentPrice_state = parseInt(SavedStockCache.get(pointer).ChangeArray[0]);
+        const currentPrice = parseInt(SavedStockCache.get(pointer).CurrentPrice);
+        const previousPrice = parseInt(SavedStockCache.getPreviousPrice(pointer));
 
         this.props.notifications(stock, previousPrice, currentPrice, currentPrice_state);
 
@@ -693,7 +693,7 @@ export class FetchData extends Component {
         />
 
         {/* ALERT TABLE */}
-        <NotificationsTable {...this} />
+        <SavedStockTable {...this} />
 
         <div id="tableContainer">
           {this.state.stockTableTwo}

@@ -12,7 +12,7 @@ import {
 
 
 /* Table for adding Alerts */
-export class NotificationsTable extends Component {
+export class SavedStockTable extends Component {
     constructor(props) {
         super(props);
 
@@ -452,7 +452,7 @@ export class NotificationsTable extends Component {
             <div>
                 {/* ALERT TABLE */}
                 <Box
-                    style={{ position: 'absolute', top: '315px', left: '1070px' }}
+                    style={{ position: 'absolute', top: '315px', left: '1070px', zIndex: 888 }}
                     //     bg='rgb(30,30,30)'
                     boxShadow='sm'
                     textAlign='center'

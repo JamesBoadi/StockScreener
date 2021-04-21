@@ -14,6 +14,8 @@ export class DashboardOne extends Component {
             <div>
                 <header class="App-header">
                     <DashboardNavbar updateCache={this.props.state.updateCache} style={{ transform: 'translateX(20px)' }} />
+                    
+                
                 </header>
             </div>
         );

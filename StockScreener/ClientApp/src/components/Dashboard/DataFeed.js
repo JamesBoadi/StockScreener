@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import HistoryCache from './Historical/js/HistoryCache';
 import PortfolioCache from './Portfolio/js/PortfolioCache';
 import TableCache from './DashboardOne/js/TableCache.js';
-import NotificationsCache from './DashboardOne/js/NotificationsCache.js';
+import SavedStockCache from './DashboardOne/js/SavedStockCache.js';
 import AlertCache from './DashboardOne/js/AlertCache.js';
 import ScannerCache from './Scanner/js/ScannerCache.js';
 import DashboardTwoCache from './DashboardTwo/js/DashboardTwoCache.js';
@@ -90,7 +90,7 @@ export class DataFeed extends Component {
                     // Dashboard One
                     TableCache.set(key, item);
                     AlertCache.set(key, item);
-                    NotificationsCache.set(key, item);
+                    SavedStockCache.set(key, item);
 
                 }
             })
@@ -149,7 +149,7 @@ export class DataFeed extends Component {
                     // Dashboard One
                     TableCache.set(key, item);
                     AlertCache.set(key, item);
-                    NotificationsCache.set(key, item);
+                    SavedStockCache.set(key, item);
 
                     if (!this.state.updateCache)
                         this.setState({ updateCache: false });

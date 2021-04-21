@@ -2,7 +2,7 @@ import * as cache from 'cache-base';
 
 let cache_ = new cache();
 
-export default class NotificationsCache {
+export default class SavedStockCache {
     
 
     static set(key, value) {

@@ -5,6 +5,7 @@ import {
     NumberIncrementStepper, NumberDecrementStepper,
 } from '@chakra-ui/react';
 import { FetchData } from '../../Dashboard/FetchData.js';
+import { Notifications } from '../../Dashboard/Notifications.js';
 import { Menu, Dropdown } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import PriceSettings from './js/PriceSettings.js';
@@ -29,6 +30,7 @@ export class DashboardNavbar extends Component {
         this.setAlertTrigger = this.setAlertTrigger.bind(this);
         this.parseTime = this.parseTime.bind(this);
         this.notifications = this.notifications.bind(this);
+        
         this.enableNotifications = this.enableNotifications.bind(this);
         this.enableNotificationsMenu = this.enableNotificationsMenu.bind(this);
         this.addToNotificationsMenu = this.addToNotificationsMenu.bind(this);
@@ -603,25 +605,26 @@ export class DashboardNavbar extends Component {
                                 onChange={this.setHideBearishStocks} />
                             {/*  />*/}
 
-                            <a
-                                style={{
-                                    color: 'white',
-                                    position: 'absolute', top: '-68px', left: '1130px',
-                                }} onClick={this.enableNotificationsMenu}>
-                                Notifications <DownOutlined />
-                            </a>
+                            <div >
+                            <Button
+                                class="toggleNotifications"
+                                 onClick={this.enableNotificationsMenu}>
+                                Notifications 
+                            </Button>
+                            </div>
+
 
                             <div class="dropdown-content">
                                 <Box
                                     style={{ position: 'absolute' }}
                                     visibility={(this.state.notificationsMenuVisible) ? 'visible' : 'hidden'}
-                                    min-width='16.25rem'
-                                    width='16.25rem'
-                                    height='17.25rem'
+                                    min-width='19.25rem'
+                                    width='25.25rem'
+                                    height='30.25rem'
                                     overflowY='auto'
                                     bg='#f9f9f9'
-                                    top='-35px'
-                                    left='1130px'
+                                    top='-25px'
+                                    left='1030px'
                                     backgroundColor='wheat.511'
                                     zIndex='999'
                                 >
@@ -640,8 +643,9 @@ export class DashboardNavbar extends Component {
                         Change Alert Settings</Button>*/}
                     </div>
                 </Box>
-
-                <FetchData {...this} updateCache={this.props.updateCache} />
+                
+                <Notifications {...this}/>
+               
             </div>
         );
     }

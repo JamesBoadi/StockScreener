@@ -2,7 +2,31 @@ import React, { Component, useState, useContext } from 'react';
 import { Box, Select } from '@chakra-ui/react';
 import './Dashboard.css';
 
+import { Router, Route, Switch } from 'react-router';
+import { Menu, Button } from 'antd';
+import { Redirect } from "react-router-dom";
+import {
+  AppstoreOutlined,
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+  SyncOutlined,
+  NotificationOutlined,
+  SettingOutlined,
+  PieChartOutlined,
+  DesktopOutlined,
+  ContainerOutlined,
+  MailOutlined,
+} from '@ant-design/icons';
+
+
 export const TopNavbar = props => {
+
+    const [collapsed, toggleCollapsed] = useState(false);
+
+
+   // toggleCollapsed(!collapsed);
+
+
     /*           
                 {Index}
                 {MSCap}
@@ -27,6 +51,21 @@ export const TopNavbar = props => {
     // Return NavBar
     return (
         <div >
+            <Menu
+            style={{ position: 'absolute', left: 0, top: 0, minWidth: '1900px', width: '100vw',
+            height: '60px', margin: 0,
+            backgroundColor: 'rgb(40,40,40)',
+            zIndex: '-999' }}
+            
+          //  onClick={this.onMenuClick.bind(this)}
+        
+          
+            inlineCollapsed={collapsed}
+          >
+    <p style={{position: "absolute", right: "70px", bottom: "15px", color: 'white'  }}> Version 1.00 </p>
+          </Menu>
+
+            {/*
             <Box
                 style={{ position: 'absolute', top: '0px', left: '60px', zIndex: -999 }}
                 bg='rgb(40,40,40)'
@@ -40,9 +79,9 @@ export const TopNavbar = props => {
 
                 <p id="selectDashboard">Dashboard A</p>
   
-                <p style={{position: "absolute", right: "70px", top: "10px" }}> Version 1.00 </p>
+            
 
-            </Box>
+            </Box>*/}
         </div>
     );
 };

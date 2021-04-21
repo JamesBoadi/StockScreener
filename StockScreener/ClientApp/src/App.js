@@ -15,6 +15,11 @@ import { DataFeed } from './components/Dashboard/DataFeed';
 import './custom.css'
 import 'antd/dist/antd.css';
 
+
+import { NotificationsContext } from './components/Dashboard/NotificationsContext';
+
+
+
 export default class App extends Component {
   static displayName = App.name;
   constructor(props) {
@@ -29,7 +34,8 @@ export default class App extends Component {
       redirect: [],
       updateCache: false,
       update: true,
-      sidemenu: null
+      sidemenu: null,
+      toggleTab: false
     };
   }
 
@@ -43,6 +49,8 @@ export default class App extends Component {
     if (this.state.update) {
       this.setState({ update: false });
     }
+
+
 
   }
 
@@ -118,7 +126,21 @@ export default class App extends Component {
 
   }
 
+
+  showTab = () => {
+    this.setState({ toggleTab: !this.state.toggleTab });
+  }
+
+
+
+
+
   render() {
+
+    const state = {
+      toggleTab: false,
+      showTab: this.showTab
+    }
     /*
             <Route exact path='/' component={DashboardInterface} />
             <Route path='/counter' component={Counter} />
@@ -128,12 +150,13 @@ export default class App extends Component {
              style={{ position: 'absolute', minHeight: '975px', width: '55px', height: '100vh', margin: 0, zIndex: '999' }}
      */
 
-    return (
-      <div>
-
-        {this.state.sidemenu}
-        <DataFeed {...this} />
-        {this.state.redirect}
+    return ( <div >
+      {this.state.sidemenu}
+      <DataFeed {...this} />
+      {this.state.redirect}
+     
+      <NotificationsContext.Provider value={state}>
+      
         <Switch>
           <Route exact path='/' component={() => <DashboardOne {...this} />} />
           <Route path='/DashboardOne' component={() => <DashboardOne {...this} />} />
@@ -142,7 +165,9 @@ export default class App extends Component {
           <Route path='/Portfolio' component={() => <PortFolio {...this} />} />
           <Route path='/Scanner' component={() => <Scanner {...this} />} />
         </Switch>
-      </div>
+
+     </NotificationsContext.Provider>
+     </div>
     );
   }
 }

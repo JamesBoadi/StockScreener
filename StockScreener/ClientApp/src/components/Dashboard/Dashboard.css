@@ -121,6 +121,19 @@
     display: block;
   }
 
+
+
+  
+  .notifications .dropdown-content {
+    display: none;
+    position: absolute;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    top: 19px;
+    right: 0px;
+    z-index: 999; 
+  }
+
   
   /************** DashboardOne ***************/
   /***************************************/
@@ -130,9 +143,6 @@
     grid-template-columns: repeat(5, 1fr);
     gap: 10px;
   }
-
-  /************** Stock Table ******************/
-  /*********************************************/
 
   #tableContainer
   {
@@ -244,8 +254,6 @@
     position: relative;
     top: 0px;
     right: 0px;
-  
-  
   }
   
   .stockTableTwoMenu .dropdown-content {
@@ -927,6 +935,7 @@
     left: 0px;
     top: 45px;
     background-color:  rgb(40,40,40); 
+    z-index: 88;
   }
 
   .alertTableHeader thead:nth-child(odd) th
@@ -970,6 +979,33 @@
 
 /************** DashboardNavbar ***************/
 /*********************************************/
+
+    
+
+    .DashboardNavbar .toggleNotifications {
+      position: absolute;
+      top: -72px;
+      left: 1310px;
+      box-shadow:inset 0px 0px 3px 0px #91b8b3;
+      background-color:rgb(40,40,40);
+      border-radius:12px;
+      border:1px solid rgb(40,40,40);
+      display:inline-block;
+      cursor:pointer;
+      color:#ffffff;
+      font-family:Times New Roman;
+      font-size:16px;
+      padding:9px 18px;
+      text-decoration:none;
+      text-shadow:0px -1px 0px #2b665e;
+
+    }
+    
+    .DashboardNavbar .toggleNotifications:hover {
+      background-color:#6c7c7c;
+
+
+    }
 
   .DashboardNavbar #dashboard
     {

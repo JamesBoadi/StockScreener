@@ -23,8 +23,10 @@ export class SideMenu extends Component {
     super();
     this.state = {
       collapsed: 5000,
+     
     };
   }
+
 
   toggleCollapsed = () => {
     this.setState({
@@ -75,21 +77,20 @@ export class SideMenu extends Component {
             theme="rgb(0.00,0.00,0.55)"
             inlineCollapsed={this.state.collapsed}
           >
-           
-              <SubMenu key="sub2" icon={<AppstoreOutlined />} title=" Menu">
-                <Menu.Item key="9">Dashboard One</Menu.Item>
-                <Menu.Item key="10">Dashboard Two</Menu.Item>
-                <Menu.Item key="11">Dashboard Three</Menu.Item>
-                <Menu.Item key="12">Screener</Menu.Item>
-                <Menu.Item key="13">Historical Table</Menu.Item>
-                <Menu.Item key="14">My Portfolio</Menu.Item>
-              </SubMenu>
-             
-    
+
+            <SubMenu key="sub2" icon={<AppstoreOutlined />} title=" Menu">
+              <Menu.Item key="9">Dashboard One</Menu.Item>
+              <Menu.Item key="10">Dashboard Two</Menu.Item>
+              <Menu.Item key="11">Dashboard Three</Menu.Item>
+              <Menu.Item key="12">Screener</Menu.Item>
+              <Menu.Item key="13">Historical Table</Menu.Item>
+              <Menu.Item key="14">My Portfolio</Menu.Item>
+            </SubMenu>
+
             <Menu.Item key="1" icon={<SyncOutlined />} onClick={() => this.props.redirect(1)}>
               Manual Refresh
           </Menu.Item>
-            <Menu.Item key="2" icon={<NotificationOutlined />}>
+            <Menu.Item key="2" icon={<NotificationOutlined />} onClick={this.props.showTab} >
               Notifications
           </Menu.Item>
 
