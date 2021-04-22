@@ -12,6 +12,13 @@ import PriceSettings from './js/PriceSettings.js';
 import AlertSettings from './js/AlertSettings.js';
 import TableCache from './js/TableCache.js';
 
+import { StockTableTwo } from './StockTableTwo';
+import { SavedStockTable } from './SavedStockTable';
+
+import { AlertContext } from './AlertContext';
+
+
+
 export class DashboardNavbar extends Component {
     constructor(props) {
         super(props);
@@ -30,7 +37,7 @@ export class DashboardNavbar extends Component {
         this.setAlertTrigger = this.setAlertTrigger.bind(this);
         this.parseTime = this.parseTime.bind(this);
         this.notifications = this.notifications.bind(this);
-        
+
         this.enableNotifications = this.enableNotifications.bind(this);
         this.enableNotificationsMenu = this.enableNotificationsMenu.bind(this);
         this.addToNotificationsMenu = this.addToNotificationsMenu.bind(this);
@@ -44,11 +51,14 @@ export class DashboardNavbar extends Component {
         this.hideBullishStocksConfig = this.hideBullishStocksConfig.bind(this);
         this.hideBearishStocksConfig = this.hideBearishStocksConfig.bind(this);
 
+        this.toggleSettings = this.toggleSettings.bind(this);
+
         this.state = {
             animationTime: 5000,
             alertEnabled: false,
             alertInterval: 1000,
             triggerAlert: false,
+
             startTime: [],
             endTime: [],
             notifications_temp: [],
@@ -90,10 +100,14 @@ export class DashboardNavbar extends Component {
 
             disableSetPrice: true,
 
+            state: {},
+            saveSettings: false,
+
         };
     }
 
     componentDidMount() {
+     
     }
 
     componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -104,7 +118,8 @@ export class DashboardNavbar extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextState.disableSetPrice !== this.state.disableSetPrice ||
+        if (nextState.saveSettings !== this.state.saveSettings ||
+            nextState.disableSetPrice !== this.state.disableSetPrice ||
             nextState.autoDisabled !== this.state.autoDisabled ||
             nextState.manualDisabled !== this.state.manualDisabled ||
             nextState.hideBearishStocks !== this.state.hideBearishStocks ||
@@ -115,6 +130,10 @@ export class DashboardNavbar extends Component {
             return true;
         }
         return false;
+    }
+
+    toggleSettings(state) {
+        this.setState({ saveSettings: state });
     }
 
     // Enable/Disable Menu of Notifications
@@ -131,39 +150,52 @@ export class DashboardNavbar extends Component {
         switch (state) {
             case 3:
                 alert = `${stock} has increased to a price of ${currentPrice}
-                from ${previousPrice} to ${startPrice} Bullish signal warning`
+                from ${previousPrice} to ${startPrice} \n Bullish signal warning`
                 break;
             case 2:
                 alert = `${stock} has increased to a price of ${currentPrice}
-                from ${previousPrice} Bullish signal`
+                from ${previousPrice} \n Bullish signal`
                 break;
             case 1:
                 alert = `${stock} has hit target price of ${targetPrice}
-                from ${previousPrice} to ${currentPrice} Bullish signal`
+                from ${previousPrice} to ${currentPrice} \n Bullish signal`
                 break;
             case -1:
                 alert = `${stock} has dropped to price of ${currentPrice}
-                from ${previousPrice} Bearish signal`
+                from ${previousPrice} \n Bearish signal`
                 break;
             case -2:
                 alert = `${stock} has dropped to price of ${currentPrice}
-                from ${startPrice} Bearish signal warning`
+                from ${startPrice} \n Bearish signal warning`
                 break;
             case -3:
                 alert = `${stock} has hit target price of ${targetPrice}
-                from ${previousPrice} Bearish signal`
+                from ${previousPrice} \n Bearish signal`
                 break;
         }
+        let h = parseInt((new Date().getHours() + 8) >= 17 ? 24 - new Date().getHours()
+            : new Date().getHours() + 8);
+        let m = new Date().getMinutes().toPrecision(2);
+        let time = 'Alert Time: ' + h + ' : ' + m;
+
 
         notifications.push(
             <div class="record"
-                style={{ position: "relative", color: "grey", top: "10px" }}>
+                style={{
+                    position: "relative", color: "black", top: "10px",
+                    fontFamily: 'Times New Roman', letterSpacing: '1.5px'
+                }}>
                 {alert}
+                <br />
+                {time}
             </div>
         );
 
-        this.setState({ updateNotifications: true });
         this.setState({ notifications_temp: notifications });
+        this.setState({ updateNotifications: true });
+
+
+
     }
 
     // Call notifications
@@ -179,15 +211,15 @@ export class DashboardNavbar extends Component {
         targetPrice = globalTargetPrice;
 
         // Override global price individually
-     /*   if (localStartPrice !== globalStartPrice)
-            startPrice = localStartPrice;
-        else
-            startPrice = globalStartPrice;
-
-        if (localTargetPrice !== globalTargetPrice)
-            targetPrice = localTargetPrice
-        else
-            targetPrice = globalTargetPrice;*/
+        /*   if (localStartPrice !== globalStartPrice)
+               startPrice = localStartPrice;
+           else
+               startPrice = globalStartPrice;
+   
+           if (localTargetPrice !== globalTargetPrice)
+               targetPrice = localTargetPrice
+           else
+               targetPrice = globalTargetPrice;*/
 
         // User specifies a Bearish criteria
         if (startPrice > targetPrice) {
@@ -221,29 +253,30 @@ export class DashboardNavbar extends Component {
     }
 
 
-
-
     // Save all settings
     saveConfiguration() {
+    
         AlertSettings.setAlertInterval(this.alertFrequencyRef.current.value);
 
         if (this.state.setNotifications) {
             this.setState({ notificationsEnabled: 1 })
         }
-
+        //  console.log(this.state.manualAlert+' mn '+this.state.autoAlert);
+       
+        
         // Set Alert Times
         // Detect Change in Alert Settings
-        if (AlertSettings.getManual() !== this.state.manualAlert
-            || AlertSettings.getAuto() !== this.state.autoAlert) {
+        if (AlertSettings.getManual() != this.state.manualAlert
+            || AlertSettings.getAuto() != this.state.autoAlert) {
             AlertSettings.setUpdateAlertSettings(true);
         }
+
+        AlertSettings.setManual(this.state.manualAlert);
+        AlertSettings.setAuto(this.state.autoAlert);
 
         if (!this.state.autoAlert) {
             TableCache.setDisableScroll(false);
         }
-      //  console.log(this.state.manualAlert+' mn '+this.state.autoAlert);
-        AlertSettings.setManual(this.state.manualAlert);
-        AlertSettings.setAuto(this.state.autoAlert);
 
         // Override all prices if enabled
         if (this.state.overrideGlobalPrices) {
@@ -269,6 +302,12 @@ export class DashboardNavbar extends Component {
         } else if (!this.state.hideBearishStocks) {
             PriceSettings.sethideBearishStocks(false);
         }
+
+        // Save to database
+
+        this.setState({ saveSettings: true });
+
+
     }
 
     // hideStocksConfig
@@ -353,7 +392,7 @@ export class DashboardNavbar extends Component {
 
     // Checkbox that enables manual alert
     setManualAlert(e) {
-        this.setState({ manualAlert: e.target.checked });
+        this.setState({ manualAlert: (e.target.checked) ? true : false });
 
         this.setState({ disableStartTime: e.target.checked });
         this.setState({ disableEndTime: e.target.checked });
@@ -364,7 +403,7 @@ export class DashboardNavbar extends Component {
 
     // Checkbox that enables auto alert
     setAutoAlert(e) {
-        this.setState({ autoAlert: e.target.checked });
+        this.setState({ autoAlert: (e.target.checked) ? true : false });
 
         // Disable auto alert checkbox 
         this.setState({ manualDisabled: !this.state.manualDisabled });
@@ -420,9 +459,9 @@ export class DashboardNavbar extends Component {
             </select>;
 
         let alertFrequency =
-            <select class="alertFrequency" name="Frequency" 
-            ref={this.alertFrequencyRef}
-            disabled={this.state.disableStartTime}>
+            <select class="alertFrequency" name="Frequency"
+                ref={this.alertFrequencyRef}
+                disabled={this.state.disableStartTime}>
                 <option value="60000">1 Minute</option>
                 <option value="300000">5 Minutes</option>
                 <option value="600000">10 Minutes</option>
@@ -435,14 +474,15 @@ export class DashboardNavbar extends Component {
         let custom_alertFrequency = <input class="customalertFrequency" type="number" id="quantity"
             name="quantity" min="1" max="240" />
 
-        let startTime = <input class="startTime" type="time" name="time" 
-        ref={this.getStartTime} min="09:00" max="17:00" disabled={this.state.disableStartTime} />;
+        let startTime = <input class="startTime" type="time" name="time"
+            ref={this.getStartTime} min="09:00" max="17:00" disabled={this.state.disableStartTime} />;
 
-        let endTime = <input class="endTime" type="time" name="time" 
-        ref={this.getEndTime} min="09:00" max="17:00" disabled={this.state.disableEndTime} />;
+        let endTime = <input class="endTime" type="time" name="time"
+            ref={this.getEndTime} min="09:00" max="17:00" disabled={this.state.disableEndTime} />;
 
         return (
             <div class="DashboardNavbar">
+
                 <Box
                     style={{ position: 'absolute', top: '80px', left: '60px', zIndex: 888 }}
                     bg='rgb(40,40,40)'
@@ -477,7 +517,7 @@ export class DashboardNavbar extends Component {
                             <label id="endTime">End Time</label>
                             {endTime}
 
-                             <label id="manualAlerts">Manual</label>
+                            <label id="manualAlerts">Manual</label>
 
                             <input class="manualAlerts" type="checkbox" checked={this.state.manualAlert}
                                 disabled={this.state.manualDisabled} onChange={this.setManualAlert} />
@@ -486,6 +526,7 @@ export class DashboardNavbar extends Component {
 
                             <input class="autoAlerts" type="checkbox" checked={this.state.autoAlert}
                                 disabled={this.state.autoDisabled} onChange={this.setAutoAlert} /> {/* {...(this.state.manualAlert == 1) ? disabled : ""} */}
+
 
                             {/* 
                               <label id="manualAlertsNotifications">Notifications</label>
@@ -606,11 +647,11 @@ export class DashboardNavbar extends Component {
                             {/*  />*/}
 
                             <div >
-                            <Button
-                                class="toggleNotifications"
-                                 onClick={this.enableNotificationsMenu}>
-                                Notifications 
-                            </Button>
+                                <Button
+                                    class="toggleNotifications"
+                                    onClick={this.enableNotificationsMenu}>
+                                    Notifications
+                                    </Button>
                             </div>
 
 
@@ -619,13 +660,13 @@ export class DashboardNavbar extends Component {
                                     style={{ position: 'absolute' }}
                                     visibility={(this.state.notificationsMenuVisible) ? 'visible' : 'hidden'}
                                     min-width='19.25rem'
-                                    width='25.25rem'
-                                    height='30.25rem'
+                                    width='22.25rem'
+                                    height='40.25rem'
                                     overflowY='auto'
-                                    bg='#f9f9f9'
+                                    bg='rgb(230,230,230)'
                                     top='-25px'
-                                    left='1030px'
-                                    backgroundColor='wheat.511'
+                                    left='1070px'
+                                    backgroundColor='wheat.800'
                                     zIndex='999'
                                 >
                                     {this.state.notifications}
@@ -641,11 +682,13 @@ export class DashboardNavbar extends Component {
                         <Button style={{ position: 'absolute', top: '135px', left: '410px' }}>Save</Button>
                     <Button style={{ position: 'absolute', top: '135px', left: '200px' }}>
                         Change Alert Settings</Button>*/}
+
                     </div>
                 </Box>
-                
-                <Notifications {...this}/>
-               
+
+                <StockTableTwo {...this} />
+                <SavedStockTable {...this} />
+
             </div>
         );
     }

@@ -215,19 +215,19 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     pointer++;
                 }
 
-             /*      copy(start, end);
-                    data = client.GetRealTimePrices(stockArray);
-                    Stock stock;
+                /*      copy(start, end);
+                       data = client.GetRealTimePrices(stockArray);
+                       Stock stock;
 
-                foreach (RealTimePrice data_ in data)
-                {
-                    stock = new Stock(StocksCode.Value[pointer],
-                    data_.Open, data_.Change, data_.ChangeP, data_.Volume, changeArray, data_.High, data_.Low,
-                    (positive && !negative) ? 1 : -1, data_.Close, data_.PreviousClose);
+                   foreach (RealTimePrice data_ in data)
+                   {
+                       stock = new Stock(StocksCode.Value[pointer],
+                       data_.Open, data_.Change, data_.ChangeP, data_.Volume, changeArray, data_.High, data_.Low,
+                       (positive && !negative) ? 1 : -1, data_.Close, data_.PreviousClose);
 
-                    cache.Add(stock);
-                } */
-            
+                       cache.Add(stock);
+                   } */
+
             }
             catch (Exception ex)
             {
@@ -248,16 +248,16 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 int pointer = start;
                 while (pointer < end)
                 {
-                    int[] array = { -1, 2, -2 };
+                    int[] array = { -1, 2, -2, 0 };
                     Random random = new Random();
                     int start2 = random.Next(0, array.Length);
 
                     int[] changeArray = new int[6] { array[start2], array[start2], array[start2], array[start2],
                      array[start2], array[start2] };
-
+                    int s = new Random().Next(0, 99);
                     stock = new Stock(pointer.ToString(), Stocks.StocksCode.Value[pointer],
                     Stocks.StocksName.Value[pointer], "8:00",
-                    start2, 2, 3, start2, changeArray, 5, 6, 7, 8, 86);
+                    s, 2, 3, start2, changeArray, 5, 6, 7, 8, 86);
 
                     cache.Update(pointer, stock);
                     pointer++;
@@ -300,10 +300,10 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         public void setHistoricalPrices(int start, int end)
         {
             // List<HistoricalPrice> prices = client.
-           // GetHistoricalPrices(Consts.TestSymbol, Consts.StartDate, Consts.EndDate);
-           // Serialise HISTORICALDATA.CS
+            // GetHistoricalPrices(Consts.TestSymbol, Consts.StartDate, Consts.EndDate);
+            // Serialise HISTORICALDATA.CS
 
-           
+
         }
 
 

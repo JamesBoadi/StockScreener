@@ -7,6 +7,7 @@ import AlertCache from './js/AlertCache.js';
 import TableCache from './js/TableCache.js';
 import AlertSettings from './js/AlertSettings.js';
 import PriceSettings from './js/PriceSettings.js';
+import SavedStockCache from './js/SavedStockCache.js';
 
 // Replace with Redux
 export class StockTableTwoAlert extends React.Component {
@@ -70,53 +71,66 @@ export class StockTableTwoAlert extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-     /*   if (this.props.state.disableScrolling === false
-            && AlertSettings.getManual()) {
-            this.priority_queue.clear()
-            clearInterval(this.animationTime);
-            this.manualAlert(this.props.addToStyleMap);
-            this.props.setScrollUpdate(false);
-        }*/
-        if (AlertSettings.getUpdateAlertSettings()) {
-            // Clear all Alerts
-            if (!AlertSettings.getManual() && !AlertSettings.getAuto()) {
-                this.priority_queue.clear()
-                if (this.animationTime !== undefined) {
-                    clearInterval(this.animationTime);
-                } if (this.autoInterval !== undefined) {
-                    clearInterval(this.autoInterval);
+        /*   if (this.props.state.disableScrolling === false
+               && AlertSettings.getManual()) {
+               this.priority_queue.clear()
+               clearInterval(this.animationTime);
+               this.manualAlert(this.props.addToStyleMap);
+               this.props.setScrollUpdate(false);
+           }*/
+        if (this.props.state.toggleAlert) {
+            let changeSettings = true;
+            if(AlertSettings.triggerSettings() == 1 && !AlertSettings.getUpdateAlertSettings())
+                changeSettings = false;
+            else if(AlertSettings.triggerSettings() == 0)
+                changeSettings = true;
+
+            if(AlertSettings.triggerSettings() == 0)
+                AlertSettings.setTriggerSettings(1);
+
+            if (changeSettings) {
+                // Clear all Alerts
+                if (!AlertSettings.getManual() && !AlertSettings.getAuto()) {
+                    this.priority_queue.clear()
+                    if (this.animationTime !== undefined) {
+                        clearInterval(this.animationTime);
+                    } if (this.autoInterval !== undefined) {
+                        clearInterval(this.autoInterval);
+                    }
+                    if (this.manualInterval !== undefined) {
+                        clearInterval(this.autoInterval);
+                    }
                 }
-                if (this.manualInterval !== undefined) {
-                    clearInterval(this.autoInterval);
+                // Trigger manual Alert
+                else if (AlertSettings.getManual()) {
+                    if (this.animationTime !== undefined) {
+                        clearInterval(this.animationTime);
+                    }
+                    if (this.autoInterval !== undefined) {
+                        clearInterval(this.autoInterval);
+                    }
+                    if (this.manualInterval !== undefined) {
+                        clearInterval(this.autoInterval);
+                    }
+                    TableCache.setDisableScroll(false);
+                    console.log('Called! Manual Alert! 2')
+                    this.manualAlert(this.props.addToStyleMap);
+                } // Trigger Auto Alert
+                else if (AlertSettings.getAuto()) {
+                    if (this.animationTime !== undefined) {
+                        clearInterval(this.animationTime);
+                    } if (this.autoInterval !== undefined) {
+                        clearInterval(this.autoInterval);
+                    }
+                    if (this.manualInterval !== undefined) {
+                        clearInterval(this.autoInterval);
+                    }
+                    console.log('Called! Auto Alert! 2')
+                    this.autoAlert(this.props.addToStyleMap);
                 }
             }
-            // Trigger manual Alert
-            else if (AlertSettings.getManual()) {
-                if (this.animationTime !== undefined) {
-                    clearInterval(this.animationTime);
-                }
-                if (this.autoInterval !== undefined) {
-                    clearInterval(this.autoInterval);
-                }        
-                if (this.manualInterval !== undefined) {
-                    clearInterval(this.autoInterval);
-                }
-                TableCache.setDisableScroll(false);
-                console.log('Called! Manual Alert! 2')
-                this.manualAlert(this.props.addToStyleMap);
-            } // Trigger Auto Alert
-            else if (AlertSettings.getAuto()) {
-                if (this.animationTime !== undefined) {
-                    clearInterval(this.animationTime);
-                } if (this.autoInterval !== undefined) {
-                    clearInterval(this.autoInterval);
-                }
-                if (this.manualInterval !== undefined) {
-                    clearInterval(this.autoInterval);
-                }
-                console.log('Called! Auto Alert! 2')
-                this.autoAlert(this.props.addToStyleMap);
-            }
+
+            this.props.toggleAlert(false);
             AlertSettings.setUpdateAlertSettings(false);
         }
     }
@@ -127,7 +141,7 @@ export class StockTableTwoAlert extends React.Component {
 
     shouldComponentUpdate(nextProps, nextState) {
         if (nextProps.state.tb2_scrollPosition !== this.props.state.tb2_scrollPosition
-            || AlertSettings.getUpdateAlertSettings()) {
+            || nextProps.state.toggleAlert !== this.props.state.toggleAlert) {
             return true;
         }
         return false;
@@ -159,12 +173,16 @@ export class StockTableTwoAlert extends React.Component {
 
     // Trigger alert automatically
     autoAlert(callback) {
+        // FETCH
+
+        let prevArray = [] // FFetch
+
         TableCache.setDisableScroll(true);
         this.setState({ continueAnimation: true });
         this.autoInterval = setInterval(() => {
             if (this.state.continueAnimation) {
                 console.log('Call Animation ');
-      
+
                 // Add stocks to array and priority priority_queue;
                 let pointer = 0;
                 while (pointer < 897) {
@@ -183,6 +201,8 @@ export class StockTableTwoAlert extends React.Component {
                             if (this.priority_queue.includes(pointer) == false)
                                 this.priority_queue.enqueue(pointer);
 
+
+
                             // Update existing element
                             this.array[pointer] = [pointer, state, 1600];
                         }
@@ -198,6 +218,8 @@ export class StockTableTwoAlert extends React.Component {
                     }
                     pointer++;
                 }
+
+                // Randonmise the array
 
                 if (this.priority_queue.length !== 0)
                     this.triggerAnimation(callback, this.array);
@@ -215,7 +237,7 @@ export class StockTableTwoAlert extends React.Component {
         this.manualInterval = setInterval(() => {
             if (this.state.continueAnimation) {
                 console.log('NEXT ');
-      
+
                 // Add stocks to array and priority priority_queue;
                 let pointer = 0;
                 while (pointer < 897) {
@@ -259,7 +281,40 @@ export class StockTableTwoAlert extends React.Component {
         }, AlertSettings.getAlertInterval());
     }
 
+    // Add Notifications to notifications menu
+    addToNotificationsMenu() {
+        const defaultInterval = 60000;
+        const clickedAlertTableRowID = this.state.clickedAlertTableRowID;
+
+        let pointer = 0;//this.state.start;
+        const end = 897;//this.state.end;
+
+        // Add the database (last known pointer)
+
+        this.notificationsDelayInterval = setInterval(() => {
+            // const stock = this.stockDashBoardMap.get(pointer).StockCode;
+            // const localStartPrice = this.stockDashBoardMap.get(pointer).LocalStartPrice;
+            // const localTargetPrice = this.stockDashBoardMap.get(pointer).LocalTargetPrice;
+            const stock = SavedStockCache.get(pointer).StockCode;
+            const currentPrice_state = parseInt(SavedStockCache.get(pointer).ChangeArray[0]);
+
+            if (currentPrice_state === 0) {
+                pointer++;
+            }
+
+            const currentPrice = parseInt(SavedStockCache.get(pointer).CurrentPrice);
+            const previousPrice = parseInt(SavedStockCache.getPreviousPrice(pointer));
+
+            this.props.notifications(stock, previousPrice, currentPrice, currentPrice_state);
+
+            if (pointer++ >= end) {
+                pointer = 0; // Add the database (last known pointer)
+            }
+        }, 7000);
+    }
+
     render() {
+
         return null;
     }
 

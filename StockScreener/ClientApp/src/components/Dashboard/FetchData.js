@@ -176,18 +176,11 @@ export class FetchData extends Component {
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     var t = [];
 
-    // Display Stock Info
-    if (this.updateStockInfo) {
-      this.setState({ stockInfoHeader: this.state.stockInfoName[0] });
-      this.setState({ stockInfoPrevPrice: this.state.stockInfoName[1] });
-      this.setState({ stockInfoCurrPrice: this.state.stockInfoName[2] });
-      this.setState({ stockInfoCode: this.state.stockInfoName[3] });
-
-      this.updateStockInfo = false;
-    }
-    else if (this.state.lock === true) {
+    
+    if (this.state.lock === true) {
       t.push(<StockTableTwo
         {...this}
+        updateSettings={this.props.updateSettings} 
         alertInterval={this.props.state.alertInterval}
         endTime={this.props.state.endTime}
         cache={this.getCache()}
@@ -217,45 +210,6 @@ export class FetchData extends Component {
     return false;
   }
 
-  // **************************************************
-  // Initialise Alert Rows
-  // **************************************************
-
-  // Initialise alert rows from database
-  async initialiseAlertTable() {
-    // Read notifications from database
-    await fetch('getallnotifications')
-      .then(response => response.json())
-      .then(response =>
-        this.addFirstRows(response)
-      )
-      .catch(error => {
-        console.log("error " + error) // 404
-        return;
-      }
-      );
-  }
-
-  addFirstRows(response) {
-    var t = [];
-    var alertTableStocks = this.state.alertTableStocks;
-
-    for (var i = 0; i < response.length; i++) {
-      const item = JSON.parse(response[i]);
-      const pointer = parseInt(item.Id);
-      t.push(item);
-      alertTableStocks.push(item);
-      this.map.set(i, pointer);
-    }
-
-    this.setState({ maxNumberOfAlertTableRows: response.length });
-    this.setState({ alertTableStack: t });
-    this.setState({ alertTableStocks: alertTableStocks });
-    this.setState({ addAlertTableRowBool: true });
-  }
-
-  // **************************************************
-
   updateCache(bool) {
     this.setState({ updateCache: bool });
   }
@@ -273,34 +227,6 @@ export class FetchData extends Component {
   // End variable Setter
   setEnd(bool) {
     this.setState({ end: bool });
-  }
-
-  // Add Notifications to notifications menu
-  addToNotificationsMenu() {
-    const defaultInterval = 60000;
-    const clickedAlertTableRowID = this.state.clickedAlertTableRowID;
-
-    // Clear Interval only on manual mode
-    this.notificationsInterval = setInterval(() => {
-      let pointer = 0;//this.state.start;
-      const end = 897;//this.state.end;
-
-      this.notificationsDelayInterval = setInterval(() => {
-        // const stock = this.stockDashBoardMap.get(pointer).StockCode;
-        // const localStartPrice = this.stockDashBoardMap.get(pointer).LocalStartPrice;
-        // const localTargetPrice = this.stockDashBoardMap.get(pointer).LocalTargetPrice;
-        const stock = SavedStockCache.get(pointer).StockCode;
-        const currentPrice_state = parseInt(SavedStockCache.get(pointer).ChangeArray[0]);
-        const currentPrice = parseInt(SavedStockCache.get(pointer).CurrentPrice);
-        const previousPrice = parseInt(SavedStockCache.getPreviousPrice(pointer));
-
-        this.props.notifications(stock, previousPrice, currentPrice, currentPrice_state);
-
-        if (pointer++ >= end) {
-          clearInterval(this.notificationsInterval)
-        }
-      }, 7000);
-    }, AlertSettings.getAlertInterval());
   }
 
   // Triggered when a table row is clicked
@@ -336,225 +262,6 @@ export class FetchData extends Component {
     this.setState({ target: alertTableId });
     this.setState({ addAlertTableRowBool: true });
   }
-
-  // Disable button until a stock is CLICKED
-  async keyExists(e, target) {
-    //  e.persist();
-    return new Promise(resolve => {
-      setTimeout(() => {
-        //    e.stopPropagation();
-        const target_ = parseInt(target);
-
-        for (const pair of this.map) {
-          let value = parseInt(pair.value);
-          if (target_ === value)
-            resolve(true);
-        }
-        resolve(false);
-      }, 100);
-    });
-  }
-
-  // Add a Row to Notifications table
-  async addAlertTableRow(e) {
-    var t = this.state.alertTableStack;
-    var alertTableStocks = this.state.alertTableStocks;
-    const target = parseInt(this.state.clickedAlertTableRowID);
-
-    const exists = await this.keyExists(e, target);
-    const maxRows = 45;
-
-    // Change from defensive to error class (call from errorr class) 
-    if (exists || this.state.maxNumberOfAlertTableRows >= maxRows ||
-      isNaN(target) || (target === null || target === undefined)) {
-      window.alert('This stock already exists ');
-      return;
-
-    }
-
-    // Save to Database
-    const json = TableCache.get(target);
-
-    const obj =
-    {
-      Id: json.Id,
-      StockCode: json.StockCode,
-      TimeStamp: json.TimeStamp,
-      CurrentPrice: json.CurrentPrice,
-      ChangeP: json.ChangeP,
-      Volume: json.Volume,
-    };
-
-    var jsonString = JSON.stringify(obj);
-
-    await fetch('savenotifications/'.concat(jsonString))
-      .then(response => response.status)
-      .then(response => {
-        if (!response.ok) {
-          // 404 
-          return;
-        }
-      })
-      .catch(error => {
-        console.log("error " + error) // 404
-        return;
-      }
-      );
-
-    // Stocks to be displayed in the Notifications table
-    alertTableStocks.push(json);
-    let pointer = alertTableStocks.length - 1;
-
-    t.push(
-      <tbody>
-        <tr key={pointer} >
-          <td id={pointer} onClick={this.selectAlertTableRow}>{alertTableStocks[pointer].StockCode.toString()}</td>
-          <td id={pointer} onClick={this.selectAlertTableRow}>{alertTableStocks[pointer].TimeStamp.toString()}</td>
-          <td id={pointer} onClick={this.selectAlertTableRow}>{alertTableStocks[pointer].CurrentPrice.toString()} </td>
-          <td id={pointer} onClick={this.selectAlertTableRow}>{alertTableStocks[pointer].ChangeP.toString()}</td>
-          <td id={pointer} onClick={this.selectAlertTableRow}>{alertTableStocks[pointer].Volume.toString()}</td>
-        </tr>
-      </tbody>
-    )
-    // Add id with its value to map
-    // key: 0..N value: alertTable
-    this.map.set(pointer, target);
-    // Save to Database
-
-    console.log('NEXT')
-
-    // Force an update
-    this.setState({ maxNumberOfAlertTableRows: this.state.maxNumberOfAlertTableRows + 1 });
-    this.setState({ alertTableStack: t });
-    this.setState({ alertTableStocks: alertTableStocks });
-    this.setState({ addAlertTableRowBool: true });
-  }
-
-  // Are you sure you want to remove this stock?
-  async removeAlertTableRow() {
-    let target = parseInt(this.state.target);
-
-    if (this.state.maxNumberOfAlertTableRows < 1
-      || isNaN(target) || (target === null || target === undefined))
-      return;
-
-
-    let pointer;
-    let start = 0;
-    let end = this.state.alertTableStocks.length - 1;
-    let alertTableStocks = [];
-
-    let deleteId;
-
-    for (pointer = start; pointer <= end; pointer++) {
-      // console.log('alertTableId ' + pointer + ' target ' + target);
-      if (pointer === target) {
-        deleteId = pointer;
-        continue;
-      }
-      else
-        alertTableStocks.push(this.state.alertTableStocks[pointer]);
-    }
-
-    await fetch('deletenotification/'.concat(this.map.get(target)))
-      .then(response => response.status)
-      .then(response => {
-        if (!response.ok) {
-          // 404 
-          return;
-        }
-      })
-      .catch(error => {
-        console.log("error " + error) // 404
-        return;
-      }
-      );
-
-    console.log('delete id ' + deleteId);
-
-    if ((deleteId !== null || deleteId !== undefined))
-      this.map.delete(deleteId);
-    else
-      return;
-
-    this.setState({ maxNumberOfAlertTableRows: this.state.maxNumberOfAlertTableRows - 1 });
-    this.setState({ alertTableStocks: alertTableStocks });
-    this.setState({ removeAlertTableRowBool: true });
-  }
-
-  // **************************************************
-  // Add to Historical Table
-  // **************************************************
-
-  // Add to History Table
-  async addToHistorical() {
-    const target = parseInt(this.state.clickedAlertTableRowID);
-    const json = TableCache.get(target);
-    console.log('target ' + target);
-    let txt;
-    if (isNaN(target) || (target === null || target === undefined)) {
-      window.alert("No target is clicked ");
-    }
-    else {
-      var r = window.confirm("Add to Historical Table?");
-      if (r == true) {
-        txt = "Yes";
-      } else {
-        txt = "Cancel";
-      }
-
-      const jsonString = await this.getJSON(json);
-
-
-      // if (txt === "Yes") {
-      const res = await this.saveHistoricalData(jsonString);
-      console.log('Historical data added? ' + res);
-      // window.alert(returned message)             window.alert('Maximum stocks for portfolio exceeded, limit: 200 ');
-      //}
-    }
-  }
-
-  async saveHistoricalData(data) {
-    await fetch('savehistoricaldata/temp/'.concat(data))
-      .then(response => response.status)
-      .then(response => {
-        if (!response.ok) {
-          // 404 
-          return false;
-        }
-        else return true;
-      })
-      .catch(error => {
-        console.log("error " + error) // 404
-        return false;
-      }
-      );
-
-    return false;
-  }
-
-  async getJSON(json) {
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth() + 1;
-
-    var yyyy = today.getFullYear();
-    if (dd < 10) {
-      dd = '0' + dd;
-    }
-    if (mm < 10) {
-      mm = '0' + mm;
-    }
-
-    var today = yyyy + 'a' + mm + 'a' + dd;
-
-    const obj = { Id: json.Id, Date: today };
-    var jsonString = JSON.stringify(obj);
-
-    return jsonString;
-  }
-
-  // **************************************************
 
   triggerAnimation(param) {
     console.log('CALL ACK HELL ' + param)
@@ -605,10 +312,7 @@ export class FetchData extends Component {
   getCache() {
     return this.state.cache;
   }
-
-
-
-
+  
   async addToCache() {
     var count = 0;
   }
@@ -629,7 +333,6 @@ export class FetchData extends Component {
     return (
       <div>
 
-
         {/* Stock Dashboard */}
         <Box
           style={{ position: 'absolute', top: '340px', left: '60px' }}
@@ -646,33 +349,6 @@ export class FetchData extends Component {
           {this.state.stockInfoPrevPrice}
           {this.state.stockInfoCurrPrice}
 
-
-          {/*   <h4 style={{ position: 'relative', top: '38px', left: '5px', color: 'white' }}>Start Price:  </h4>
-
-          <NumberInput
-             ref={this.startPriceRef}
-            style={{ position: 'relative', top: '0px', left: '150px' }}
-            size="md" maxW={70} maxH={10} defaultValue={15} min={10} max={20}>
-            <NumberInputField />
-            <NumberInputStepper >
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-
-          <h4 style={{ position: 'relative', top: '38px', left: '5px', color: 'white' }}>Target Price:  </h4>
-
-          <NumberInput
-            // ref={this.targetPriceRef}
-            style={{ position: 'relative', top: '0px', left: '150px' }}
-            size="md" maxW={70} defaultValue={15} min={10} max={20}>
-            <NumberInputField />
-            <NumberInputStepper >
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-    </NumberInput> */}
-
           <Button onClick={this.addAlertTableRow}
             style={{ position: 'absolute', bottom: '20px', right: '180px', width: '90px' }}>
             Add <br />to Table</Button>
@@ -687,10 +363,6 @@ export class FetchData extends Component {
         </Box>
 
         {/* <SideBar isStreaming={() => { return this.state.isStreaming }}/>  */}
-
-        <TopNavbar
-          Data={this.state.data}
-        />
 
         {/* ALERT TABLE */}
         <SavedStockTable {...this} />

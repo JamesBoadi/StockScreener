@@ -13,6 +13,8 @@ import * as cache from 'cache-base';
 import DashboardTwoCache from './js/DashboardTwoCache.js';
 import AlertSettings from './js/AlertSettings.js';
 import HistoryCalc from '../Historical/js/HistoryCalc.js';
+import { DisplayStock } from '../../Dashboard/DisplayStock.js';
+
 
 // Fetch data for dash board one
 export class StockTableOne extends React.Component {
@@ -639,7 +641,6 @@ export class StockTableOne extends React.Component {
             this.setState({ tempID: id });
             this.setState({ filterStocks: true });
         }
-
     }
 
     biggestLosers() {
@@ -747,7 +748,6 @@ export class StockTableOne extends React.Component {
             this.setState({ tempID: id });
             this.setState({ filterStocks: true });
         }
-
     }
 
 
@@ -800,52 +800,56 @@ export class StockTableOne extends React.Component {
 
         return (
             <div>
+
+                <DisplayStock {...this} />
+
+
                 <div class="stockTableOneWrap">
-             
-                {/* STOCK TABLE TWO */}
-                <Box
-                    style={{ position: 'absolute', top: '405px', left: '1070px' }}
-                    bg='rgb(30,30,30)'
 
-                    boxShadow='sm'
-                    textAlign='center'
-                    height='35px'
-                    width='60rem'
-                    rounded="lg"
-                    maxHeight='35px'
-                    margin='auto'
-                    zIndex='999'
-                    color='white'>
-
-                    {/* Filter Options */}
-                    <div style={{ position: 'absolute', top: '-5px', right: '0px' }}>
-                        <Dropdown overlay={menu} placement="bottomCenter">
-                            <Button>Filter</Button>
-                        </Dropdown>
-                    </div>
-
-                    {stockTableTwoHeader}
-
+                    {/* STOCK TABLE TWO */}
                     <Box
-                        style={this.state.tb2_style}
-                        position='absolute'
-                        overflowY='initial'
-                        top='35px'
-                        ref={this.textInput}
-                        onScroll={this.freezeScrollPosition}
-                        overflowX='hidden'
+                        style={{ position: 'absolute', top: '405px', left: '1070px' }}
                         bg='rgb(30,30,30)'
+
                         boxShadow='sm'
                         textAlign='center'
-                        height='800px'
-                        width='62rem'
-                        maxHeight='800px'
+                        height='35px'
+                        width='60rem'
                         rounded="lg"
-                        color='white'
-                        zIndex='-999'>
-                        {this.state.tb2}
+                        maxHeight='35px'
+                        margin='auto'
+                        zIndex='999'
+                        color='white'>
+
+                        {/* Filter Options */}
+                        <div style={{ position: 'absolute', top: '-5px', right: '0px' }}>
+                            <Dropdown overlay={menu} placement="bottomCenter">
+                                <Button>Filter</Button>
+                            </Dropdown>
+                        </div>
+
+                        {stockTableTwoHeader}
+
+                        <Box
+                            style={this.state.tb2_style}
+                            position='absolute'
+                            overflowY='initial'
+                            top='35px'
+                            ref={this.textInput}
+                            onScroll={this.freezeScrollPosition}
+                            overflowX='hidden'
+                            bg='rgb(30,30,30)'
+                            boxShadow='sm'
+                            textAlign='center'
+                            height='800px'
+                            width='62rem'
+                            maxHeight='800px'
+                            rounded="lg"
+                            color='white'
+                            zIndex='-999'>
+                            {this.state.tb2}
+                        </Box>
                     </Box>
-                </Box>
                 </div>
             </div>
         );

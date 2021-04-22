@@ -641,11 +641,8 @@ export class DashboardTwoNavbar extends Component {
                     </div>
                 </Box>
 
-
                 <StockTableOne {...this} />
                 <StockTableTwo {...this} />
-
-
 
             </div>
         );

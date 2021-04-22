@@ -16,6 +16,7 @@ import * as cache from 'cache-base';
 
 import DashboardTwoCache from './js/DashboardTwoCache.js';
 import AlertSettings from './js/AlertSettings.js';
+import { DisplayStock } from '../../Dashboard/DisplayStock.js';
 
 // Fetch data for dash board one
 export class StockTableTwo extends React.Component {
@@ -181,95 +182,95 @@ export class StockTableTwo extends React.Component {
 
                 this.updateStockInfo = false;
             }
-            // Trigger if Hide Bullish/Bearish Stocks Enabled
-            if (DashboardTwoCache.getUpdateHideStocks()) {
-                console.log('  ---->  ' + 'THESE ARE MAH STOCKS!');
+        // Trigger if Hide Bullish/Bearish Stocks Enabled
+        if (DashboardTwoCache.getUpdateHideStocks()) {
+            console.log('  ---->  ' + 'THESE ARE MAH STOCKS!');
+            this.newTable()
+            this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
+                this.updateTable(this.state.start)
+            });
+
+            if (this.state.start === 0)
+                this.textInput.current.scrollTop = 10;
+            else
+                this.textInput.current.scrollTop = 25;
+
+            DashboardTwoCache.setDisableScroll(false);
+            DashboardTwoCache.setDisableScroll(false);
+            DashboardTwoCache.setUpdateHideStocks(false);
+        }
+        // Highlight rowtable if selected
+        else if (this.state.isSelected) {
+            this.newTable()
+            this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
+                this.updateTable(this.state.start)
+                this.forceUpdate()
+            });
+
+            this.setState({ isSelected: false });
+        }
+        // Update if scrolled
+        else if (prevState.tb2_count === 1) {
+            this.newTable()
+            this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
+                this.updateTable(this.state.start)
+            });
+
+            console.log('SCROLL ');
+
+            if (this.state.start === 0)
+                this.textInput.current.scrollTop = 10;
+            else
+                this.textInput.current.scrollTop = 25;
+
+            //this.props.resetTableID(null); // Reset id
+            this.setState({ scrollUpdated: true });
+            this.setState({ tb2_count: 0 });
+
+        }
+        // Search for a stock
+        else if (this.state.validInput) {
+
+            this.setState({
+                tb2_scrollPosition: (this.state.tb2_scrollPosition <= 17) ? this.getUnits(scroll) : 17
+            }, () => {
                 this.newTable()
-                this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
-                    this.updateTable(this.state.start)
-                });
+                this.setState({ start: this.state.tb2_scrollPosition * 50 })
+                this.updateTable(this.state.start)
+            });
 
-                if (this.state.start === 0)
-                    this.textInput.current.scrollTop = 10;
-                else
-                    this.textInput.current.scrollTop = 25;
+            if (this.state.start === 0)
+                this.textInput.current.scrollTop = 10;
+            else
+                this.textInput.current.scrollTop = 25;
 
-                DashboardTwoCache.setDisableScroll(false);
-                DashboardTwoCache.setDisableScroll(false);
-                DashboardTwoCache.setUpdateHideStocks(false);
-            }
-            // Highlight rowtable if selected
-            else if (this.state.isSelected) {
-                this.newTable()
-                this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
-                    this.updateTable(this.state.start)
-                    this.forceUpdate()
-                });
-
-                this.setState({ isSelected: false });
-            }
-            // Update if scrolled
-            else if (prevState.tb2_count === 1) {
-                this.newTable()
-                this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
-                    this.updateTable(this.state.start)
-                });
-
-                console.log('SCROLL ');
-
-                if (this.state.start === 0)
-                    this.textInput.current.scrollTop = 10;
-                else
-                    this.textInput.current.scrollTop = 25;
-
-                //this.props.resetTableID(null); // Reset id
-                this.setState({ scrollUpdated: true });
-                this.setState({ tb2_count: 0 });
-
-            }
-            // Search for a stock
-            else if (this.state.validInput) {
-
+            //this.props.resetTableID(this.state.stockRecord); // Reset id
+            this.setState({ validInput: false });
+            this.setState({ queryRes: false });
+        }
+        // Animation
+        else if (this.state.updateStyleMap) {
+            if (AlertSettings.getAuto()) {
                 this.setState({
-                    tb2_scrollPosition: (this.state.tb2_scrollPosition <= 17) ? this.getUnits(scroll) : 17
+                    tb2_scrollPosition: (this.getUnits(scroll) <= 17) ? this.getUnits(scroll) : 17
                 }, () => {
                     this.newTable()
                     this.setState({ start: this.state.tb2_scrollPosition * 50 })
-                    this.updateTable(this.state.start)
+                    this.updateTable(this.state.start);
                 });
 
-                if (this.state.start === 0)
-                    this.textInput.current.scrollTop = 10;
-                else
-                    this.textInput.current.scrollTop = 25;
-
-                //this.props.resetTableID(this.state.stockRecord); // Reset id
-                this.setState({ validInput: false });
-                this.setState({ queryRes: false });
+                // Top half or Bottom Half
+                const stockRecord = this.state.stockRecord;
+                let rem = stockRecord % 50;
+                this.textInput.current.scrollTop = parseInt((rem * (795 / 50)) + 55);
             }
-            // Animation
-            else if (this.state.updateStyleMap) {
-                if (AlertSettings.getAuto()) {
-                    this.setState({
-                        tb2_scrollPosition: (this.getUnits(scroll) <= 17) ? this.getUnits(scroll) : 17
-                    }, () => {
-                        this.newTable()
-                        this.setState({ start: this.state.tb2_scrollPosition * 50 })
-                        this.updateTable(this.state.start);
-                    });
-
-                    // Top half or Bottom Half
-                    const stockRecord = this.state.stockRecord;
-                    let rem = stockRecord % 50;
-                    this.textInput.current.scrollTop = parseInt((rem * (795 / 50)) + 55);
-                }
-                else if (AlertSettings.getManual()) {
-                    this.newTable()
-                    this.updateTable(this.state.start);
-                }
-
-                this.setState({ updateStyleMap: false })
+            else if (AlertSettings.getManual()) {
+                this.newTable()
+                this.updateTable(this.state.start);
             }
+
+            this.setState({ updateStyleMap: false })
+        }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -277,7 +278,7 @@ export class StockTableTwo extends React.Component {
             return true;
         }
         if (nextState.tb2_count !== this.state.tb2_count
-            || this.updateStockInfo 
+            || this.updateStockInfo
             || this.state.validInput || this.state.queryRes
             || this.state.isUpdating === false
             || this.state.isSelected !== nextState.isSelected
@@ -876,34 +877,8 @@ export class StockTableTwo extends React.Component {
 
         return (
             <div>
-
-                <Box
-                    style={{ position: 'absolute', top: '340px', left: '60px' }}
-                    bg='rgb(40,40,40)'
-                    boxShadow='sm'
-                    height='305px'
-                    width='62rem'
-                    rounded="lg"
-                    margin='auto'
-                    zIndex='0'>
-
-                    {this.state.stockInfoCode}
-                    {this.state.stockInfoHeader}
-                    {this.state.stockInfoPrevPrice}
-                    {this.state.stockInfoCurrPrice}
-
-                    <Button onClick={this.addAlertTableRow}
-                        style={{ position: 'absolute', bottom: '20px', right: '180px', width: '90px' }}>
-                        Add <br />to Table</Button>
-
-                    <Button onClick={this.removeAlertTableRow}
-                        style={{ position: 'absolute', bottom: '20px', right: '50px', width: '90px' }}>
-                        Remove  <br /> from Table</Button>
-
-                    <Button onClick={this.addToHistorical}
-                        style={{ position: 'absolute', bottom: '20px', left: '40px', width: '90px' }}>
-                        Add  <br /> to Historical</Button>
-                </Box>
+                {/* DISPLAY STOCK */}
+                <DisplayStock {...this} />
 
                 {/* STOCK TABLE TWO */}
                 <Box

@@ -2,19 +2,28 @@
 export default class PriceSettings {
     static startTime = [];
     static endTime = [];
-
     static dateTime = new Date();
     static dateTime = [];
-
     static triggerAlert = 0;
-
     static auto = true;
     static manual = false;
     static notifications = false;
     static updateAlertSettings = false;
     static alertInterval = 60000;
+    static settingsTriggered = 0;
 
     // Enable local storage of states / Database 
+
+
+    static triggerSettings()
+    {
+        return this.settingsTriggered;
+    }
+
+    static setTriggerSettings(value)
+    {
+        this.settingsTriggered = value;
+    }
 
     static setUpdateAlertSettings(setter) {
         this.updateAlertSettings = setter;
@@ -52,11 +61,11 @@ export default class PriceSettings {
     }
 
     static setManual(alert) {
-        this.manual = alert;
+        this.manual = new Boolean(alert);
     }
 
     static setAuto(alert) {
-        this.auto = alert;
+        this.auto = new Boolean(alert);
     }
 
     static getManual() {

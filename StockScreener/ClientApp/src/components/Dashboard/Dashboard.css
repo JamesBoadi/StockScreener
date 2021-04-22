@@ -935,7 +935,7 @@
     left: 0px;
     top: 45px;
     background-color:  rgb(40,40,40); 
-    z-index: 88;
+    
   }
 
   .alertTableHeader thead:nth-child(odd) th
@@ -954,6 +954,7 @@
     width: 50rem;
     left: 0px;
     top: 45px;
+    
   }
   
  .alertTable, th, td{
@@ -970,12 +971,12 @@
 /*********************************************/
 
   .record{
-    background-color: 'rgb(40,40,40)';
+    /*background-color: 'rgb(40,40,40)';*/
     font-size: 14px;
     font-weight: 300;
   }
 
-  .record:hover { background-color: rgb(40,40,90); }
+  .record:hover { background-color: rgba(253, 253, 253, 0.678); }
 
 /************** DashboardNavbar ***************/
 /*********************************************/
