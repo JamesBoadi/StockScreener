@@ -48,6 +48,8 @@ export class StockTableTwo extends React.Component {
 
         this.toggleAlert = this.toggleAlert.bind(this);
 
+        this.initialiseNotifications = this.initialiseNotifications.bind(this);
+        this.addFirstRows = this.addFirstRows.bind(this);
 
         this.timeout = null;
         this.cache = null;
@@ -114,6 +116,8 @@ export class StockTableTwo extends React.Component {
         for (id = 0; id < 897; id++) {
             this.styleMap.set(id, {});
         }
+
+        this.initialiseNotifications();
 
         this.setState({ scroll: this.scrollBy() })
     }
@@ -271,7 +275,7 @@ export class StockTableTwo extends React.Component {
     // **************************************************
 
     // Initialise alert rows from database
-    async initialiseAlertTable() {
+    async initialiseNotifications() {
         // Read notifications from database
         await fetch('getallnotifications')
             .then(response => response.json())
@@ -282,28 +286,14 @@ export class StockTableTwo extends React.Component {
                 console.log("error " + error) // 404
                 return;
             }
-            );
+        );
     }
 
     addFirstRows(response) {
-        var t = [];
-        var alertTableStocks = this.state.alertTableStocks;
-
         for (var i = 0; i < response.length; i++) {
             const item = JSON.parse(response[i]);
-            const pointer = parseInt(item.Id);
-            console.log('pointer ' + pointer);
-
-
-            t.push(item);
-            alertTableStocks.push(item);
-            this.map.set(i, pointer);
+            this.props.initialiseNotifications(item.Alert, item.Time);
         }
-
-        this.setState({ maxNumberOfAlertTableRows: response.length });
-        this.setState({ alertTableStack: t });
-        this.setState({ alertTableStocks: alertTableStocks });
-        this.setState({ addAlertTableRowBool: true });
     }
 
     // **************************************************
@@ -882,15 +872,15 @@ export class StockTableTwo extends React.Component {
             // const stock = this.stockDashBoardMap.get(pointer).StockCode;
             // const localStartPrice = this.stockDashBoardMap.get(pointer).LocalStartPrice;
             // const localTargetPrice = this.stockDashBoardMap.get(pointer).LocalTargetPrice;
-            const stock = SavedStockCache.get(pointer).StockCode;
-            const currentPrice_state = parseInt(SavedStockCache.get(pointer).ChangeArray[0]);
+            const stock = TableCache.get(pointer).StockCode;
+            const currentPrice_state = parseInt(TableCache.get(pointer).ChangeArray[0]);
 
             if (currentPrice_state === 0) {
                 pointer++;
             }
 
-            const currentPrice = parseInt(SavedStockCache.get(pointer).CurrentPrice);
-            const previousPrice = parseInt(SavedStockCache.getPreviousPrice(pointer));
+            const currentPrice = parseInt(TableCache.get(pointer).CurrentPrice);
+            const previousPrice = parseInt(TableCache.getPreviousPrice(pointer));
 
             let obj = this.props.notifications(pointer, stock, previousPrice, currentPrice, currentPrice_state);
             this.saveNotifications(JSON.stringify(obj)) // Save to database

@@ -51,6 +51,7 @@ export class DashboardNavbar extends Component {
         this.hideBullishStocksConfig = this.hideBullishStocksConfig.bind(this);
         this.hideBearishStocksConfig = this.hideBearishStocksConfig.bind(this);
 
+        this.initialiseNotifications = this.initialiseNotifications.bind(this);
         this.toggleSettings = this.toggleSettings.bind(this);
 
         this.state = {
@@ -81,25 +82,20 @@ export class DashboardNavbar extends Component {
             notificationsEnabled: 0,
             globalStartPrice: 0,
             globalTargetPrice: 0,
-
-
             manualAlert: false,
             autoAlert: true,
 
             manualDisabled: true,
             autoDisabled: false,
-
             hideBearishStocks: true,
             hideBullishStocks: false,
 
             hideBearishStocksDisabled: false,
             hideBullishStocksDisabled: true,
-
             disableStartTime: false,
             disableEndTime: false,
 
             disableSetPrice: true,
-
             state: {},
             saveSettings: false,
 
@@ -140,6 +136,27 @@ export class DashboardNavbar extends Component {
     enableNotificationsMenu(e) {
         this.setState({ notificationsMenuVisible: !this.state.notificationsMenuVisible })
     }
+
+    // Initialise Notifications
+    initialiseNotifications(alert, time) {
+        let notifications = this.state.notifications;
+        
+        notifications.push(
+            <div class="record"
+                style={{
+                    position: "relative", color: "black", top: "10px",
+                    fontFamily: 'Times New Roman', letterSpacing: '1.5px'
+                }}>
+                {alert}
+                <br />
+                {time}
+            </div>
+        );
+
+        this.setState({ notifications_temp: notifications });
+        this.setState({ updateNotifications: true });
+    }
+
 
     // Add notification to Menu
     addToNotificationsMenu(id, stock, previousPrice, currentPrice,
@@ -194,8 +211,8 @@ export class DashboardNavbar extends Component {
         const obj =
         {
             Id: id,
-            alert: alert,
-            time: time
+            Alert: alert,
+            Time: time
         }
 
         this.setState({ notifications_temp: notifications });

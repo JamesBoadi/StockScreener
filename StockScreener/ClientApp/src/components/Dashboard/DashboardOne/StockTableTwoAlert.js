@@ -37,7 +37,8 @@ export class StockTableTwoAlert extends React.Component {
             end: 0,
             cache: null,
             continueAnimation: true,
-            animationsCache: new cache()
+            animationsCache: new cache(),
+            isUpdating: false
         };
     }
 
@@ -79,14 +80,22 @@ export class StockTableTwoAlert extends React.Component {
                this.props.setScrollUpdate(false);
            }*/
         if (this.props.state.toggleAlert) {
+            if (this.state.isUpdating) { // If there are aniimations in progress
+                this.props.toggleAlert(false);
+                AlertSettings.setUpdateAlertSettings(false);
+                return;
+            }
+
+
             let changeSettings = true;
-            if(AlertSettings.triggerSettings() == 1 && !AlertSettings.getUpdateAlertSettings())
+            if (AlertSettings.triggerSettings() == 1 && !AlertSettings.getUpdateAlertSettings())
                 changeSettings = false;
-            else if(AlertSettings.triggerSettings() == 0)
+            else if (AlertSettings.triggerSettings() == 0)
                 changeSettings = true;
 
-            if(AlertSettings.triggerSettings() == 0)
+            if (AlertSettings.triggerSettings() == 0)
                 AlertSettings.setTriggerSettings(1);
+
 
             if (changeSettings) {
                 // Clear all Alerts
@@ -147,14 +156,77 @@ export class StockTableTwoAlert extends React.Component {
         return false;
     }
 
+
+    // Initialise alert rows from database
+    async initialiseAlerts() {
+        // Read notifications from database
+        await fetch('getdashboardoneAlerts/')
+            .then(response => response.json())
+            .then(response => {
+                this.addFirstRows(response)
+            }
+                //   
+            )
+            .catch(error => {
+                console.log("error " + error) // 404
+                return;
+            }
+            );
+    }
+
+    addFirstRows(response) {
+        
+        for (var i = 0; i < response.length; i++) {
+            const item = JSON.parse(response[i]);
+            this.priority_queue.enqueue(item.Id);
+            this.array[i] = item.Attribute;
+            this.setState({isUpdating: true});
+        }
+
+        this.triggerAnimation(this.props.addToStyleMap, this.array);
+    }
+
+    // Save alert rows into database
+    async saveAlerts(alert) {
+        // Read notifications from database
+        await fetch('saveAlerts/'.concat(alert))
+            .then(response => response.json())
+            .then(response => {
+            }
+                //   this.addFirstRows(response)
+            )
+            .catch(error => {
+                console.log("error " + error) // 404
+                return;
+            }
+            );
+    }
+
+    // Save alert rows into database
+    async deleteAlerts(id) {
+        // Read notifications from database
+        await fetch('deleteAlerts/'.concat(id))
+            .then(response => response.json())
+            .then(response => {
+            }
+                //   this.addFirstRows(response)
+            )
+            .catch(error => {
+                console.log("error " + error) // 404
+                return;
+            }
+            );
+    }
+
     triggerAnimation(callback, array) {
         this.animationTime = setInterval(() => {
             if (this.priority_queue.length === 0) {
                 console.log('Continue animation ');
+                this.setState({isUpdating: false});
                 clearInterval(this.animationTime);
                 this.setState({ continueAnimation: true }) // this.setState({ update_priorityQueue: true });
             }
-            let index = parseInt(this.priority_queue.dequeue())
+            let index = parseInt(this.priority_queue.dequeue()) // Change Order Of Priority queue to change order of array
 
             for (const [key, value] of array.entries()) {
 
@@ -165,6 +237,7 @@ export class StockTableTwoAlert extends React.Component {
                     const delay = item[2];
 
                     callback(count, state, delay, 0);
+                    this.deleteAlerts(index);
                     break;
                 }
             }
@@ -174,9 +247,7 @@ export class StockTableTwoAlert extends React.Component {
     // Trigger alert automatically
     autoAlert(callback) {
         // FETCH SAVE TO DATABASE
-
         let prevArray = [] // FFetch
-
         TableCache.setDisableScroll(true);
         this.setState({ continueAnimation: true });
         this.autoInterval = setInterval(() => {
@@ -190,15 +261,15 @@ export class StockTableTwoAlert extends React.Component {
                     let inRange = 0;
 
                     // Bearish
-                    if(PriceSettings.startPrice() > PriceSettings.getTargetPrice())
+                    if (PriceSettings.startPrice() > PriceSettings.getTargetPrice())
                         inRange = (cache.CurrentPrice <= PriceSettings.getStartPrice() &&
                             cache.CurrentPrice >= PriceSettings.getTargetPrice());
                     else // Bullish
                     {
                         inRange = (cache.CurrentPrice >= PriceSettings.getStartPrice() &&
-                        cache.CurrentPrice <= PriceSettings.getTargetPrice());
+                            cache.CurrentPrice <= PriceSettings.getTargetPrice());
                     }
-                   
+
                     const priceDetectionEnabled = PriceSettings.getPriceDetectionEnabled();
                     const currentPrice_state = parseInt(cache.ChangeArray[0]);
                     const state = AlertReducer(currentPrice_state);
@@ -210,9 +281,13 @@ export class StockTableTwoAlert extends React.Component {
                             if (this.priority_queue.includes(pointer) == false)
                                 this.priority_queue.enqueue(pointer);
 
-                                this.priority_queue
+                            //this.priority_queue
                             // Update existing element
                             this.array[pointer] = [pointer, state, 1600];
+                            this.array[pointer] = [pointer, state, 1600];
+                            const obj = { Id: pointer, Attribute: this.array[pointer] };
+                            this.saveAlerts(JSON.stringify(obj)); //
+
                         }
                     } else {
                         if (currentPrice_state !== 0) {
@@ -222,13 +297,12 @@ export class StockTableTwoAlert extends React.Component {
 
                             // Update existing element
                             this.array[pointer] = [pointer, state, 1600];
+                            const obj = { Id: pointer, Attribute: this.array[pointer] };
+                            this.saveAlerts(JSON.stringify(obj));
                         }
                     }
                     pointer++;
                 }
-
-                
-
 
                 if (this.priority_queue.length !== 0)
                     this.triggerAnimation(callback, this.array);
@@ -255,13 +329,13 @@ export class StockTableTwoAlert extends React.Component {
                     let inRange = 0;
 
                     // Bearish
-                    if(PriceSettings.startPrice() > PriceSettings.getTargetPrice())
+                    if (PriceSettings.startPrice() > PriceSettings.getTargetPrice())
                         inRange = (cache.CurrentPrice <= PriceSettings.getStartPrice() &&
                             cache.CurrentPrice >= PriceSettings.getTargetPrice());
                     else // Bullish
                     {
                         inRange = (cache.CurrentPrice >= PriceSettings.getStartPrice() &&
-                        cache.CurrentPrice <= PriceSettings.getTargetPrice());
+                            cache.CurrentPrice <= PriceSettings.getTargetPrice());
                     }
 
                     const priceDetectionEnabled = PriceSettings.getPriceDetectionEnabled();
@@ -277,6 +351,10 @@ export class StockTableTwoAlert extends React.Component {
 
                             // Update existing element
                             this.array[pointer] = [pointer, state, 1600];
+                            this.array[pointer] = [pointer, state, 1600];
+                            const obj = { Id: pointer, Attribute: this.array[pointer] };
+                            this.saveAlerts(JSON.stringify(obj));
+
                         }
                     } else {
                         if (currentPrice_state !== 0) {
@@ -286,6 +364,10 @@ export class StockTableTwoAlert extends React.Component {
 
                             // Update existing element
                             this.array[pointer] = [pointer, state, 1600];
+                            this.array[pointer] = [pointer, state, 1600];
+                            const obj = { Id: pointer, Attribute: this.array[pointer] };
+                            this.saveAlerts(JSON.stringify(obj));
+
                         }
                     }
                     pointer++;
@@ -302,7 +384,6 @@ export class StockTableTwoAlert extends React.Component {
 
 
     render() {
-
         return null;
     }
 
