@@ -120,7 +120,6 @@ export class StockTableTwo extends React.Component {
 
     componentWillUnmount() {
         // Clear the interval right before component unmount
-
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -160,7 +159,7 @@ export class StockTableTwo extends React.Component {
                 TableCache.setUpdateHideStocks(false);
             }
             else if (this.props.state.saveSettings) {
-                this.setState({toggleAlert: true});
+                this.setState({ toggleAlert: true });
                 console.log('NEW SETTINGS?')
                 this.props.toggleSettings(false);
             }
@@ -182,7 +181,7 @@ export class StockTableTwo extends React.Component {
                     this.updateTable(this.state.start)
                 });
 
-               // console.log('SCROLL ');
+                // console.log('SCROLL ');
 
                 if (this.state.start === 0)
                     this.textInput.current.scrollTop = 10;
@@ -241,8 +240,8 @@ export class StockTableTwo extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (TableCache.getUpdateHideStocks() || 
-        this.props.state.saveSettings !== nextProps.state.saveSettings) {
+        if (TableCache.getUpdateHideStocks() ||
+            this.props.state.saveSettings !== nextProps.state.saveSettings) {
             return true;
         }
         else if (this.props.state.updateCache !== nextProps.state.updateCache) {
@@ -259,15 +258,55 @@ export class StockTableTwo extends React.Component {
         return false;
     }
 
-    toggleAlert(state)
-    {
-        this.setState({toggleAlert: state   })
-
+    toggleAlert(state) {
+        this.setState({ toggleAlert: state })
     }
 
     resetTableID(id) {
         this.setState({ clickedAlertTableRowID: id });
     }
+
+    // **************************************************
+    // Initialise Notifications
+    // **************************************************
+
+    // Initialise alert rows from database
+    async initialiseAlertTable() {
+        // Read notifications from database
+        await fetch('getallnotifications')
+            .then(response => response.json())
+            .then(response =>
+                this.addFirstRows(response)
+            )
+            .catch(error => {
+                console.log("error " + error) // 404
+                return;
+            }
+            );
+    }
+
+    addFirstRows(response) {
+        var t = [];
+        var alertTableStocks = this.state.alertTableStocks;
+
+        for (var i = 0; i < response.length; i++) {
+            const item = JSON.parse(response[i]);
+            const pointer = parseInt(item.Id);
+            console.log('pointer ' + pointer);
+
+
+            t.push(item);
+            alertTableStocks.push(item);
+            this.map.set(i, pointer);
+        }
+
+        this.setState({ maxNumberOfAlertTableRows: response.length });
+        this.setState({ alertTableStack: t });
+        this.setState({ alertTableStocks: alertTableStocks });
+        this.setState({ addAlertTableRowBool: true });
+    }
+
+    // **************************************************
 
     // Disable scrolling
     disableScrolling(e) {
@@ -664,8 +703,8 @@ export class StockTableTwo extends React.Component {
         start = (start <= 15 || (start === undefined || start === null)) ? 0 : start - mod;
 
         // Set start and end variables for FetchData
-       // this.props.setStart(start);
-      //  this.props.setEnd(start + endMod);
+        // this.props.setStart(start);
+        //  this.props.setEnd(start + endMod);
         // this.props.setUpdateNotifications(true);
 
         // Get values from cache
@@ -806,6 +845,64 @@ export class StockTableTwo extends React.Component {
                 </tbody>)
         }
     }
+
+    // **************************************************
+    // Save Notifications
+    // **************************************************
+
+    async saveNotifications(notifications) {
+        await fetch('savenotifications/{query?}'.concat(notifications))
+            .then(response => response.status)
+            .then(response => {
+                if (!response.ok) {
+                    // 404 
+                    return false;
+                }
+                else return true;
+            })
+            .catch(error => {
+                console.log("error " + error) // 404
+                return false;
+            }
+            );
+
+        return false;
+    }
+
+    // Add Notifications to notifications menu
+    async addToNotificationsMenu() {
+        const defaultInterval = 60000;
+        const clickedAlertTableRowID = this.state.clickedAlertTableRowID
+
+        let pointer = 0;//this.state.start;
+        const end = 897;//this.state.end;
+
+        // Add the database (last known pointer)
+        this.notificationsDelayInterval = setInterval(() => {
+            // const stock = this.stockDashBoardMap.get(pointer).StockCode;
+            // const localStartPrice = this.stockDashBoardMap.get(pointer).LocalStartPrice;
+            // const localTargetPrice = this.stockDashBoardMap.get(pointer).LocalTargetPrice;
+            const stock = SavedStockCache.get(pointer).StockCode;
+            const currentPrice_state = parseInt(SavedStockCache.get(pointer).ChangeArray[0]);
+
+            if (currentPrice_state === 0) {
+                pointer++;
+            }
+
+            const currentPrice = parseInt(SavedStockCache.get(pointer).CurrentPrice);
+            const previousPrice = parseInt(SavedStockCache.getPreviousPrice(pointer));
+
+            let obj = this.props.notifications(pointer, stock, previousPrice, currentPrice, currentPrice_state);
+            this.saveNotifications(JSON.stringify(obj)) // Save to database
+
+            if (pointer++ >= end) {
+                pointer = 0; // Add the database (last known pointer)
+            }
+        }, 7000);
+    }
+
+    // **********************************************************
+
 
     render() {
         let stockTableTwoHeader = <table class="stockTableTwoHeader" aria-labelledby="tabelLabel">

@@ -16,6 +16,9 @@ namespace StockScreener
 
         private readonly IMongoCollection<EndOfDayData> _eodData;
 
+         private readonly IMongoCollection<SavedStocks> _savedStocks;
+
+
         public StockScreenerService(IStockScreenerDatabaseSettings settings)
         {
             var client = new MongoClient("mongodb+srv://dbJames:mn9BfsBg3peDI88L@cluster0.w2zx6.mongodb.net/StockScreenerDb?socketTimeoutMS=360000&"
@@ -24,10 +27,10 @@ namespace StockScreener
             var database = client.GetDatabase("StockScreenerDb");
 
               //  database.CreateCollection(0001.KLSE, 0002.KLSE ETCCCCCC)
-              
             // Get Collection
             _notifications = database.GetCollection<Notifications>("Notifications");
             _tempHistoricalData = database.GetCollection<TempHistorical>("TempHistoricalData");
+            _savedStocks = database.GetCollection<SavedStocks>("SavedStocks");
             _historicalData = database.GetCollection<Historical>("HistoricalData");
             _eodData = database.GetCollection<EndOfDayData>("EODdata");
         }
@@ -44,9 +47,9 @@ namespace StockScreener
         public Notifications Get(string id) =>
             _notifications.Find<Notifications>(notifications => notifications.Id == id).FirstOrDefault();
 
-        public bool StockCodeExists(string stockCode)
+        public bool StockCodeExists(string id)
         {
-            var query = _notifications.Find<Notifications>(notifications => notifications.StockCode.Equals(stockCode)).Any();
+            var query = _notifications.Find<Notifications>(notifications => notifications.Id.Equals(id)).Any();
             return query;
         }
 
@@ -71,6 +74,14 @@ namespace StockScreener
 
         // **************************************************
 
+
+
+
+
+
+
+
+
         // **************************************************
         // Temp Historical
         // **************************************************
@@ -87,7 +98,7 @@ namespace StockScreener
         
         public bool TempIdExists(string id)
         {
-            var query = _tempHistoricalData.Find<TempHistorical>(notifications => notifications.Id.Equals(id)).Any();
+            var query = _tempHistoricalData.Find<TempHistorical>(savedstocks => savedstocks.Id.Equals(id)).Any();
             return query;
         }
 
@@ -163,6 +174,39 @@ namespace StockScreener
 
         // **************************************************
 
+
+        // **************************************************
+        // Saved Stocks
+        // **************************************************
+
+        // Return all documents in a collection
+        public List<SavedStocks> GetAllSavedStocks() =>
+            _savedStocks.Find(savedstocks => true).ToList();
+
+
+        public SavedStocks GetSavedStocks(string id) =>
+            _savedStocks.Find<SavedStocks>(savedstocks => savedstocks.Id == id).FirstOrDefault();
+
+        public bool SavedStockExists(string id)
+        {
+            var query = _savedStocks.Find<SavedStocks>(savedstocks => savedstocks.Id.Equals(id)).Any();
+            return query;
+        }
+
+        public SavedStocks Create(SavedStocks savedstocks)
+        {
+            // Insert document in collection
+            _savedStocks.InsertOne(savedstocks);
+            return savedstocks;
+        }
+
+        public void Remove(SavedStocks savedstocks) =>
+            _savedStocks.DeleteOne(savedstocks => savedstocks.Id == savedstocks.Id);
+
+        public void RemoveSavedStock(string id) =>
+            _savedStocks.DeleteOne(savedstocks => savedstocks.Id.Equals(id));
+
+        // **************************************************
 
 
 

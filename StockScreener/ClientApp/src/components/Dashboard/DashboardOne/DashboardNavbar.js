@@ -142,7 +142,7 @@ export class DashboardNavbar extends Component {
     }
 
     // Add notification to Menu
-    addToNotificationsMenu(stock, previousPrice, currentPrice,
+    addToNotificationsMenu(id, stock, previousPrice, currentPrice,
         startPrice, targetPrice, state) {
         let notifications = this.state.notifications;
 
@@ -176,7 +176,7 @@ export class DashboardNavbar extends Component {
         let h = parseInt((new Date().getHours() + 8) >= 17 ? 24 - new Date().getHours()
             : new Date().getHours() + 8);
         let m = new Date().getMinutes().toPrecision(2);
-        let time = 'Alert Time: ' + h + ' : ' + m;
+        const time = 'Alert Time: ' + h + ' : ' + m;
 
 
         notifications.push(
@@ -191,15 +191,21 @@ export class DashboardNavbar extends Component {
             </div>
         );
 
+        const obj =
+        {
+            Id: id,
+            alert: alert,
+            time: time
+        }
+
         this.setState({ notifications_temp: notifications });
         this.setState({ updateNotifications: true });
 
-
-
+        return obj;
     }
 
     // Call notifications
-    notifications(stock, previousPrice, currentPrice, state) {
+    notifications(id, stock, previousPrice, currentPrice, state) {
 
         let targetPrice;
         let startPrice;
@@ -248,8 +254,10 @@ export class DashboardNavbar extends Component {
                + ' targetPrice ' + localTargetPrice);*/
 
         // Default states: 2, -1
-        this.addToNotificationsMenu(stock, previousPrice, currentPrice,
+        const obj = this.addToNotificationsMenu(id, stock, previousPrice, currentPrice,
             startPrice, targetPrice, state);
+
+        return obj;
     }
 
 
@@ -268,11 +276,12 @@ export class DashboardNavbar extends Component {
         // Detect Change in Alert Settings
         if (AlertSettings.getManual() != this.state.manualAlert
             || AlertSettings.getAuto() != this.state.autoAlert) {
+                AlertSettings.setManual(this.state.manualAlert);
+                AlertSettings.setAuto(this.state.autoAlert);
             AlertSettings.setUpdateAlertSettings(true);
         }
 
-        AlertSettings.setManual(this.state.manualAlert);
-        AlertSettings.setAuto(this.state.autoAlert);
+     
 
         if (!this.state.autoAlert) {
             TableCache.setDisableScroll(false);
@@ -392,7 +401,7 @@ export class DashboardNavbar extends Component {
 
     // Checkbox that enables manual alert
     setManualAlert(e) {
-        this.setState({ manualAlert: (e.target.checked) ? true : false });
+        this.setState({ manualAlert: e.target.checked });
 
         this.setState({ disableStartTime: e.target.checked });
         this.setState({ disableEndTime: e.target.checked });
@@ -403,7 +412,7 @@ export class DashboardNavbar extends Component {
 
     // Checkbox that enables auto alert
     setAutoAlert(e) {
-        this.setState({ autoAlert: (e.target.checked) ? true : false });
+        this.setState({ autoAlert: e.target.checked });
 
         // Disable auto alert checkbox 
         this.setState({ manualDisabled: !this.state.manualDisabled });

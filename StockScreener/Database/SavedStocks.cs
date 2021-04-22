@@ -1,14 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Collections;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Text.Json;
 
 namespace StockScreener
 {
-    public class Notifications
+    public class SavedStocks
     {
         // static List<Notifications> notifications = new List<Notifications>();
 
@@ -18,14 +14,21 @@ namespace StockScreener
 
         // [BsonElement("Name")]
         public string Id { get; set; }
-        public string Alert { get; set; }
+        
+        public string StockCode { get; set; }
 
         public string TimeStamp { get; set; }
-        public static Notifications Deserialize(string query)
+
+        public double CurrentPrice { get; set; }
+
+        public double ChangeP { get; set; }
+
+        public double Volume { get; set; }
+        public static SavedStocks Deserialize(string query)
         {
             // Case Insensitive (Does not exclude capitals and numbers)
-            Notifications data = JsonSerializer.
-            Deserialize<Notifications>(query, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            SavedStocks data = JsonSerializer.
+            Deserialize<SavedStocks>(query, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             //Console.WriteLine("data " + data.Id + " stockcode " + data.StockCode);
             return data;

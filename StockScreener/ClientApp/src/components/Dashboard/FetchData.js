@@ -271,7 +271,6 @@ export class FetchData extends Component {
     this.setState({ clickedAlertTableRowID: id });
   }
 
-
   setAlertTableRowBool(bool) {
     this.setState({ addAlertTableRowBool: bool });
   }

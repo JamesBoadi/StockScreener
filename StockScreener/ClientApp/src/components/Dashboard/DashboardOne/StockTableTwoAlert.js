@@ -173,7 +173,7 @@ export class StockTableTwoAlert extends React.Component {
 
     // Trigger alert automatically
     autoAlert(callback) {
-        // FETCH
+        // FETCH SAVE TO DATABASE
 
         let prevArray = [] // FFetch
 
@@ -187,10 +187,19 @@ export class StockTableTwoAlert extends React.Component {
                 let pointer = 0;
                 while (pointer < 897) {
                     const cache = AlertCache.get(pointer);
-                    const inRange = (cache.CurrentPrice >= PriceSettings.getStartPrice() &&
-                        cache.CurrentPrice <= PriceSettings.getTargetPrice());
-                    const priceDetectionEnabled = PriceSettings.getPriceDetectionEnabled();
+                    let inRange = 0;
 
+                    // Bearish
+                    if(PriceSettings.startPrice() > PriceSettings.getTargetPrice())
+                        inRange = (cache.CurrentPrice <= PriceSettings.getStartPrice() &&
+                            cache.CurrentPrice >= PriceSettings.getTargetPrice());
+                    else // Bullish
+                    {
+                        inRange = (cache.CurrentPrice >= PriceSettings.getStartPrice() &&
+                        cache.CurrentPrice <= PriceSettings.getTargetPrice());
+                    }
+                   
+                    const priceDetectionEnabled = PriceSettings.getPriceDetectionEnabled();
                     const currentPrice_state = parseInt(cache.ChangeArray[0]);
                     const state = AlertReducer(currentPrice_state);
 
@@ -201,8 +210,7 @@ export class StockTableTwoAlert extends React.Component {
                             if (this.priority_queue.includes(pointer) == false)
                                 this.priority_queue.enqueue(pointer);
 
-
-
+                                this.priority_queue
                             // Update existing element
                             this.array[pointer] = [pointer, state, 1600];
                         }
@@ -219,7 +227,8 @@ export class StockTableTwoAlert extends React.Component {
                     pointer++;
                 }
 
-                // Randonmise the array
+                
+
 
                 if (this.priority_queue.length !== 0)
                     this.triggerAnimation(callback, this.array);
@@ -242,10 +251,20 @@ export class StockTableTwoAlert extends React.Component {
                 let pointer = 0;
                 while (pointer < 897) {
                     const cache = AlertCache.get(pointer);
-                    const inRange = (cache.CurrentPrice >= PriceSettings.getStartPrice() &&
-                        cache.CurrentPrice <= PriceSettings.getTargetPrice());
-                    const priceDetectionEnabled = PriceSettings.getPriceDetectionEnabled();
 
+                    let inRange = 0;
+
+                    // Bearish
+                    if(PriceSettings.startPrice() > PriceSettings.getTargetPrice())
+                        inRange = (cache.CurrentPrice <= PriceSettings.getStartPrice() &&
+                            cache.CurrentPrice >= PriceSettings.getTargetPrice());
+                    else // Bullish
+                    {
+                        inRange = (cache.CurrentPrice >= PriceSettings.getStartPrice() &&
+                        cache.CurrentPrice <= PriceSettings.getTargetPrice());
+                    }
+
+                    const priceDetectionEnabled = PriceSettings.getPriceDetectionEnabled();
                     const currentPrice_state = parseInt(cache.ChangeArray[0]);
                     const state = AlertReducer(currentPrice_state);
 
@@ -281,37 +300,6 @@ export class StockTableTwoAlert extends React.Component {
         }, AlertSettings.getAlertInterval());
     }
 
-    // Add Notifications to notifications menu
-    addToNotificationsMenu() {
-        const defaultInterval = 60000;
-        const clickedAlertTableRowID = this.state.clickedAlertTableRowID;
-
-        let pointer = 0;//this.state.start;
-        const end = 897;//this.state.end;
-
-        // Add the database (last known pointer)
-
-        this.notificationsDelayInterval = setInterval(() => {
-            // const stock = this.stockDashBoardMap.get(pointer).StockCode;
-            // const localStartPrice = this.stockDashBoardMap.get(pointer).LocalStartPrice;
-            // const localTargetPrice = this.stockDashBoardMap.get(pointer).LocalTargetPrice;
-            const stock = SavedStockCache.get(pointer).StockCode;
-            const currentPrice_state = parseInt(SavedStockCache.get(pointer).ChangeArray[0]);
-
-            if (currentPrice_state === 0) {
-                pointer++;
-            }
-
-            const currentPrice = parseInt(SavedStockCache.get(pointer).CurrentPrice);
-            const previousPrice = parseInt(SavedStockCache.getPreviousPrice(pointer));
-
-            this.props.notifications(stock, previousPrice, currentPrice, currentPrice_state);
-
-            if (pointer++ >= end) {
-                pointer = 0; // Add the database (last known pointer)
-            }
-        }, 7000);
-    }
 
     render() {
 

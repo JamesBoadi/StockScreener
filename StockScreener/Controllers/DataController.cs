@@ -48,6 +48,19 @@ namespace StockScreener.Controllers
             _stockScreenerService = service;
         }
 
+
+        // state
+      /*  [Route("state")]
+        public void transmitData(string query) // convert to json
+        {
+
+
+
+
+        }*/
+
+
+
         // Return stock names in order of subsequence
         [Route("searchstock/{query?}")]
         public string transmitData(string query) // convert to json
@@ -106,7 +119,7 @@ namespace StockScreener.Controllers
             try
             {
                 Notifications notifications = Notifications.Deserialize(query);
-                bool idExists = _stockScreenerService.StockCodeExists(notifications.StockCode);
+                bool idExists = _stockScreenerService.StockCodeExists(notifications.Id);
 
                 if (idExists)
                 {
@@ -195,6 +208,114 @@ namespace StockScreener.Controllers
 
             return res;
         }
+
+
+        // Save stocks
+
+        //.................................................................
+
+        [Route("savestocks/{query?}")]
+        public HttpStatusCode saveStocks(string query) // convert to json
+        {
+            var response = new HttpResponseMessage();
+            HttpStatusCode res;
+            try
+            {
+                SavedStocks savedStocks = SavedStocks.Deserialize(query);
+                bool idExists = _stockScreenerService.StockCodeExists(savedStocks.StockCode);
+
+                if (idExists)
+                {
+                    return HttpStatusCode.Ambiguous;
+                }
+
+                SavedStocks list = _stockScreenerService.Create(savedStocks);
+                res = response.StatusCode;
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+
+                res = response.StatusCode;
+            }
+
+            return res;
+        }
+
+
+
+        [Route("getallsavedstocks")]
+        public string[] getSavedStocks() // convert to json
+        {
+            string[] jsonArray;
+            List<SavedStocks> list;
+            try
+            {
+                list = _stockScreenerService.GetAllSavedStocks();
+                jsonArray = new string[list.Count];
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+                return null;
+            }
+
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                jsonArray[i] = JsonSerializer.Serialize(list[i]);
+            }
+
+            return jsonArray;
+        }
+
+        [Route("deletesavedstocks/{id?}")]
+        public HttpStatusCode deleteSavedStocks(string id) // convert to json
+        {
+            var response = new HttpResponseMessage();
+            HttpStatusCode res;
+
+            try
+            {
+                string _id = JsonSerializer.Deserialize<int>(id).ToString();
+
+                bool idExists = _stockScreenerService.IdExists(_id);
+
+                if (idExists)
+                {
+                    _stockScreenerService.Remove(_id);
+
+                    Console.WriteLine("id " + _id);
+
+                }
+                else
+                {
+                    return HttpStatusCode.Ambiguous;
+                }
+
+
+                res = response.StatusCode;
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+                res = response.StatusCode;
+            }
+
+            return res;
+        }
+
+        //.............................................................
+
 
         [Route("savehistoricaldata/temp/{data?}")]
         public HttpStatusCode saveTempHistoricalData(string data) // convert to json
