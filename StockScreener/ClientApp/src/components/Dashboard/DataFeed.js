@@ -33,8 +33,8 @@ export class DataFeed extends Component {
         };
     }
 
-    componentDidMount() {
-        console.log('START THE FEED!')
+    async componentDidMount() {
+        // console.log('START THE FEED!')
         localStorage.setItem('_connectionEstablished', false);
         this.startDataFeed();
     }
@@ -67,6 +67,29 @@ export class DataFeed extends Component {
                 count++;
             }, 8000);
         });
+    }
+
+   /**
+     * Gets the timezone by identifier as
+     * well as the total time elapsed, can 
+     * only be called if a user is logged in 
+     * and triggers the alert interval, as 
+     * long as the settings persist before the 
+     * user logs out
+     */
+    async detectTimeZone() {
+        // Fill Cache with EOD data
+        await fetch('detectTimeZone')
+            .then(response => response.json())
+            .then(response => {
+                //.set(key, item);
+            })
+            .catch(error => {
+                console.log("error " + error) // 404
+                // Last successfully catched data
+                return;
+            }
+            );
     }
 
     /*End Of Day Data */
@@ -165,6 +188,8 @@ export class DataFeed extends Component {
                         DashboardTwoCache.setFill(true);
                         this.setState({ updateCache: true });
                         this.connected = true;
+
+
                     }
                 })
             }) // Bind to constructor

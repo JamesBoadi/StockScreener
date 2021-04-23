@@ -53,22 +53,8 @@ export class StockTableTwoAlert extends React.Component {
             } */
 
     // 404 if component does not mount
-    componentDidMount() {
-        this.startAnimation = setInterval(() => {
-            if (this.props.state.enableAlerts) {
-                // Trigger manual Alert
-                if (AlertSettings.getManual()) {
-                    console.log('Called! Manual Alert! ')
-                    TableCache.setDisableScroll(false);
-                    this.manualAlert(this.props.addToStyleMap);
-                } // Trigger auto Alert
-                else if (AlertSettings.getAuto()) {
-                    console.log('Called! Auto Alert! ')
-                    this.autoAlert(this.props.addToStyleMap);
-                }
-                clearInterval(this.startAnimation); // Start the Animation and clear the interval
-            }
-        }, 6000);
+    async componentDidMount() {
+        this.initialiseAlerts();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -86,7 +72,6 @@ export class StockTableTwoAlert extends React.Component {
                 return;
             }
 
-
             let changeSettings = true;
             if (AlertSettings.triggerSettings() == 1 && !AlertSettings.getUpdateAlertSettings())
                 changeSettings = false;
@@ -95,7 +80,6 @@ export class StockTableTwoAlert extends React.Component {
 
             if (AlertSettings.triggerSettings() == 0)
                 AlertSettings.setTriggerSettings(1);
-
 
             if (changeSettings) {
                 // Clear all Alerts
@@ -156,11 +140,10 @@ export class StockTableTwoAlert extends React.Component {
         return false;
     }
 
-
     // Initialise alert rows from database
     async initialiseAlerts() {
         // Read notifications from database
-        await fetch('getdashboardoneAlerts/')
+        await fetch('getdashboardonealerts/')
             .then(response => response.json())
             .then(response => {
                 this.addFirstRows(response)
@@ -171,16 +154,19 @@ export class StockTableTwoAlert extends React.Component {
                 console.log("error " + error) // 404
                 return;
             }
-            );
+        );
     }
 
     addFirstRows(response) {
-        
+        if (response.length === 0)
+            return;
+
+        this.setState({ isUpdating: true });
+
         for (var i = 0; i < response.length; i++) {
             const item = JSON.parse(response[i]);
             this.priority_queue.enqueue(item.Id);
             this.array[i] = item.Attribute;
-            this.setState({isUpdating: true});
         }
 
         this.triggerAnimation(this.props.addToStyleMap, this.array);
@@ -189,7 +175,7 @@ export class StockTableTwoAlert extends React.Component {
     // Save alert rows into database
     async saveAlerts(alert) {
         // Read notifications from database
-        await fetch('saveAlerts/'.concat(alert))
+        await fetch('savedashboardonealerts/'.concat(alert))
             .then(response => response.json())
             .then(response => {
             }
@@ -205,7 +191,7 @@ export class StockTableTwoAlert extends React.Component {
     // Save alert rows into database
     async deleteAlerts(id) {
         // Read notifications from database
-        await fetch('deleteAlerts/'.concat(id))
+        await fetch('deletedashboardonealerts/'.concat(id))
             .then(response => response.json())
             .then(response => {
             }
@@ -222,7 +208,7 @@ export class StockTableTwoAlert extends React.Component {
         this.animationTime = setInterval(() => {
             if (this.priority_queue.length === 0) {
                 console.log('Continue animation ');
-                this.setState({isUpdating: false});
+                this.setState({ isUpdating: false });
                 clearInterval(this.animationTime);
                 this.setState({ continueAnimation: true }) // this.setState({ update_priorityQueue: true });
             }
@@ -389,164 +375,178 @@ export class StockTableTwoAlert extends React.Component {
 
 
     /* 
-    
-                /*
-                this.interval = setInterval(() => {
-                    if (this.state.update_priorityQueue) {
-                        this.manualAlert(this.props.addToStyleMap);
-                        this.setState({ queueCount: this.state.queueCount + 1 })
-                        this.setState({ update_priorityQueue: false })
-                    }
-                    else {
-                        // Retry
-                        this.retry = setInterval(() => {
-                            if (this.state.update_priorityQueue) {
-                                this.manualAlert(this.props.addToStyleMap);
-                                this.setState({ queueCount: this.state.queueCount + 1 })
-                                this.setState({ update_priorityQueue: false })
-                                clearInterval(this.retry)
-                            }
-                        }, 60000); // No interval on manual mode (Default is 1 Minute)
-                    }
-
-                    if (this.state.queueCount >= this.props.state.maximumAlertNotifications) {
-                        clearInterval(this.interval)
-                    }
-
-                }, 8000);//this.props.state.alertInterval); // Animation Alert Interval
-    
-      addToQueue(node) {
-          this.queue_Length += 1;
-          this.queue.push(node);
-      }
-  
-      removeFromQueue(node) {
-          var newQueue = [];
-          if (this.queue_Length > 1) {
-              this.queue_Length -= 1;
-              let contains;
-              let pointer = -1;
-  
-              for (let index = 0; index < this.queue.length; index++) {
-                  contains = (this.queue[index] === node);
-  
-                  if (contains)
-                      continue;
-                  // Add to queue
-                  newQueue[++pointer] = this.queue[index];
-              }
-              this.queue = newQueue;
-          }
-          else {
-              if (this.queue.length === 0)
-                  return;
-  
-              this.queue_Length -= 1;
-              if (this.queue[0] === node) {
-                  this.queue = [];
-              }
-          }
-      }
-  
-  
-  
-      // Take a slice of the queue and reorder it
-      /** order = 1 (push to the end) order = 0 (push to the front) 
-      shift(startIndex, endIndex, order) {
-          var newQueue = [];
-          var stack = [];
-  
-          let pointer = -1;
-          let stackPointer = -1;
-          if (startIndex >= 0 && endIndex <= this.queue.length &&
-              startIndex < endIndex) {
-              for (let index = 0; index < this.queue.length; index++) {
-                  if (index >= startIndex && index <= endIndex) {
-                      stack[++stackPointer] = this.queue[index];
-                  }
-                  else {
-                      newQueue[++pointer] = this.queue[index];
-                  }
-              }
-              console.log('old queue ' + newQueue + ' \n new queue \n ' + stack)
-              this.queue = [];
-              /*  // push to the front
-                if (order == 1) {
-                    for (let index = 0; index < newQueue.length; index++) {
-                        this.queue.push(newQueue[index]);
-                    }
-                    for (let index = 0; index < stack.length; index++) {
-                        this.queue.push(stack[index]);
-                    }
-    
-                } else { // push to the end end
-                    for (let index = 0; index < stack.length; index++) {
-                        this.queue.push(stack[index]);
-                    }
-                    for (let index = 0; index < newQueue.length; index++) {
-                        this.queue.push(newQueue[index]);
-                    }
-              //}
-          }
-          else {
-              console.log('nope ' + ' start ' + startIndex + ' end ' + endIndex + ' end ' + this.queue.length)
-  
-          }
-  
-      }
-  
-  
-    
-    
-    
-    if (this.props.state.disableScrolling === false) {
-                this.manualAlert(this.props.cache, this.props.addToStyleMap);
-    
-                let start = this.state.start;
-                let end = this.state.end;
-    
-                this.temp_queue = new PriorityQueue();
-                let stack = [];
-    
-                // Scroll Up: < 0
-                if (this.props.state.tb2_scrollPosition - snapshot < 0) {
-                    // Retrieve stocks from end of priority_queue
-                    this.temp_queue = this.priority_queue.slice(this.start, this.end);
-    
-                    if (this.temp_queue.length === 0) {
-                        console.log('DAWG its empty')
-                    }// return;                 
-                    for (const [key, value] of this.temp_queue.entries()) {
-                        this.addToQueue(value);
-                    }
-    
-                    // Remove largest items and push back
-                    //  this.shift(this.start, this.end, 1);
-    
-                    console.log('up temp queue ' + this.temp_queue + '\n queue \n' + this.queue)
+          /*  this.startAnimation = setInterval(() => {
+            if (this.props.state.enableAlerts) {
+                // Trigger manual Alert
+                if (AlertSettings.getManual()) {
+                    console.log('Called! Manual Alert! ')
+                    TableCache.setDisableScroll(false);
+                    this.manualAlert(this.props.addToStyleMap);
+                } // Trigger auto Alert
+                else if (AlertSettings.getAuto()) {
+                    console.log('Called! Auto Alert! ')
+                    this.autoAlert(this.props.addToStyleMap);
                 }
-                else { // Scroll Down: > 0
-                    this.temp_queue = this.priority_queue.slice(this.start, this.end);
-                    let pointer = this.temp_queue.length;
-                    if (this.temp_queue.length === 0) {
-                        console.log('DAWG its empty')
-                    }// return;        
-    
-                    if (this.temp_queue.length === 0) {
-                        console.log('DAWG its empty')
-                    }
-    
-                    for (const [key, value] of this.temp_queue.entries()) {
-                        this.addToQueue(value);
-                    }
-    
-                    // Remove smallest 50 items and push to the end
-                    //  this.shift(this.start, this.end, 1);
-    
-                    //  this.shift(this.end - (this.end - this.start), this.end, 0);
-                    console.log('down temp queue ' + this.temp_queue + '\n queue \n' + this.queue)
+                clearInterval(this.startAnimation); // Start the Animation and clear the interval
+            }
+        }, 6000);*/
+    /*
+    this.interval = setInterval(() => {
+        if (this.state.update_priorityQueue) {
+            this.manualAlert(this.props.addToStyleMap);
+            this.setState({ queueCount: this.state.queueCount + 1 })
+            this.setState({ update_priorityQueue: false })
+        }
+        else {
+            // Retry
+            this.retry = setInterval(() => {
+                if (this.state.update_priorityQueue) {
+                    this.manualAlert(this.props.addToStyleMap);
+                    this.setState({ queueCount: this.state.queueCount + 1 })
+                    this.setState({ update_priorityQueue: false })
+                    clearInterval(this.retry)
                 }
-    
-                this.props.setScrollUpdate(false);*/
+            }, 60000); // No interval on manual mode (Default is 1 Minute)
+        }
+
+        if (this.state.queueCount >= this.props.state.maximumAlertNotifications) {
+            clearInterval(this.interval)
+        }
+
+    }, 8000);//this.props.state.alertInterval); // Animation Alert Interval
+ 
+addToQueue(node) {
+this.queue_Length += 1;
+this.queue.push(node);
+}
+ 
+removeFromQueue(node) {
+var newQueue = [];
+if (this.queue_Length > 1) {
+  this.queue_Length -= 1;
+  let contains;
+  let pointer = -1;
+ 
+  for (let index = 0; index < this.queue.length; index++) {
+      contains = (this.queue[index] === node);
+ 
+      if (contains)
+          continue;
+      // Add to queue
+      newQueue[++pointer] = this.queue[index];
+  }
+  this.queue = newQueue;
+}
+else {
+  if (this.queue.length === 0)
+      return;
+ 
+  this.queue_Length -= 1;
+  if (this.queue[0] === node) {
+      this.queue = [];
+  }
+}
+}
+ 
+ 
+ 
+// Take a slice of the queue and reorder it
+/** order = 1 (push to the end) order = 0 (push to the front) 
+shift(startIndex, endIndex, order) {
+var newQueue = [];
+var stack = [];
+ 
+let pointer = -1;
+let stackPointer = -1;
+if (startIndex >= 0 && endIndex <= this.queue.length &&
+  startIndex < endIndex) {
+  for (let index = 0; index < this.queue.length; index++) {
+      if (index >= startIndex && index <= endIndex) {
+          stack[++stackPointer] = this.queue[index];
+      }
+      else {
+          newQueue[++pointer] = this.queue[index];
+      }
+  }
+  console.log('old queue ' + newQueue + ' \n new queue \n ' + stack)
+  this.queue = [];
+  /*  // push to the front
+    if (order == 1) {
+        for (let index = 0; index < newQueue.length; index++) {
+            this.queue.push(newQueue[index]);
+        }
+        for (let index = 0; index < stack.length; index++) {
+            this.queue.push(stack[index]);
+        }
+ 
+    } else { // push to the end end
+        for (let index = 0; index < stack.length; index++) {
+            this.queue.push(stack[index]);
+        }
+        for (let index = 0; index < newQueue.length; index++) {
+            this.queue.push(newQueue[index]);
+        }
+  //}
+}
+else {
+  console.log('nope ' + ' start ' + startIndex + ' end ' + endIndex + ' end ' + this.queue.length)
+ 
+}
+ 
+}
+ 
+ 
+ 
+ 
+ 
+if (this.props.state.disableScrolling === false) {
+    this.manualAlert(this.props.cache, this.props.addToStyleMap);
+ 
+    let start = this.state.start;
+    let end = this.state.end;
+ 
+    this.temp_queue = new PriorityQueue();
+    let stack = [];
+ 
+    // Scroll Up: < 0
+    if (this.props.state.tb2_scrollPosition - snapshot < 0) {
+        // Retrieve stocks from end of priority_queue
+        this.temp_queue = this.priority_queue.slice(this.start, this.end);
+ 
+        if (this.temp_queue.length === 0) {
+            console.log('DAWG its empty')
+        }// return;                 
+        for (const [key, value] of this.temp_queue.entries()) {
+            this.addToQueue(value);
+        }
+ 
+        // Remove largest items and push back
+        //  this.shift(this.start, this.end, 1);
+ 
+        console.log('up temp queue ' + this.temp_queue + '\n queue \n' + this.queue)
+    }
+    else { // Scroll Down: > 0
+        this.temp_queue = this.priority_queue.slice(this.start, this.end);
+        let pointer = this.temp_queue.length;
+        if (this.temp_queue.length === 0) {
+            console.log('DAWG its empty')
+        }// return;        
+ 
+        if (this.temp_queue.length === 0) {
+            console.log('DAWG its empty')
+        }
+ 
+        for (const [key, value] of this.temp_queue.entries()) {
+            this.addToQueue(value);
+        }
+ 
+        // Remove smallest 50 items and push to the end
+        //  this.shift(this.start, this.end, 1);
+ 
+        //  this.shift(this.end - (this.end - this.start), this.end, 0);
+        console.log('down temp queue ' + this.temp_queue + '\n queue \n' + this.queue)
+    }
+ 
+    this.props.setScrollUpdate(false);*/
     //}
 }

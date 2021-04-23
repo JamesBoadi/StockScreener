@@ -103,7 +103,7 @@ export class DashboardNavbar extends Component {
     }
 
     componentDidMount() {
-     
+
     }
 
     componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -128,9 +128,84 @@ export class DashboardNavbar extends Component {
         return false;
     }
 
+    // **************************************************
+    // Save Settings
+    // **************************************************
+    // **************************************************
+
     toggleSettings(state) {
         this.setState({ saveSettings: state });
     }
+
+
+    async saveSettingsToDatabase() {
+        await fetch('savesettings')
+            .then(response => response.json())
+            .then(response => {
+
+            }
+                // this.addFirstRows(response)
+            )
+            .catch(error => {
+                console.log("error " + error) // 404
+                return;
+            }
+        );
+    }
+    
+    // Save all settings
+    saveConfiguration() {
+        AlertSettings.setAlertInterval(this.alertFrequencyRef.current.value);
+
+        if (this.state.setNotifications) {
+            this.setState({ notificationsEnabled: 1 })
+        }
+        //  console.log(this.state.manualAlert+' mn '+this.state.autoAlert);
+
+        // Set Alert Times
+        // Detect Change in Alert Settings
+        if (AlertSettings.getManual() != this.state.manualAlert
+            || AlertSettings.getAuto() != this.state.autoAlert) {
+            AlertSettings.setManual(this.state.manualAlert);
+            AlertSettings.setAuto(this.state.autoAlert);
+            AlertSettings.setUpdateAlertSettings(true);
+        }
+
+        if (!this.state.autoAlert) {
+            TableCache.setDisableScroll(false);
+        }
+
+        // Override all prices if enabled
+        if (this.state.overrideGlobalPrices) {
+            PriceSettings.setGlobalStartPrice(this.state.globalStartPrice);
+            PriceSettings.setGlobalTargetPrice(this.state.globalTargetPrice);
+        }
+
+        // Enable Price Detection
+        PriceSettings.setPriceDetectionEnabled(this.state.enablePriceDetection);
+
+        // Set variables for hiding bullish and bearish stocks
+        if (this.state.hideBullishStocks && !PriceSettings.getHideBullishStocks()) {
+            this.hideBullishStocksConfig();
+            PriceSettings.sethideBullishStocks(true);
+            AlertSettings.setUpdateAlertSettings(true);
+        } else if (!this.state.hideBullishStocks) {
+            PriceSettings.sethideBullishStocks(false);
+        }
+        if (this.state.hideBearishStocks && !PriceSettings.getHideBearishStocks()) {
+            this.hideBearishStocksConfig();
+            PriceSettings.sethideBearishStocks(true);
+            AlertSettings.setUpdateAlertSettings(true);
+        } else if (!this.state.hideBearishStocks) {
+            PriceSettings.sethideBearishStocks(false);
+        }
+
+        // Save to database
+
+        this.setState({ saveSettings: true });
+    }
+
+    // **************************************************
 
     // Enable/Disable Menu of Notifications
     enableNotificationsMenu(e) {
@@ -140,7 +215,7 @@ export class DashboardNavbar extends Component {
     // Initialise Notifications
     initialiseNotifications(alert, time) {
         let notifications = this.state.notifications;
-        
+
         notifications.push(
             <div class="record"
                 style={{
@@ -277,64 +352,6 @@ export class DashboardNavbar extends Component {
         return obj;
     }
 
-
-    // Save all settings
-    saveConfiguration() {
-    
-        AlertSettings.setAlertInterval(this.alertFrequencyRef.current.value);
-
-        if (this.state.setNotifications) {
-            this.setState({ notificationsEnabled: 1 })
-        }
-        //  console.log(this.state.manualAlert+' mn '+this.state.autoAlert);
-       
-        
-        // Set Alert Times
-        // Detect Change in Alert Settings
-        if (AlertSettings.getManual() != this.state.manualAlert
-            || AlertSettings.getAuto() != this.state.autoAlert) {
-                AlertSettings.setManual(this.state.manualAlert);
-                AlertSettings.setAuto(this.state.autoAlert);
-            AlertSettings.setUpdateAlertSettings(true);
-        }
-
-     
-
-        if (!this.state.autoAlert) {
-            TableCache.setDisableScroll(false);
-        }
-
-        // Override all prices if enabled
-        if (this.state.overrideGlobalPrices) {
-            PriceSettings.setGlobalStartPrice(this.state.globalStartPrice);
-            PriceSettings.setGlobalTargetPrice(this.state.globalTargetPrice);
-        }
-
-        // Enable Price Detection
-        PriceSettings.setPriceDetectionEnabled(this.state.enablePriceDetection);
-
-        // Set variables for hiding bullish and bearish stocks
-        if (this.state.hideBullishStocks && !PriceSettings.getHideBullishStocks()) {
-            this.hideBullishStocksConfig();
-            PriceSettings.sethideBullishStocks(true);
-            AlertSettings.setUpdateAlertSettings(true);
-        } else if (!this.state.hideBullishStocks) {
-            PriceSettings.sethideBullishStocks(false);
-        }
-        if (this.state.hideBearishStocks && !PriceSettings.getHideBearishStocks()) {
-            this.hideBearishStocksConfig();
-            PriceSettings.sethideBearishStocks(true);
-            AlertSettings.setUpdateAlertSettings(true);
-        } else if (!this.state.hideBearishStocks) {
-            PriceSettings.sethideBearishStocks(false);
-        }
-
-        // Save to database
-
-        this.setState({ saveSettings: true });
-
-
-    }
 
     // hideStocksConfig
     hideBullishStocksConfig() {

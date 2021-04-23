@@ -11,6 +11,7 @@ export default class PriceSettings {
     static updateAlertSettings = false;
     static alertInterval = 60000;
     static settingsTriggered = 0;
+    static TimeStamp;
 
     // Enable local storage of states / Database 
 
@@ -91,6 +92,11 @@ export default class PriceSettings {
     static getAlertInterval() {
         return parseInt(this.alertInterval);
     }
+
+
+
+
+
 
     static triggerAlert() {
         let startTime_hours = this.startTime[0];

@@ -58,9 +58,7 @@ namespace StockScreener.Controllers
 
 
         }*/
-
-
-
+        
         // Return stock names in order of subsequence
         [Route("searchstock/{query?}")]
         public string transmitData(string query) // convert to json

@@ -9,8 +9,8 @@ export class DashboardOne extends Component {
     constructor(props) {
         super(props);
 
-      //  this.setLock = this.setLock.bind(this);
-
+      //  this.setLock = this.setLock.bind(this)
+      
         this.state = {
             lock: true,
             initialiseTableTwo: false,
