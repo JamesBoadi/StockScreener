@@ -2,11 +2,13 @@ using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Configuration;
 
 namespace StockScreener
 {
     public class StockScreenerService
     {
+        internal static readonly String CONNECTION_STRING = ConfigurationManager.AppSettings["CONNECTION_STRING"];
         // Establish Collection
         private readonly IMongoCollection<Notifications> _notifications;
 
@@ -16,16 +18,14 @@ namespace StockScreener
 
         private readonly IMongoCollection<EndOfDayData> _eodData;
 
-         private readonly IMongoCollection<SavedStocks> _savedStocks;
+        private readonly IMongoCollection<SavedStocks> _savedStocks;
+
 
 
         public StockScreenerService(IStockScreenerDatabaseSettings settings)
         {
-            var client = new MongoClient("mongodb+srv://dbJames:mn9BfsBg3peDI88L@cluster0.w2zx6.mongodb.net/StockScreenerDb?socketTimeoutMS=360000&"
-            + "retryWrites=true&w=majority");
-
+            var client = new MongoClient(CONNECTION_STRING);
             var database = client.GetDatabase("StockScreenerDb");
-
               //  database.CreateCollection(0001.KLSE, 0002.KLSE ETCCCCCC)
             // Get Collection
             _notifications = database.GetCollection<Notifications>("Notifications");

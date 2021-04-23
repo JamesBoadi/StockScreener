@@ -9,6 +9,8 @@ import AlertSettings from './js/AlertSettings.js';
 import PriceSettings from './js/PriceSettings.js';
 import SavedStockCache from './js/SavedStockCache.js';
 
+const date = new Date();
+
 // Replace with Redux
 export class StockTableTwoAlert extends React.Component {
     constructor(props) {
@@ -42,19 +44,14 @@ export class StockTableTwoAlert extends React.Component {
         };
     }
 
-    /*
-        if (window.performance) {
-            console.info("window.performance work's fine on this browser");
-          }
-            if (performance.navigation.type == 1) {
-              console.info( "This page is reloaded" );
-            } else {
-              console.info( "This page is not reloaded");
-            } */
 
     // 404 if component does not mount
     async componentDidMount() {
-        this.initialiseAlerts();
+
+        if (this.withinAlertTime()) {
+            this.initialiseAlerts();
+        }
+
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -93,33 +90,37 @@ export class StockTableTwoAlert extends React.Component {
                     if (this.manualInterval !== undefined) {
                         clearInterval(this.autoInterval);
                     }
-                }
-                // Trigger manual Alert
-                else if (AlertSettings.getManual()) {
-                    if (this.animationTime !== undefined) {
-                        clearInterval(this.animationTime);
+                } else {
+                    // Proceed with alerts
+                    if (this.withinAlertTime()) {
+                        // Trigger manual Alert
+                        if (AlertSettings.getManual()) {
+                            if (this.animationTime !== undefined) {
+                                clearInterval(this.animationTime);
+                            }
+                            if (this.autoInterval !== undefined) {
+                                clearInterval(this.autoInterval);
+                            }
+                            if (this.manualInterval !== undefined) {
+                                clearInterval(this.autoInterval);
+                            }
+                            TableCache.setDisableScroll(false);
+                            console.log('Called! Manual Alert! 2')
+                            this.manualAlert(this.props.addToStyleMap);
+                        } // Trigger Auto Alert
+                        else if (AlertSettings.getAuto()) {
+                            if (this.animationTime !== undefined) {
+                                clearInterval(this.animationTime);
+                            } if (this.autoInterval !== undefined) {
+                                clearInterval(this.autoInterval);
+                            }
+                            if (this.manualInterval !== undefined) {
+                                clearInterval(this.autoInterval);
+                            }
+                            console.log('Called! Auto Alert! 2')
+                            this.autoAlert(this.props.addToStyleMap);
+                        }
                     }
-                    if (this.autoInterval !== undefined) {
-                        clearInterval(this.autoInterval);
-                    }
-                    if (this.manualInterval !== undefined) {
-                        clearInterval(this.autoInterval);
-                    }
-                    TableCache.setDisableScroll(false);
-                    console.log('Called! Manual Alert! 2')
-                    this.manualAlert(this.props.addToStyleMap);
-                } // Trigger Auto Alert
-                else if (AlertSettings.getAuto()) {
-                    if (this.animationTime !== undefined) {
-                        clearInterval(this.animationTime);
-                    } if (this.autoInterval !== undefined) {
-                        clearInterval(this.autoInterval);
-                    }
-                    if (this.manualInterval !== undefined) {
-                        clearInterval(this.autoInterval);
-                    }
-                    console.log('Called! Auto Alert! 2')
-                    this.autoAlert(this.props.addToStyleMap);
                 }
             }
 
@@ -139,6 +140,47 @@ export class StockTableTwoAlert extends React.Component {
         }
         return false;
     }
+
+    // Calculate times
+    withinAlertTime() {
+        const startTime = this.parseTime(AlertSettings.getStartTime());
+        const endTime = this.parseTime(AlertSettings.getEndTime());
+
+        const h = (date.getHours() + 8) >= 24 ? Math.abs(24 - (date.getHours() + 8))
+            : date.getHours() + 8;
+        const m = date.getMinutes();
+
+        if (h >= 17 && h <= 24 || h >= 0 && h <= 8) {
+            return false;
+        }
+
+        if (h >= startTime[0] && h <= endTime[0]){
+            if(m >= startTime[0] && m <= endTime[0])
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Parse Time
+    parseTime(str) {
+        var hours = str.substring(0, 2);
+        var minutes = str.substring(3, 5);
+
+        if (hours.substring(0, 1) === "0")
+            hours = parseInt(hours.substring(1, 2));
+        else
+            hours = parseInt(hours.substring(0, 2));
+
+        if (minutes.substring(0, 1) === "0")
+            minutes = parseInt(minutes.substring(1, 2));
+        else
+            minutes = parseInt(minutes.substring(0, 2));
+
+        return [parseInt(hours), parseInt(minutes)];
+    }
+
 
     // Initialise alert rows from database
     async initialiseAlerts() {
@@ -247,7 +289,7 @@ export class StockTableTwoAlert extends React.Component {
                     let inRange = 0;
 
                     // Bearish
-                    if (PriceSettings.startPrice() > PriceSettings.getTargetPrice())
+                    if (PriceSettings.getStartPrice() > PriceSettings.getTargetPrice())
                         inRange = (cache.CurrentPrice <= PriceSettings.getStartPrice() &&
                             cache.CurrentPrice >= PriceSettings.getTargetPrice());
                     else // Bullish
@@ -315,7 +357,7 @@ export class StockTableTwoAlert extends React.Component {
                     let inRange = 0;
 
                     // Bearish
-                    if (PriceSettings.startPrice() > PriceSettings.getTargetPrice())
+                    if (PriceSettings.getStartPrice() > PriceSettings.getTargetPrice())
                         inRange = (cache.CurrentPrice <= PriceSettings.getStartPrice() &&
                             cache.CurrentPrice >= PriceSettings.getTargetPrice());
                     else // Bullish
@@ -374,6 +416,15 @@ export class StockTableTwoAlert extends React.Component {
     }
 
 
+    /*
+        if (window.performance) {
+            console.info("window.performance work's fine on this browser");
+          }
+            if (performance.navigation.type == 1) {
+              console.info( "This page is reloaded" );
+            } else {
+              console.info( "This page is not reloaded");
+            } */
     /* 
           /*  this.startAnimation = setInterval(() => {
             if (this.props.state.enableAlerts) {

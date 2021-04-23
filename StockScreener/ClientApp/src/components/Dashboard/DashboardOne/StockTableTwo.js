@@ -920,7 +920,7 @@ export class StockTableTwo extends React.Component {
 
                 {/* STOCK TABLE TWO */}
                 <Box
-                    style={{ position: 'absolute', top: '520px', left: '60px' }}
+                    style={{ position: 'absolute', top: '660px', left: '60px' }}
                     bg='rgb(30,30,30)'
 
                     boxShadow='sm'

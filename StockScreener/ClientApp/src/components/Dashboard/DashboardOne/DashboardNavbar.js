@@ -6,7 +6,7 @@ import {
 } from '@chakra-ui/react';
 import { FetchData } from '../../Dashboard/FetchData.js';
 import { Notifications } from '../../Dashboard/Notifications.js';
-import { Menu, Dropdown } from 'antd';
+import { Menu, Dropdown, TimePicker } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import PriceSettings from './js/PriceSettings.js';
 import AlertSettings from './js/AlertSettings.js';
@@ -16,8 +16,9 @@ import { StockTableTwo } from './StockTableTwo';
 import { SavedStockTable } from './SavedStockTable';
 
 import { AlertContext } from './AlertContext';
+import moment from 'moment';
 
-
+const date = new Date();
 
 export class DashboardNavbar extends Component {
     constructor(props) {
@@ -34,7 +35,6 @@ export class DashboardNavbar extends Component {
         // Global sets local does not set global
         this.setManualAlert = this.setManualAlert.bind(this);
         this.setAutoAlert = this.setAutoAlert.bind(this);
-        this.setAlertTrigger = this.setAlertTrigger.bind(this);
         this.parseTime = this.parseTime.bind(this);
         this.notifications = this.notifications.bind(this);
 
@@ -53,6 +53,8 @@ export class DashboardNavbar extends Component {
 
         this.initialiseNotifications = this.initialiseNotifications.bind(this);
         this.toggleSettings = this.toggleSettings.bind(this);
+        this.setStartTime = this.setStartTime.bind(this);
+        this.setEndTime = this.setEndTime.bind(this);
 
         this.state = {
             animationTime: 5000,
@@ -60,8 +62,10 @@ export class DashboardNavbar extends Component {
             alertInterval: 1000,
             triggerAlert: false,
 
-            startTime: [],
-            endTime: [],
+            startTime: "09:00",
+            endTime: "16:59",
+            startTimeValue: "09:00",
+
             notifications_temp: [],
             notifications: [
                 /*    { <div style={{
@@ -98,7 +102,6 @@ export class DashboardNavbar extends Component {
             disableSetPrice: true,
             state: {},
             saveSettings: false,
-
         };
     }
 
@@ -115,6 +118,8 @@ export class DashboardNavbar extends Component {
 
     shouldComponentUpdate(nextProps, nextState) {
         if (nextState.saveSettings !== this.state.saveSettings ||
+            nextState.startTime !== this.state.startTime ||
+            nextState.endTime !== this.state.endTime ||
             nextState.disableSetPrice !== this.state.disableSetPrice ||
             nextState.autoDisabled !== this.state.autoDisabled ||
             nextState.manualDisabled !== this.state.manualDisabled ||
@@ -137,9 +142,24 @@ export class DashboardNavbar extends Component {
         this.setState({ saveSettings: state });
     }
 
+    async initialieSettings() {
+        await fetch('getsettings/')
+            .then(response => response.json())
+            .then(response => {
+                // this.
 
-    async saveSettingsToDatabase() {
-        await fetch('savesettings')
+            }
+                // this.addFirstRows(response)
+            )
+            .catch(error => {
+                console.log("error " + error) // 404
+                return;
+            }
+            );
+    }
+
+    async saveSettingsToDatabase(alertsettings, pricesettings) {
+        await fetch('savesettings/'.concat(alertsettings + '/').concat(pricesettings))
             .then(response => response.json())
             .then(response => {
 
@@ -150,12 +170,59 @@ export class DashboardNavbar extends Component {
                 console.log("error " + error) // 404
                 return;
             }
-        );
+            );
     }
-    
+
+    addFirstRows(response) {
+        for (var i = 0; i < response.length; i++) {
+            const item = JSON.parse(response[i]);
+
+            this.setState({ startTime: item.startTime });
+            this.setState({ endTime: item.endTime });
+
+            if (item.hideBullishStocks) {
+                this.setState({ hideBullishStocks: true });
+                this.setState({ hideBearishStocksDisabled: true });
+            }
+            else if (item.hideBearishStocks) {
+                this.setState({ hideBearishStocks: true });
+                this.setState({ hideBullishStocksDisabled: true });
+            }
+
+            AlertSettings.setAlertInterval(item.alertInterval);
+            AlertSettings.setManual(item.manual);
+            AlertSettings.setAuto(item.auto);
+
+            PriceSettings.setGlobalStartPrice(item.globalStartPrice);
+            PriceSettings.setGlobalTargetPrice(item.globalTargetPrice);
+
+            // Set variables for hiding bullish and bearish stocks
+            if (item.hideBullishStocks) {
+                this.hideBullishStocksConfig();
+                PriceSettings.sethideBullishStocks(true);
+                AlertSettings.setUpdateAlertSettings(true);
+            } else {
+                PriceSettings.sethideBullishStocks(false);
+            }
+
+            if (item.hideBearishStocks) {
+                this.hideBearishStocksConfig();
+                PriceSettings.sethideBearishStocks(true);
+                AlertSettings.setUpdateAlertSettings(true);
+            } else {
+                PriceSettings.sethideBearishStocks(false);
+            }
+
+            AlertSettings.setUpdateAlertSettings(true);
+        }
+    }
+
+    // ************************************************************
+
     // Save all settings
     saveConfiguration() {
-        AlertSettings.setAlertInterval(this.alertFrequencyRef.current.value);
+        // AlertSettings.setAlertInterval(this.alertFrequencyRef.current.value);
+        AlertSettings.setTime(this.state.startTime, this.state.endTime);
 
         if (this.state.setNotifications) {
             this.setState({ notificationsEnabled: 1 })
@@ -202,6 +269,8 @@ export class DashboardNavbar extends Component {
 
         // Save to database
 
+
+        // this.saveSettingsToDatabase(AlertSettings.getSettings(), PriceSettings.getSettings())
         this.setState({ saveSettings: true });
     }
 
@@ -231,7 +300,6 @@ export class DashboardNavbar extends Component {
         this.setState({ notifications_temp: notifications });
         this.setState({ updateNotifications: true });
     }
-
 
     // Add notification to Menu
     addToNotificationsMenu(id, stock, previousPrice, currentPrice,
@@ -265,11 +333,10 @@ export class DashboardNavbar extends Component {
                 from ${previousPrice} \n Bearish signal`
                 break;
         }
-        let h = parseInt((new Date().getHours() + 8) >= 17 ? 24 - new Date().getHours()
-            : new Date().getHours() + 8);
-        let m = new Date().getMinutes().toPrecision(2);
+        const h = (date.getHours() + 8) >= 24 ? Math.abs(24 - (date.getHours() + 8))
+            : date.getHours() + 8;
+        const m = date.getMinutes().toPrecision(2);
         const time = 'Alert Time: ' + h + ' : ' + m;
-
 
         notifications.push(
             <div class="record"
@@ -388,6 +455,49 @@ export class DashboardNavbar extends Component {
         }, 60000);
     }
 
+    withinAlertTime() {
+        const startTime = this.parseTime(AlertSettings.getStartTime());
+        const endTime = this.parseTime(AlertSettings.getEndTime());
+
+        const h = (date.getHours() + 8) >= 24 ? Math.abs(24 - (date.getHours() + 8))
+            : date.getHours() + 8;
+        const m = date.getMinutes();
+
+        if (h >= 17 && h <= 24 || h >= 0 && h <= 8) {
+            return false;
+        }
+
+        if (h >= startTime[0] && h <= endTime[0]){
+            if(m >= startTime[0] && m <= endTime[0])
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    setStartTime(time, timeString) {
+        const _time = this.parseTime(timeString.toString().trim());
+
+        if (_time[0] >= 17 && _time[0] <= 24 || _time[0] >= 0 && _time[0] <= 8) {
+
+            window.alert('Market hours are between 9:00 AM and 17:00 PM');
+        }
+        
+        this.setState({ startTime: timeString });
+    }
+
+    setEndTime(time, timeString) {
+        const _time = this.parseTime(timeString.toString().trim());
+
+        if (_time[0] >= 17 && _time[0] <= 24 || _time[0] >= 0 && _time[0] <= 8) {
+
+            window.alert('Market hours are between 9:00 AM and 17:00 PM');
+        }
+
+        this.setState({ endTime: timeString });
+    }
+
     // Set hide Bullish Stocks
     setHideBullishStocks(e) {
         this.setState({ hideBullishStocks: e.target.checked });
@@ -452,32 +562,6 @@ export class DashboardNavbar extends Component {
         this.setState({ manualDisabled: !this.state.manualDisabled });
     }
 
-    // Determine whether or not an alert should be triggered (FIX)
-    setAlertTrigger(bool) {
-        if (bool === false)
-            return;
-
-        let alertBool = false;
-
-        let startTime = this.parseTime(this.getStartTime.current.value.toString());
-        let endTime = this.parseTime(this.getEndTime.current.value.toString());
-
-        let startTime_hours = startTime[0];
-        let startTime_minutes = startTime[1];
-
-        let endTime_hours = endTime[0];
-        let endTime_minutes = endTime[1];
-
-        /*   console.log('start time h ' + startTime_hours + ' start time m ' + startTime_minutes
-               + ' end time h  ' + endTime_hours + '  end time m ' + endTime_minutes
-               + ' DATETIME    ' + dateTime_hours);*/
-        /*
-
-    this.setState({ startTime: [startTime_hours, startTime_minutes] })
-    this.setState({ endTime: [endTime_hours, endTime_minutes] })
-    this.setState({ triggerAlert: alertBool })*/
-    }
-
     parseTime(str) {
         var hours = str.substring(0, 2);
         var minutes = str.substring(3, 5);
@@ -492,13 +576,13 @@ export class DashboardNavbar extends Component {
         else
             minutes = parseInt(minutes.substring(0, 2));
 
-        return [hours, minutes];
+        return [parseInt(hours), parseInt(minutes)];
     }
 
     render() {
         let selectMarket =
-            <select class="selectMarket" name="Select Market">
-                <option value="none">Bursa Malaysia</option>
+            <select class="selectMarket" name="Select Market" value="Bursa Malaysia">
+                <option value="Bursa Malaysia" disabled>Bursa Malaysia</option>
             </select>;
 
         let alertFrequency =
@@ -517,11 +601,27 @@ export class DashboardNavbar extends Component {
         let custom_alertFrequency = <input class="customalertFrequency" type="number" id="quantity"
             name="quantity" min="1" max="240" />
 
-        let startTime = <input class="startTime" type="time" name="time"
-            ref={this.getStartTime} min="09:00" max="17:00" disabled={this.state.disableStartTime} />;
+        const format = 'HH:mm';
 
-        let endTime = <input class="endTime" type="time" name="time"
-            ref={this.getEndTime} min="09:00" max="17:00" disabled={this.state.disableEndTime} />;
+        const startTime =
+            <div class="startTime">
+                <TimePicker defaultValue={moment('9:00', format)}
+                    disabled={this.state.disableStartTime}
+                    format={format}
+                    value={moment(this.state.startTime, format)}
+                    disabledHours={() => [17, 18, 19, 20, 21, 22, 23, 24, 0, 1, 2, 3, 4, 5, 6, 7, 8]}
+                    onChange={this.setStartTime} />
+            </div>;
+
+        const endTime =
+            <div class="endTime">
+                <TimePicker defaultValue={moment('16:59', format)}
+                    disabled={this.state.disableEndTime}
+                    format={format}
+                    value={moment(this.state.endTime, format)}
+                    disabledHours={() => [17, 18, 19, 20, 21, 22, 23, 24, 0, 1, 2, 3, 4, 5, 6, 7, 8]}
+                    onChange={this.setEndTime} />
+            </div>;
 
         return (
             <div class="DashboardNavbar">
@@ -542,8 +642,9 @@ export class DashboardNavbar extends Component {
                             <p id="selectMarket">Select Market</p>
                             {selectMarket}
 
-                            <p id="alertFrequency">Alert Frequency</p>
-                            {alertFrequency}
+                            {/* <p id="alertFrequency">Alert Frequency</p>
+                            {alertFrequency}*/}
+
                         </div>
                         {/*  <label id="customalertFrequencyLabel" for="customalertFrequency">Custom Time</label>
                         <input id="customalertFrequency" type="checkbox" />

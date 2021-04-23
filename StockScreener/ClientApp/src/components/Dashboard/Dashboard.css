@@ -1519,40 +1519,28 @@
   .DashboardNavbar #profitLossPercentage{
     position: absolute;
     top: 60px;
-    left: 945px;
+    left: 955px;
     transform: translate(0px, -5px);
   }
 
   .DashboardNavbar .profitLossPercentage{
     position: absolute;
     top: 60px;
-    left: 930px;
+    left: 940px;
   }
 
-  .DashboardNavbar #profitLossPercentage{
-    position: absolute;
-    top: 60px;
-    left: 945px;
-    transform: translate(0px, -5px);
-  }
-
-  .DashboardNavbar .profitLossPercentage{
-    position: absolute;
-    top: 60px;
-    left: 930px;
-  }
 
   .DashboardNavbar #volume{
     position: absolute;
     top: 60px;
-    left: 1015px;
+    left: 1035px;
     transform: translate(0px, -5px);
   }
 
   .DashboardNavbar .volume{
     position: absolute;
     top: 60px;
-    left: 1000px;
+    left: 1020px;
   }
 
 /* Alert Table */
@@ -1612,14 +1600,14 @@
   .DashboardNavbar .disableAlertColumns #alertProfitVolume{
     position: absolute;
     top: 60px;
-    left: 830px;
+    left: 850px;
     transform: translate(0px, -5px);
   }
 
   .DashboardNavbar .disableAlertColumns .alertProfitVolume{
     position: absolute;
     top: 60px;
-    left: 815px;
+    left: 835px;
   }
 
   /* Price Detection */
