@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import HistoryCache from './Historical/js/HistoryCache';
 import PortfolioCache from './Portfolio/js/PortfolioCache';
+import PortfolioCalc from './Portfolio/js/PortfolioCalc';
 import TableCache from './DashboardOne/js/TableCache.js';
 import SavedStockCache from './DashboardOne/js/SavedStockCache.js';
 import AlertCache from './DashboardOne/js/AlertCache.js';
@@ -108,13 +109,13 @@ export class DataFeed extends Component {
                     DashboardTwoCache.set(key, item);
 
                     PortfolioCache.set(key, item);
+                    PortfolioCalc.setGross();
                     HistoryCache.set(key, item);
 
                     // Dashboard One
                     TableCache.set(key, item);
                     AlertCache.set(key, item);
                     SavedStockCache.set(key, item);
-
                 }
             })
             .catch(error => {
@@ -188,8 +189,6 @@ export class DataFeed extends Component {
                         DashboardTwoCache.setFill(true);
                         this.setState({ updateCache: true });
                         this.connected = true;
-
-
                     }
                 })
             }) // Bind to constructor

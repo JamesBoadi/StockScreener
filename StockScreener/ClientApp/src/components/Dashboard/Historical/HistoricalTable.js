@@ -462,8 +462,6 @@ export class HistoricalTable extends Component {
 
     // **************************************************
 
-
-
     // **************************************************
     // History Calc 
     // **************************************************
@@ -692,7 +690,7 @@ export class HistoricalTable extends Component {
             return;
         }
 
-        console.log('HISTORICAL CACHE code ' + HistoryCache.get(target).StockCode);
+       // console.log('HISTORICAL CACHE code ' + HistoryCache.get(target).StockCode);
 
         // Stocks to be displayed in the Portfolio table
         portfolioTableStocks.push(HistoryCache.get(target));

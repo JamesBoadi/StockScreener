@@ -32,6 +32,7 @@ import { EditStockForm } from './EditStockForm';
 import { Search } from './Search';
 import PortfolioCache from './js/PortfolioCache';
 import PortfolioCalc from './js/PortfolioCalc';
+import throttle from 'lodash.throttle';
 import * as HashMap from 'hashmap';
 
 
@@ -54,8 +55,9 @@ export class PortFolio extends Component {
         this.scrollToPosition = this.scrollToPosition.bind(this);
         this.newTable = this.newTable.bind(this);
         this.getDisplay = this.getDisplay.bind(this);
-        this.removeRow = this.removeRow.bind(this);
         this.setSelectedRecord = this.setSelectedRecord.bind(this);
+        this.initialisePortfolio = this.initialisePortfolio.bind(this);
+        this.addFirstRows = this.addFirstRows.bind(this);
 
         this.updateTableData = this.updateTableData.bind(this);
 
@@ -66,8 +68,9 @@ export class PortFolio extends Component {
         this.addPortfolioTableRow = this.addPortfolioTableRow.bind(this);
         this.editPortfolioTableRow = this.editPortfolioTableRow.bind(this);
         this.removePortfolioTableRow = this.removePortfolioTableRow.bind(this);
-        this.selectmad = this.selectmad.bind(this);
+        this.removeStockRow = this.removeStockRow.bind(this);
         this.keyExists = this.keyExists.bind(this);
+        this.savePortfolio = this.savePortfolio.bind(this);
 
         // Setters
         // **************************************************
@@ -126,8 +129,8 @@ export class PortFolio extends Component {
             // Form
             // **************************************************
 
-            addStockFormVisible: "visible",
-            editStockFormVisible: "hidden",
+            addStockFormVisible: false,
+            editStockFormVisible: false,
             closeForm: true,
             stockFormID: null,
             selectedRecordValue: "",
@@ -150,8 +153,8 @@ export class PortFolio extends Component {
             portfolioTableStocks: [],
             portfolioTableStack: [],
             clickedPortfolioTableRowID: 0,
-            maxNumberOfPortfolioTableRows: 0
-
+            maxNumberOfPortfolioTableRows: 0,
+            removeStock: false
         };
     }
 
@@ -169,14 +172,8 @@ export class PortFolio extends Component {
 
         PortfolioCache.setUpdateData(this.updateTableData);
 
-        /* this.createTable()
-         this.updateTable()
- 
-         setInterval(() => {
-             window.location.reload();
-         }, 20000000);
- 
-         this.setState({ scroll: this.scrollBy() })*/
+        this.initialisePortfolio();
+
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -200,10 +197,12 @@ export class PortFolio extends Component {
             this.setState({ updatePortfolioTableData: false });
         }
         else if (this.state.editPortfolioTable) {
-
             this.updateTable();
-
             this.setState({ editPortfolioTable: false });
+        }
+        else if (this.state.removeStock) {
+            this.removePortfolioTableRow();
+            this.setState({ removeStock: false });
         }
 
         if (this.state.validInput) {
@@ -213,18 +212,19 @@ export class PortFolio extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (!nextProps.updateCache) {
+        if (!nextProps.state.updateCache) {
             console.log('NEXTPROPS ' + nextProps.state.updateCache)
             return false;
         }
         else {
             if (this.state.highlightTableRow !== nextState.highlightTableRow ||
                 this.state.editPortfolioTable !== nextState.editPortfolioTable ||
+                this.state.removeStock !== nextState.removeStock ||
                 this.state.closeForm !== nextState.closeForm ||
-                this.state.addPortfolioTableRowBool !== nextProps.addPortfolioTableRowBool
-                || this.state.updatePortfolioTableData !== nextState.updatePortfolioTableData ||
-                this.state.validInput || this.state.queryRes
-                || nextState.selectedRecordValue !== this.state.selectedRecordValue) {
+                this.state.addPortfolioTableRowBool !== nextProps.addPortfolioTableRowBool ||
+                this.state.updatePortfolioTableData !== nextState.updatePortfolioTableData ||
+                this.state.validInput || this.state.queryRes ||
+                nextState.selectedRecordValue !== this.state.selectedRecordValue) {
                 // console.log('NEXT ')
 
                 return true;
@@ -232,10 +232,76 @@ export class PortFolio extends Component {
         }
         return false;
     }
-    selectmad(e) {
-        const portfolioTableId = parseInt(e.target.id);
-        //   console.log('portfolio ' + portfolioTableId);
+
+    // **************************************************
+    // Initialise Portfolio
+    // **************************************************
+
+    // Initialise alert rows from database
+    async initialisePortfolio() {
+        // Read notifications from database
+        await fetch('getportfolio')
+            .then(response => response.json())
+            .then(response =>
+                this.addFirstRows(response)
+            )
+            .catch(error => {
+                console.log("error " + error) // 404
+                return;
+            }
+            );
     }
+
+    async addFirstRows(response) {
+        var t = this.state.portfolioTableStack;
+        var portfolioTableStocks = this.state.portfolioTableStocks;
+        let target = parseInt(this.state.stockRecordID);
+
+        for (var i = 0; i < response.length; i++) {
+            const item = JSON.parse(response[i]);
+
+            const exists = await this.keyExists(null, target);
+
+            if (exists) {
+                return;
+            }
+
+            portfolioTableStocks.push(PortfolioCache.get(item.Id));
+            let pointer = parseInt(portfolioTableStocks.length - 1);
+
+
+            PortfolioCalc.setDataMap(target, this.state.price, this.state.shares,
+                this.state.date);
+
+            t.push(
+                <tbody key={pointer}>
+                    <tr>
+                        <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].StockName.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].StockCode.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getPrice()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getShares()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getExpenditure()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getDate()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].PrevOpen.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].Change.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getNetGain()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getGross()}</td>
+                    </tr>
+                </tbody>
+            )
+
+            this.map.set(pointer, target);
+
+        }
+
+        this.setState({ maxNumberOfPortfolioRows: this.state.maxNumberOfPortfolioTableRows + 1 });
+        this.setState({ portfolioTableStack: t });
+        this.setState({ portfolioTableStocks: portfolioTableStocks });
+        this.setState({ addPortfolioTableRowBool: true });
+    }
+
+    // **************************************************
 
     // **************************************************
     // Form Functionality Methods
@@ -276,7 +342,66 @@ export class PortFolio extends Component {
         return validate;
     }
 
-    /* Checks if the key was added to the map
+    async savePortfolio(portfolio) {
+        await fetch('saveportfolio/'.concat(portfolio))
+            .then(response => response.status)
+            .then(response => {
+                if (!response.ok) {
+                    // 404 
+                    return false;
+                }
+                else return true;
+            })
+            .catch(error => {
+                console.log("error " + error) // 404
+                return false;
+            }
+            );
+
+        return false;
+    }
+
+
+    async editPortfolio(data) {
+        await fetch('editportfolio/'.concat(data))
+            .then(response => response.status)
+            .then(response => {
+                if (!response.ok) {
+                    // 404 
+                    return false;
+                }
+                else return true;
+            })
+            .catch(error => {
+                console.log("error " + error) // 404
+                return false;
+            }
+            );
+
+        return false;
+    }
+
+    async deletePortfolio(id) {
+        await fetch('deleteportfolio/'.concat(id))
+            .then(response => response.status)
+            .then(response => {
+                if (!response.ok) {
+                    // 404 
+                    return false;
+                }
+                else return true;
+            })
+            .catch(error => {
+                console.log("error " + error) // 404
+                return false;
+            }
+            );
+
+        return false;
+    }
+
+    /* 
+    * Checks if the key was added to the map
     * Iterates through map and determines 
     * if a stock was added to the table
     */
@@ -322,32 +447,30 @@ export class PortFolio extends Component {
         }
         else if (this.state.maxNumberOfAlertTableRows >= maxRows) {
             window.alert('Maximum stocks for portfolio exceeded, limit: 200 ');
-            return
+            return;
         }
 
-        PortfolioCalc.setPortfolio(this.state.price, this.state.shares,
-            this.state.price * this.state.shares);
+        PortfolioCalc.setDataMap(target, this.state.price, this.state.shares,
+            this.state.date);
 
         // Stocks to be displayed in the Portfolio table
         portfolioTableStocks.push(PortfolioCache.get(target));
         let pointer = parseInt(portfolioTableStocks.length - 1);
 
-        this.data.set(pointer, { price: this.state.price, shares: this.state.shares, date: this.state.date });
-
         t.push(
             <tbody key={pointer}>
                 <tr>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockName.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockCode.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{this.data.get(pointer).price}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{this.data.get(pointer).shares}</td>
+                    <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].StockName.toString()}</td>
+                    <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].StockCode.toString()}</td>
+                    <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getPrice()}</td>
+                    <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getShares()}</td>
                     <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getExpenditure()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{this.data.get(pointer).date}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].PrevOpen.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].Change.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getProfitLoss()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getProfitLossPercentage()}</td>
+                    <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getDate()}</td>
+                    <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].PrevOpen.toString()}</td>
+                    <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
+                    <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].Change.toString()}</td>
+                    <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getNetGain()}</td>
+                    <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getGross()}</td>
                 </tr>
             </tbody>
         )
@@ -356,7 +479,16 @@ export class PortFolio extends Component {
         this.map.set(pointer, target);
 
         // Save to Database
+        // Add to database
+        const obj =
+        {
+            Id: target,
+            Price: this.state.price,
+            Shares: this.state.shares,
+            Date: this.state.date
+        }
 
+        this.savePortfolio(JSON.stringify(obj));
         // Force an update
 
         this.setState({ maxNumberOfPortfolioRows: this.state.maxNumberOfPortfolioTableRows + 1 });
@@ -382,15 +514,16 @@ export class PortFolio extends Component {
         var new_stack = [];
         var new_portfolioTableStocks = [];
 
-        // Add a key so it adds to a map updated by the database
-        PortfolioCalc.setPortfolio(this.state.price, this.state.shares,
-            this.state.price * this.state.shares);
+        const target = parseInt(this.state.stockRecordID);
+
+        PortfolioCalc.setDataMap(target, this.state.price, this.state.shares,
+            this.state.date);
 
         for (let pointer = 0; pointer < this.map.size; pointer++) {
-            if (parseInt(this.state.stockRecordID) == parseInt(pointer)) {
+            if (target == pointer) {
 
                 // Update maps
-                this.data.set(pointer, { price: this.state.price, shares: this.state.shares, date: this.state.date });
+
                 this.map.set(pointer, this.state.stockFormID);
 
                 new_portfolioTableStocks[pointer] = PortfolioCache.get(this.state.stockFormID); // New information
@@ -401,15 +534,15 @@ export class PortFolio extends Component {
                         <tr>
                             <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].StockName.toString()}</td>
                             <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].StockCode.toString()}</td>
-                            <td id={pointer} onClick={this.select.bind(this)}>{this.data.get(pointer).price}</td>
-                            <td id={pointer} onClick={this.select.bind(this)}>{this.data.get(pointer).shares}</td>
+                            <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getPrice()}</td>
+                            <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getShares()}</td>
                             <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getExpenditure()}</td>
-                            <td id={pointer} onClick={this.select.bind(this)}>{this.data.get(pointer).date}</td>
+                            <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getDate()}</td>
                             <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].PrevOpen.toString()}</td>
                             <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
                             <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].Change.toString()}</td>
-                            <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getProfitLoss()}</td>
-                            <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getProfitLossPercentage()}</td>
+                            <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getNetGain()}</td>
+                            <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getGross()}</td>
                         </tr>
                     </tbody>;
             }
@@ -419,35 +552,55 @@ export class PortFolio extends Component {
             }
         }
 
+        // Add to database
+        const obj =
+        {
+            Id: target,
+            Price: this.state.price,
+            Shares: this.state.shares,
+            Date: this.state.date
+        }
+
+        this.editPortfolio(JSON.stringify(obj));
+
         this.setState({ portfolioTableStack: new_stack });
         this.setState({ portfolioTableStocks: new_portfolioTableStocks });
         this.setState({ editPortfolioTable: true });
     }
 
+
+    removeStockRow() {
+        if (this.state.maxNumberOfPortfolioTableRows < 1)
+            return;
+        var answer = window.confirm("Remove Stock? ");
+        if (answer) {
+            this.setState({ removeStock: true });
+        }
+    }
+
     // Are you sure you want to remove this stock?
     removePortfolioTableRow() {
-      /*  if (this.state.maxNumberOfAlertTableRows < 1)
-            return;
-
         let pointer;
         let start = 0;
-        let end = this.state.alertTableStocks.length - 1;
-        let target = parseInt(this.state.target);
+        const end = this.map.size - 1;
+        const target = parseInt(this.state.stockRecordID);
         let portfolioTableStack = [];
 
         for (pointer = start; pointer <= end; pointer++) {
             // console.log('alertTableId ' + pointer + ' target ' + target);
             if (pointer === target) {
-                this.map.delete(pointer);
+                this.map.delete(target);
+                this.deletePortfolio(target);
+                PortfolioCalc.deleteKeyDataMap(target);
                 continue;
             }
             else
                 portfolioTableStack.push(this.state.portfolioTableStack[pointer]);
         }
 
-        this.setState({ maxNumberOfAlertTableRows: this.state.maxNumberOfAlertTableRows - 1 });
-        this.setState({ alertTableStocks: alertTableStocks });
-        this.setState({ removeAlertTableRowBool: true });*/
+        this.setState({ maxNumberOfPortfolioRows: this.state.maxNumberOfPortfolioTableRows - 1 });
+        this.setState({ portfolioTableStack: portfolioTableStack });
+        this.setState({ addPortfolioTableRowBool: true });
     }
 
     // Search box retrieves stocks from database
@@ -527,7 +680,7 @@ export class PortFolio extends Component {
         this.setState({ stockRecordID: id });
         this.setState({ validInput: true });
 
-        console.log("ID " + id)
+        // console.log("ID " + id)
         if (this.map.has(this.state.stockRecordID))
             this.setState({ stockFormID: id });
 
@@ -697,39 +850,6 @@ export class PortFolio extends Component {
         this.setState({ addPortfolioTableRowBool: true });
     }
 
-    // Remove row from table
-    removeRow() {
-        let t = [];
-        let style = {};
-        var portfolioTableStocks = this.state.portfolioTableStocks;
-        let pointer = 0;
-        let start = 0;
-        let end = this.state.portfolioTableStocks.length - 1;
-
-        for (pointer = start; pointer <= end; pointer++) {
-            //      console.log('POINTER ' + pointer + ' TARGET ' + this.props.state.target);
-
-            t.push(
-                <tbody>
-                    <tr>
-                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockName.toString()}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockCode.toString()}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{this.data.get(pointer).price}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{this.data.get(pointer).shares}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getExpenditure()}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{this.data.get(pointer).date}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].PrevOpen.toString()}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].Change.toString()}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getProfitLoss()}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getProfitLossPercentage()}</td>
-                    </tr>
-                </tbody>);
-        }
-
-        this.setState({ portfolioTableStack: t });
-    }
-
     // Update the table
     updateTable() {
         let t = <div>
@@ -796,126 +916,72 @@ export class PortFolio extends Component {
                     <th>Current <br /> Price</th>
                     <th>Change</th>
                     <th>Net Gain / Loss <br /> (Est)</th>
-                    <th>Net Gain / Loss <br /> % (Est)</th>
+                    <th>Gross</th>
                 </tr>
             </thead>
         </table>;
 
         return (
             <div>
+
+                <AddStockForm {...this} />
+                <EditStockForm {...this} />
+
                 <div class="portfolio">
-                {/* TOP NAVBAR */}
-                <Box
-                    min-width='12.25rem'
-                    width='20rem'
-                    height='22rem'
-                    overflowY='auto'
-                    bg='#f9f9f9'
-                    top='0px'
-                    justifyContent='center'
-                    visibility={this.state.addStockFormVisible}
-                    backgroundColor='whiteAlpha.508'
-                    style={{ position: 'absolute', left: '1000px', top: '220px' }}
-                    zIndex='999'
-                >
 
-                    <h4 style={{ position: 'absolute', color: 'black' }}>Add Stock </h4>
-                    <p style={{
-                        position: 'absolute', color: 'black', fontWeight: 'bold',
-                        fontSize: '15px', top: '5px', right: '20px', cursor: 'pointer'
-                    }}
-                        onClick={() => this.setAddFormVisibility("hidden")}>Close</p>
-                    <AddStockForm {...this} />
-                </Box>
+                    <div class="addStock" style={{ zIndex: '999' }}>
+                        <Button onClick={() => {
+                            this.setAddFormVisibility(true)
+                            this.setEditFormVisibility(false)
+                        }}>Add</Button>
+                    </div>
 
-                <Box
-                    min-width='12.25rem'
-                    width='20rem'
-                    height='22rem'
-                    overflowY='auto'
-                    bg='#f9f9f9'
-                    top='0px'
-                    justifyContent='center'
-                    visibility={this.state.editStockFormVisible}
-                    backgroundColor='whiteAlpha.508'
-                    style={{ position: 'absolute', left: '1000px', top: '220px' }}
-                    zIndex='999'
-                >
+                    <div class="editStock" style={{ zIndex: '999' }}>
+                        <Button onClick={() => {
+                            this.setEditFormVisibility(true)
+                            this.setAddFormVisibility(false)
+                        }}>Edit</Button>
+                    </div>
 
-                    <h4 style={{ position: 'absolute', color: 'black' }}>Edit Stock </h4>
-                    <p style={{
-                        position: 'absolute', color: 'black', fontWeight: 'bold',
-                        fontSize: '15px', top: '5px', right: '20px', cursor: 'pointer'
-                    }}
-                        onClick={() => this.setEditFormVisibility("hidden")}>Close</p>
+                    <div class="removeStock" style={{ zIndex: '999' }}>
+                        <Button onClick={() => this.removeStockRow()}>Remove</Button>
+                    </div>
 
-                    <EditStockForm {...this} />
-                </Box>
+                    <h2 style={{ position: 'absolute', top: '100px', left: '60px', color: 'wheat' }}>My Portfolio</h2>
 
-                {/* TOP NAVBAR */}
-                <TopNavbar />
-
-                <div class="editStock" style={{ zIndex: '999' }}>
-                    <Button onClick={() => {
-                        this.setEditFormVisibility("visible")
-                        this.setAddFormVisibility("hidden")
-                    }}>Edit</Button>
-                </div>
-
-                <div class="addStock" style={{ zIndex: '999' }}>
-                    <Button onClick={() => {
-                        this.setAddFormVisibility("visible")
-                        this.setEditFormVisibility("hidden")
-                    }}>Add</Button>
-                </div>
-
-                <div class="removeStock" style={{ zIndex: '999' }}>
-                    <Button onClick={() => this.setAddFormVisibility("visible")}>Remove</Button>
-                </div>
-
-                {/*     
-                    
-                    <Button class="addStock" style={{ position: 'absolute', top: '130px', left: '1030px' }}
-                                onClick={() => this.setAddFormVisibility("visible")}>Add a Stock</Button>*/}
-
-                <h2 style={{ position: 'absolute', top: '100px', left: '60px', color: 'wheat' }}>My Portfolio</h2>
-
-                {/* PORTFOLIO TABLE */}
-                <Box
-                    style={{ position: 'absolute', top: '125px', left: '60px' }}
-                    //     bg='rgb(30,30,30)'
-                    boxShadow='sm'
-                    textAlign='center'
-                    height='45px'
-                    width='78rem'
-                    rounded="lg"
-                    margin='auto'
-                    color='white'
-                >
-                    {portfolioTableHeader}
-
+                    {/* PORTFOLIO TABLE */}
                     <Box
-                        style={{
-                            position: 'absolute',
-                            overflowY: 'auto',
-                            top: '45px'
-                        }}
-                        overflowX='hidden'
+                        style={{ position: 'absolute', top: '125px', left: '60px' }}
+                        //     bg='rgb(30,30,30)'
                         boxShadow='sm'
                         textAlign='center'
-                        height='1110px'
+                        height='45px'
                         width='78rem'
                         rounded="lg"
                         margin='auto'
                         color='white'
                     >
+                        {portfolioTableHeader}
 
+                        <Box
+                            style={{
+                                position: 'absolute',
+                                overflowY: 'auto',
+                                top: '45px'
+                            }}
+                            overflowX='hidden'
+                            boxShadow='sm'
+                            textAlign='center'
+                            height='1110px'
+                            width='78rem'
+                            rounded="lg"
+                            margin='auto'
+                            color='white'
+                        >
+                            {this.state.portfolioTable}
 
-                        {this.state.portfolioTable}
-
+                        </Box>
                     </Box>
-                </Box>
-
                 </div>
             </div>
         );

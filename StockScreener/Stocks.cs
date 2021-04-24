@@ -16,8 +16,8 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
     // Change to singleton class
     public class Stocks
     {
-        internal static readonly String API_TOKEN = ConfigurationManager.AppSettings["API_TOKEN"];
-        internal static EODHistoricalDataClient client = new EODHistoricalDataClient(API_TOKEN, true);
+        private static readonly String API_TOKEN = ConfigurationManager.AppSettings["API_TOKEN"];
+        private static EODHistoricalDataClient client = new EODHistoricalDataClient(API_TOKEN, true);
 
         /*
                 static List<Database> stockList { get; set; }//= new List<Database>()  

@@ -479,6 +479,118 @@
     left: -100px;
   }*/
 
+  .editStockForm
+  {
+    position: absolute;
+    left: 1000px;
+    top: 220px;
+    width: 20rem;
+    height: 22rem;
+    background-color: white;
+    justify-content: center;
+    
+  }
+
+  .addStockForm
+  {
+    position: absolute;
+    left: 1000px;
+    top: 220px;
+    width: 20rem;
+    height: 22rem;
+    background-color: white;
+    justify-content: center;
+    
+  }
+  
+/***************** StockForms **********************/
+
+@media screen and ( min-width: 100px ) {
+ 
+  .editStockForm
+  {
+    position: absolute;
+    height: 37rem;
+  }
+
+  .addStockForm
+  {
+    position: absolute;
+    height: 37rem;
+  }
+
+}
+@media screen and ( min-width: 200px ) {
+  
+  .editStockForm
+  {
+    position: absolute;
+    height: 32rem;
+  }
+
+  .addStockForm
+  {
+    position: absolute;
+    height: 32rem;
+  }
+ 
+}
+
+@media screen and ( min-width: 300px ) and ( max-width: 690px ){
+  .editStockForm
+  {
+    position: absolute;
+    height: 32rem;
+  }
+
+  .addStockForm
+  {
+    position: absolute;
+    height: 32rem;
+  }
+}
+
+/* Solve zooming issue at 200% 
+@media screen and ( min-width: 1100px ) {
+  .editStockForm
+  {
+    position: absolute;
+    height: 22rem;
+  }
+}*/
+
+
+@media screen and ( min-width: 690px ) and  ( max-width: 1390px ){
+  .editStockForm
+  {
+    position: absolute;
+    height: 22rem;
+  }
+
+  .addStockForm
+  {
+    position: absolute;
+    height: 22rem;
+  }
+}
+
+@media screen and ( min-width: 1400px ) {
+  .editStockForm
+  {
+    position: absolute;
+    height: 22rem;
+  }
+
+  .addStockForm
+  {
+    position: absolute;
+    height: 22rem;
+  }
+}
+
+
+/***************************************/
+
   
 
 /*****************Stock table one**********************/
@@ -489,6 +601,8 @@
       position: absolute;
       left: -135px;
     }
+
+
 
   }
   @media screen and ( min-width: 200px ) {
@@ -576,8 +690,6 @@
     {
       min-height: 100%;
     }
-
-
 
   }
 
@@ -742,7 +854,6 @@
   }
   
   @media screen and (min-width: 100px) and (max-width: 578px) { 
-
 
     .historical .removeHistoricalStock {
     position: absolute;
