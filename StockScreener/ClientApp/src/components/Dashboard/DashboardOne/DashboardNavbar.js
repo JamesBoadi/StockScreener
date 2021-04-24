@@ -268,6 +268,7 @@ export class DashboardNavbar extends Component {
         }
 
         // Save to database
+        
 
 
         // this.saveSettingsToDatabase(AlertSettings.getSettings(), PriceSettings.getSettings())
@@ -467,9 +468,8 @@ export class DashboardNavbar extends Component {
             return false;
         }
 
-        if (h >= startTime[0] && h <= endTime[0]){
-            if(m >= startTime[0] && m <= endTime[0])
-            {
+        if (h >= startTime[0] && h <= endTime[0]) {
+            if (m >= startTime[0] && m <= endTime[0]) {
                 return true;
             }
         }
@@ -483,7 +483,7 @@ export class DashboardNavbar extends Component {
 
             window.alert('Market hours are between 9:00 AM and 17:00 PM');
         }
-        
+
         this.setState({ startTime: timeString });
     }
 

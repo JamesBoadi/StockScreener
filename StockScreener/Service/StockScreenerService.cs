@@ -20,17 +20,29 @@ namespace StockScreener
 
         private readonly IMongoCollection<SavedStocks> _savedStocks;
 
+
+
+        private readonly IMongoCollection<DashboardOneAlertSettings> _dashboardOneAlertSettings;
+
+
+        private readonly IMongoCollection<DashboardOnePriceSettings> _dashboardOnePriceSettings;
+
+
+        // private readonly IMongoCollection<SavedStocks> _savedStocks;
+
         public StockScreenerService(IStockScreenerDatabaseSettings settings)
         {
-            var client = new MongoClient("mongodb+srv://dbJames:"+CONNECTION_STRING+"@cluster0.w2zx6.mongodb.net/StockScreenerDb?socketTimeoutMS=360000&retryWrites=true&w=majority");
+            var client = new MongoClient("mongodb+srv://dbJames:" + CONNECTION_STRING + "@cluster0.w2zx6.mongodb.net/StockScreenerDb?socketTimeoutMS=360000&retryWrites=true&w=majority");
             var database = client.GetDatabase("StockScreenerDb");
-              //  database.CreateCollection(0001.KLSE, 0002.KLSE ETCCCCCC)
+            //  database.CreateCollection(0001.KLSE, 0002.KLSE ETCCCCCC)
             // Get Collection
             _notifications = database.GetCollection<Notifications>("Notifications");
             _tempHistoricalData = database.GetCollection<TempHistorical>("TempHistoricalData");
             _savedStocks = database.GetCollection<SavedStocks>("SavedStocks");
             _historicalData = database.GetCollection<Historical>("HistoricalData");
             _eodData = database.GetCollection<EndOfDayData>("EODdata");
+            _dashboardOneAlertSettings = database.GetCollection<DashboardOneAlertSettings>("DashboardOneAlertSettings");
+            _dashboardOnePriceSettings = database.GetCollection<DashboardOnePriceSettings>("DashboardOnePriceSettings");
         }
 
         // **************************************************
@@ -85,14 +97,12 @@ namespace StockScreener
             return historical;
         }
 
-        
+
         public bool TempIdExists(string id)
         {
             var query = _tempHistoricalData.Find<TempHistorical>(savedstocks => savedstocks.Id.Equals(id)).Any();
             return query;
         }
-
-
 
         public bool TempHistoricalIdExists(string id)
         {
@@ -149,11 +159,8 @@ namespace StockScreener
             return query;
         }
 
-        
-
         public EndOfDayData Create(EndOfDayData historical)
         {
-
             // Insert document in collection
             _eodData.InsertOne(historical);
             return historical;
@@ -163,7 +170,6 @@ namespace StockScreener
            _eodData.DeleteOne(historical => historical.Id.Equals(id));
 
         // **************************************************
-
 
         // **************************************************
         // Saved Stocks
@@ -198,12 +204,54 @@ namespace StockScreener
 
         // **************************************************
 
+        // **************************************************
+        // Alert Settings
+        // **************************************************
 
+        // Return all documents in a collection
+        public List<DashboardOneAlertSettings> GetAlertSettings() =>
+            _dashboardOneAlertSettings.Find(settings => true).ToList();
 
+        public DashboardOneAlertSettings Create(DashboardOneAlertSettings settings)
+        {
+            _dashboardOneAlertSettings.InsertOne(settings);
+            return settings;
+        }
 
+        public bool FindDashboardOneAlertSettings(string id)
+        {
+            var query = _dashboardOneAlertSettings.Find<DashboardOneAlertSettings>(historical => historical.Id.Equals(id)).Any();
+            return query;
+        }
 
+        public void DeleteDashboardOneAlertSettings(string id) =>
+            _dashboardOneAlertSettings.DeleteOne(settings => settings.Id == id);
 
+        // **************************************************
 
+        // **************************************************
+        // Price Settings
+        // **************************************************
+
+        public List<DashboardOnePriceSettings> GetPriceSettings() =>
+            _dashboardOnePriceSettings.Find(settings => true).ToList();
+
+        public DashboardOnePriceSettings Create(DashboardOnePriceSettings settings)
+        {
+            _dashboardOnePriceSettings.InsertOne(settings);
+            return settings;
+        }
+
+         public bool FindDashboardOnePriceSettings(string id)
+        {
+            var query = _dashboardOnePriceSettings.Find<DashboardOnePriceSettings>(historical => historical.Id.Equals(id)).Any();
+            return query;
+        }
+
+        public void DeleteDashboardOnePriceSettings(string id) =>
+            _dashboardOneAlertSettings.DeleteOne(settings => settings.Id == id);
+
+        // **************************************************
 
     }
 }

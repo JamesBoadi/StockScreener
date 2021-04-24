@@ -1,11 +1,10 @@
-
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Text.Json;
 
 namespace StockScreener
 {
-    public class Historical
+    public class Portfolio
     {
         // static List<Notifications> notifications = new List<Notifications>();
 
@@ -15,13 +14,17 @@ namespace StockScreener
 
         public string Id { get; set; }
 
+        public long Price { get; set; }
+
+        public long Shares { get; set; }
+
         public string Date { get; set; }
 
-        public static Historical Deserialize(string query)
+        public static Portfolio Deserialize(string query)
         {
             // Case Insensitive (Does not exclude capitals and numbers)
-            Historical data = JsonSerializer.
-            Deserialize<Historical>(query, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            Portfolio data = JsonSerializer.
+            Deserialize<Portfolio>(query, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             //Console.WriteLine("data " + data.Id + " stockcode " + data.StockCode);
             return data;

@@ -50,15 +50,15 @@ namespace StockScreener.Controllers
 
 
         // state
-      /*  [Route("state")]
-        public void transmitData(string query) // convert to json
-        {
+        /*  [Route("state")]
+          public void transmitData(string query) // convert to json
+          {
 
 
 
 
-        }*/
-        
+          }*/
+
         // Return stock names in order of subsequence
         [Route("searchstock/{query?}")]
         public string transmitData(string query) // convert to json
@@ -109,6 +109,9 @@ namespace StockScreener.Controllers
             return data;
         }
 
+        // ******************************************************
+        // Notifications
+        // ******************************************************
         [Route("savenotifications/{query?}")]
         public HttpStatusCode saveNotifications(string query) // convert to json
         {
@@ -208,9 +211,9 @@ namespace StockScreener.Controllers
         }
 
 
-        // Save stocks
-
-        //.................................................................
+        // ******************************************************
+        // Save Stocks
+        // ******************************************************
 
         [Route("savestocks/{query?}")]
         public HttpStatusCode saveStocks(string query) // convert to json
@@ -312,8 +315,10 @@ namespace StockScreener.Controllers
             return res;
         }
 
-        //.............................................................
 
+        // ******************************************************
+        // Temp Historical Data
+        // ******************************************************
 
         [Route("savehistoricaldata/temp/{data?}")]
         public HttpStatusCode saveTempHistoricalData(string data) // convert to json
@@ -377,6 +382,44 @@ namespace StockScreener.Controllers
 
             return jsonArray;
         }
+
+        [Route("deletehistoricaldata/temp/{id?}")]
+        public HttpStatusCode deleteTempHistoricalData(string id) // convert to json
+        {
+            var response = new HttpResponseMessage();
+            HttpStatusCode res;
+
+            try
+            {
+                string _id = JsonSerializer.Deserialize<int>(id).ToString();
+                bool idExists = _stockScreenerService.TempIdExists(_id);
+
+                if (idExists)
+                {
+                    _stockScreenerService.RemoveTempHistoricalId(_id);
+                }
+                else
+                {
+                    return HttpStatusCode.Ambiguous;
+                }
+
+                res = response.StatusCode;
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+                res = response.StatusCode;
+            }
+
+            return res;
+        }
+
+        // ******************************************************
+        // Historical 
+        // ******************************************************
 
         [Route("savehistoricaldata/{id?}")]
         public HttpStatusCode saveHistoricalData(string id) // convert to json
@@ -481,6 +524,11 @@ namespace StockScreener.Controllers
 
             return jsonArray;
         }
+
+        // ******************************************************
+        // EOD (End Of Day)
+        // ******************************************************
+
         [Route("geteod/data")]
         public string[] getEODdata() // convert to json
         {
@@ -510,24 +558,41 @@ namespace StockScreener.Controllers
             return jsonArray;
         }
 
-        [Route("deletehistoricaldata/temp/{id?}")]
-        public HttpStatusCode deleteTempHistoricalData(string id) // convert to json
+
+        // ******************************************************
+        // DashboardOneSettings
+        // ******************************************************
+        [Route("savesettings/dashboardOne/{alertsettings?}/{pricesettings?}")]
+        public HttpStatusCode setDashboardOneSettings(string alertsettings, string pricesettings) // convert to json
         {
             var response = new HttpResponseMessage();
             HttpStatusCode res;
-
             try
             {
-                string _id = JsonSerializer.Deserialize<int>(id).ToString();
-                bool idExists = _stockScreenerService.TempIdExists(_id);
+                DashboardOneAlertSettings dashboardAlertsSettings = DashboardOneAlertSettings.Deserialize(alertsettings);
+                DashboardOnePriceSettings dashboardPriceSettings = DashboardOnePriceSettings.Deserialize(pricesettings);
 
-                if (idExists)
+                bool alertSettingsExists = _stockScreenerService.FindDashboardOneAlertSettings("0");
+                bool priceSettingsExists = _stockScreenerService.FindDashboardOneAlertSettings("0");
+
+                if (alertSettingsExists)
                 {
-                    _stockScreenerService. RemoveTempHistoricalId(_id);
+                    _stockScreenerService.Create(dashboardAlertsSettings);
                 }
                 else
                 {
-                    return HttpStatusCode.Ambiguous;
+                    _stockScreenerService.DeleteDashboardOneAlertSettings("0");
+                    _stockScreenerService.Create(dashboardAlertsSettings);
+                }
+
+                if (priceSettingsExists)
+                {
+                    _stockScreenerService.Create(dashboardPriceSettings);
+                }
+                else
+                {
+                    _stockScreenerService.DeleteDashboardOnePriceSettings("0");
+                    _stockScreenerService.Create(dashboardPriceSettings);
                 }
 
                 res = response.StatusCode;
@@ -538,14 +603,47 @@ namespace StockScreener.Controllers
                     Console.WriteLine("Exception " + ex);
 
                 Console.WriteLine("Exception " + ex);
+
                 res = response.StatusCode;
             }
 
             return res;
         }
 
+        [Route("getsettings/dashboardOne/")]
+        public string[] getAllDashboardOneSettings() // convert to json
+        {
+            string[] jsonArray;
+            List<DashboardOneAlertSettings> alertSettings;
+            List<DashboardOnePriceSettings> priceSettings;
+            try
+            {
+                alertSettings = _stockScreenerService.GetAlertSettings();
+                priceSettings = _stockScreenerService.GetPriceSettings();
 
-        
+                jsonArray = new string[alertSettings.Count + priceSettings.Count];
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+                return null;
+            }
+
+            List<string> list = new List<string>();
+
+            for (int i = 0; i < alertSettings.Count; i++)
+            {
+                list.Add(JsonSerializer.Serialize(alertSettings[i]));
+                list.Add(JsonSerializer.Serialize(priceSettings[i]));
+            }
+            jsonArray = list.ToArray();
+            return jsonArray;
+        }
+
+
 
 
 

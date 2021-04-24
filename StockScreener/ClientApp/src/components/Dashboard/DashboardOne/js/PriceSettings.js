@@ -73,7 +73,6 @@ export default class PriceSettings {
             priceDetectionEnabled: this.priceDetectionEnabled,
             hideBullishStocks: this.hideBullishStocks,
             hideBearishStocks: this.hideBearishStocks,
-            timestamp: this.TimeStamp
         }
 
         return JSON.stringify(json);
@@ -85,7 +84,7 @@ export default class PriceSettings {
 
 
 
-
+/*
 
     // Set local prices using global prices without overriding prices already set
     static setLocalPrices(startPrice, targetPrice, clickedAlertTableRowID) {
@@ -115,7 +114,7 @@ export default class PriceSettings {
     
             for (let key = 0; key < 897; key++) {
                 this.map.set(key, data);
-            } */
+            } 
     }
 
     // Update stock hashmap
@@ -129,7 +128,7 @@ export default class PriceSettings {
           // Update HashMap
         const clickedAlertTableRowID = this.state.clickedAlertTableRowID;
           this.map.set(clickedAlertTableRowID, data);*/
-    }
+  //  }
 
 
 }
