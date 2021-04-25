@@ -4,7 +4,7 @@ import {
     NumberInputField, NumberInputStepper,
     NumberIncrementStepper, NumberDecrementStepper,
 } from '@chakra-ui/react';
-import { FetchData } from '../../Dashboard/FetchData.js';
+import { DisplayStock } from '../../Dashboard/DisplayStock';
 import { Notifications } from '../../Dashboard/Notifications.js';
 import { Menu, Dropdown, TimePicker } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
@@ -12,8 +12,6 @@ import PriceSettings from './js/PriceSettings.js';
 import AlertSettings from './js/AlertSettings.js';
 import TableCache from './js/TableCache.js';
 
-import { StockTableTwo } from './StockTableTwo';
-import { SavedStockTable } from './SavedStockTable';
 
 import { AlertContext } from './AlertContext';
 import moment from 'moment';
@@ -268,8 +266,6 @@ export class DashboardNavbar extends Component {
         }
 
         // Save to database
-        
-
 
         // this.saveSettingsToDatabase(AlertSettings.getSettings(), PriceSettings.getSettings())
         this.setState({ saveSettings: true });
@@ -790,32 +786,6 @@ export class DashboardNavbar extends Component {
                                 onChange={this.setHideBearishStocks} />
                             {/*  />*/}
 
-                            <div >
-                                <Button
-                                    class="toggleNotifications"
-                                    onClick={this.enableNotificationsMenu}>
-                                    Notifications
-                                    </Button>
-                            </div>
-
-
-                            <div class="dropdown-content">
-                                <Box
-                                    style={{ position: 'absolute' }}
-                                    visibility={(this.state.notificationsMenuVisible) ? 'visible' : 'hidden'}
-                                    min-width='19.25rem'
-                                    width='22.25rem'
-                                    height='40.25rem'
-                                    overflowY='auto'
-                                    bg='rgb(230,230,230)'
-                                    top='-25px'
-                                    left='1070px'
-                                    backgroundColor='wheat.800'
-                                    zIndex='999'
-                                >
-                                    {this.state.notifications}
-                                </Box>
-                            </div>
 
                             <Button style={{ position: 'absolute', top: '170px', left: '1325px', zIndex: '-999' }}
                                 onClick={this.saveConfiguration}>Save Configuration</Button>
@@ -830,9 +800,9 @@ export class DashboardNavbar extends Component {
                     </div>
                 </Box>
 
-                <StockTableTwo {...this} />
-                <SavedStockTable {...this} />
-
+                {/* DISPLAY STOCK */}
+                <DisplayStock {...this} />
+             
             </div>
         );
     }

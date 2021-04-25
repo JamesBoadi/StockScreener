@@ -6,9 +6,6 @@ import {
 } from '@chakra-ui/react';
 import { NotificationsContext } from './NotificationsContext';
 
-
-
-
 /**
      * Starts the data feed and subscribes to a method on
      * the server which will retrieve the data. All Caches will

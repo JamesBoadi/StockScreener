@@ -20,7 +20,7 @@ namespace StockScreener.Tests
         [Fact]
         public void Test1()
         {
-            Manager stocks = new Manager();
+            //Manager stocks = new Manager();
 
             //stocks.initialise_cache();
        /*     BackgroundServiceWorker service = new BackgroundServiceWorker();

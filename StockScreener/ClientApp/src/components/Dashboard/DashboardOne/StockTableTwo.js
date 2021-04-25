@@ -16,7 +16,7 @@ import * as cache from 'cache-base';
 
 import TableCache from './js/TableCache.js';
 import AlertSettings from './js/AlertSettings.js';
-import { DisplayStock } from '../../Dashboard/DisplayStock';
+
 
 import { AlertContext } from './AlertContext';
 
@@ -129,7 +129,7 @@ export class StockTableTwo extends React.Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         const scroll = this.scrollBy();
         if (this.props.state.updateCache) {
-           // console.log('SJ ' + this.props.state.updateCache);
+            // console.log('SJ ' + this.props.state.updateCache);
             this.setState({ cache: TableCache.cache() }); // Cannot access value immediately
 
             // Update table data (fix)
@@ -513,7 +513,7 @@ export class StockTableTwo extends React.Component {
         let style = {
             backgroundColor: ""
         };
-
+        
         this.styleMap.set(this.state.target, style);
 
         var target = new Number(e.target.id);
@@ -595,11 +595,10 @@ export class StockTableTwo extends React.Component {
             }
         }
 
+        // Display stock
+        this.props.displayStock(target);
         this.setState({ tb2_stack: array });
         this.setState({ isSelected: true });
-
-        // Send Information to Display Stock
-        //this.props.selectStockTableRow(e);
     }
 
     newTable() {
@@ -836,64 +835,6 @@ export class StockTableTwo extends React.Component {
         }
     }
 
-    // **************************************************
-    // Save Notifications
-    // **************************************************
-
-    async saveNotifications(notifications) {
-        await fetch('savenotifications/{query?}'.concat(notifications))
-            .then(response => response.status)
-            .then(response => {
-                if (!response.ok) {
-                    // 404 
-                    return false;
-                }
-                else return true;
-            })
-            .catch(error => {
-                console.log("error " + error) // 404
-                return false;
-            }
-            );
-
-        return false;
-    }
-
-    // Add Notifications to notifications menu
-    async addToNotificationsMenu() {
-        const defaultInterval = 60000;
-        const clickedAlertTableRowID = this.state.clickedAlertTableRowID
-
-        let pointer = 0;//this.state.start;
-        const end = 897;//this.state.end;
-
-        // Add the database (last known pointer)
-        this.notificationsDelayInterval = setInterval(() => {
-            // const stock = this.stockDashBoardMap.get(pointer).StockCode;
-            // const localStartPrice = this.stockDashBoardMap.get(pointer).LocalStartPrice;
-            // const localTargetPrice = this.stockDashBoardMap.get(pointer).LocalTargetPrice;
-            const stock = TableCache.get(pointer).StockCode;
-            const currentPrice_state = parseInt(TableCache.get(pointer).ChangeArray[0]);
-
-            if (currentPrice_state === 0) {
-                pointer++;
-            }
-
-            const currentPrice = parseInt(TableCache.get(pointer).CurrentPrice);
-            const previousPrice = parseInt(TableCache.getPreviousPrice(pointer));
-
-            let obj = this.props.notifications(pointer, stock, previousPrice, currentPrice, currentPrice_state);
-            this.saveNotifications(JSON.stringify(obj)) // Save to database
-
-            if (pointer++ >= end) {
-                pointer = 0; // Add the database (last known pointer)
-            }
-        }, 7000);
-    }
-
-    // **********************************************************
-
-
     render() {
         let stockTableTwoHeader = <table class="stockTableTwoHeader" aria-labelledby="tabelLabel">
             <thead>
@@ -913,11 +854,6 @@ export class StockTableTwo extends React.Component {
 
         return (
             <div>
-
-                {/* DISPLAY STOCK */}
-
-                <DisplayStock {...this} />
-
                 {/* STOCK TABLE TWO */}
                 <Box
                     style={{ position: 'absolute', top: '660px', left: '60px' }}

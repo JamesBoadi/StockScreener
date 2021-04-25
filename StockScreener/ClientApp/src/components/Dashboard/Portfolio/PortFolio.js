@@ -276,15 +276,15 @@ export class PortFolio extends Component {
             t.push(
                 <tbody key={pointer}>
                     <tr>
-                        <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].StockName.toString()}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].StockCode.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockName.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockCode.toString()}</td>
                         <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getPrice()}</td>
                         <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getShares()}</td>
                         <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getExpenditure()}</td>
                         <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getDate()}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].PrevOpen.toString()}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
-                        <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].Change.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].PrevOpen.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
+                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].Change.toString()}</td>
                         <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getNetGain()}</td>
                         <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getGross()}</td>
                     </tr>
@@ -460,15 +460,15 @@ export class PortFolio extends Component {
         t.push(
             <tbody key={pointer}>
                 <tr>
-                    <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].StockName.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].StockCode.toString()}</td>
+                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockName.toString()}</td>
+                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockCode.toString()}</td>
                     <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getPrice()}</td>
                     <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getShares()}</td>
                     <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getExpenditure()}</td>
                     <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getDate()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].PrevOpen.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
-                    <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].Change.toString()}</td>
+                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].PrevOpen.toString()}</td>
+                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
+                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].Change.toString()}</td>
                     <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getNetGain()}</td>
                     <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getGross()}</td>
                 </tr>

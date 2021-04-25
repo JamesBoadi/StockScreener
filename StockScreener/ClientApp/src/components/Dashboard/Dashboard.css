@@ -1096,8 +1096,8 @@
 
     .DashboardNavbar .toggleNotifications {
       position: absolute;
-      top: -72px;
-      left: 1310px;
+      top: 10px;
+      left: 1350px;
       box-shadow:inset 0px 0px 3px 0px #91b8b3;
       background-color:rgb(40,40,40);
       border-radius:12px;

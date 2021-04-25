@@ -92,15 +92,14 @@ export class SavedStockTable extends Component {
             this.initialiseAlertTable();
             this.setState({ populateTable: false });
         }
-
-        if (this.state.addAlertTableRowBool) {
+        if (this.props.state.addAlertTableRowBool) {
             //console.log('mounted  ' + this.state.alertTableStack.length);
             this.newTable();
             this.setState({ start: this.state.tb2_scrollPosition * 50 }, () => {
                 this.updateTable(this.state.start);
             });
 
-            this.setState({ addAlertTableRowBool: false });
+            this.props.setAddAlertTableRowBool(false);
         }
         if (this.props.state.removeAlertTableRowBool) {
             this.removeRow();
@@ -112,7 +111,8 @@ export class SavedStockTable extends Component {
         }
     }
     shouldComponentUpdate(nextProps, nextState) {
-        if (this.state.addAlertTableRowBool !== nextState.addAlertTableRowBool) {
+        if (this.props.state.addAlertTableRowBool !== nextProps.state.addAlertTableRowBool
+            || this.props.state.removeAlertTableRow !== nextProps.state.removeAlertTableRow) {
             return true;
         } else if (this.props.state.populateTable !== nextState.populateTable) {
             return true;
@@ -194,8 +194,10 @@ export class SavedStockTable extends Component {
     // select record from dropdown list
     selectRecords(e) {
         var id = new Number(e.target.id);
+        this.props.displayStock(id);
         this.setState({ stockRecord: id });
         this.setState({ validInput: true });
+
     }
 
     // create searchable records from dropdown list
@@ -309,8 +311,6 @@ export class SavedStockTable extends Component {
         this.setState({ target: alertTableId });
         this.setState({ addAlertTableRowBool: true });
     }
-
-
 
     // Create a new table
     newTable() {

@@ -20,27 +20,16 @@ namespace StockScreener
 {
     public class BackgroundServiceWorker : IHostedService, IDisposable
     {
-
         private readonly ILogger<BackgroundServiceWorker> _logger;
         private Timer _timer;
-
         public readonly int MAX_API_REQUESTS = (8 * 60 * 60) / 290;
-
         public int API_REQUESTS = 0;
-
         public bool _streamStarted = true;
-
         private string[] tradingHours = { "09:00am-12:30pm", "02:30pm-05:00pm" };
-
         DateTime malaysiaTime = DateTime.UtcNow;
-
         const string easternZoneId = "Singapore Standard Time";
-
         static int REQUESTS = 1;
-
-        //  private readonly MemoryCache memoryCache;// = new MemoryCache();
-
-        private Manager stocks = new Manager();
+        private Manager Manager = Manager.Instance;
 
         public CancellationToken CancellationToken { get; set; }
 
@@ -94,7 +83,7 @@ namespace StockScreener
                 // Update stocks
                 // var count = Interlocked.Increment(ref executionCount);
 
-                Manager.stocks.updateManager(0, length);
+                Manager.updateManager(0, length);
                 API_REQUESTS += 1;
 
                 await Task.Delay(100);

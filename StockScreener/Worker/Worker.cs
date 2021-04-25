@@ -20,8 +20,6 @@ namespace StockScreener
     {
         private readonly ILogger<Worker> _logger;
 
-
-
         private static readonly int MAX = 897;
 
         private static int calls = 0;
@@ -39,6 +37,8 @@ namespace StockScreener
         private readonly StockScreenerService _stockScreenerService;
 
         BackgroundServiceWorker serviceWorker = new BackgroundServiceWorker();
+
+        private readonly Manager Manager = Manager.Instance;
 
         CancellationToken cacheCancellationToken;
 
@@ -62,7 +62,7 @@ namespace StockScreener
                 // Read Database
                 if (_init_called == false)
                 {
-                    Manager.stocks.init(); // Change to singleton
+                    Manager.init(); // Change to singleton
                     _ = initialise_cache();
                     _init_called = !_init_called;
                 }
@@ -178,22 +178,20 @@ namespace StockScreener
             await Task.Delay(100);
         }
 
-
         private async Task initialise_cache()
         {
             int start = 0;
             int end = 19;
 
-
-            for (int pointer = 0; pointer <= Manager.stocks.MAX_CALLS; pointer++)
+            for (int pointer = 0; pointer <= Manager.MAX_CALLS; pointer++)
             {
-                if (pointer == Manager.stocks.MAX_CALLS)
+                if (pointer == Manager.MAX_CALLS)
                 {
-                    Manager.stocks.initialiseManager(start, start + Manager.stocks.Mod);
+                    Manager.initialiseManager(start, start + Manager.Mod);
                     break;
                 }
 
-                Manager.stocks.initialiseManager(start, end);
+                Manager.initialiseManager(start, end);
 
                 start += 20;
                 end += 20;
@@ -204,6 +202,33 @@ namespace StockScreener
             _cacheFull = true; // Cache is populated
             await Task.Delay(1000);
         }
+
+        private async Task deleteNotifications() // At EOD
+        {
+            int start = 0;
+            int end = 19;
+
+            for (int pointer = 0; pointer <= Manager.MAX_CALLS; pointer++)
+            {
+                if (pointer == Manager.MAX_CALLS)
+                {
+                    Manager.initialiseManager(start, start + Manager.Mod);
+                    break;
+                }
+
+                Manager.initialiseManager(start, end);
+
+                start += 20;
+                end += 20;
+                //  Console.WriteLine(start + " " + end);
+                // await Task.Delay(delay, cancellationToken);
+            }
+
+            _cacheFull = true; // Cache is populated
+            await Task.Delay(1000);
+        }
+
+
 
 
         /*

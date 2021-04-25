@@ -148,6 +148,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             }
         }
 
+
         static string[] stockArray;
 
         // Copy stocks from database into stock array
