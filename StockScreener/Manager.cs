@@ -13,50 +13,14 @@ using System.Text.Json;
 
 namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_server For the database (https://gist.github.com/kevinswiber/1390198)
 {
-    // Change to singleton class
-    public class Stocks
+
+    public sealed class Manager
     {
+        private static Manager instance = null;
+        private static readonly object padlock = new object();
         private static readonly String API_TOKEN = ConfigurationManager.AppSettings["API_TOKEN"];
         private static EODHistoricalDataClient client = new EODHistoricalDataClient(API_TOKEN, true);
-
-        /*
-                static List<Database> stockList { get; set; }//= new List<Database>()  
-                static public List<Database> StockList { get { return stockList; } set { stockList = value; } }
-
-                static private string[] stockCode = new string[StocksCode.Value.Length];
-                static public string[] Arr { get { return stockCode; } set { stockCode = value; } }   new string[StockList.Value.Count]; */
-
-        // https://docs.microsoft.com/en-us/dotnet/framework/performance/lazy-initialization <-------------- This!
-
-
-        //  public List<Database> StockList { get { return stockList; } set { stockList = value; } }
-
-        //  static Lazy<string[]> all = new Lazy<string[]>(() => new Stocks().getAll());
-
-        /*   
-             internal const string TestSymbol = "0001.KLSE";
-
-             internal static readonly string[] D  atabase = new[] { TestSymbol, "EUR.FOREX" };
-
-             static List<Database> stockList = new List<Database>();
-
-          //   static Lazy<string[]> stocksName = new Lazy<string[]>(() => getStockNames());
-            // Set this value from stock controller
-*/
-
-        //                    stock = new Stock();
-
-        /*     cache.Add(data_.Open.ToString());
-            cache.Add(StocksCode.Value[code].ToString());
-             cache.Add(data_.Change.ToString());
-             cache.Add(data_.ChangeP.ToString());
-             cache.Add(data_.Volume.ToString());
-             cache.Add(Request_Calls.ToString());
-             cache.Add(MAX_CALLS.ToString());*/
-        /*    pointer += 7;
-            code++;*/
         private static Lazy<List<Database>> stockList;// = new Lazy<List<Database>>();
-
         public static Lazy<List<Database>> StockList
         {
             get { return stockList; }
@@ -65,7 +29,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
         private static Lazy<string[]> stocksCode; //= new Lazy<string[]>();
 
-        public static Lazy<string[]> StocksCode
+        public static Lazy<string[]> ManagerCode
         {
             get { return stocksCode; }
             set { stocksCode = value; }
@@ -73,7 +37,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
         private static Lazy<string[]> stocksName; //= new Lazy<string[]>();
 
-        public static Lazy<string[]> StocksName
+        public static Lazy<string[]> ManagerName
         {
             get { return stocksName; }
             set { stocksName = value; }
@@ -132,8 +96,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
         public static int startPrice = 0;
 
-        // Replace blocking operation with await tasks and loading bar
-        // Initialise StockList and StockCode
         public void init()
         {
             init_StockList();
@@ -142,18 +104,18 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
         public void init_StockList()
         {
-            Stocks.StockList = new Lazy<List<Database>>(() => readDatabase(), LazyThreadSafetyMode.ExecutionAndPublication); // We want the lisst to return first preceding initilization
+            Manager.StockList = new Lazy<List<Database>>(() => readDatabase(), LazyThreadSafetyMode.ExecutionAndPublication); // We want the lisst to return first preceding initilization
         }
 
         public void init_StockCode()
         {
-            Stocks.StocksCode = new Lazy<string[]>(() => getStockCode(), LazyThreadSafetyMode.ExecutionAndPublication);
-            Stocks.StocksName = new Lazy<string[]>(() => getStockName(), LazyThreadSafetyMode.ExecutionAndPublication);
-            MAX_CALLS = ((StocksCode.Value.Length - (StocksCode.Value.Length % 20)) / 20);
-            Mod = ((StocksCode.Value.Length % 20) - 1);
+            Manager.ManagerCode = new Lazy<string[]>(() => getStockCode(), LazyThreadSafetyMode.ExecutionAndPublication);
+            Manager.ManagerName = new Lazy<string[]>(() => getStockName(), LazyThreadSafetyMode.ExecutionAndPublication);
+            MAX_CALLS = ((ManagerCode.Value.Length - (ManagerCode.Value.Length % 20)) / 20);
+            Mod = ((ManagerCode.Value.Length % 20) - 1);
         }
 
-        static string[] manualScanStocks = new string[7 * 20];
+        static string[] manualScanManager = new string[7 * 20];
 
         List<RealTimePrice> data;
 
@@ -167,12 +129,24 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             set { cancellationToken = value; }
         }
 
+        private Manager()
+        {
+        }
 
-        public static Stocks stocks = new Stocks();
-
-        //  public readonly Cache cache = new Cache();
-
-        // BackgroundServiceWorker service = new BackgroundServiceWorker();
+        public static Manager Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new Manager();
+                    }
+                    return instance;
+                }
+            }
+        }
 
         static string[] stockArray;
 
@@ -184,7 +158,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
             for (int i = 0; i <= stockArray.Length - 1; i++)
             {
-                stockArray[i] = Stocks.StocksCode.Value[++pointer];
+                stockArray[i] = Manager.ManagerCode.Value[++pointer];
             }
         }
 
@@ -194,7 +168,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
         public static CacheOp cache = new CacheOp();
         // Get stocks from the cache
-        public void initialiseStocks(int start, int end)
+        public void initialiseManager(int start, int end)
         {
             int s = new Random().Next(-99, 99);
             bool positive = s >= 0;
@@ -207,8 +181,8 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
                 while (pointer <= end)
                 {
-                    stock = new Stock(pointer.ToString(), Stocks.StocksCode.Value[pointer],
-                    Stocks.StocksName.Value[pointer], "8:00",
+                    stock = new Stock(pointer.ToString(), Manager.ManagerCode.Value[pointer],
+                    Manager.ManagerName.Value[pointer], "8:00",
                     s, s, s, s, changeArray, 5, 6, 7, 8, 86);
 
                     cache.Add(stock);
@@ -221,7 +195,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
                    foreach (RealTimePrice data_ in data)
                    {
-                       stock = new Stock(StocksCode.Value[pointer],
+                       stock = new Stock(ManagerCode.Value[pointer],
                        data_.Open, data_.Change, data_.ChangeP, data_.Volume, changeArray, data_.High, data_.Low,
                        (positive && !negative) ? 1 : -1, data_.Close, data_.PreviousClose);
 
@@ -241,7 +215,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         }
 
         // Change array
-        public void updateStocks(int start, int end)
+        public void updateManager(int start, int end)
         {
             try
             {
@@ -255,8 +229,8 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     int[] changeArray = new int[6] { array[start2], array[start2], array[start2], array[start2],
                      array[start2], array[start2] };
                     int s = new Random().Next(0, 99);
-                    stock = new Stock(pointer.ToString(), Stocks.StocksCode.Value[pointer],
-                    Stocks.StocksName.Value[pointer], "8:00",
+                    stock = new Stock(pointer.ToString(), Manager.ManagerCode.Value[pointer],
+                    Manager.ManagerName.Value[pointer], "8:00",
                     s, 2, 3, start2, changeArray, 5, 6, 7, 8, 86);
 
                     cache.Update(pointer, stock);
@@ -270,7 +244,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
                 foreach (RealTimePrice data_ in data)
                 {
-                    stock = new Stock(StocksCode.Value[pointer],
+                    stock = new Stock(ManagerCode.Value[pointer],
                     data_.Open, data_.Change, data_.ChangeP, data_.Volume, changeArray, data_.High, data_.Low,
                     (positive && !negative) ? 1 : -1, data_.Close, data_.PreviousClose);
                     
@@ -390,7 +364,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
               EODHistoricalDataClient client = new EODHistoricalDataClient(API_TOKEN, true);
 
               //if() // Perform a refresh if fail (like restart thread or put on seperate thread)
-              List<RealTimePrice> prices = client.GetRealTimePrices(StocksCode.Value); // enumeration
+              List<RealTimePrice> prices = client.GetRealTimePrices(ManagerCode.Value); // enumeration
           }*/
 
 
@@ -411,7 +385,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                      int[] changeArray = new int[6] { array[start2], array[start2], array[start2], array[start2],
                      array[start2], array[start2] };
 
-                     stock.StockCode = StocksCode.Value[pointer];
+                     stock.StockCode = ManagerCode.Value[pointer];
                      stock.Change = s;
                      stock.ChangeP = 1;
                      stock.Volume = 11;
@@ -438,8 +412,8 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                      bool update = cache.Get(pointer).Equals(stock);
                      stock.ChangeArray = changeArray;
 
-                     Stocks.stocks.Request_Calls = Stocks.stocks.Request_Calls + 1;
-                     stock.Request_Calls = Stocks.stocks.Request_Calls;
+                     Manager.stocks.Request_Calls = Manager.stocks.Request_Calls + 1;
+                     stock.Request_Calls = Manager.stocks.Request_Calls;
 
                      // Compare each stock
                      //if (update || !update)
@@ -449,7 +423,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                      pointer++;
                  }
 
-                 Stocks.API_REQUESTS = Stocks.API_REQUESTS + 1;*/
+                 Manager.API_REQUESTS = Manager.API_REQUESTS + 1;*/
 
     }
 }

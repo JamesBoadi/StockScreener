@@ -21,7 +21,7 @@ namespace StockScreener
     // https://benfoster.io/blog/how-to-configure-kestrel-urls-in-aspnet-core-rc2
     public class Program
     {
-        Stocks stocks = new Stocks();
+        Manager stocks = new Manager();
 
         public static void Main(string[] args)
         {

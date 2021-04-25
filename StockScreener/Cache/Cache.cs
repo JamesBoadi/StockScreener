@@ -9,7 +9,7 @@ namespace StockScreener
 
         public static void Add(Stock data)
         {
-            _cache.Add(++Stocks.Pointer, data);
+            _cache.Add(++Manager.Pointer, data);
         }
 
         public static void Update(int position, Stock data)

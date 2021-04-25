@@ -62,7 +62,7 @@ namespace StockScreener
                 // Read Database
                 if (_init_called == false)
                 {
-                    Stocks.stocks.init(); // Change to singleton
+                    Manager.stocks.init(); // Change to singleton
                     _ = initialise_cache();
                     _init_called = !_init_called;
                 }
@@ -185,15 +185,15 @@ namespace StockScreener
             int end = 19;
 
 
-            for (int pointer = 0; pointer <= Stocks.stocks.MAX_CALLS; pointer++)
+            for (int pointer = 0; pointer <= Manager.stocks.MAX_CALLS; pointer++)
             {
-                if (pointer == Stocks.stocks.MAX_CALLS)
+                if (pointer == Manager.stocks.MAX_CALLS)
                 {
-                    Stocks.stocks.initialiseStocks(start, start + Stocks.stocks.Mod);
+                    Manager.stocks.initialiseManager(start, start + Manager.stocks.Mod);
                     break;
                 }
 
-                Stocks.stocks.initialiseStocks(start, end);
+                Manager.stocks.initialiseManager(start, end);
 
                 start += 20;
                 end += 20;

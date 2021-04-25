@@ -40,7 +40,7 @@ namespace StockScreener
 
         //  private readonly MemoryCache memoryCache;// = new MemoryCache();
 
-        private Stocks stocks = new Stocks();
+        private Manager stocks = new Manager();
 
         public CancellationToken CancellationToken { get; set; }
 
@@ -66,7 +66,7 @@ namespace StockScreener
 
         public async void getDataFromCache(object current_state)
         {
-            int length = Stocks.StocksCode.Value.Length;
+            int length = Manager.ManagerCode.Value.Length;
             try
             {
                /* if (API_REQUESTS == MAX_API_REQUESTS)
@@ -94,7 +94,7 @@ namespace StockScreener
                 // Update stocks
                 // var count = Interlocked.Increment(ref executionCount);
 
-                Stocks.stocks.updateStocks(0, length);
+                Manager.stocks.updateManager(0, length);
                 API_REQUESTS += 1;
 
                 await Task.Delay(100);

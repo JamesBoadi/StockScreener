@@ -637,6 +637,11 @@ namespace StockScreener.Controllers
             for (int i = 0; i < alertSettings.Count; i++)
             {
                 list.Add(JsonSerializer.Serialize(alertSettings[i]));
+
+            }
+
+            for (int i = 0; i < priceSettings.Count; i++)
+            {
                 list.Add(JsonSerializer.Serialize(priceSettings[i]));
             }
             jsonArray = list.ToArray();
