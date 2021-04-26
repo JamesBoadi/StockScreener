@@ -215,9 +215,16 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             }
         }
 
-        // Change array
+        // Update Stock
         public void updateManager(int start, int end)
         {
+
+            Time time = new Time();
+            TimeSpan _time = time.ReturnTime();
+            string hour = _time.Hours.ToString();
+            string minutes = _time.Minutes.ToString();
+
+            string time_format = hour + ":" + minutes;
             try
             {
                 int pointer = start;
@@ -230,11 +237,14 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     int[] changeArray = new int[6] { array[start2], array[start2], array[start2], array[start2],
                      array[start2], array[start2] };
                     int s = new Random().Next(0, 99);
-                    stock = new Stock(pointer.ToString(), Manager.ManagerCode.Value[pointer],
-                    Manager.ManagerName.Value[pointer], "8:00",
+                    Stock stock = new Stock(pointer.ToString(), Manager.ManagerCode.Value[pointer],
+                    Manager.ManagerName.Value[pointer], time_format,
                     s, 2, 3, start2, changeArray, 5, 6, 7, 8, 86);
 
-                    cache.Update(pointer, stock);
+                    // Update stock
+                    Stock newStockData = cache.Get(pointer).Update(stock);
+
+                    cache.Update(pointer, newStockData);
                     pointer++;
                 }
 

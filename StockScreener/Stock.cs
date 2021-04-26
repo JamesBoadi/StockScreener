@@ -9,7 +9,7 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
     {
         private static IMemoryCache _cache;
         //private readonly MemoryCache memoryCache = new MemoryCache(_cache);
-        public  List<Stock> list = new List<Stock>(); // Might not be needed
+        public List<Stock> list = new List<Stock>(); // Might not be needed
 
         // int Pointer = 0;
         public Stock(string id,
@@ -31,13 +31,13 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
             this.Volume = Volume;
             this.ChangeP = ChangeP;
             this.Change = Change;
-            
+
             list.Add(this);
         }
 
         // Contains all the stocks information
         public string Id { get; set; }
-        public double CurrentPrice{ get; set; }
+        public double CurrentPrice { get; set; }
         public string StockCode { get; set; }
         public string StockName { get; set; }
         public string TimeStamp { get; set; }
@@ -47,69 +47,33 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         public double Low { get; set; }
         public double Change { get; set; }
         public double ChangeP { get; set; }
-        //   double ProfitLoss;
-        // double ProfitLoss_Percentage;
         public double Volume { get; set; }
         public int[] ChangeArray { get; set; }
 
         public int Signal { get; set; }
 
-        // Time the stock was last updated
-        //string TimeStamp;
 
         /// <summary>Compare the equality of stocks</summary>
-        public bool Equals(Stock stock)
+        public Stock Update(Stock stock)
         {
+             Time time = new Time();
+             TimeSpan _time = time.ReturnTime();
+             string hour = _time.Hours.ToString();
+             string minutes = _time.Minutes.ToString();
+
             // Default states 2, -1, 0
             if (stock.CurrentPrice == this.CurrentPrice)
-            {
-                this.ChangeArray[0] = 0;
-            }
+                stock.ChangeArray[0] = 0; // No Change
             else
             {
-                this.changeArray[0] = (stock.CurrentPrice < this.CurrentPrice) ? -1 : 2;
-            }
-            if (stock.High == this.High)
-            {
-                this.changeArray[1] = 0;
-            }
-            else
-            {
-                this.changeArray[1] = (stock.High < this.High) ? -1 : 2;
-            }
-            if (stock.Low == this.Low)
-            {
-                this.changeArray[2] = 0;
-            }
-            else
-            {
-                this.changeArray[2] = (stock.Low < this.Low) ? -1 : 2;
-            }
-            if (stock.ProfitLoss == this.ProfitLoss)
-            {
-                this.changeArray[3] = 0;
-            }
-            else
-            {
-                this.changeArray[3] = (stock.ProfitLoss < this.ProfitLoss) ? -1 : 2;
-            }
-            if (stock.ProfitLoss_Percentage == this.ProfitLoss_Percentage)
-            {
+                // Bearish signal 2 if stock drops below 30%
+                stock.ChangeArray[0] =  (stock.CurrentPrice < this.CurrentPrice - (this.CurrentPrice * 0.3))
+                ? -2 : (stock.CurrentPrice < this.CurrentPrice) ? -1 : 2; 
+                // Update timeStamp
+                stock.TimeStamp = hour + ":" + minutes;
+            } // Add other variables later
 
-                this.changeArray[4] = 0;
-            }
-            else
-            {
-                this.changeArray[4] = (stock.ProfitLoss_Percentage < this.ProfitLoss_Percentage) ? -1 : 2;
-            }
-            if (stock.Volume == this.Volume)
-                this.changeArray[5] = 0;
-            else
-            {
-                this.changeArray[5] = (stock.Volume < this.Volume) ? -1 : 2;
-            }
-
-            return true;// this.changeArray.Contains(-1) || this.changeArray.Contains(2);
+            return stock;
         }
 
         // Convert to JSON notation
@@ -117,7 +81,7 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         {
             return JsonSerializer.Serialize(this);
         }
-        
+
         public void Clear()
         {
             list.Clear();

@@ -50,9 +50,18 @@ namespace StockScreener
             _stockHandler = stockHandler;
         }
 
+
+        // LOG ALL ERRORS INTO GLOBAL ERROR HANDLER
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            // Http Client // Do a manual call if this fails
+            if (cancellationToken.IsCancellationRequested)
+            {
+                cacheCancellationToken = new CancellationToken();
+                // Log
+                // Http Client // Do a manual call if this fails
+            }
+
+
             CancellationToken newToken;
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -112,6 +121,13 @@ namespace StockScreener
 
                 if (_cacheFull)
                 {
+                    // Data is kept up to date
+                    for (int key = 0; key < MAX; key++)
+                    {
+                        String JSON = Cache.Get(key).Serialize();
+                        _ = saveEODdata(JSON);
+                    }
+
                     for (int key = 0; key < MAX; key++)
                     {
                         String JSON = Cache.Get(key).Serialize();
@@ -120,7 +136,7 @@ namespace StockScreener
                 }
                 //  }
 
-                await Task.Delay(5000);
+                await Task.Delay(1000);
             }
         }
 

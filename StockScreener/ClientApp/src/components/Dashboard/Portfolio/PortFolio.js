@@ -507,8 +507,11 @@ export class PortFolio extends Component {
 
         if (!res)
             return;
-        //const exists = await this.keyExists(e, this.state.stockFormID)
-        if (this.state.stockRecordID === null || this.state.stockRecordID === undefined) {
+
+        const id = parseInt(this.state.stockRecordID);
+        const exists = await this.keyExists(e, target);
+
+        if (exists || (this.state.stockRecordID === null || this.state.stockRecordID === undefined)) {
             window.alert('Please select a stock');
             return;
         }
@@ -516,7 +519,6 @@ export class PortFolio extends Component {
         var new_stack = [];
         var new_portfolioTableStocks = [];
 
-        const id = parseInt(this.state.stockRecordID);
 
         PortfolioCalc.setDataMap(id, this.state.price, this.state.shares,
             this.state.date);
@@ -577,7 +579,6 @@ export class PortFolio extends Component {
         }
     }
 
-    // Are you sure you want to remove this stock?
     removePortfolioTableRow() {
         let count = 0;
         let start = 0;
@@ -588,20 +589,20 @@ export class PortFolio extends Component {
         let portfolioTableStocks = [];
         let t = [];
 
-        for (count= start; count <= end; count++) {
+        for (count = start; count <= end; count++) {
             if (count === target) {
-              
+
                 this.map.delete(target);
                 PortfolioCalc.deleteKeyDataMap(target);
 
                 console.log('delete ' + count);
             }
             else {
-               const id = this.map.get(count);
+                const id = this.map.get(count);
 
                 // Stocks to be displayed in the Portfolio table
-                portfolioTableStocks[pointer] = PortfolioCache.get(count);
-
+                portfolioTableStocks.push(PortfolioCache.get(id));
+                let pointer = parseInt(portfolioTableStocks.length - 1);
 
                 t.push(
                     <tbody key={pointer}>
@@ -621,11 +622,10 @@ export class PortFolio extends Component {
                     </tbody>
                 )
 
-                pointer++;
-               
+                this.map.set(pointer, id);
+
             }
         }
-
 
         this.setState({ maxNumberOfPortfolioTableRows: this.state.maxNumberOfPortfolioTableRows - 1 });
         this.setState({ portfolioTableStocks: portfolioTableStocks });
