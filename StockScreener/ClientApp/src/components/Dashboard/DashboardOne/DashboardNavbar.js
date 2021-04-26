@@ -11,7 +11,7 @@ import { DownOutlined } from '@ant-design/icons';
 import PriceSettings from './js/PriceSettings.js';
 import AlertSettings from './js/AlertSettings.js';
 import TableCache from './js/TableCache.js';
-
+import TableSettings from './js/TableSettings.js';
 
 import { AlertContext } from './AlertContext';
 import moment from 'moment';
@@ -268,7 +268,9 @@ export class DashboardNavbar extends Component {
         // Save to database
 
         // this.saveSettingsToDatabase(AlertSettings.getSettings(), PriceSettings.getSettings())
+        TableSettings.setSettings(true);
         this.setState({ saveSettings: true });
+
     }
 
     // **************************************************

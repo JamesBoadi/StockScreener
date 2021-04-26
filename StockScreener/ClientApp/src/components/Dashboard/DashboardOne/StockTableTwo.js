@@ -162,9 +162,9 @@ export class StockTableTwo extends React.Component {
                 TableCache.setDisableScroll(false);
                 TableCache.setUpdateHideStocks(false);
             }
-            else if (this.props.state.saveSettings) {
+            else if (this.props.state.toggleAlert || prevProps.state.toggleAlert) {
                 this.setState({ toggleAlert: true });
-                console.log('NEW SETTINGS?')
+            
                 this.props.toggleSettings(false);
             }
 
@@ -245,8 +245,9 @@ export class StockTableTwo extends React.Component {
 
     shouldComponentUpdate(nextProps, nextState) {
         if (TableCache.getUpdateHideStocks() ||
-            this.props.state.saveSettings !== nextProps.state.saveSettings) {
-            return true;
+            this.props.state.toggleAlert !== nextProps.state.toggleAlert) {
+                
+                return true;
         }
         else if (this.props.state.updateCache !== nextProps.state.updateCache) {
             return true;

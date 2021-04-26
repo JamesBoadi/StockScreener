@@ -14,7 +14,6 @@ export default class PriceSettings {
 
     static setTime(startTime, endTime)
     {
-
         this.startTime = startTime;
         this.endTime = endTime;
     }

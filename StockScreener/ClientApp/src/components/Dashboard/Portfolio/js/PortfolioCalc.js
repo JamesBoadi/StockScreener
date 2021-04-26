@@ -1,5 +1,5 @@
 
-import * as HashMap from 'hashmap';
+import * as map from 'collections/map';
 /**
 * Calculations for Portfolio, includes a set of mathematical 
 * functions that query a database for saved informaion
@@ -8,49 +8,58 @@ export default class PortfolioCalc {
     static expenditure = 0;
     static netGain = 0;
     static gross = 0;
-
-    static data = new HashMap();
-
+    static map = new map();
     // Called at initialise
     static setDataMap(key, price, shares, date) {
-        this.data.set(key, { price: price, shares: shares, date: date });
-        this.calculateExpenditure(key);
+        let obj = { price: price, shares: shares, date: date };
+        if (this.map.has(key)) {
+            this.map.delete(key);
+            this.map.set(key, obj);
+        }
+
+        this.map.set(key, obj);
     }
 
     static deleteKeyDataMap(key) {
-        this.data.delete(key);
-    }
-
-    static calculateExpenditure(id) {
-        this.expenditure = this.data.get(id).price * this.data.get(id).shares;
+        if (this.map.has(key))
+            this.map.delete(key);
     }
 
     static getPrice(id) {
-        return this.data.get(id).price;
+        const val = this.map.get(id);
+        const price = val.price;
+        return price;
     }
 
     static getShares(id) {
-        return this.data.get(id).shares;
+        const val = this.map.get(id);
+        const shares = val.shares;
+        return shares;
     }
 
     static getDate(id) {
-        return this.data.get(id).date;
+        const val = this.map.get(id);
+        const date = val.date;
+        return date;
     }
 
-    static getExpenditure() {
-        return this.expenditure;
+    static getExpenditure(id) {
+        return this.getPrice(id) * this.getShares(id);
     }
 
-    static getNetGain() {
-        return this.netGain;
+    static getNetGain(id) {
+        // this.calculateNetGain(id);
+        return 0;   //this.netGain;
     }
 
-    static getGross() {
-        return this.gross;
+    static getGross(id) {
+        // gross= await this.getGross()
+        return 0; // gross
     }
 
     static calculateNetGain(id) {
-        const expenditure = this.data.get(id).expenditure;
+        const val = this.map.get(id);
+        const expenditure = val.expenditure;
         const netGain = expenditure - (this.currentPrice * this.shares);
         this.netGain = netGain;
         return this.netGain;
@@ -67,7 +76,7 @@ export default class PortfolioCalc {
                 console.log("error " + error) // 404
                 return undefined;
             }
-        );
+            );
     }
     //  set Gross and Id
     async setGross(gross) {
@@ -94,7 +103,7 @@ export default class PortfolioCalc {
         const res = await this.getGross();
         if (res === null || res === undefined)
             return;
-        
+
         const gross = res.Gross;
         const Id = res.Id;
         this.gross = gross + this.calculateNetGain(Id);

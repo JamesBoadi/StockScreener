@@ -14,6 +14,16 @@ export class DisplayStock extends Component {
         this.displayStock = this.displayStock.bind(this);
         this.setAddAlertTableRowBool = this.setAddAlertTableRowBool.bind(this);
         this.setRemoveAlertTableRowBool = this.setRemoveAlertTableRowBool.bind(this);
+        this.selectAlertTableRow = this.selectAlertTableRow.bind(this);
+        this.setIsSelected = this.setIsSelected.bind(this);
+        this.removeStock = this.removeStock.bind(this);
+        this.idExists = this.idExists.bind(this);
+        this.addToHistorical = this.addToHistorical.bind(this);
+        this.addToHistoricalTable = this.addToHistoricalTable.bind(this);
+
+
+        // D1
+        this.toggleSettings = this.toggleSettings.bind(this);
 
         this.state = {
             // Display Stock
@@ -27,10 +37,16 @@ export class DisplayStock extends Component {
 
             updateNotifications: false,
             notificationsMenuVisible: false,
-
+            clickedAlertTableRowID: null,
             addAlertTableRowBool: false,
             removeAlertTableRowBool: false,
 
+            isSelected: false,
+
+
+            // D1
+            saveSettings: false,
+            toggleAlert: false
         };
     }
 
@@ -46,14 +62,56 @@ export class DisplayStock extends Component {
 
             this.setState({ updateStockInfo: false });
         }
+        if (this.props.state.saveSettings) {
+          
+            console.log('NEW SETTINGS?')
+            this.props.toggleSettings(false);
+        }
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+
+        return true;
+
+    }
+
+
+    toggleSettings(state) {
+        this.setState({ saveSettings: state });
+    }
+
+    // Reset ID
+    resetID() {
+
     }
 
     // **************************************************
     // Add to Historical Table
     // **************************************************
 
+    async idExists(target) {
+        return new Promise(resolve => {
+            if (this.state.clickedAlertTableRowID === null
+                || this.state.clickedAlertTableRowID === undefined) {
+                resolve(false);
+            }
+            resolve(true);
+        });
+    }
+
+    addToHistorical(e) {
+        this.addToHistoricalTable();
+    }
+
+
     // Add to History Table
-    async addToHistorical() {
+    async addToHistoricalTable() {
+        const res = await this.idExists();
+        if (!res) {
+            window.alert('Please select a stock from your saved stocks table');
+            return;
+        }
+
         const target = parseInt(this.state.clickedAlertTableRowID);
         const json = TableCache.get(target);
         console.log('target ' + target);
@@ -144,6 +202,7 @@ export class DisplayStock extends Component {
             {TableCache.get(stockID).StockCode}</h1>);
 
 
+        this.setState({ clickedAlertTableRowID: stockID });
         this.setState({ stockInfoName: info });
         this.setState({ updateStockInfo: true });
     }
@@ -153,15 +212,36 @@ export class DisplayStock extends Component {
     // Saved Stock Rows
     // **************************************************
 
+    // Select Row Setter
+    selectAlertTableRow(e) {
+        const alertTableId = parseInt(e.target.id);
+        this.setState({ clickedAlertTableRowID: alertTableId });
+        this.setState({ isSelected: true });
+    }
+
     setAddAlertTableRowBool(state) {
         this.setState({ addAlertTableRowBool: state });
+    }
+
+    removeStock(e) {
+        if (this.state.clickedAlertTableRowID === null
+            || this.state.clickedAlertTableRowID === undefined) {
+            window.alert('Please select a stock from your saved stocks table');
+            return;
+        }
+        var userselection = window.confirm("Are you sure you want to delete this stock ?");
+        if (userselection == true) {
+            this.setRemoveAlertTableRowBool(true);
+        }
     }
 
     setRemoveAlertTableRowBool(state) {
         this.setState({ removeAlertTableRowBool: state });
     }
 
-    // **************************************************
+    setIsSelected(state) {
+        this.setState({ isSelected: state });
+    }
 
     render() {
         return (
@@ -181,11 +261,11 @@ export class DisplayStock extends Component {
                     {this.state.stockInfoPrevPrice}
                     {this.state.stockInfoCurrPrice}
 
-                    <Button onClick={this.addAlertTableRow}
+                    <Button onClick={() => { this.setAddAlertTableRowBool(true) }}
                         style={{ position: 'absolute', bottom: '20px', right: '180px', width: '90px' }}>
                         Add <br />to Table</Button>
 
-                    <Button onClick={this.removeAlertTableRow}
+                    <Button onClick={this.removeStock}
                         style={{ position: 'absolute', bottom: '20px', right: '50px', width: '90px' }}>
                         Remove  <br /> from Table</Button>
 

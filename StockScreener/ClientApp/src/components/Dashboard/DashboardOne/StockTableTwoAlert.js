@@ -7,6 +7,8 @@ import AlertCache from './js/AlertCache.js';
 import TableCache from './js/TableCache.js';
 import AlertSettings from './js/AlertSettings.js';
 import PriceSettings from './js/PriceSettings.js';
+import TableSettings from './js/TableSettings.js';
+
 import SavedStockCache from './js/SavedStockCache.js';
 
 import {
@@ -26,6 +28,7 @@ export class StockTableTwoAlert extends React.Component {
         this.enableNotificationsMenu = this.enableNotificationsMenu.bind(this);
         this.initialiseNotifications = this.initialiseNotifications.bind(this);
         this.addToNotificationsMenu = this.addToNotificationsMenu.bind(this);
+        
         this.notifications = this.notifications.bind(this);
 
         // Create priority priority_queue for animations not shown yet
@@ -71,7 +74,8 @@ export class StockTableTwoAlert extends React.Component {
                this.manualAlert(this.props.addToStyleMap);
                this.props.setScrollUpdate(false);
            }*/
-        if (this.props.state.toggleAlert) {
+        if (TableSettings.getSettings()) {
+            console.log('NEW SETTINGS?')
             if (this.state.isUpdating) { // If there are aniimations in progress
                 this.props.toggleAlert(false);
                 AlertSettings.setUpdateAlertSettings(false);
@@ -87,6 +91,10 @@ export class StockTableTwoAlert extends React.Component {
             if (AlertSettings.triggerSettings() == 0)
                 AlertSettings.setTriggerSettings(1);
 
+                
+                console.log('change settings ' + changeSettings);
+
+
             if (changeSettings) {
                 // Clear all Alerts
                 if (!AlertSettings.getManual() && !AlertSettings.getAuto()) {
@@ -101,7 +109,7 @@ export class StockTableTwoAlert extends React.Component {
                     }
                 } else {
                     // Proceed with alerts
-                    if (this.withinAlertTime()) {
+                  //  if (this.withinAlertTime()) {
                         // Trigger manual Alert
                         if (AlertSettings.getManual()) {
                             if (this.animationTime !== undefined) {
@@ -129,11 +137,11 @@ export class StockTableTwoAlert extends React.Component {
                             console.log('Called! Auto Alert! 2')
                             this.autoAlert(this.props.addToStyleMap);
                         }
-                    }
+                    //}
                 }
             }
 
-            this.props.toggleAlert(false);
+            TableSettings.setSettings(false);
             AlertSettings.setUpdateAlertSettings(false);
         }
     }
@@ -145,7 +153,10 @@ export class StockTableTwoAlert extends React.Component {
     shouldComponentUpdate(nextProps, nextState) {
         if (nextProps.state.tb2_scrollPosition !== this.props.state.tb2_scrollPosition
             || nextProps.state.toggleAlert !== this.props.state.toggleAlert
-            ||  nextState.notificationsMenuVisible !== this.state.notificationsMenuVisible) {
+            ||  nextState.notificationsMenuVisible !== this.state.notificationsMenuVisible
+            || nextState.updateNotifications !== this.state.updateNotifications
+            
+            ) {
             return true;
         }
         return false;
@@ -273,6 +284,7 @@ export class StockTableTwoAlert extends React.Component {
                     const state = item[1];
                     const delay = item[2];
 
+                    this._addToNotificationsMenu(count); // Sync to notifications
                     callback(count, state, delay, 0);
                     this.deleteAlerts(index);
                     break;
@@ -419,8 +431,6 @@ export class StockTableTwoAlert extends React.Component {
         }, AlertSettings.getAlertInterval());
     }
 
-
-    
     // **************************************************
     // Save Notifications
     // **************************************************
@@ -445,15 +455,15 @@ export class StockTableTwoAlert extends React.Component {
     }
 
     // Add Notifications to notifications menu
-    async addToNotificationsMenu() {
+    async _addToNotificationsMenu(pointer) {
         const defaultInterval = 60000;
         const clickedAlertTableRowID = this.state.clickedAlertTableRowID
 
-        let pointer = 0;//this.state.start;
+     //   let pointer = 0;//this.state.start;
         const end = 897;//this.state.end;
 
         // Add the database (last known pointer)
-        this.notificationsDelayInterval = setInterval(() => {
+        //this.notificationsDelayInterval = setInterval(() => {
             // const stock = this.stockDashBoardMap.get(pointer).StockCode;
             // const localStartPrice = this.stockDashBoardMap.get(pointer).LocalStartPrice;
             // const localTargetPrice = this.stockDashBoardMap.get(pointer).LocalTargetPrice;
@@ -467,13 +477,13 @@ export class StockTableTwoAlert extends React.Component {
             const currentPrice = parseInt(TableCache.get(pointer).CurrentPrice);
             const previousPrice = parseInt(TableCache.getPreviousPrice(pointer));
 
-            let obj = this.props.notifications(pointer, stock, previousPrice, currentPrice, currentPrice_state);
+            let obj = this.notifications(pointer, stock, previousPrice, currentPrice, currentPrice_state);
             this.saveNotifications(JSON.stringify(obj)); // Save to database
-
+/*
             if (pointer++ >= end) {
                 pointer = 0; // Add the database (last known pointer)
             }
-        }, 7000);
+        }, 7000);*/
     }
 
     // **********************************************************
@@ -569,7 +579,6 @@ export class StockTableTwoAlert extends React.Component {
 
     // Call notifications
     notifications(id, stock, previousPrice, currentPrice, state) {
-
         let targetPrice;
         let startPrice;
 
