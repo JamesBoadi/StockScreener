@@ -123,6 +123,7 @@ export class SavedStockTable extends Component {
     shouldComponentUpdate(nextProps, nextState) {
         if (this.props.state.addAlertTableRowBool !== nextProps.state.addAlertTableRowBool
             || this.props.state.removeAlertTableRow !== nextProps.state.removeAlertTableRow
+            || this.props.state.update !== nextProps.state.update
             || this.state.addAlertTableRowBool !== nextState.addAlertTableRowBool
             || this.state.removeAlertTableRowBool !== nextState.removeAlertTableRowBool
             || this.props.state.isSelected !== nextProps.state.isSelected

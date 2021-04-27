@@ -85,7 +85,8 @@ export class EditStockForm extends Component {
                             this.props.setShares(null);
                             this.props.setPrice(null)
                             this.props.setDate(null);
-                            
+                            this.props.updateForm(true);
+
                             this.props.setEditFormVisibility(false)}}>Close</p>
 
                     {form}
@@ -94,7 +95,9 @@ export class EditStockForm extends Component {
                         position: 'absolute', bottom: '4px', right: '20px',
                         zIndex: '999'
                     }}
-                        onClick={this.props.editPortfolioTableRow}
+                        onClick={() => {
+            
+                            this.props.editPortfolioTableRow()}}
                         visibility={!this.props.state.editStockFormVisible}
                     >Edit</button>
                 </div>

@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using System;
 
 namespace StockScreener
 {
@@ -20,22 +20,22 @@ namespace StockScreener
         // Alert Settings
         // ******************************************************
 
-        public long TriggerAlert { get; set; }
+        public int TriggerAlert { get; set; }
 
-        public long Manual { get; set; }
+        public bool Manual { get; set; }
 
-        public long Auto { get; set; }
+        public bool Auto { get; set; }
 
-        public long Notifications { get; set; }
+        public bool Notifications { get; set; }
 
-        public long UpdateAlertSettings { get; set; }
+        public bool UpdateAlertSettings { get; set; }
 
-        public long AlertInterval { get; set; }
-        public long StartTime { get; set; }
+        public int AlertInterval { get; set; }
+        public string StartTime { get; set; }
 
-        public long EndTime { get; set; }
+        public string EndTime { get; set; }
 
-        public string SettingsTriggered { get; set; }
+        public int SettingsTriggered { get; set; }
 
         public string TimeStamp { get; set; }
 
@@ -46,7 +46,7 @@ namespace StockScreener
             DashboardOneAlertSettings data = JsonSerializer.
             Deserialize<DashboardOneAlertSettings>(query, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            //Console.WriteLine("data " + data.Id + " stockcode " + data.StockCode);
+            Console.WriteLine("data " + data.Id + " stockcode " + data.Auto + "  " + data.EndTime);
             return data;
         }
     }

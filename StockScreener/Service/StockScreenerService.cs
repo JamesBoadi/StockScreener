@@ -213,7 +213,7 @@ namespace StockScreener
 
         public DashboardOneAlertSettings Create(DashboardOneAlertSettings settings)
         {
-            _dashboardOneAlertSettings.InsertOne(settings);
+            _dashboardOneAlertSettings.InsertOneAsync(settings);
             return settings;
         }
 
@@ -224,7 +224,7 @@ namespace StockScreener
         }
 
         public void DeleteDashboardOneAlertSettings(string id) =>
-            _dashboardOneAlertSettings.DeleteOne(settings => settings.Id == id);
+            _dashboardOneAlertSettings.DeleteOneAsync(settings => settings.Id.Equals(id));
 
         // **************************************************
 
@@ -237,7 +237,7 @@ namespace StockScreener
 
         public DashboardOnePriceSettings Create(DashboardOnePriceSettings settings)
         {
-            _dashboardOnePriceSettings.InsertOne(settings);
+            _dashboardOnePriceSettings.InsertOneAsync(settings);
             return settings;
         }
 
@@ -248,7 +248,7 @@ namespace StockScreener
         }
 
         public void DeleteDashboardOnePriceSettings(string id) =>
-            _dashboardOneAlertSettings.DeleteOne(settings => settings.Id == id);
+            _dashboardOneAlertSettings.DeleteOneAsync(settings => settings.Id.Equals(id));
 
         // **************************************************
 

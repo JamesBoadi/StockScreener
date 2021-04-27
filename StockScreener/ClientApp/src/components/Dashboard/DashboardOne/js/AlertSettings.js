@@ -10,10 +10,10 @@ export default class PriceSettings {
     static updateAlertSettings = false;
     static alertInterval = 60000;
     static settingsTriggered = 0;
-    static TimeStamp;
+    static TimeStamp = "";
 
     static setTime(startTime, endTime)
-    {
+    { 
         this.startTime = startTime;
         this.endTime = endTime;
     }
@@ -95,7 +95,7 @@ export default class PriceSettings {
             alertInterval: this.alertInterval,
             startTime: this.startTime,
             endTime: this.endTime,
-            settingsTriggered: this.updateAlertSettings,
+            settingsTriggered: this.settingsTriggered,
             timestamp: this.TimeStamp
         }
 

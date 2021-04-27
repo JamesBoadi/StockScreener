@@ -18,15 +18,15 @@ namespace StockScreener
         // PriceSettings
         // ******************************************************
 
-        public long StartPrice { get; set; }
+        public float StartPrice { get; set; }
 
-        public long TargetPrice { get; set; }
+        public float TargetPrice { get; set; }
 
-        public long PriceDetectionEnabled { get; set; }
+        public bool PriceDetectionEnabled { get; set; }
 
-        public long HideBullishStocks { get; set; }
+        public bool HideBullishStocks { get; set; }
 
-        public long HideBearishStocks { get; set; }
+        public bool HideBearishStocks { get; set; }
 
         // ******************************************************
         public static DashboardOnePriceSettings Deserialize(string query)

@@ -107,6 +107,8 @@ export class StockTableTwo extends React.Component {
             cache: new cache(),
             animationsCache: new cache(),
 
+            
+
             toggleAlert: false
         }
     }
@@ -159,12 +161,11 @@ export class StockTableTwo extends React.Component {
                     this.textInput.current.scrollTop = 25;
 
                 TableCache.setDisableScroll(false);
-                TableCache.setDisableScroll(false);
                 TableCache.setUpdateHideStocks(false);
             }
-            else if (this.props.state.toggleAlert || prevProps.state.toggleAlert) {
+            else if (this.props.state.saveSettings) {
                 this.setState({ toggleAlert: true });
-            
+                console.log('NEW SETTINGS? --------')
                 this.props.toggleSettings(false);
             }
 
@@ -245,8 +246,7 @@ export class StockTableTwo extends React.Component {
 
     shouldComponentUpdate(nextProps, nextState) {
         if (TableCache.getUpdateHideStocks() ||
-            this.props.state.toggleAlert !== nextProps.state.toggleAlert) {
-                
+            this.props.state.saveSettings !== nextProps.state.saveSettings) {
                 return true;
         }
         else if (this.props.state.updateCache !== nextProps.state.updateCache) {
@@ -635,7 +635,9 @@ export class StockTableTwo extends React.Component {
 
         // Use shallow compare
         for (id = start; id < end; id++) {
-            if (id == this.state.target) {
+            if (id === null || id === undefined)
+                continue;
+            else if (id == this.state.target) {
                 style = { color: "green", backgroundColor: "rgb(21,100,111)" };
             }
             else

@@ -563,7 +563,7 @@ namespace StockScreener.Controllers
         // DashboardOneSettings
         // ******************************************************
 
-        [Route("savesettings/dashboardOne/{alertsettings?}/{pricesettings?}")]
+        [Route("savesettings/dashboardOne/{alertsettings}/{pricesettings}")]
         public HttpStatusCode setDashboardOneSettings(string alertsettings, string pricesettings) // convert to json
         {
             var response = new HttpResponseMessage();
@@ -574,24 +574,31 @@ namespace StockScreener.Controllers
                 DashboardOnePriceSettings dashboardPriceSettings = DashboardOnePriceSettings.Deserialize(pricesettings);
 
                 bool alertSettingsExists = _stockScreenerService.FindDashboardOneAlertSettings("0");
-                bool priceSettingsExists = _stockScreenerService.FindDashboardOneAlertSettings("0");
+                bool priceSettingsExists = _stockScreenerService.FindDashboardOnePriceSettings("0");
 
                 if (alertSettingsExists)
                 {
-                    _stockScreenerService.Create(dashboardAlertsSettings);
+                    Console.WriteLine("Write 1");
+                    var s = _stockScreenerService.Create(dashboardAlertsSettings);
+                    Console.WriteLine("ssss" + s.AlertInterval);
                 }
                 else
                 {
+                    Console.WriteLine("Write 2");
                     _stockScreenerService.DeleteDashboardOneAlertSettings("0");
-                    _stockScreenerService.Create(dashboardAlertsSettings);
+                    var s = _stockScreenerService.Create(dashboardAlertsSettings);
+                    Console.WriteLine("ssss" + s.AlertInterval);
+
                 }
 
                 if (priceSettingsExists)
                 {
+                    Console.WriteLine("Write 3");
                     _stockScreenerService.Create(dashboardPriceSettings);
                 }
                 else
                 {
+                    Console.WriteLine("Write 4");
                     _stockScreenerService.DeleteDashboardOnePriceSettings("0");
                     _stockScreenerService.Create(dashboardPriceSettings);
                 }
@@ -753,19 +760,17 @@ namespace StockScreener.Controllers
 
             try
             {
-                Portfolio _portfolio = Portfolio.Deserialize(portfolio);
-                bool idExists = _stockScreenerService.PortfolioStockExists(_portfolio.StockCode);
+                int _id = JsonSerializer.Deserialize<int>(portfolio);
+                bool idExists = _stockScreenerService.PortfolioStockExists(_id);
 
                 if (idExists)
                 {
-                    _stockScreenerService.DeletePortfolio(_portfolio.StockCode);
-                    _stockScreenerService.Create(_portfolio);
+                    _stockScreenerService.DeletePortfolio(_id);
                 }
                 else
                 {
                     return HttpStatusCode.Ambiguous;
                 }
-
 
                 res = response.StatusCode;
             }

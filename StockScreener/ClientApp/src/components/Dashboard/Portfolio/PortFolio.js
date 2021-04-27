@@ -72,6 +72,7 @@ export class PortFolio extends Component {
         this.removeStockRow = this.removeStockRow.bind(this);
         this.keyExists = this.keyExists.bind(this);
         this.savePortfolio = this.savePortfolio.bind(this);
+        this.updateForm = this.updateForm.bind(this);
 
         // Setters
         // **************************************************
@@ -141,6 +142,8 @@ export class PortFolio extends Component {
             price: 0,
             target: 0,
             portfolioTableRowBool: true,
+            update: false,
+
 
             // **************************************************
             // Portfolio Table Variables
@@ -172,7 +175,6 @@ export class PortFolio extends Component {
             }
         }, 1000);
 
-        PortfolioCache.setUpdateData(this.updateTableData);
         this.initialisePortfolio();
     }
 
@@ -227,6 +229,7 @@ export class PortFolio extends Component {
             if (this.state.highlightTableRow !== nextState.highlightTableRow ||
                 this.state.editPortfolioTable !== nextState.editPortfolioTable ||
                 this.state.removeStock !== nextState.removeStock ||
+                this.state.update !== nextState.update ||
                 this.state.closeForm !== nextState.closeForm ||
                 this.state.addPortfolioTableRowBool !== nextProps.addPortfolioTableRowBool ||
                 this.state.updatePortfolioTableData !== nextState.updatePortfolioTableData ||
@@ -260,27 +263,17 @@ export class PortFolio extends Component {
     }
 
     async addFirstRows(response) {
-        var t = this.state.portfolioTableStack;
+        var t = [];
         var portfolioTableStocks = this.state.portfolioTableStocks;
-        let target = parseInt(this.state.stockRecordID);
-
+        
         for (var i = 0; i < response.length; i++) {
             const item = JSON.parse(response[i]);
-
-            const exists = await this.keyExists(null, target);
-
-            if (exists) {
-                return;
-            }
-
-            portfolioTableStocks.push(PortfolioCache.get(item.Id));
+            const target = item.StockCode;
+            portfolioTableStocks.push(PortfolioCache.get(target));
             let pointer = parseInt(portfolioTableStocks.length - 1);
 
-
-            PortfolioCalc.setDataMap(target, this.state.price, this.state.shares,
-                this.state.date);
-
-            console.log('Price ' + PortfolioCalc.getPrice(target))
+            PortfolioCalc.setDataMap(target, item.Price, item.Shares,
+                item.Date);
 
             t.push(
                 <tbody key={pointer}>
@@ -301,13 +294,12 @@ export class PortFolio extends Component {
             )
 
             this.map.set(pointer, target);
-
         }
 
-        this.setState({ maxNumberOfPortfolioTableRows: this.state.maxNumberOfPortfolioTableRows + 1 });
+        this.setState({ maxNumberOfPortfolioTableRows: response.length });
         this.setState({ portfolioTableStack: t });
         this.setState({ portfolioTableStocks: portfolioTableStocks });
-        this.setState({ addPortfolioTableRowBool: true });
+        this.setState({ updatePortfolioTableData: true });
     }
 
     // **************************************************
@@ -315,8 +307,6 @@ export class PortFolio extends Component {
     // **************************************************
     // Form Functionality Methods
     // **************************************************
-
-
 
     // Triggered and highlighted when a row is clicked
     select(e) {
@@ -333,20 +323,22 @@ export class PortFolio extends Component {
         let alertPrefix = "";
         let validate = true;
 
+        console.log('not null ' + this.state.date + ' ' + this.state.price + ' ' + this.state.shares);
+
         if (this.state.selectedRecordValue === null || this.state.selectedRecordValue === undefined
             || this.state.selectedRecordValue.length < 1) {
             alertPrefix += "Stock";
             validate = false;
         }
-        else if (this.state.price == null || this.state.price == undefined) {
+        else if (this.state.price === null || this.state.price === undefined) {
             alertPrefix += "Price";
             validate = false;
         }
-        else if(this.state.shares !== null || this.state.shares !== undefined) {
+        else if (this.state.shares === null || this.state.shares === undefined) {
             alertPrefix += "Shares";
             validate = false;
         }
-        else if(this.state.date !== null || this.state.date !== undefined) {
+        else if (this.state.date === null || this.state.date === undefined) {
             alertPrefix += "Date";
             validate = false;
         }
@@ -354,7 +346,7 @@ export class PortFolio extends Component {
         if (alertPrefix !== "") {
             window.alert(alertPrefix + alertPostfix);
         }
-        
+
         return validate;
     }
 
@@ -372,11 +364,10 @@ export class PortFolio extends Component {
                 console.log("error " + error) // 404
                 return false;
             }
-        );
+            );
 
         return false;
     }
-
 
     async editPortfolio(data) {
         await fetch('editportfolio/'.concat(data))
@@ -440,8 +431,26 @@ export class PortFolio extends Component {
         });
     }
 
+    editStockRow() {
+        this.setState({ stockRecordID: null });
+        this.deselectRow();
+        this.setState({ editStock: true });
+    }
+
+    removeStockRow() {
+        console.log('REMOVE STOCK CLICKE ' + this.state.maxNumberOfPortfolioTableRows)
+        if (this.state.maxNumberOfPortfolioTableRows < 1)
+            return;
+        var answer = window.confirm("Remove Stock? ");
+        if (answer) {
+
+            this.setState({ removeStock: true });
+        }
+    }
+
     // Add a Row to Portfolio table
     async addPortfolioTableRow(e) {
+
         this.setState({ closeForm: false });
         this.setEditFormVisibility(false);
 
@@ -545,6 +554,7 @@ export class PortFolio extends Component {
                 new_portfolioTableStocks[pointer] = PortfolioCache.get(target); // New information
                 console.log("Update THIS STOCK " + new_portfolioTableStocks[pointer].StockName.toString());
 
+                // Id represents new data at this position
                 new_stack[pointer] =
                     <tbody key={pointer}>
                         <tr>
@@ -561,6 +571,17 @@ export class PortFolio extends Component {
                             <td id={pointer} onClick={this.select.bind(this)}>{PortfolioCalc.getGross(id)}</td>
                         </tr>
                     </tbody>;
+
+                // Add to database
+                const obj =
+                {
+                    StockCode: target,
+                    Price: PortfolioCalc.getPrice(id),
+                    Shares: PortfolioCalc.getShares(id),
+                    Date: PortfolioCalc.getDate(id)
+                }
+
+                this.editPortfolio(JSON.stringify(obj));
             }
             else {
                 new_portfolioTableStocks[pointer] = this.state.portfolioTableStocks[pointer];
@@ -568,38 +589,9 @@ export class PortFolio extends Component {
             }
         }
 
-        // Add to database
-        const obj =
-        {
-            StockCode: id,
-            Price: PortfolioCalc.getPrice(id),
-            Shares: PortfolioCalc.getShares(id),
-            Date: PortfolioCalc.getDate(id)
-        }
-
-        this.editPortfolio(JSON.stringify(obj));
-
         this.setState({ portfolioTableStack: new_stack });
         this.setState({ portfolioTableStocks: new_portfolioTableStocks });
         this.setState({ editPortfolioTable: true });
-    }
-
-    editStockRow()
-    {
-        this.setState({ stockRecordID: null });
-        this.deselectRow();
-        this.setState({editStock: true});
-    }
-
-    removeStockRow() {
-        console.log('REMOVE STOCK CLICKE ' + this.state.maxNumberOfPortfolioTableRows)
-        if (this.state.maxNumberOfPortfolioTableRows < 1)
-            return;
-        var answer = window.confirm("Remove Stock? ");
-        if (answer) {
-            
-            this.setState({ removeStock: true });
-        }
     }
 
     removePortfolioTableRow() {
@@ -612,9 +604,9 @@ export class PortFolio extends Component {
 
         for (count = start; count <= end; count++) {
             if (count === target) {
+                this.deletePortfolio(this.map.get(target));
                 this.map.delete(target);
                 PortfolioCalc.deleteKeyDataMap(target);
-                this.deletePortfolio(target);
             }
             else {
                 const id = this.map.get(count);
@@ -642,7 +634,6 @@ export class PortFolio extends Component {
                 )
 
                 this.map.set(pointer, id);
-
             }
         }
 
@@ -661,7 +652,7 @@ export class PortFolio extends Component {
 
         for (let pointer = start; pointer <= end; pointer++) {
             const id = this.map.get(pointer);
-     
+
             t.push(
                 <tbody key={pointer}>
                     <tr style={style}>
@@ -684,8 +675,6 @@ export class PortFolio extends Component {
         this.setState({ portfolioTableStack: t });
         this.setState({ updatePortfolioTableData: true });
     }
-
-
 
     // Search box retrieves stocks from database
     async searchDatabase(e) {
@@ -745,6 +734,10 @@ export class PortFolio extends Component {
 
     setPrice(value) {
         this.setState({ price: value });
+    }
+
+    updateForm(value) {
+        this.setState({ update: value });
     }
 
     setDate(date, dateString) {
@@ -1011,6 +1004,10 @@ export class PortFolio extends Component {
 
                     <div class="addStock" style={{ zIndex: '999' }}>
                         <Button onClick={() => {
+                            this.setShares(null);
+                            this.setPrice(null)
+                            this.setDate(null);
+                            this.updateForm(true);
                             this.setAddFormVisibility(true)
                             this.setEditFormVisibility(false)
                         }}>Add</Button>
@@ -1018,6 +1015,10 @@ export class PortFolio extends Component {
 
                     <div class="editStock" style={{ zIndex: '999' }}>
                         <Button onClick={() => {
+                            this.setShares(null);
+                            this.setPrice(null)
+                            this.setDate(null);
+                            this.updateForm(true);
                             this.setEditFormVisibility(true)
                             this.setAddFormVisibility(false)
                         }}>Edit</Button>

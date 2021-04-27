@@ -175,6 +175,13 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             bool positive = s >= 0;
             bool negative = s < 0;
 
+              Time time = new Time();
+            TimeSpan _time = time.ReturnTime();
+            string hour = _time.Hours.ToString();
+            string minutes = _time.Minutes.ToString();
+
+            string time_format = hour + ":" + minutes;
+
             try
             {
                 copy(start, end);
@@ -183,7 +190,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 while (pointer <= end)
                 {
                     stock = new Stock(pointer.ToString(), Manager.ManagerCode.Value[pointer],
-                    Manager.ManagerName.Value[pointer], "8:00",
+                    Manager.ManagerName.Value[pointer], time_format,
                     s, s, s, s, changeArray, 5, 6, 7, 8, 86);
 
                     cache.Add(stock);
@@ -218,13 +225,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         // Update Stock
         public void updateManager(int start, int end)
         {
-
-            Time time = new Time();
-            TimeSpan _time = time.ReturnTime();
-            string hour = _time.Hours.ToString();
-            string minutes = _time.Minutes.ToString();
-
-            string time_format = hour + ":" + minutes;
+          
             try
             {
                 int pointer = start;
@@ -238,7 +239,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                      array[start2], array[start2] };
                     int s = new Random().Next(0, 99);
                     Stock stock = new Stock(pointer.ToString(), Manager.ManagerCode.Value[pointer],
-                    Manager.ManagerName.Value[pointer], time_format,
+                    Manager.ManagerName.Value[pointer], "",
                     s, 2, 3, start2, changeArray, 5, 6, 7, 8, 86);
 
                     // Update stock
@@ -247,7 +248,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     cache.Update(pointer, newStockData);
                     pointer++;
                 }
-
 
                 /*    
                     data = client.GetRealTimePrices(stockArray);
@@ -262,13 +262,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     cache.Update(pointer, stock);
                     pointer++;
                 }
-            */
-                // bool update = cache.Get(pointer).Equals(stock);
-
-
-                // Compare each stock
-                //if (update || !update)
-                /*   cache.Update(pointer, stock);
 */
             }
             catch (Exception ex)

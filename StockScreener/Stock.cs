@@ -22,6 +22,7 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
             this.StockName = StockName;
             this.TimeStamp = TimeStamp;
             this.CurrentPrice = CurrentPrice;
+            this.PreviousPrice = CurrentPrice + Change;
             this.PrevOpen = PrevOpen;
             this.Close = Close;
             this.High = High;
@@ -38,6 +39,8 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         // Contains all the stocks information
         public string Id { get; set; }
         public double CurrentPrice { get; set; }
+
+        public double PreviousPrice { get; set; }
         public string StockCode { get; set; }
         public string StockName { get; set; }
         public string TimeStamp { get; set; }
@@ -56,20 +59,27 @@ namespace StockScreener //h ttps://developer.mozilla.org/en-US/docs/Web/API/WebS
         /// <summary>Compare the equality of stocks</summary>
         public Stock Update(Stock stock)
         {
-             Time time = new Time();
-             TimeSpan _time = time.ReturnTime();
-             string hour = _time.Hours.ToString();
-             string minutes = _time.Minutes.ToString();
+            Time time = new Time();
+            TimeSpan _time = time.ReturnTime();
+            string hour = _time.Hours.ToString();
+            string minutes = _time.Minutes.ToString();
 
             // Default states 2, -1, 0
-            if (stock.CurrentPrice == this.CurrentPrice)
+            if (stock.CurrentPrice == this.CurrentPrice){
+                stock.TimeStamp = this.TimeStamp;
                 stock.ChangeArray[0] = 0; // No Change
+            }
             else
             {
                 // Bearish signal 2 if stock drops below 30%
-                stock.ChangeArray[0] =  (stock.CurrentPrice < this.CurrentPrice - (this.CurrentPrice * 0.3))
-                ? -2 : (stock.CurrentPrice < this.CurrentPrice) ? -1 : 2; 
+                stock.ChangeArray[0] = (stock.CurrentPrice < this.CurrentPrice - (this.CurrentPrice * 0.3))
+                ? -2 : (stock.CurrentPrice < this.CurrentPrice) ? -1 : 2;
                 // Update timeStamp
+                if (_time.Minutes <= 9)
+                {
+                    minutes = "0" + minutes;
+                }
+
                 stock.TimeStamp = hour + ":" + minutes;
             } // Add other variables later
 

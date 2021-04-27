@@ -84,7 +84,7 @@ export class AddStockForm extends Component {
                             this.props.setShares(null);
                             this.props.setPrice(null)
                             this.props.setDate(null);
-                            
+                            this.props.updateForm(true);
                             this.props.setAddFormVisibility(false)}}>Close</p>
 
                     {form}
@@ -93,7 +93,11 @@ export class AddStockForm extends Component {
                         position: 'absolute', bottom: '4px', right: '20px',
                         zIndex: '999'
                     }}
-                        onClick={this.props.addPortfolioTableRow}
+                        onClick={() =>{ 
+                          
+
+                            this.props.addPortfolioTableRow()
+                        }}
                         visibility={!this.props.state.addStockFormVisible}
                     > Add Stock </button>
                 </div>

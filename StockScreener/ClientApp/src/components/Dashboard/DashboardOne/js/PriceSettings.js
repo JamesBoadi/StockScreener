@@ -68,8 +68,8 @@ export default class PriceSettings {
         this.TimeStamp = h + ' : ' + m;
 
         const json = {
-            startPrice: this.startPrice,
-            targetPrice: this.targetPrice,
+            startPrice: parseFloat( this.startPrice),
+            targetPrice: parseFloat(this.targetPrice),
             priceDetectionEnabled: this.priceDetectionEnabled,
             hideBullishStocks: this.hideBullishStocks,
             hideBearishStocks: this.hideBearishStocks,
@@ -78,14 +78,8 @@ export default class PriceSettings {
         return JSON.stringify(json);
     }
 
-
-
-
-
-
-
+    
 /*
-
     // Set local prices using global prices without overriding prices already set
     static setLocalPrices(startPrice, targetPrice, clickedAlertTableRowID) {
         const data =

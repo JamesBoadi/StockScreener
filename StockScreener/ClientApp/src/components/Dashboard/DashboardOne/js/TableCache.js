@@ -116,6 +116,7 @@ export default class TableCache {
         return this.priceDetection;
     }
 
+    
     static getPreviousPrice(key) {
         return (this.get(key).CurrentPrice + this.get(key).Change);
     }
