@@ -44,7 +44,7 @@ export default class PortfolioCalc {
     }
 
     static getExpenditure(id) {
-        return this.getPrice(id) * this.getShares(id);
+        return 0;//this.getPrice(id) * this.getShares(id);
     }
 
     static getNetGain(id) {

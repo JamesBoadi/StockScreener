@@ -20,13 +20,11 @@ namespace StockScreener
 
         private readonly IMongoCollection<SavedStocks> _savedStocks;
 
-
-
         private readonly IMongoCollection<DashboardOneAlertSettings> _dashboardOneAlertSettings;
-
 
         private readonly IMongoCollection<DashboardOnePriceSettings> _dashboardOnePriceSettings;
 
+        private readonly IMongoCollection<Portfolio> _portfolio;
 
         // private readonly IMongoCollection<SavedStocks> _savedStocks;
 
@@ -43,6 +41,7 @@ namespace StockScreener
             _eodData = database.GetCollection<EndOfDayData>("EODdata");
             _dashboardOneAlertSettings = database.GetCollection<DashboardOneAlertSettings>("DashboardOneAlertSettings");
             _dashboardOnePriceSettings = database.GetCollection<DashboardOnePriceSettings>("DashboardOnePriceSettings");
+            _portfolio = database.GetCollection<Portfolio>("Portfolio");
         }
 
         // **************************************************
@@ -242,7 +241,7 @@ namespace StockScreener
             return settings;
         }
 
-         public bool FindDashboardOnePriceSettings(string id)
+        public bool FindDashboardOnePriceSettings(string id)
         {
             var query = _dashboardOnePriceSettings.Find<DashboardOnePriceSettings>(historical => historical.Id.Equals(id)).Any();
             return query;
@@ -253,5 +252,31 @@ namespace StockScreener
 
         // **************************************************
 
+        // **************************************************
+        // Portfolio
+        // **************************************************
+
+        public List<Portfolio> GetPortfolio() =>
+            _portfolio.Find(settings => true).ToList();
+
+        public Portfolio GetPortfolioStock(int stockcode) =>
+            _portfolio.Find<Portfolio>(settings => settings.StockCode == stockcode).FirstOrDefault();
+
+         public bool PortfolioStockExists(int stockcode)
+        {
+            var query = _portfolio.Find<Portfolio>(settings => settings.StockCode == stockcode).Any();
+            return query;
+        }
+
+        public Portfolio Create(Portfolio settings)
+        {
+            _portfolio.InsertOne(settings);
+            return settings;
+        }
+
+        public void DeletePortfolio(int stockcode) =>
+             _portfolio.DeleteOne(settings => settings.StockCode == stockcode);
+
+        // **************************************************
     }
 }

@@ -12,11 +12,10 @@ namespace StockScreener
         [BsonRepresentation(BsonType.ObjectId)]
         public string _Id { get; set; }
 
-        public string Id { get; set; }
+        public int StockCode { get; set; }
+        public double Price { get; set; }
 
-        public long Price { get; set; }
-
-        public long Shares { get; set; }
+        public double Shares { get; set; }
 
         public string Date { get; set; }
 

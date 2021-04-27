@@ -562,6 +562,7 @@ namespace StockScreener.Controllers
         // ******************************************************
         // DashboardOneSettings
         // ******************************************************
+
         [Route("savesettings/dashboardOne/{alertsettings?}/{pricesettings?}")]
         public HttpStatusCode setDashboardOneSettings(string alertsettings, string pricesettings) // convert to json
         {
@@ -648,6 +649,137 @@ namespace StockScreener.Controllers
             return jsonArray;
         }
 
+        // ******************************************************
+        // Portfolio
+        // ******************************************************
+        [Route("getportfolio")]
+        public string[] getPortfolio() // convert to json
+        {
+            string[] jsonArray;
+            List<Portfolio> list;
+
+            try
+            {
+                list = _stockScreenerService.GetPortfolio();
+                jsonArray = new string[list.Count];
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+                return null;
+            }
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                jsonArray[i] = JsonSerializer.Serialize(list[i]);
+            }
+
+            return jsonArray;
+        }
+
+        [Route("saveportfolio/{portfolio?}")]
+        public HttpStatusCode savePortfolio(string portfolio) // convert to json
+        {
+            var response = new HttpResponseMessage();
+            HttpStatusCode res;
+            try
+            {
+                Portfolio _portfolio = Portfolio.Deserialize(portfolio);
+                bool idExists = _stockScreenerService.PortfolioStockExists(_portfolio.StockCode);
+
+                if (idExists)
+                {
+                    return HttpStatusCode.Ambiguous;
+                }
+
+                _stockScreenerService.Create(_portfolio);
+
+                res = response.StatusCode;
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+
+                res = response.StatusCode;
+            }
+
+            return res;
+        }
+
+
+        [Route("editportfolio/{portfolio?}")]
+        public HttpStatusCode editPortfolio(string portfolio) // convert to json
+        {
+            var response = new HttpResponseMessage();
+            HttpStatusCode res;
+            try
+            {
+                Portfolio _portfolio = Portfolio.Deserialize(portfolio);
+                bool idExists = _stockScreenerService.PortfolioStockExists(_portfolio.StockCode);
+
+                if (idExists)
+                {
+                    _stockScreenerService.DeletePortfolio(_portfolio.StockCode);
+                    var o = _stockScreenerService.Create(_portfolio);
+                    Console.WriteLine("Portfolio Exists    NEW SHARES" + o.Shares);
+                }
+
+                res = response.StatusCode;
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+
+                res = response.StatusCode;
+            }
+
+            return res;
+        }
+
+        [Route("deleteportfolio/{portfolio?}")]
+        public HttpStatusCode deletePortfolio(string portfolio) // convert to json
+        {
+            var response = new HttpResponseMessage();
+            HttpStatusCode res;
+
+            try
+            {
+                Portfolio _portfolio = Portfolio.Deserialize(portfolio);
+                bool idExists = _stockScreenerService.PortfolioStockExists(_portfolio.StockCode);
+
+                if (idExists)
+                {
+                    _stockScreenerService.DeletePortfolio(_portfolio.StockCode);
+                    _stockScreenerService.Create(_portfolio);
+                }
+                else
+                {
+                    return HttpStatusCode.Ambiguous;
+                }
+
+
+                res = response.StatusCode;
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+                res = response.StatusCode;
+            }
+
+            return res;
+        }
 
 
 

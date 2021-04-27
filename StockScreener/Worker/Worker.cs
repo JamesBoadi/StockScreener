@@ -122,11 +122,11 @@ namespace StockScreener
                 if (_cacheFull)
                 {
                     // Data is kept up to date
-                    for (int key = 0; key < MAX; key++)
+                 /*   for (int key = 0; key < MAX; key++)
                     {
                         String JSON = Cache.Get(key).Serialize();
                         _ = saveEODdata(JSON);
-                    }
+                    }*/
 
                     for (int key = 0; key < MAX; key++)
                     {

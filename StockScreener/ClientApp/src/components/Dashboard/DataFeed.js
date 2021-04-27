@@ -109,7 +109,7 @@ export class DataFeed extends Component {
                     DashboardTwoCache.set(key, item);
 
                     PortfolioCache.set(key, item);
-                    PortfolioCalc.setGross();
+                   // PortfolioCalc.setGross();
                     HistoryCache.set(key, item);
 
                     // Dashboard One
