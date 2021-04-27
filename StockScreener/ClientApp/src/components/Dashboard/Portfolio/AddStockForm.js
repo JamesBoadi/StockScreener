@@ -80,7 +80,12 @@ export class AddStockForm extends Component {
                         fontSize: '15px', top: '5px', right: '20px', cursor: 'pointer',
                         zIndex: '999'
                     }}
-                        onClick={() => this.props.setAddFormVisibility(false)}>Close</p>
+                        onClick={() => {
+                            this.props.setShares(null);
+                            this.props.setPrice(null)
+                            this.props.setDate(null);
+                            
+                            this.props.setAddFormVisibility(false)}}>Close</p>
 
                     {form}
 

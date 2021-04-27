@@ -208,10 +208,7 @@ export class PortFolio extends Component {
             this.setState({ removeStock: false });
         }
         else if (this.state.editStock) {
-            this.setEditFormVisibility(false);
-            this.setAddFormVisibility(false);
-            this.setState({ closeForm: false });
-            this.removePortfolioTableRow();
+            this.editPortfolioTableRow();
             this.setState({ editStock: false });
         }
 
@@ -331,30 +328,34 @@ export class PortFolio extends Component {
     }
 
     // Validates the Form before adding a stock to the table 
-    validateForm() {
+    async validateForm() {
         let alertPostfix = " is missing!"
         let alertPrefix = "";
         let validate = true;
 
-        if (this.state.selectedRecordValue == null || this.state.selectedRecordValue == undefined
+        if (this.state.selectedRecordValue === null || this.state.selectedRecordValue === undefined
             || this.state.selectedRecordValue.length < 1) {
             alertPrefix += "Stock";
             validate = false;
         }
-        else if ((this.state.price == null) || (this.state.price == undefined)) {
+        else if (this.state.price == null || this.state.price == undefined) {
             alertPrefix += "Price";
             validate = false;
-        } //else if  (!((this.state.price !== null) || (this.state.price !== undefined))  ) {
-        //alertPrefix += "";
-        //}
+        }
+        else if(this.state.shares !== null || this.state.shares !== undefined) {
+            alertPrefix += "Shares";
+            validate = false;
+        }
+        else if(this.state.date !== null || this.state.date !== undefined) {
+            alertPrefix += "Date";
+            validate = false;
+        }
+
         if (alertPrefix !== "") {
-            // console.log("PREFIX")
             window.alert(alertPrefix + alertPostfix);
         }
-        else
-            // console.log("No errors")
-
-            return validate;
+        
+        return validate;
     }
 
     async savePortfolio(portfolio) {
@@ -444,7 +445,7 @@ export class PortFolio extends Component {
         this.setState({ closeForm: false });
         this.setEditFormVisibility(false);
 
-        const res = this.validateForm();
+        const res = await this.validateForm();
 
         if (!res)
             return;
@@ -452,9 +453,7 @@ export class PortFolio extends Component {
         var t = this.state.portfolioTableStack;
         var portfolioTableStocks = this.state.portfolioTableStocks;
 
-
         const target = parseInt(this.state.stockRecordID);
-
         const exists = await this.keyExists(e, target);
         const maxRows = 45;
 
@@ -517,7 +516,7 @@ export class PortFolio extends Component {
     async editPortfolioTableRow(e) {
         this.setState({ closeForm: false });
         this.setAddFormVisibility(false);
-        const res = this.validateForm();
+        const res = await this.validateForm();
 
         if (!res)
             return;
@@ -541,12 +540,10 @@ export class PortFolio extends Component {
             this.state.date);
 
         for (let pointer = 0; pointer < this.map.size; pointer++) {
+            const target = this.map.get(pointer);
             if (id == pointer) {
-                // Update map
-                this.map.set(pointer, id);
-
-                new_portfolioTableStocks[pointer] = PortfolioCache.get(id); // New information
-                console.log("Update state " + new_portfolioTableStocks[pointer].StockName.toString());
+                new_portfolioTableStocks[pointer] = PortfolioCache.get(target); // New information
+                console.log("Update THIS STOCK " + new_portfolioTableStocks[pointer].StockName.toString());
 
                 new_stack[pointer] =
                     <tbody key={pointer}>
@@ -591,6 +588,7 @@ export class PortFolio extends Component {
     {
         this.setState({ stockRecordID: null });
         this.deselectRow();
+        this.setState({editStock: true});
     }
 
     removeStockRow() {
