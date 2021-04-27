@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -9,6 +10,7 @@ using System.Collections.Specialized;
 using System.Configuration;
 using Microsoft.AspNetCore.Http;
 using System.Net.WebSockets;
+
 using System.IO;
 using CsvHelper;
 using System.Text.Json;
@@ -570,38 +572,8 @@ namespace StockScreener.Controllers
             HttpStatusCode res;
             try
             {
-                DashboardOneAlertSettings dashboardAlertsSettings = DashboardOneAlertSettings.Deserialize(alertsettings);
-                DashboardOnePriceSettings dashboardPriceSettings = DashboardOnePriceSettings.Deserialize(pricesettings);
-
-                bool alertSettingsExists = _stockScreenerService.FindDashboardOneAlertSettings("0");
-                bool priceSettingsExists = _stockScreenerService.FindDashboardOnePriceSettings("0");
-
-                if (alertSettingsExists)
-                {
-                    Console.WriteLine("Write 1");
-                    var s = _stockScreenerService.Create(dashboardAlertsSettings);
-                    Console.WriteLine("ssss" + s.AlertInterval);
-                }
-                else
-                {
-                    Console.WriteLine("Write 2");
-                    _stockScreenerService.DeleteDashboardOneAlertSettings("0");
-                    var s = _stockScreenerService.Create(dashboardAlertsSettings);
-                    Console.WriteLine("ssss" + s.AlertInterval);
-
-                }
-
-                if (priceSettingsExists)
-                {
-                    Console.WriteLine("Write 3");
-                    _stockScreenerService.Create(dashboardPriceSettings);
-                }
-                else
-                {
-                    Console.WriteLine("Write 4");
-                    _stockScreenerService.DeleteDashboardOnePriceSettings("0");
-                    _stockScreenerService.Create(dashboardPriceSettings);
-                }
+                _ = saveAlertSettings(alertsettings);
+                _ = savePriceSettings(pricesettings);
 
                 res = response.StatusCode;
             }
@@ -656,6 +628,47 @@ namespace StockScreener.Controllers
             return jsonArray;
         }
 
+
+        private async Task saveAlertSettings(string alertsettings) // convert to json
+        {
+            DashboardOneAlertSettings dashboardAlertsSettings = DashboardOneAlertSettings.Deserialize(alertsettings);
+
+            bool alertSettingsExists = _stockScreenerService.FindDashboardOneAlertSettings("0");
+
+
+            if (alertSettingsExists)
+            {              
+                await _stockScreenerService.UpdateAlertSettings(dashboardAlertsSettings);
+            }
+            else
+            {
+                await _stockScreenerService.Create(dashboardAlertsSettings);
+            }
+
+
+            await Task.Delay(100);
+        }
+
+
+        private async Task savePriceSettings(string pricesettings) // convert to json
+        {
+
+            DashboardOnePriceSettings dashboardPriceSettings = DashboardOnePriceSettings.Deserialize(pricesettings);
+            bool priceSettingsExists = _stockScreenerService.FindDashboardOnePriceSettings("0");
+
+            if (priceSettingsExists)
+            {
+                await _stockScreenerService.UpdatePriceSettings(dashboardPriceSettings);
+            }
+            else
+            {
+                await _stockScreenerService.Create(dashboardPriceSettings);
+            }
+
+
+            await Task.Delay(100);
+
+        }
         // ******************************************************
         // Portfolio
         // ******************************************************

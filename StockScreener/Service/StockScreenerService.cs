@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using System.Configuration;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace StockScreener
 {
@@ -211,11 +213,43 @@ namespace StockScreener
         public List<DashboardOneAlertSettings> GetAlertSettings() =>
             _dashboardOneAlertSettings.Find(settings => true).ToList();
 
-        public DashboardOneAlertSettings Create(DashboardOneAlertSettings settings)
+        public async Task Create(DashboardOneAlertSettings settings)
         {
-            _dashboardOneAlertSettings.InsertOneAsync(settings);
-            return settings;
+            await _dashboardOneAlertSettings.InsertOneAsync(settings);
         }
+
+
+        public async Task UpdateAlertSettings(DashboardOneAlertSettings settings)
+        {
+            var filter = Builders<DashboardOneAlertSettings>.Filter.Eq("Id", "0");
+            var ta = Builders<DashboardOneAlertSettings>.Update.Set("TriggerAlert", settings.TriggerAlert);
+            var manual = Builders<DashboardOneAlertSettings>.Update.Set("Manual", settings.Manual);
+            var auto = Builders<DashboardOneAlertSettings>.Update.Set("Auto", settings.Auto);
+            var notifications = Builders<DashboardOneAlertSettings>.Update.Set("Notifications", settings.Notifications);
+            var updatealertsettings = Builders<DashboardOneAlertSettings>.Update.Set("UpdateAlertSettings", settings.UpdateAlertSettings);
+            var alertinterval = Builders<DashboardOneAlertSettings>.Update.Set("AlertInterval", settings.AlertInterval);
+            var st = Builders<DashboardOneAlertSettings>.Update.Set("StartTime", settings.StartTime);
+            var et = Builders<DashboardOneAlertSettings>.Update.Set("EndTime", settings.EndTime);
+            var st2 = Builders<DashboardOneAlertSettings>.Update.Set("SettingsTriggered", settings.SettingsTriggered);
+            var ts = Builders<DashboardOneAlertSettings>.Update.Set("TimeStamp", settings.TimeStamp);
+
+
+            _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, ta);
+            _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, manual);
+            _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, auto);
+            _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, notifications);
+            _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, updatealertsettings);
+            _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, alertinterval);
+            _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, st);
+            _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, et);
+            _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, st2);
+            _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, ts);
+
+            await Task.Delay(100);
+        }
+
+
+
 
         public bool FindDashboardOneAlertSettings(string id)
         {
@@ -223,8 +257,8 @@ namespace StockScreener
             return query;
         }
 
-        public void DeleteDashboardOneAlertSettings(string id) =>
-            _dashboardOneAlertSettings.DeleteOneAsync(settings => settings.Id.Equals(id));
+        public async Task DeleteDashboardOneAlertSettings(string id) =>
+             await _dashboardOneAlertSettings.DeleteOneAsync(settings => settings.Id.Equals(id));
 
         // **************************************************
 
@@ -235,10 +269,9 @@ namespace StockScreener
         public List<DashboardOnePriceSettings> GetPriceSettings() =>
             _dashboardOnePriceSettings.Find(settings => true).ToList();
 
-        public DashboardOnePriceSettings Create(DashboardOnePriceSettings settings)
+        public async Task Create(DashboardOnePriceSettings settings)
         {
-            _dashboardOnePriceSettings.InsertOneAsync(settings);
-            return settings;
+            await _dashboardOnePriceSettings.InsertOneAsync(settings);
         }
 
         public bool FindDashboardOnePriceSettings(string id)
@@ -247,8 +280,30 @@ namespace StockScreener
             return query;
         }
 
-        public void DeleteDashboardOnePriceSettings(string id) =>
-            _dashboardOneAlertSettings.DeleteOneAsync(settings => settings.Id.Equals(id));
+        public async Task UpdatePriceSettings(DashboardOnePriceSettings settings)
+        {
+            var filter = Builders<DashboardOnePriceSettings>.Filter.Eq("Id", "0");
+            var sp = Builders<DashboardOnePriceSettings>.Update.Set("StartPrice", settings.StartPrice);
+            var tp = Builders<DashboardOnePriceSettings>.Update.Set("TargetPrice", settings.TargetPrice);
+            var pd = Builders<DashboardOnePriceSettings>.Update.Set("PriceDetectionEnabled", settings.PriceDetectionEnabled);
+            var hs = Builders<DashboardOnePriceSettings>.Update.Set("HideBullishStocks", settings.HideBullishStocks);
+            var hs2 = Builders<DashboardOnePriceSettings>.Update.Set("HideBearishStocks", settings.HideBearishStocks);
+
+
+            _ = _dashboardOnePriceSettings.UpdateOneAsync(filter, sp);
+            _ = _dashboardOnePriceSettings.UpdateOneAsync(filter, tp);
+            _ = _dashboardOnePriceSettings.UpdateOneAsync(filter, pd);
+            _ = _dashboardOnePriceSettings.UpdateOneAsync(filter, hs);
+            _ = _dashboardOnePriceSettings.UpdateOneAsync(filter, hs2);
+
+            await Task.Delay(100);
+        }
+
+        public async Task DeleteDashboardOnePriceSettings(string id)
+        {
+            await _dashboardOneAlertSettings.DeleteOneAsync(settings => settings.Id.Equals(id));
+        }
+
 
         // **************************************************
 
@@ -262,7 +317,7 @@ namespace StockScreener
         public Portfolio GetPortfolioStock(int stockcode) =>
             _portfolio.Find<Portfolio>(settings => settings.StockCode == stockcode).FirstOrDefault();
 
-         public bool PortfolioStockExists(int stockcode)
+        public bool PortfolioStockExists(int stockcode)
         {
             var query = _portfolio.Find<Portfolio>(settings => settings.StockCode == stockcode).Any();
             return query;

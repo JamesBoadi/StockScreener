@@ -8,8 +8,7 @@ using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Channels;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
+
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using StockScreener.Controllers;

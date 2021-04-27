@@ -646,7 +646,9 @@ export class StockTableTwo extends React.Component {
             // Get values from cache
             let list = (!priceDetection) ? TableCache.get(id) :
                 TableCache.getOp(id);//this.state.cache.get(id.toString());
-
+            
+            if (list === null || list === undefined)
+                continue;
 
             //  console.log( 'WORK WORK ' + id);
             array.push(
