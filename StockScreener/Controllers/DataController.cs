@@ -590,18 +590,16 @@ namespace StockScreener.Controllers
             return res;
         }
 
-        [Route("getsettings/dashboardOne/")]
+        [Route("getpricesettings/dashboardOne/")]
         public string[] getAllDashboardOneSettings() // convert to json
         {
             string[] jsonArray;
-            List<DashboardOneAlertSettings> alertSettings;
             List<DashboardOnePriceSettings> priceSettings;
             try
             {
-                alertSettings = _stockScreenerService.GetAlertSettings();
                 priceSettings = _stockScreenerService.GetPriceSettings();
 
-                jsonArray = new string[alertSettings.Count + priceSettings.Count];
+                jsonArray = new string[priceSettings.Count];
             }
             catch (Exception ex)
             {
@@ -612,23 +610,16 @@ namespace StockScreener.Controllers
                 return null;
             }
 
-            List<string> list = new List<string>();
-
-            for (int i = 0; i < alertSettings.Count; i++)
-            {
-                list.Add(JsonSerializer.Serialize(alertSettings[i]));
-
-            }
-
             for (int i = 0; i < priceSettings.Count; i++)
             {
-                list.Add(JsonSerializer.Serialize(priceSettings[i]));
+                jsonArray[i] = JsonSerializer.Serialize(priceSettings[i]);
             }
-            jsonArray = list.ToArray();
+
             return jsonArray;
         }
 
-
+        // Save Settings
+        //..........................................................................
         private async Task saveAlertSettings(string alertsettings) // convert to json
         {
             DashboardOneAlertSettings dashboardAlertsSettings = DashboardOneAlertSettings.Deserialize(alertsettings);
@@ -637,7 +628,7 @@ namespace StockScreener.Controllers
 
 
             if (alertSettingsExists)
-            {              
+            {
                 await _stockScreenerService.UpdateAlertSettings(dashboardAlertsSettings);
             }
             else
@@ -669,6 +660,8 @@ namespace StockScreener.Controllers
             await Task.Delay(100);
 
         }
+
+   
         // ******************************************************
         // Portfolio
         // ******************************************************

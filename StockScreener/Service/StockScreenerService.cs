@@ -233,7 +233,6 @@ namespace StockScreener
             var st2 = Builders<DashboardOneAlertSettings>.Update.Set("SettingsTriggered", settings.SettingsTriggered);
             var ts = Builders<DashboardOneAlertSettings>.Update.Set("TimeStamp", settings.TimeStamp);
 
-
             _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, ta);
             _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, manual);
             _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, auto);
@@ -247,9 +246,6 @@ namespace StockScreener
 
             await Task.Delay(100);
         }
-
-
-
 
         public bool FindDashboardOneAlertSettings(string id)
         {
@@ -283,12 +279,12 @@ namespace StockScreener
         public async Task UpdatePriceSettings(DashboardOnePriceSettings settings)
         {
             var filter = Builders<DashboardOnePriceSettings>.Filter.Eq("Id", "0");
-            var sp = Builders<DashboardOnePriceSettings>.Update.Set("StartPrice", settings.StartPrice);
-            var tp = Builders<DashboardOnePriceSettings>.Update.Set("TargetPrice", settings.TargetPrice);
+
+            var sp = Builders<DashboardOnePriceSettings>.Update.Set("GlobalStartPrice", settings.GlobalStartPrice);
+            var tp = Builders<DashboardOnePriceSettings>.Update.Set("GlobalTargetPrice", settings.GlobalTargetPrice);
             var pd = Builders<DashboardOnePriceSettings>.Update.Set("PriceDetectionEnabled", settings.PriceDetectionEnabled);
             var hs = Builders<DashboardOnePriceSettings>.Update.Set("HideBullishStocks", settings.HideBullishStocks);
             var hs2 = Builders<DashboardOnePriceSettings>.Update.Set("HideBearishStocks", settings.HideBearishStocks);
-
 
             _ = _dashboardOnePriceSettings.UpdateOneAsync(filter, sp);
             _ = _dashboardOnePriceSettings.UpdateOneAsync(filter, tp);

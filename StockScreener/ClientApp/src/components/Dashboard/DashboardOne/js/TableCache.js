@@ -1,7 +1,5 @@
 import * as cache from 'cache-base';
 
-
-
 export default class TableCache {
     static cache_ = new cache();
     static cacheOp_ = new cache();
@@ -13,7 +11,6 @@ export default class TableCache {
     static priceDetection = false;
     static update_hideStocks = false;
     static disableUpdate = false;
-
     static cacheNotNull = false;
 
     static item =
@@ -236,14 +233,11 @@ export default class TableCache {
                 this.cacheOp_.set(key, this.item);
             }
         }
-
         /* console.log("SIZE " + size);
          console.log("MAX " + this.max);
          console.log("ENDMOD " + this.endMod);*/
         this.priceDetection = true;
         this.update_hideStocks = true;
     }
-
-
 
 }

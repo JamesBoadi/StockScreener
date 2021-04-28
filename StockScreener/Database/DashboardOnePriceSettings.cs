@@ -18,9 +18,9 @@ namespace StockScreener
         // PriceSettings
         // ******************************************************
 
-        public float StartPrice { get; set; }
+        public double GlobalStartPrice { get; set; }
 
-        public float TargetPrice { get; set; }
+        public double GlobalTargetPrice { get; set; }
 
         public bool PriceDetectionEnabled { get; set; }
 

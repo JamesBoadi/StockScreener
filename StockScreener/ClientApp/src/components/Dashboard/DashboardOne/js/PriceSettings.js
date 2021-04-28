@@ -4,7 +4,7 @@ import * as HashMap from 'hashmap';
 export default class PriceSettings {
     static startPrice = 0;
     static targetPrice = 0;
-
+    
     static priceDetectionEnabled = false;
     static hideBullishStocks = false;
     static hideBearishStocks = false;
@@ -61,15 +61,19 @@ export default class PriceSettings {
         return this.map.get(clickedAlertTableRowID).LocalTargetPrice;
     }
 
-    static getSettings() {
+    static getPriceSettings() {
         const h = parseInt((new Date().getHours() + 8) >= 17 ? 24 - new Date().getHours()
             : new Date().getHours() + 8);
         const m = new Date().getMinutes().toPrecision(2);
-        this.TimeStamp = h + ' : ' + m;
+        this.TimeStamp = h + ':' + m;
 
-        const json = {
-            startPrice: parseFloat( this.startPrice),
-            targetPrice: parseFloat(this.targetPrice),
+       
+       const sp = parseFloat(this.startPrice);
+       const tp =  parseFloat(this.targetPrice);
+       console.log( sp + ' product ' + tp);
+        let json = {
+            globalStartPrice: sp,
+            globalTargetPrice: tp,
             priceDetectionEnabled: this.priceDetectionEnabled,
             hideBullishStocks: this.hideBullishStocks,
             hideBearishStocks: this.hideBearishStocks,
@@ -78,51 +82,51 @@ export default class PriceSettings {
         return JSON.stringify(json);
     }
 
-    
-/*
-    // Set local prices using global prices without overriding prices already set
-    static setLocalPrices(startPrice, targetPrice, clickedAlertTableRowID) {
-        const data =
-        {
-            LocalStartPrice: startPrice,
-            LocalTargetPrice: targetPrice,
-            Override: "YES"
-        }
 
-        for (let key = 0; key < 897; key++) {
-            if (key === clickedAlertTableRowID) {
-                this.map.set(key, data);
-                break;
-            }
-        }
-    }
-
-    // Override local prices using global prices
-    overrideLocalPrices(startPrice, targetPrice) {
-        /*    const data =
+    /*
+        // Set local prices using global prices without overriding prices already set
+        static setLocalPrices(startPrice, targetPrice, clickedAlertTableRowID) {
+            const data =
             {
                 LocalStartPrice: startPrice,
                 LocalTargetPrice: targetPrice,
-                Override: "NO" // If set by user, price will be overriden
+                Override: "YES"
             }
     
             for (let key = 0; key < 897; key++) {
-                this.map.set(key, data);
-            } 
-    }
-
-    // Update stock hashmap
-    updateStockDashBoardMap() {
-        /*    const data =
-          {
-              LocalStartPrice: this.startPriceRef.current.value,
-              LocalTargetPrice: this.targetPriceRef.current.value
-          }
-  
-          // Update HashMap
-        const clickedAlertTableRowID = this.state.clickedAlertTableRowID;
-          this.map.set(clickedAlertTableRowID, data);*/
-  //  }
+                if (key === clickedAlertTableRowID) {
+                    this.map.set(key, data);
+                    break;
+                }
+            }
+        }
+    
+        // Override local prices using global prices
+        overrideLocalPrices(startPrice, targetPrice) {
+            /*    const data =
+                {
+                    LocalStartPrice: startPrice,
+                    LocalTargetPrice: targetPrice,
+                    Override: "NO" // If set by user, price will be overriden
+                }
+        
+                for (let key = 0; key < 897; key++) {
+                    this.map.set(key, data);
+                } 
+        }
+    
+        // Update stock hashmap
+        updateStockDashBoardMap() {
+            /*    const data =
+              {
+                  LocalStartPrice: this.startPriceRef.current.value,
+                  LocalTargetPrice: this.targetPriceRef.current.value
+              }
+      
+              // Update HashMap
+            const clickedAlertTableRowID = this.state.clickedAlertTableRowID;
+              this.map.set(clickedAlertTableRowID, data);*/
+    //  }
 
 
 }

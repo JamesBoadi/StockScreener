@@ -148,7 +148,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             }
         }
 
-
         static string[] stockArray;
 
         // Copy stocks from database into stock array
@@ -162,9 +161,7 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                 stockArray[i] = Manager.ManagerCode.Value[++pointer];
             }
         }
-
         private static int[] changeArray = { -1, 1, 2, 0, 1, 1 };//new int[6];
-
         Stock stock;
 
         public static CacheOp cache = new CacheOp();
@@ -179,7 +176,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
             TimeSpan _time = time.ReturnTime();
             string hour = _time.Hours.ToString();
             string minutes = _time.Minutes.ToString();
-
             string time_format = hour + ":" + minutes;
 
             try
@@ -209,7 +205,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
 
                        cache.Add(stock);
                    } */
-
             }
             catch (Exception ex)
             {
@@ -225,7 +220,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
         // Update Stock
         public void updateManager(int start, int end)
         {
-          
             try
             {
                 int pointer = start;
@@ -236,18 +230,20 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     int start2 = random.Next(0, array.Length);
 
                     int[] changeArray = new int[6] { array[start2], array[start2], array[start2], array[start2],
-                     array[start2], array[start2] };
+                    array[start2], array[start2] };
+
                     int s = new Random().Next(0, 99);
                     Stock stock = new Stock(pointer.ToString(), Manager.ManagerCode.Value[pointer],
                     Manager.ManagerName.Value[pointer], "",
                     s, 2, 3, start2, changeArray, 5, 6, 7, 8, 86);
 
+
                     // Update stock
                     Stock newStockData = cache.Get(pointer).Update(stock);
-
                     cache.Update(pointer, newStockData);
                     pointer++;
                 }
+
 
                 /*    
                     data = client.GetRealTimePrices(stockArray);
@@ -258,7 +254,6 @@ namespace StockScreener //https://developer.mozilla.org/en-US/docs/Web/API/WebSo
                     stock = new Stock(ManagerCode.Value[pointer],
                     data_.Open, data_.Change, data_.ChangeP, data_.Volume, changeArray, data_.High, data_.Low,
                     (positive && !negative) ? 1 : -1, data_.Close, data_.PreviousClose);
-                    
                     cache.Update(pointer, stock);
                     pointer++;
                 }

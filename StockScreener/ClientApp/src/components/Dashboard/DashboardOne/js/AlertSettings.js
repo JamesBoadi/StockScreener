@@ -1,10 +1,10 @@
 /* Set Start Prices and Target Prices */
-export default class PriceSettings {
+export default class AlertSettings {
 
     static startTime = "";
     static endTime = "";
     static triggerAlert = 0;
-    static auto = true;
+    static auto = false;
     static manual = false;
     static notifications = false;
     static updateAlertSettings = false;
@@ -79,12 +79,12 @@ export default class PriceSettings {
         return parseInt(this.alertInterval);
     }
 
-    static getSettings()
+    static getAlertSettings()
     {
         const h = parseInt((new Date().getHours() + 8) >= 17 ? 24 - new Date().getHours()
             : new Date().getHours() + 8);
         const m = new Date().getMinutes().toPrecision(2);
-        this.TimeStamp = h + ' : ' + m;
+        this.TimeStamp = h + ':' + m;
   
         const json = {
             triggerAlert: this.triggerAlert,

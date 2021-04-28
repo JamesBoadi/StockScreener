@@ -8,12 +8,12 @@ import TableCache from './js/TableCache.js';
 import AlertSettings from './js/AlertSettings.js';
 import PriceSettings from './js/PriceSettings.js';
 import TableSettings from './js/TableSettings.js';
-
 import SavedStockCache from './js/SavedStockCache.js';
 
 import {
     Box, Button
 } from '@chakra-ui/react';
+
 const date = new Date();
 
 // Replace with Redux
@@ -23,12 +23,12 @@ export class StockTableTwoAlert extends React.Component {
         this.manualAlert = throttle(this.manualAlert, 1000);
         this.autoAlert = throttle(this.autoAlert, 1000);
         this.triggerAnimation = this.triggerAnimation.bind(this);
+        this.randomizeStack = this.randomizeStack.bind(this);
 
         // Notifications
         this.enableNotificationsMenu = this.enableNotificationsMenu.bind(this);
         this.initialiseNotifications = this.initialiseNotifications.bind(this);
         this.addToNotificationsMenu = this.addToNotificationsMenu.bind(this);
-
         this.notifications = this.notifications.bind(this);
 
         // Create priority priority_queue for animations not shown yet
@@ -70,11 +70,9 @@ export class StockTableTwoAlert extends React.Component {
 
     // 404 if component does not mount
     async componentDidMount() {
-
         if (this.withinAlertTime()) {
             this.initialiseAlerts();
         }
-
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -86,13 +84,31 @@ export class StockTableTwoAlert extends React.Component {
                this.props.setScrollUpdate(false);
            }*/
         if (this.props.state.toggleAlert) {
-            console.log('NEW SETTINGS?')
+            console.log('NEW SETTINGS?');
             if (this.state.isUpdating) { // If there are aniimations in progress
                 this.props.toggleAlert(false);
                 AlertSettings.setUpdateAlertSettings(false);
                 return;
-            }
+            }/*else if (!this.withinAlertTime()) {
+                window.alert('Time is outside of alert hours' );
 
+                if (this.animationTime !== undefined || this.animationTime !== null) {
+                    clearInterval(this.animationTime);
+                    this.priority_queue.clear();
+                } if (this.autoInterval !== undefined || this.autoInterval !== null) {
+                    clearInterval(this.autoInterval);
+                    this.priority_queue.clear();
+                }
+                if (this.manualInterval !== undefined || this.manualInterval !== null) {
+                    clearInterval(this.autoInterval);
+                    this.priority_queue.clear();
+                }
+
+                this.props.toggleAlert(false);
+                AlertSettings.setUpdateAlertSettings(false);
+                return;
+            }*/
+            
             let changeSettings = true;
             if (AlertSettings.triggerSettings() == 1 && !AlertSettings.getUpdateAlertSettings())
                 changeSettings = false;
@@ -102,59 +118,63 @@ export class StockTableTwoAlert extends React.Component {
             if (AlertSettings.triggerSettings() == 0)
                 AlertSettings.setTriggerSettings(1);
 
-
             console.log('change settings ' + changeSettings);
 
             if (changeSettings) {
                 // Clear all Alerts
                 if (!AlertSettings.getManual() && !AlertSettings.getAuto()) {
                     this.priority_queue.clear()
-                    if (this.animationTime !== undefined) {
+                    if (this.animationTime !== undefined || this.animationTime !== null) {
                         clearInterval(this.animationTime);
-                    } if (this.autoInterval !== undefined) {
+                        this.priority_queue.clear();
+                    } if (this.autoInterval !== undefined || this.autoInterval !== null) {
                         clearInterval(this.autoInterval);
+                        this.priority_queue.clear();
                     }
-                    if (this.manualInterval !== undefined) {
+                    if (this.manualInterval !== undefined || this.manualInterval !== null) {
                         clearInterval(this.autoInterval);
+                        this.priority_queue.clear();
                     }
                 } else {
-                    // Proceed with alerts
-                    //  if (this.withinAlertTime()) {
                     // Trigger manual Alert
                     if (AlertSettings.getManual()) {
-                        if (this.animationTime !== undefined) {
+                        if (this.animationTime !== undefined || this.animationTime !== null) {
                             clearInterval(this.animationTime);
+                            this.priority_queue.clear();
                         }
-                        if (this.autoInterval !== undefined) {
+                        if (this.autoInterval !== undefined || this.autoInterval !== null) {
                             clearInterval(this.autoInterval);
+                            this.priority_queue.clear();
                         }
-                        if (this.manualInterval !== undefined) {
+                        if (this.manualInterval !== undefined || this.manualInterval !== null) {
                             clearInterval(this.autoInterval);
+                            this.priority_queue.clear();
                         }
                         TableCache.setDisableScroll(false);
                         console.log('Called! Manual Alert! 2')
                         this.manualAlert(this.props.addToStyleMap);
                     } // Trigger Auto Alert
                     else if (AlertSettings.getAuto()) {
-                        if (this.animationTime !== undefined) {
+                        if (this.animationTime !== undefined || this.animationTime !== null) {
                             clearInterval(this.animationTime);
-                        } if (this.autoInterval !== undefined) {
-                            clearInterval(this.autoInterval);
+                            this.priority_queue.clear();
                         }
-                        if (this.manualInterval !== undefined) {
+                        if (this.autoInterval !== undefined || this.autoInterval !== null) {
                             clearInterval(this.autoInterval);
+                            this.priority_queue.clear();
+                        }
+                        if (this.manualInterval !== undefined || this.manualInterval !== null) {
+                            clearInterval(this.autoInterval);
+                            this.priority_queue.clear();
                         }
                         console.log('Called! Auto Alert! 2')
                         this.autoAlert(this.props.addToStyleMap);
                     }
-                    //}
                 }
             }
 
             this.props.toggleAlert(false);
             AlertSettings.setUpdateAlertSettings(false);
-            TableSettings.setSettings(false);
-           
         }
     }
 
@@ -213,7 +233,6 @@ export class StockTableTwoAlert extends React.Component {
         return [parseInt(hours), parseInt(minutes)];
     }
 
-
     // Initialise alert rows from database
     async initialiseAlerts() {
         // Read notifications from database
@@ -228,7 +247,7 @@ export class StockTableTwoAlert extends React.Component {
                 console.log("error " + error) // 404
                 return;
             }
-        );
+            );
     }
 
     addFirstRows(response) {
@@ -278,20 +297,19 @@ export class StockTableTwoAlert extends React.Component {
             );
     }
 
-    triggerAnimation(callback, array) {
+    triggerAnimation(callback, array, stack) {
         this.animationTime = setInterval(() => {
-            if (this.priority_queue.length === 0) {
-                console.log('Continue animation ');
+            if (stack.length === 0) {
+                //   console.log('Continue animation ');
                 this.setState({ isUpdating: false });
                 clearInterval(this.animationTime);
                 this.setState({ continueAnimation: true }) // this.setState({ update_priorityQueue: true });
             }
-            let index = parseInt(this.priority_queue.dequeue()) // Change Order Of Priority queue to change order of array
 
+            let index = stack.pop();
             for (const [key, value] of array.entries()) {
                 if (index == parseInt(value)) {
-                   // TableCache.setDisableScroll(true);
-
+                    // TableCache.setDisableScroll(true);
                     const item = array[index];
                     const count = item[0];
                     const state = item[1];
@@ -300,7 +318,7 @@ export class StockTableTwoAlert extends React.Component {
                     this._addToNotificationsMenu(count); // Sync to notifications
                     callback(count, state, delay, 0);
                     this.deleteAlerts(index);
-                    this.setState({updateNotifications: false});
+                    this.setState({ updateNotifications: false });
                     break;
                 }
             }
@@ -310,7 +328,6 @@ export class StockTableTwoAlert extends React.Component {
     // Trigger alert automatically
     autoAlert(callback) {
         // FETCH SAVE TO DATABASE
-        let prevArray = [] // FFetch
         TableCache.setDisableScroll(true);
         this.setState({ continueAnimation: true });
         this.autoInterval = setInterval(() => {
@@ -319,6 +336,7 @@ export class StockTableTwoAlert extends React.Component {
 
                 // Add stocks to array and priority priority_queue;
                 let pointer = 0;
+                let length = 0;
                 while (pointer < 897) {
                     const cache = AlertCache.get(pointer);
                     let inRange = 0;
@@ -340,23 +358,27 @@ export class StockTableTwoAlert extends React.Component {
                     if (priceDetectionEnabled) {
                         //console.log('STATE 2' + state + '  ' + currentPrice_state);
                         if (inRange) {
-                            // Prevent adding an element twice
-                            if (this.priority_queue.includes(pointer) == false)
-                                this.priority_queue.enqueue(pointer);
+                            if (currentPrice_state !== 0) {
+                                // Prevent adding an element twice
+                                if (this.priority_queue.includes(pointer) == false) {
+                                    this.priority_queue.enqueue(pointer);
+                                    length++;
+                                }
 
-                            //this.priority_queue
-                            // Update existing element
-                            this.array[pointer] = [pointer, state, 1600];
-                            this.array[pointer] = [pointer, state, 1600];
-                            const obj = { Id: pointer, Attribute: this.array[pointer] };
-                            this.saveAlerts(JSON.stringify(obj)); //
-
+                                // Update existing element
+                                this.array[pointer] = [pointer, state, 1600];
+                                this.array[pointer] = [pointer, state, 1600];
+                                const obj = { Id: pointer, Attribute: this.array[pointer] };
+                                this.saveAlerts(JSON.stringify(obj)); // Save alerts to database                                
+                            }
                         }
                     } else {
                         if (currentPrice_state !== 0) {
                             // Prevent adding an element twice
-                            if (this.priority_queue.includes(pointer) == false)
+                            if (this.priority_queue.includes(pointer) == false) {
                                 this.priority_queue.enqueue(pointer);
+                                length++;
+                            }
 
                             // Update existing element
                             this.array[pointer] = [pointer, state, 1600];
@@ -367,8 +389,9 @@ export class StockTableTwoAlert extends React.Component {
                     pointer++;
                 }
 
+                const stack = this.randomizeStack(length);
                 if (this.priority_queue.length !== 0)
-                    this.triggerAnimation(callback, this.array);
+                    this.triggerAnimation(callback, this.array, stack);
 
                 this.setState({ continueAnimation: false })
             }
@@ -443,6 +466,27 @@ export class StockTableTwoAlert extends React.Component {
             }
 
         }, AlertSettings.getAlertInterval());
+    }
+
+    randomizeStack(length) {
+        let stack = [];
+        while (stack.length < length) {
+            const index = parseInt(this.priority_queue.dequeue())
+            stack.push(index);
+        }
+
+        let counter = length;
+        while (0 !== counter) {
+            let randId = Math.floor(Math.random() * length);
+            // Swap it with the current element.
+            let tmp = stack[counter];
+            stack[counter] = stack[randId];
+            stack[randId] = tmp;
+
+            counter--;
+        }
+
+        return stack;
     }
 
     // **************************************************
@@ -589,8 +633,8 @@ export class StockTableTwoAlert extends React.Component {
             } else if (currentPrice < targetPrice) {
                 state = -3;
             }
-            
-        // User specifies a Bullish criteria
+
+            // User specifies a Bullish criteria
         } else if (startPrice < targetPrice) {
 
             if (currentPrice < startPrice) {
@@ -607,7 +651,7 @@ export class StockTableTwoAlert extends React.Component {
                 state = 1;
             }
         }
-       
+
         // Default states: 2, -1
         const obj = this.addToNotificationsMenu(id, stock, previousPrice, currentPrice,
             startPrice, targetPrice, state);
