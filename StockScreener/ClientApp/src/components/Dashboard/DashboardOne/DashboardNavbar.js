@@ -36,7 +36,6 @@ export class DashboardNavbar extends Component {
         this.parseTime = this.parseTime.bind(this);
 
 
-        this.enableNotifications = this.enableNotifications.bind(this);
 
         this.setGlobalStartPrice = this.setGlobalStartPrice.bind(this);
         this.setGlobalTargetPrice = this.setGlobalTargetPrice.bind(this);
@@ -183,6 +182,8 @@ export class DashboardNavbar extends Component {
             nextState.globalStartPrice !== this.state.globalStartPrice ||
             nextState.enablePriceDetection !== this.state.enablePriceDetection ||
             nextState.disableSetPrice !== this.state.disableSetPrice ||
+            nextState.manualAlert !== this.state.manualAlert ||
+            nextState.autoAlert !== this.state.autoAlert ||
             nextState.autoDisabled !== this.state.autoDisabled ||
             nextState.manualDisabled !== this.state.manualDisabled ||
             nextState.hideBearishStocks !== this.state.hideBearishStocks ||
@@ -210,8 +211,6 @@ export class DashboardNavbar extends Component {
         this.setState({ saveSettings: state });
     }
 
-
-
     async saveSettingsToDatabase(alertsettings, pricesettings) {
         await fetch('savesettings/dashboardOne/'.concat(alertsettings) + '/'.concat(pricesettings))
             .then(response => response.json())
@@ -235,9 +234,6 @@ export class DashboardNavbar extends Component {
             }
             );
     }
-
-
-
 
     getPriceSettings(response) {
         for (var i = 0; i < response.length; i++) {
@@ -274,7 +270,7 @@ export class DashboardNavbar extends Component {
                 this.setState({ enablePriceDetection: true });
                 this.setState({ disableSetPrice: false });
             }
-            else{
+            else {
                 this.setState({ enablePriceDetection: false });
                 this.setState({ disableSetPrice: true });
             }
@@ -351,9 +347,6 @@ export class DashboardNavbar extends Component {
 
     }
 
-
-
-
     getAlertSettings(response) {
         for (var i = 0; i < response.length; i++) {
             const item = JSON.parse(response[i]);
@@ -372,7 +365,6 @@ export class DashboardNavbar extends Component {
                 console.log(' Nullable ');
                 return;
             }
-
 
             this.setState({ startTime: item.StartTime });
             this.setState({ endTime: item.EndTime });
@@ -407,18 +399,26 @@ export class DashboardNavbar extends Component {
     }
 
     // ************************************************************
-
     // Save all settings
+    // ************************************************************
     saveConfiguration() {
         // AlertSettings.setAlertInterval(this.alertFrequencyRef.current.value);
         AlertSettings.setTime(this.state.startTime, this.state.endTime);
 
         // Set Alert Times
         // Detect Change in Alert Settings
-        if (AlertSettings.getManual() != this.state.manualAlert
-            || AlertSettings.getAuto() != this.state.autoAlert) {
+        if (AlertSettings.getManual() !== this.state.manualAlert
+            || AlertSettings.getAuto() !== this.state.autoAlert) {
+
+            if (this.state.autoAlert) {
+                let ans = window.confirm("Scrolling is disabled in auto mode, proceed?")
+                if (!ans)
+                    return;
+            }
+
             AlertSettings.setManual(this.state.manualAlert);
             AlertSettings.setAuto(this.state.autoAlert);
+
             AlertSettings.setUpdateAlertSettings(true);
         }
 
@@ -630,16 +630,6 @@ export class DashboardNavbar extends Component {
     overrideGlobalPrices(e) {
 
         this.setState({ overrideGlobalPrices: e.target.checked });
-    }
-
-    // Enable Alert Notifications
-    enableNotifications(e) {
-        if (e.target.checked)
-            this.setState({ notificationsEnabled: 1 })
-        else
-            this.setState({ notificationsEnabled: 0 })
-
-        this.setState({ setNotifications: e.target.checked })
     }
 
     // Checkbox that enables manual alert

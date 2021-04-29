@@ -792,6 +792,69 @@ namespace StockScreener.Controllers
             return res;
         }
 
+        // ******************************************************
+        // Dashboard One Alerts
+        // ******************************************************
+        [Route("getalerts/dashboardOne")]
+        public string[] getDashboardOneAlerts() // convert to json
+        {
+            string[] jsonArray;
+            List<DashBoardOneAlerts> list;
+
+            try
+            {
+                list = _stockScreenerService.GetDashboardOneAlerts();
+                jsonArray = new string[list.Count];
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+                return null;
+            }
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                jsonArray[i] = JsonSerializer.Serialize(list[i]);
+            }
+
+            return jsonArray;
+        }
+
+        [Route("savealerts/{dashboardOne?}")]
+        public HttpStatusCode saveDashboardOneAlerts(string alerts) // convert to json
+        {
+            var response = new HttpResponseMessage();
+            HttpStatusCode res;
+            try
+            {
+                DashBoardOneAlerts _alerts =  DashBoardOneAlerts.Deserialize(alerts);
+                bool idExists = _stockScreenerService.DashBoardOneAlertsExists(_alerts.Id);
+
+                if (idExists)
+                {
+                    _stockScreenerService.UpdateDashboardOneAlerts(_alerts);
+                }
+
+                _stockScreenerService.Create(_alerts);
+
+                res = response.StatusCode;
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+
+                res = response.StatusCode;
+            }
+
+            return res;
+        }
+
 
 
 

@@ -28,6 +28,8 @@ namespace StockScreener
 
         private readonly IMongoCollection<Portfolio> _portfolio;
 
+        private readonly IMongoCollection<DashBoardOneAlerts> _dashboardOneAlerts;
+
         // private readonly IMongoCollection<SavedStocks> _savedStocks;
 
         public StockScreenerService(IStockScreenerDatabaseSettings settings)
@@ -44,6 +46,7 @@ namespace StockScreener
             _dashboardOneAlertSettings = database.GetCollection<DashboardOneAlertSettings>("DashboardOneAlertSettings");
             _dashboardOnePriceSettings = database.GetCollection<DashboardOnePriceSettings>("DashboardOnePriceSettings");
             _portfolio = database.GetCollection<Portfolio>("Portfolio");
+            _dashboardOneAlerts = database.GetCollection<DashBoardOneAlerts>("DashBoardOneAlerts");
         }
 
         // **************************************************
@@ -327,6 +330,40 @@ namespace StockScreener
 
         public void DeletePortfolio(int stockcode) =>
              _portfolio.DeleteOne(settings => settings.StockCode == stockcode);
+
+        // **************************************************
+
+
+        // **************************************************
+        // Dashboard One Alerts
+        // **************************************************
+
+        public List<DashBoardOneAlerts> GetDashboardOneAlerts() =>
+             _dashboardOneAlerts.Find(settings => true).ToList();
+
+        public DashBoardOneAlerts Create(DashBoardOneAlerts settings)
+        {
+            _dashboardOneAlerts.InsertOne(settings);
+            return settings;
+        }
+
+        public bool DashBoardOneAlertsExists(string id)
+        {
+            var query = _dashboardOneAlerts.Find<DashBoardOneAlerts>(settings => settings.Id.Equals(id)).Any();
+            return query;
+        }
+
+
+        public void UpdateDashboardOneAlerts(DashBoardOneAlerts settings)
+        {
+            var filter = Builders<DashBoardOneAlerts>.Filter.Eq("Id", "0");
+            var alert = Builders<DashBoardOneAlerts>.Update.Set("Index", settings.Index);
+
+            _ = _dashboardOneAlerts.UpdateOne(filter, alert);
+        }
+
+        public void DeleteDashboardOneAlerts(string id) =>
+             _dashboardOneAlerts.DeleteOne(settings => settings.Id.Equals(id));
 
         // **************************************************
     }

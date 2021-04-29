@@ -165,10 +165,8 @@ export class StockTableTwo extends React.Component {
             }
             else if (this.props.state.saveSettings) {
                 this.setState({ toggleAlert: true });
-                console.log('NEW SETTINGS? --------')
                 this.props.toggleSettings(false);
             }
-
             // Highlight rowtable if selected
             else if (this.state.isSelected) {
                 this.newTable()

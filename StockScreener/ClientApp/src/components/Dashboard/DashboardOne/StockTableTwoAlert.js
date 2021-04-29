@@ -34,6 +34,7 @@ export class StockTableTwoAlert extends React.Component {
         // Create priority priority_queue for animations not shown yet
         //............. = new
         this.array = [];
+        this.stack = [];
         this.priority_queue = new PriorityQueue();
         this.queue = [];
         this.queue_Length = 0;
@@ -51,6 +52,7 @@ export class StockTableTwoAlert extends React.Component {
             end: 0,
             cache: null,
             continueAnimation: true,
+            disableAnimation: false,
             animationsCache: new cache(),
             isUpdating: false,
 
@@ -76,16 +78,53 @@ export class StockTableTwoAlert extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        /*   if (this.props.state.disableScrolling === false
-               && AlertSettings.getManual()) {
-               this.priority_queue.clear()
-               clearInterval(this.animationTime);
-               this.manualAlert(this.props.addToStyleMap);
-               this.props.setScrollUpdate(false);
-           }*/
+        if (this.state.disableAnimation) {
+            // Within alert time()
+            if (AlertSettings.getManual()) {
+                if (this.animationTime !== undefined || this.animationTime !== null) {
+                    clearInterval(this.animationTime);
+                    this.priority_queue.clear();
+                    this.stack = [];
+                }
+                if (this.autoInterval !== undefined || this.autoInterval !== null) {
+                    clearInterval(this.autoInterval);
+                    this.priority_queue.clear();
+                    this.stack = [];
+                }
+                if (this.manualInterval !== undefined || this.manualInterval !== null) {
+                    clearInterval(this.autoInterval);
+                    this.priority_queue.clear();
+                    this.stack = [];
+                }
+                TableCache.setDisableScroll(false);
+                console.log('Restart manual')
+                this.manualAlert(this.props.addToStyleMap);
+            } else if (AlertSettings.getAuto()) {
+                if (this.animationTime !== undefined || this.animationTime !== null) {
+                    clearInterval(this.animationTime);
+                    this.priority_queue.clear();
+                    this.stack = [];
+                }
+                if (this.autoInterval !== undefined || this.autoInterval !== null) {
+                    clearInterval(this.autoInterval);
+                    this.priority_queue.clear();
+                    this.stack = [];
+                }
+                if (this.manualInterval !== undefined || this.manualInterval !== null) {
+                    clearInterval(this.autoInterval);
+                    this.priority_queue.clear();
+                    this.stack = [];
+                }
+                console.log('Restart auto')
+                this.autoAlert(this.props.addToStyleMap);
+            }
+
+            this.setState({ continueAnimation: true });
+            this.setState({ disableAnimation: false });
+        }
         if (this.props.state.toggleAlert) {
-            console.log('NEW SETTINGS?');
-            if (this.state.isUpdating) { // If there are aniimations in progress
+            // If there are aniimations in progress
+            if (this.state.isUpdating) {
                 this.props.toggleAlert(false);
                 AlertSettings.setUpdateAlertSettings(false);
                 return;
@@ -108,7 +147,7 @@ export class StockTableTwoAlert extends React.Component {
                 AlertSettings.setUpdateAlertSettings(false);
                 return;
             }*/
-            
+
             let changeSettings = true;
             if (AlertSettings.triggerSettings() == 1 && !AlertSettings.getUpdateAlertSettings())
                 changeSettings = false;
@@ -127,13 +166,16 @@ export class StockTableTwoAlert extends React.Component {
                     if (this.animationTime !== undefined || this.animationTime !== null) {
                         clearInterval(this.animationTime);
                         this.priority_queue.clear();
+                        this.stack = [];
                     } if (this.autoInterval !== undefined || this.autoInterval !== null) {
                         clearInterval(this.autoInterval);
                         this.priority_queue.clear();
+                        this.stack = [];
                     }
                     if (this.manualInterval !== undefined || this.manualInterval !== null) {
                         clearInterval(this.autoInterval);
                         this.priority_queue.clear();
+                        this.stack = [];
                     }
                 } else {
                     // Trigger manual Alert
@@ -141,14 +183,17 @@ export class StockTableTwoAlert extends React.Component {
                         if (this.animationTime !== undefined || this.animationTime !== null) {
                             clearInterval(this.animationTime);
                             this.priority_queue.clear();
+                            this.stack = [];
                         }
                         if (this.autoInterval !== undefined || this.autoInterval !== null) {
                             clearInterval(this.autoInterval);
                             this.priority_queue.clear();
+                            this.stack = [];
                         }
                         if (this.manualInterval !== undefined || this.manualInterval !== null) {
                             clearInterval(this.autoInterval);
                             this.priority_queue.clear();
+                            this.stack = [];
                         }
                         TableCache.setDisableScroll(false);
                         console.log('Called! Manual Alert! 2')
@@ -158,21 +203,24 @@ export class StockTableTwoAlert extends React.Component {
                         if (this.animationTime !== undefined || this.animationTime !== null) {
                             clearInterval(this.animationTime);
                             this.priority_queue.clear();
+                            this.stack = [];
                         }
                         if (this.autoInterval !== undefined || this.autoInterval !== null) {
                             clearInterval(this.autoInterval);
                             this.priority_queue.clear();
+                            this.stack = [];
                         }
                         if (this.manualInterval !== undefined || this.manualInterval !== null) {
                             clearInterval(this.autoInterval);
                             this.priority_queue.clear();
+                            this.stack = [];
                         }
                         console.log('Called! Auto Alert! 2')
                         this.autoAlert(this.props.addToStyleMap);
                     }
                 }
             }
-
+            this.setState({ disableAnimation: false });
             this.props.toggleAlert(false);
             AlertSettings.setUpdateAlertSettings(false);
         }
@@ -183,10 +231,12 @@ export class StockTableTwoAlert extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.state.tb2_scrollPosition !== this.props.state.tb2_scrollPosition
-            || nextProps.state.toggleAlert !== this.props.state.toggleAlert
+        if (
+            nextProps.state.toggleAlert !== this.props.state.toggleAlert
             || nextState.notificationsMenuVisible !== this.state.notificationsMenuVisible
             || nextState.updateNotifications !== this.state.updateNotifications
+            || nextState.continueAnimation !== this.state.continueAnimation
+            || nextState.disableAnimation !== this.state.disableAnimation
 
         ) {
             return true;
@@ -302,11 +352,13 @@ export class StockTableTwoAlert extends React.Component {
             if (stack.length === 0) {
                 //   console.log('Continue animation ');
                 this.setState({ isUpdating: false });
+                this.setState({ continueAnimation: false });
+                this.setState({ disableAnimation: true });
                 clearInterval(this.animationTime);
-                this.setState({ continueAnimation: true }) // this.setState({ update_priorityQueue: true });
             }
 
             let index = stack.pop();
+
             for (const [key, value] of array.entries()) {
                 if (index == parseInt(value)) {
                     // TableCache.setDisableScroll(true);
@@ -314,6 +366,8 @@ export class StockTableTwoAlert extends React.Component {
                     const count = item[0];
                     const state = item[1];
                     const delay = item[2];
+
+                    console.log(' index ' + index);
 
                     this._addToNotificationsMenu(count); // Sync to notifications
                     callback(count, state, delay, 0);
@@ -328,9 +382,10 @@ export class StockTableTwoAlert extends React.Component {
     // Trigger alert automatically
     autoAlert(callback) {
         // FETCH SAVE TO DATABASE
-        TableCache.setDisableScroll(true);
         this.setState({ continueAnimation: true });
+        TableCache.setDisableScroll(true);
         this.autoInterval = setInterval(() => {
+            // If the animation is safe to continue
             if (this.state.continueAnimation) {
                 console.log('Call Animation ');
 
@@ -390,10 +445,14 @@ export class StockTableTwoAlert extends React.Component {
                 }
 
                 const stack = this.randomizeStack(length);
-                if (this.priority_queue.length !== 0)
-                    this.triggerAnimation(callback, this.array, stack);
+                if (stack.length === 0) {
+                    // Restart Animation
+                    this.setState({ disableAnimation: true });
+                    return;
+                }
 
-                this.setState({ continueAnimation: false })
+                this.triggerAnimation(callback, this.array, stack);
+                this.setState({ continueAnimation: false });
             }
 
         }, AlertSettings.getAlertInterval());
@@ -402,13 +461,14 @@ export class StockTableTwoAlert extends React.Component {
     // Trigger alert manually
     manualAlert(callback) {
         TableCache.setDisableScroll(false);
-        this.setState({ continueAnimation: true });
+        this.setState({ continueAnimation: true })
         this.manualInterval = setInterval(() => {
             if (this.state.continueAnimation) {
                 console.log('NEXT ');
 
                 // Add stocks to array and priority priority_queue;
                 let pointer = 0;
+                let length = 0;
                 while (pointer < 897) {
                     const cache = AlertCache.get(pointer);
 
@@ -431,22 +491,27 @@ export class StockTableTwoAlert extends React.Component {
                     if (priceDetectionEnabled) {
                         //console.log('STATE 2' + state + '  ' + currentPrice_state);
                         if (inRange) {
-                            // Prevent adding an element twice
-                            if (this.priority_queue.includes(pointer) == false)
-                                this.priority_queue.enqueue(pointer);
+                            if (currentPrice_state !== 0) {
+                                // Prevent adding an element twice
+                                if (this.priority_queue.includes(pointer) == false) {
+                                    this.priority_queue.enqueue(pointer);
+                                    length++;
+                                }
 
-                            // Update existing element
-                            this.array[pointer] = [pointer, state, 1600];
-                            this.array[pointer] = [pointer, state, 1600];
-                            const obj = { Id: pointer, Attribute: this.array[pointer] };
-                            this.saveAlerts(JSON.stringify(obj));
-
+                                // Update existing element
+                                this.array[pointer] = [pointer, state, 1600];
+                                this.array[pointer] = [pointer, state, 1600];
+                                const obj = { Id: pointer, Attribute: this.array[pointer] };
+                                this.saveAlerts(JSON.stringify(obj));
+                            }
                         }
                     } else {
                         if (currentPrice_state !== 0) {
                             // Prevent adding an element twice
-                            if (this.priority_queue.includes(pointer) == false)
+                            if (this.priority_queue.includes(pointer) == false) {
                                 this.priority_queue.enqueue(pointer);
+                                length++;
+                            }
 
                             // Update existing element
                             this.array[pointer] = [pointer, state, 1600];
@@ -459,9 +524,14 @@ export class StockTableTwoAlert extends React.Component {
                     pointer++;
                 }
 
-                if (this.priority_queue.length !== 0)
-                    this.triggerAnimation(callback, this.array);
+                const stack = this.randomizeStack(length);
+                if (stack.length === 0) {
+                    // Restart Animation
+                    this.setState({ disableAnimation: true });
+                    return;
+                }
 
+                this.triggerAnimation(callback, this.array, stack);
                 this.setState({ continueAnimation: false })
             }
 

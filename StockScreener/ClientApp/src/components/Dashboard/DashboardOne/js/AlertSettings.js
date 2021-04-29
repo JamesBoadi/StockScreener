@@ -48,11 +48,11 @@ export default class AlertSettings {
     }
 
     static setManual(alert) {
-        this.manual = new Boolean(alert);
+        this.manual = alert;
     }
 
     static setAuto(alert) {
-        this.auto = new Boolean(alert);
+        this.auto = alert;
     }
 
     static getManual() {

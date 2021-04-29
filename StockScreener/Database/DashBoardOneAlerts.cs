@@ -12,9 +12,10 @@ namespace StockScreener
         [BsonRepresentation(BsonType.ObjectId)]
         public string _Id { get; set; }
 
-        public string Id { get; set; }
+        [BsonElement("Id")]
+        public string Id = "0";
 
-        public string Attribute { get; set; }
+        public int[] Index { get; set; }
 
         public static DashBoardOneAlerts Deserialize(string query)
         {
