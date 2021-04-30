@@ -121,8 +121,9 @@ namespace StockScreener.Controllers
             HttpStatusCode res;
             try
             {
+         
                 Notifications notifications = Notifications.Deserialize(query);
-                bool idExists = _stockScreenerService.StockCodeExists(notifications.Id);
+                bool idExists = _stockScreenerService.NotificationsIdExists(notifications.Id);
 
                 if (idExists)
                 {
@@ -152,7 +153,7 @@ namespace StockScreener.Controllers
             List<Notifications> list;
             try
             {
-                list = _stockScreenerService.Get();
+                list = _stockScreenerService.Get().Result;
                 jsonArray = new string[list.Count];
             }
             catch (Exception ex)
@@ -167,6 +168,7 @@ namespace StockScreener.Controllers
 
             for (int i = 0; i < list.Count; i++)
             {
+                Console.WriteLine("Item " + list[i].Alert);
                 jsonArray[i] = JsonSerializer.Serialize(list[i]);
             }
 
@@ -181,14 +183,13 @@ namespace StockScreener.Controllers
 
             try
             {
-                string _id = JsonSerializer.Deserialize<int>(id).ToString();
+                int _id = JsonSerializer.Deserialize<int>(id);
 
-                bool idExists = _stockScreenerService.IdExists(_id);
+                bool idExists = _stockScreenerService.NotificationsIdExists(_id);
 
                 if (idExists)
                 {
                     _stockScreenerService.Remove(_id);
-
                     Console.WriteLine("id " + _id);
 
                 }
@@ -225,7 +226,7 @@ namespace StockScreener.Controllers
             try
             {
                 SavedStocks savedStocks = SavedStocks.Deserialize(query);
-                bool idExists = _stockScreenerService.StockCodeExists(savedStocks.StockCode);
+                bool idExists = _stockScreenerService.SavedStockExists(savedStocks.StockCode);
 
                 if (idExists)
                 {
@@ -288,11 +289,11 @@ namespace StockScreener.Controllers
             {
                 string _id = JsonSerializer.Deserialize<int>(id).ToString();
 
-                bool idExists = _stockScreenerService.IdExists(_id);
+                bool idExists = _stockScreenerService.SavedStockExists(_id);
 
                 if (idExists)
                 {
-                    _stockScreenerService.Remove(_id);
+                    _stockScreenerService.RemoveSavedStock(_id);
 
                     Console.WriteLine("id " + _id);
 
@@ -618,6 +619,35 @@ namespace StockScreener.Controllers
             return jsonArray;
         }
 
+        
+        [Route("getalertsettings/dashboardOne/")]
+        public string[] getAlertDashboardOneSettings() // convert to json
+        {
+            string[] jsonArray;
+            List<DashboardOneAlertSettings> alertSettings;
+            try
+            {
+                alertSettings = _stockScreenerService.GetAlertSettings();
+
+                jsonArray = new string[alertSettings.Count];
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+                return null;
+            }
+
+            for (int i = 0; i < alertSettings.Count; i++)
+            {
+                jsonArray[i] = JsonSerializer.Serialize(alertSettings[i]);
+            }
+
+            return jsonArray;
+        }
+
         // Save Settings
         //..........................................................................
         private async Task saveAlertSettings(string alertsettings) // convert to json
@@ -661,7 +691,7 @@ namespace StockScreener.Controllers
 
         }
 
-   
+
         // ******************************************************
         // Portfolio
         // ******************************************************
@@ -796,7 +826,7 @@ namespace StockScreener.Controllers
         // Dashboard One Alerts
         // ******************************************************
         [Route("getalerts/dashboardOne")]
-        public string[] getDashboardOneAlerts() // convert to json
+        public string[] getAllDashboardOneAlerts() // convert to json
         {
             string[] jsonArray;
             List<DashBoardOneAlerts> list;
@@ -823,19 +853,52 @@ namespace StockScreener.Controllers
             return jsonArray;
         }
 
-        [Route("savealerts/{dashboardOne?}")]
+
+        [Route("deletealerts/dashboardOne/{id?}")]
+        public HttpStatusCode deleteDashboardOneAlerts(string id) // convert to json
+        {
+            var response = new HttpResponseMessage();
+            try
+            {
+                int _id = JsonSerializer.Deserialize<int>(id);
+
+                bool idExists = _stockScreenerService.DashBoardOneAlertsExists(_id);
+
+                if (idExists)
+                {
+                    Console.WriteLine("idExists " + _id);
+                    _stockScreenerService.DeleteDashboardOneAlerts(_id);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ArgumentNullException)
+                    Console.WriteLine("Exception " + ex);
+
+                Console.WriteLine("Exception " + ex);
+
+            }
+
+            return response.StatusCode;
+
+        }
+
+
+        [Route("savealerts/dashboardOne/{alerts?}")]
         public HttpStatusCode saveDashboardOneAlerts(string alerts) // convert to json
         {
             var response = new HttpResponseMessage();
             HttpStatusCode res;
             try
             {
-                DashBoardOneAlerts _alerts =  DashBoardOneAlerts.Deserialize(alerts);
+                DashBoardOneAlerts _alerts = DashBoardOneAlerts.Deserialize(alerts);
                 bool idExists = _stockScreenerService.DashBoardOneAlertsExists(_alerts.Id);
 
                 if (idExists)
                 {
-                    _stockScreenerService.UpdateDashboardOneAlerts(_alerts);
+                    _stockScreenerService.UpdateDashboardOneAlerts(_alerts.Id, _alerts);
+                    return response.StatusCode;
                 }
 
                 _stockScreenerService.Create(_alerts);
@@ -854,8 +917,6 @@ namespace StockScreener.Controllers
 
             return res;
         }
-
-
 
 
         /*

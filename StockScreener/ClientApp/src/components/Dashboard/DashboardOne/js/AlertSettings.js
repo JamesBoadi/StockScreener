@@ -3,10 +3,8 @@ export default class AlertSettings {
 
     static startTime = "";
     static endTime = "";
-    static triggerAlert = 0;
     static auto = false;
     static manual = false;
-    static notifications = false;
     static updateAlertSettings = false;
     static alertInterval = 60000;
     static settingsTriggered = 0;
@@ -63,14 +61,6 @@ export default class AlertSettings {
         return this.auto;
     }
 
-    static setTriggerAlert(alert) {
-        this.triggerAlert = alert;
-    }
-
-    static getTriggerAlert() {
-        return this.triggerAlert;
-    }
-
     static setAlertInterval(interval) {
         this.alertInterval = parseInt(interval);
     }
@@ -87,16 +77,15 @@ export default class AlertSettings {
         this.TimeStamp = h + ':' + m;
   
         const json = {
-            triggerAlert: this.triggerAlert,
+            
             manual: this.manual,
             auto: this.auto, 
-            notifications: this.notifications,
             updateAlertSettings: this.updateAlertSettings,
             alertInterval: this.alertInterval,
             startTime: this.startTime,
             endTime: this.endTime,
             settingsTriggered: this.settingsTriggered,
-            timestamp: this.TimeStamp
+            timeStamp: this.TimeStamp
         }
 
         return JSON.stringify(json);

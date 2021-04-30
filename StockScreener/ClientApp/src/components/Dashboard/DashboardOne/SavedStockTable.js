@@ -73,6 +73,7 @@ export class SavedStockTable extends Component {
 
     componentDidMount() {
         this.setState({ populateTable: true });
+        this.initialiseAlertTable();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -142,7 +143,7 @@ export class SavedStockTable extends Component {
     // Initialise alert rows from database
     async initialiseAlertTable() {
         // Read notifications from database
-        await fetch('getallnotifications')
+        await fetch('getallsavedstocks')
             .then(response => response.json())
             .then(response =>
                 this.addFirstRows(response)
@@ -155,6 +156,10 @@ export class SavedStockTable extends Component {
     }
 
     addFirstRows(response) {
+        if (response.length === 0 || response === null || response === undefined)
+            return;
+        
+        
         var t = [];
         var alertTableStocks = this.state.alertTableStocks;
 
@@ -305,7 +310,7 @@ export class SavedStockTable extends Component {
 
         var jsonString = JSON.stringify(obj);
 
-        await fetch('savenotifications/'.concat(jsonString))
+        await fetch('savestocks/'.concat(jsonString))
             .then(response => response.status)
             .then(response => {
                 if (!response.ok) {
@@ -376,7 +381,7 @@ export class SavedStockTable extends Component {
                 alertTableStocks.push(this.state.alertTableStocks[pointer]);
         }
 
-        await fetch('deletenotification/'.concat(this.map.get(target)))
+        await fetch('deletesavedstocks/'.concat(this.map.get(target)))
             .then(response => response.status)
             .then(response => {
                 if (!response.ok) {

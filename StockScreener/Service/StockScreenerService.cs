@@ -46,7 +46,7 @@ namespace StockScreener
             _dashboardOneAlertSettings = database.GetCollection<DashboardOneAlertSettings>("DashboardOneAlertSettings");
             _dashboardOnePriceSettings = database.GetCollection<DashboardOnePriceSettings>("DashboardOnePriceSettings");
             _portfolio = database.GetCollection<Portfolio>("Portfolio");
-            _dashboardOneAlerts = database.GetCollection<DashBoardOneAlerts>("DashBoardOneAlerts");
+            _dashboardOneAlerts = database.GetCollection<DashBoardOneAlerts>("DashboardOneAlerts");
         }
 
         // **************************************************
@@ -54,37 +54,32 @@ namespace StockScreener
         // **************************************************
 
         // Return all documents in a collection
-        public List<Notifications> Get() =>
-            _notifications.Find(notifications => true).ToList();
+        public Task<List<Notifications>> Get() =>
+            _notifications.Find(notifications => true).ToListAsync();
 
 
-        public Notifications Get(string id) =>
+        public Notifications Get(int id) =>
             _notifications.Find<Notifications>(notifications => notifications.Id == id).FirstOrDefault();
 
-        public bool StockCodeExists(string id)
-        {
-            var query = _notifications.Find<Notifications>(notifications => notifications.Id.Equals(id)).Any();
-            return query;
-        }
 
-        public bool IdExists(string id)
+        public bool NotificationsIdExists(int id)
         {
-            var query = _notifications.Find<Notifications>(notifications => notifications.Id.Equals(id)).Any();
-            return query;
+            var query = _notifications.Find<Notifications>(notifications => notifications.Id == id).AnyAsync();
+            return query.Result;
         }
 
         public Notifications Create(Notifications notifications)
         {
             // Insert document in collection
-            _notifications.InsertOne(notifications);
+            _notifications.InsertOneAsync(notifications);
             return notifications;
         }
 
         public void Remove(Notifications notifcations) =>
-            _notifications.DeleteOne(notifications => notifications.Id == notifcations.Id);
+            _notifications.DeleteOneAsync(notifications => notifications.Id == notifcations.Id);
 
-        public void Remove(string id) =>
-            _notifications.DeleteOne(notifications => notifications.Id.Equals(id));
+        public void Remove(int id) =>
+            _notifications.DeleteOneAsync(notifications => notifications.Id == id);
 
         // **************************************************
 
@@ -225,10 +220,10 @@ namespace StockScreener
         public async Task UpdateAlertSettings(DashboardOneAlertSettings settings)
         {
             var filter = Builders<DashboardOneAlertSettings>.Filter.Eq("Id", "0");
-            var ta = Builders<DashboardOneAlertSettings>.Update.Set("TriggerAlert", settings.TriggerAlert);
+        
             var manual = Builders<DashboardOneAlertSettings>.Update.Set("Manual", settings.Manual);
             var auto = Builders<DashboardOneAlertSettings>.Update.Set("Auto", settings.Auto);
-            var notifications = Builders<DashboardOneAlertSettings>.Update.Set("Notifications", settings.Notifications);
+  
             var updatealertsettings = Builders<DashboardOneAlertSettings>.Update.Set("UpdateAlertSettings", settings.UpdateAlertSettings);
             var alertinterval = Builders<DashboardOneAlertSettings>.Update.Set("AlertInterval", settings.AlertInterval);
             var st = Builders<DashboardOneAlertSettings>.Update.Set("StartTime", settings.StartTime);
@@ -236,10 +231,10 @@ namespace StockScreener
             var st2 = Builders<DashboardOneAlertSettings>.Update.Set("SettingsTriggered", settings.SettingsTriggered);
             var ts = Builders<DashboardOneAlertSettings>.Update.Set("TimeStamp", settings.TimeStamp);
 
-            _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, ta);
+            
             _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, manual);
             _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, auto);
-            _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, notifications);
+      
             _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, updatealertsettings);
             _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, alertinterval);
             _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, st);
@@ -347,23 +342,27 @@ namespace StockScreener
             return settings;
         }
 
-        public bool DashBoardOneAlertsExists(string id)
+        public bool DashBoardOneAlertsExists(int id)
         {
-            var query = _dashboardOneAlerts.Find<DashBoardOneAlerts>(settings => settings.Id.Equals(id)).Any();
+            var query = _dashboardOneAlerts.Find<DashBoardOneAlerts>(settings => settings.Id ==id).Any();
             return query;
         }
 
 
-        public void UpdateDashboardOneAlerts(DashBoardOneAlerts settings)
+        public void UpdateDashboardOneAlerts(int id, DashBoardOneAlerts settings)
         {
-            var filter = Builders<DashBoardOneAlerts>.Filter.Eq("Id", "0");
-            var alert = Builders<DashBoardOneAlerts>.Update.Set("Index", settings.Index);
+            var filter = Builders<DashBoardOneAlerts>.Filter.Eq("Id", id);
+            var alert = Builders<DashBoardOneAlerts>.Update.Set("Id", settings.Id);
+            var state = Builders<DashBoardOneAlerts>.Update.Set("State", settings.State);
 
             _ = _dashboardOneAlerts.UpdateOne(filter, alert);
+            _ = _dashboardOneAlerts.UpdateOne(filter, state);
+
+
         }
 
-        public void DeleteDashboardOneAlerts(string id) =>
-             _dashboardOneAlerts.DeleteOne(settings => settings.Id.Equals(id));
+        public void DeleteDashboardOneAlerts(int id) =>
+             _dashboardOneAlerts.DeleteOne(settings => settings.Id == id);
 
         // **************************************************
     }

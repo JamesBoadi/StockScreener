@@ -20,14 +20,9 @@ namespace StockScreener
         // Alert Settings
         // ******************************************************
 
-        public int TriggerAlert { get; set; }
-
         public bool Manual { get; set; }
 
         public bool Auto { get; set; }
-
-        public bool Notifications { get; set; }
-
         public bool UpdateAlertSettings { get; set; }
 
         public int AlertInterval { get; set; }

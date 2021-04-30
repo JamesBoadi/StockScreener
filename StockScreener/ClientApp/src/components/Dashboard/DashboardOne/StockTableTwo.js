@@ -48,9 +48,6 @@ export class StockTableTwo extends React.Component {
 
         this.toggleAlert = this.toggleAlert.bind(this);
 
-        this.initialiseNotifications = this.initialiseNotifications.bind(this);
-        this.addFirstRows = this.addFirstRows.bind(this);
-
         this.timeout = null;
         this.cache = null;
         this.initialiseSearch = false;
@@ -118,9 +115,7 @@ export class StockTableTwo extends React.Component {
         for (id = 0; id < 897; id++) {
             this.styleMap.set(id, {});
         }
-
-        this.initialiseNotifications();
-
+        
         this.setState({ scroll: this.scrollBy() })
     }
 
@@ -269,33 +264,7 @@ export class StockTableTwo extends React.Component {
         this.setState({ clickedAlertTableRowID: id });
     }
 
-    // **************************************************
-    // Initialise Notifications
-    // **************************************************
-
-    // Initialise alert rows from database
-    async initialiseNotifications() {
-        // Read notifications from database
-        await fetch('getallnotifications')
-            .then(response => response.json())
-            .then(response =>
-                this.addFirstRows(response)
-            )
-            .catch(error => {
-                console.log("error " + error) // 404
-                return;
-            }
-        );
-    }
-
-    addFirstRows(response) {
-        for (var i = 0; i < response.length; i++) {
-            const item = JSON.parse(response[i]);
-            this.props.initialiseNotifications(item.Alert, item.Time);
-        }
-    }
-
-    // **************************************************
+ 
 
     // Disable scrolling
     disableScrolling(e) {

@@ -148,10 +148,8 @@ export class DashboardNavbar extends Component {
     }
 
     componentDidMount() {
-
         this.initialieSettings();
-
-
+        this.initialieAlertSettings();
     }
 
     componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -226,6 +224,20 @@ export class DashboardNavbar extends Component {
             .then(response => response.json())
             .then(response => {
                 this.getPriceSettings(response)
+            }
+            )
+            .catch(error => {
+                console.log("error 5 " + error) // 404
+                return;
+            }
+            );
+    }
+
+    async initialieAlertSettings() {
+        await fetch('getalertsettings/dashboardOne/')
+            .then(response => response.json())
+            .then(response => {
+                this.getAlertSettings(response)
             }
             )
             .catch(error => {
@@ -351,17 +363,14 @@ export class DashboardNavbar extends Component {
         for (var i = 0; i < response.length; i++) {
             const item = JSON.parse(response[i]);
 
-            console.log(' ITEM ' + item.StartTime + ' ' + item.EndTime + ' ' +
-                item.Manual + ' ' + item.Auto + ' ' + item.HideBullishStocks
-                + ' ' + item.HideBullishStocks + ' ' + item.HideBearishStocks
-                + ' ' + item.GlobalStartPrice + ' ' + item.GlobalTargetPrice + ' ' +
-                + item.PriceDetectionEnabled);
-
             if (item.StartTime === null || item.StartTime === undefined
                 || item.EndTime === null || item.EndTime === undefined
                 || item.AlertInterval === null || item.AlertInterval === undefined
                 || item.Auto === null || item.Auto === undefined
-                || item.Manual === null || item.Manual === undefined) {
+                || item.Manual === null || item.Manual === undefined ||
+                
+                item.SettingsTriggered === null || item.SettingsTriggered === undefined
+            ) {
                 console.log(' Nullable ');
                 return;
             }
@@ -382,17 +391,17 @@ export class DashboardNavbar extends Component {
                 this.setState({ disableStartTime: true });
                 this.setState({ disableEndTime: true });
                 // Disable auto alert checkbox 
+                this.setState({ manualDisabled: false });
                 this.setState({ autoDisabled: true });
             }
             else if (item.Auto) {
                 this.setState({ autoAlert: true });
                 this.setState({ manualAlert: false });
+
                 // Disable auto alert checkbox 
                 this.setState({ manualDisabled: true });
+                this.setState({ autoDisabled: false });
             }
-
-            this.setState({ startTime: item.StartTime });
-            this.setState({ endTime: item.EndTime });
 
             AlertSettings.setUpdateAlertSettings(true);
         }
@@ -477,7 +486,6 @@ export class DashboardNavbar extends Component {
 
         this.saveSettingsToDatabase(AlertSettings.getAlertSettings(), PriceSettings.getPriceSettings());
     }
-
 
     // **************************************************
 
