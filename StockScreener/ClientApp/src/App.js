@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withRouter } from "react-router-dom";
 import { Button, ButtonGroup } from "@chakra-ui/react";
 import { Redirect } from "react-router-dom";
 import { DashboardOne } from './components/Dashboard/DashboardOne/DashboardOne';
@@ -17,10 +18,11 @@ import 'antd/dist/antd.css';
 
 
 import { NotificationsContext } from './components/Dashboard/NotificationsContext';
+import { TopNavbar } from './components/Dashboard/TopNavbar';
 
 
 
-export default class App extends Component {
+class App extends Component {
   static displayName = App.name;
   constructor(props) {
     super();
@@ -35,18 +37,41 @@ export default class App extends Component {
       updateCache: false,
       update: true,
       sidemenu: null,
-      toggleTab: false
+      topmenu: null,
+      toggleTab: false,
+      dashboard: "Dashboard One"
     };
   }
 
   componentDidMount() {
     /*<Redirect to='/' />;*/
     this.setState({ sidemenu: <SideMenu {...this} /> });
+
+    switch (this.props.location.pathname) {
+      case '/DashboardOne':
+        this.setState({ dashboard: "Dashboard 1" });
+        break;
+      case '/DashboardTwo':
+        this.setState({ dashboard: "Dashboard 2" });
+        break;
+      case '/Scanner':
+        this.setState({ dashboard: "Scanner" });
+        break;
+      case '/HistoricalTable':
+        this.setState({ dashboard: "Historical Table" });
+        break;
+      case '/Portfolio':
+        this.setState({ dashboard: "Portfolio" });
+        break;
+      default:
+        break;
+    }
     this.setState({ update: true });
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (this.state.update) {
+      //this.setState({ topmenu: <TopNavbar {...this}  /> });
       this.setState({ update: false });
     }
 
@@ -60,25 +85,28 @@ export default class App extends Component {
 
 
   redirect(key) {
-
     this.sideMenu(key);
-
     let redirect = [];
     switch (key) {
       case 9:
         redirect.push(<Redirect to='/DashboardOne' />);
+        this.setState({ dashboard: "Dashboard 1" });
         break;
       case 10:
         redirect.push(<Redirect to='/DashboardTwo' />);
+        this.setState({ dashboard: "Dashboard 2" });
         break;
       case 12:
         redirect.push(<Redirect to='/Scanner' />);
+        this.setState({ dashboard: "Scanner" });
         break;
       case 13:
         redirect.push(<Redirect to='/HistoricalTable' />);
+        this.setState({ dashboard: "Historical Table" });
         break;
       case 14:
         redirect.push(<Redirect to='/Portfolio' />);
+        this.setState({ dashboard: "Portfolio" });
         break;
       default:
         break;
@@ -107,7 +135,6 @@ export default class App extends Component {
           sidemenu: <SideMenu {...this}
 
           />
-
         });
         this.setState({ update: true });
         break;
@@ -126,37 +153,23 @@ export default class App extends Component {
 
   }
 
-
-
-
   showTab = () => {
     this.setState({ toggleTab: !this.state.toggleTab });
   }
 
-
-
   render() {
-
     const state = {
       toggleTab: false,
       showTab: this.showTab
     }
-    /*
-            <Route exact path='/' component={DashboardInterface} />
-            <Route path='/counter' component={Counter} />
-            <Route path='/fetch-data' component={FetchData} />
-            <Route path='/DashboardOne' component={DashboardOne} />
 
-             style={{ position: 'absolute', minHeight: '975px', width: '55px', height: '100vh', margin: 0, zIndex: '999' }}
-     */
-
-    return ( <div >
+    return (<div >
+      <TopNavbar {...this} />
       {this.state.sidemenu}
       <DataFeed {...this} />
       {this.state.redirect}
-     
       <NotificationsContext.Provider value={state}>
-      
+
         <Switch>
           <Route exact path='/' component={() => <DashboardOne {...this} />} />
           <Route path='/DashboardOne' component={() => <DashboardOne {...this} />} />
@@ -166,8 +179,9 @@ export default class App extends Component {
           <Route path='/Scanner' component={() => <Scanner {...this} />} />
         </Switch>
 
-     </NotificationsContext.Provider>
-     </div>
+      </NotificationsContext.Provider>
+    </div>
     );
   }
 }
+export default withRouter(App);

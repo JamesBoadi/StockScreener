@@ -27,13 +27,11 @@ export class SideMenu extends Component {
     };
   }
 
-
   toggleCollapsed = () => {
     this.setState({
       collapsed: !this.state.collapsed,
     });
   };
-
 
   onMenuClick(e) {
     switch (e.key) {
@@ -62,9 +60,7 @@ export class SideMenu extends Component {
   render() {
     // switch
     return (
-
       <div>
-
         <div style={{ top: '0px', width: '25px', zIndex: '999' }}>
           {/*  <Button type="primary" onClick={this.toggleCollapsed} style={{ marginBottom: 16 }}>
             {React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined)}
@@ -81,7 +77,6 @@ export class SideMenu extends Component {
             <SubMenu key="sub2" icon={<AppstoreOutlined />} title=" Menu">
               <Menu.Item key="9">Dashboard One</Menu.Item>
               <Menu.Item key="10">Dashboard Two</Menu.Item>
-              <Menu.Item key="11">Dashboard Three</Menu.Item>
               <Menu.Item key="12">Screener</Menu.Item>
               <Menu.Item key="13">Historical Table</Menu.Item>
               <Menu.Item key="14">My Portfolio</Menu.Item>

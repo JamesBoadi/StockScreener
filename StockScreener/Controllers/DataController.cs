@@ -153,6 +153,7 @@ namespace StockScreener.Controllers
             List<Notifications> list;
             try
             {
+                
                 list = _stockScreenerService.Get().Result;
                 jsonArray = new string[list.Count];
             }
@@ -168,7 +169,6 @@ namespace StockScreener.Controllers
 
             for (int i = 0; i < list.Count; i++)
             {
-                Console.WriteLine("Item " + list[i].Alert);
                 jsonArray[i] = JsonSerializer.Serialize(list[i]);
             }
 
@@ -866,7 +866,6 @@ namespace StockScreener.Controllers
 
                 if (idExists)
                 {
-                    Console.WriteLine("idExists " + _id);
                     _stockScreenerService.DeleteDashboardOneAlerts(_id);
                 }
 

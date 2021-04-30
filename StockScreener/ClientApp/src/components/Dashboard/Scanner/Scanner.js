@@ -851,7 +851,7 @@ export class Scanner extends React.Component {
         return (
             <div>
 
-                <h2 style={{ position: 'absolute', top: '40px', left: '60px', color: 'wheat' }}>Screener</h2>
+                <h2 style={{ position: 'absolute', top: '70px', left: '60px', color: 'wheat' }}>Screener</h2>
 
                     {/* STOCK TABLE TWO */}
                     <Box

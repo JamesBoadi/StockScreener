@@ -1369,13 +1369,30 @@
   /**************** DashboardNavbar ************************/
   /***********************************************************/
 
-  .DashboardNavbar .frequencyAdjust{
-
-    transform: translateY(25px)
-
+  .DashboardNavbar .saveConfiguration
+  {
+    box-shadow:inset 0px 0px 3px 0px #91b8b3;
+    background-color:rgb(40,40,40);
+    border-radius:9px;
+    border:1px solid rgb(40,40,40);
+    display:inline-block;
+    cursor:pointer;
+    color:#ffffff;
+    font-family:Times New Roman;
+    font-size:16px;
+    padding:4px 10px;
+    text-decoration:none;
+    text-shadow:0px -1px 0px #2b665e;
+  
   }
 
+  .DashboardNavbar .saveConfiguration:hover {
+    background-color:#6c7c7c;
+  }
 
+  .DashboardNavbar .frequencyAdjust{
+    transform: translateY(25px)
+  }
 
   .DashboardNavbar #selectMarket{
     position: absolute;
@@ -1527,11 +1544,55 @@
   .DashboardNavbar #table_{
     position: absolute;
     top: 0px;
-    left: 575px;
+    left: 765px;
     font-size: 18px;
     font-family: 'sans-serif';  
     color: white;
   }
+
+  
+  .DashboardNavbar #volumeNum
+  {
+    position: absolute;
+    top: 30px;
+    left: 765px;
+    font-size: 35px;
+    font-family: 'sans-serif';  
+    color: white;
+  }
+
+  
+  .DashboardNavbar #volume_{
+    position: absolute;
+    top: 80px;
+    left: 793px;
+    font-size: 14px;
+    font-family: 'sans-serif';  
+    color: white;
+  }
+
+  
+  .DashboardNavbar #marketCap
+  {
+    position: absolute;
+    top: 130px;
+    left: 765px;
+    font-size: 35px;
+    font-family: 'sans-serif';  
+    color: white;
+  }
+
+  
+  .DashboardNavbar #marketCap_{
+    position: absolute;
+    top: 180px;
+    left: 781.5px;
+    font-size: 14px;
+    font-family: 'sans-serif';  
+    color: white;
+  }
+
+
 
   .vl {
     position: absolute;

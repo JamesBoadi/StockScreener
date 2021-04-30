@@ -59,7 +59,7 @@ namespace StockScreener
 
 
         public Notifications Get(int id) =>
-            _notifications.Find<Notifications>(notifications => notifications.Id == id).FirstOrDefault();
+            _notifications.Find<Notifications>(notifications => notifications.Id == id).FirstOrDefaultAsync().Result;
 
 
         public bool NotificationsIdExists(int id)

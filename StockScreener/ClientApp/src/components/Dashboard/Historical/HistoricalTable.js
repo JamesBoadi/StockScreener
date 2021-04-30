@@ -1328,7 +1328,7 @@ export class HistoricalTable extends Component {
                             {/* <Button class="addStock" style={{ position: 'absolute', top: '130px', left: '1030px' }}
                          onClick={() => this.setAddFormVisibility("visible")}>Add a Stock</Button>*/}
 
-                            <h2 style={{ position: 'absolute', top: '40px', left: '60px', color: 'wheat' }}>Historical Information</h2>
+                            <h2 style={{ position: 'absolute', top: '70px', left: '60px', color: 'wheat' }}>Historical Information</h2>
                             <h4 style={{ position: 'absolute', top: '120px', left: '60px', color: 'wheat' }}>{this.getDisplay()}</h4>
 
                             {/* PORTFOLIO TABLE */}

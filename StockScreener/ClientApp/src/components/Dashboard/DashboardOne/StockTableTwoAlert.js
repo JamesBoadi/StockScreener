@@ -27,6 +27,7 @@ export class StockTableTwoAlert extends React.Component {
 
         // Notifications
         this.enableNotificationsMenu = this.enableNotificationsMenu.bind(this);
+        this._initialiseNotifications = this._initialiseNotifications.bind(this);
         this.initialiseNotifications = this.initialiseNotifications.bind(this);
         this.addToNotificationsMenu = this.addToNotificationsMenu.bind(this);
         this.saveNotifications = this.saveNotifications.bind(this);
@@ -69,16 +70,24 @@ export class StockTableTwoAlert extends React.Component {
                          Notifications <br/>
                      </div> */
             ],
+            updateNotifications: false
         };
     }
 
 
     // 404 if component does not mount
-    async componentDidMount() {
-        this.initialiseNotifications();
+     componentDidMount() {
+         setTimeout(() => {
+            this._initialiseNotifications();
+         }, 1000);
+        
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.state.updateNotifications) {
+            this.setState({updateNotifications: false});
+        }
+
         if (this.state.disableAnimation) {
             // Within alert time()
             if (AlertSettings.getManual()) {
@@ -245,6 +254,37 @@ export class StockTableTwoAlert extends React.Component {
         return false;
     }
 
+     // **************************************************
+    // Initialise Notifications
+    // **************************************************
+
+    // Initialise alert rows from database
+    async _initialiseNotifications() {
+        console.log('OG ');
+        // Read notifications from database
+        await fetch('getallnotifications')
+            .then(response => response.json())
+            .then(response =>
+                this.addFirstNotifications(response)
+            )
+            .catch(error => {
+                console.log("error " + error) // 404
+                return;
+            }
+            );
+    }
+
+    addFirstNotifications(response) {
+        if (response === null || response === undefined) {
+            return;
+        }   
+        for (var i = 0; i < response.length; i++) {
+            const item = JSON.parse(response[i]);
+            this.initialiseNotifications(item.Alert, item.TimeStamp);
+        }
+    }
+
+    // **************************************************
     // Calculate times
     withinAlertTime() {
         const startTime = this.parseTime(AlertSettings.getStartTime());
@@ -640,55 +680,7 @@ export class StockTableTwoAlert extends React.Component {
         return stack;
     }
 
-    // **************************************************
-    // Initialise Notifications
-    // **************************************************
-
-    // Initialise alert rows from database
-    async initialiseNotifications() {
-        // Read notifications from database
-        await fetch('getallnotifications')
-            .then(response => response.json())
-            .then(response =>
-                this.addFirstNotifications(response)
-            )
-            .catch(error => {
-                console.log("error " + error) // 404
-                return;
-            }
-            );
-    }
-
-    addFirstNotifications(response) {
-        if (response === null || response === undefined) {
-            console.log('OG ');
-            return;
-        }   
-
-        var notifications = [];
-        for (var i = 0; i < response.length; i++) {
-            const item = JSON.parse(response[i]);
-
-            console.log('item ' + item.Alert + '  ' + item.TimeStamp);
-
-            notifications.push(
-                <div class="record"
-                    style={{
-                        position: "relative", color: "black", top: "10px",
-                        fontFamily: 'Times New Roman', letterSpacing: '1.5px'
-                    }}>
-                    {item.Alert}
-                    <br />
-                    {item.TimeStamp}
-                </div>
-            );
-        }
-
-        this.setState({ notifications_temp: notifications });
-        this.setState({ updateNotifications: true });
-    }
-
-    // **************************************************
+   
 
     // **************************************************
     // Save Notifications
@@ -788,17 +780,7 @@ export class StockTableTwoAlert extends React.Component {
         }
         const time = 'Alert Time: ' + h.toString() + ':' + m;
 
-        notifications.push(
-            <div class="record"
-                style={{
-                    position: "relative", color: "black", top: "10px",
-                    fontFamily: 'Times New Roman', letterSpacing: '1.5px'
-                }}>
-                {alert}
-                <br />
-                {time}
-            </div>
-        );
+        this.initialiseNotifications(alert, time)
         let obj;
         if (!(alert === null || alert === undefined)) {
             obj =

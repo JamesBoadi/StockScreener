@@ -141,9 +141,6 @@ export class DashboardNavbar extends Component {
             saveSettings: false,
             toggleAlert: false,
             update: false
-
-
-
         };
     }
 
@@ -368,7 +365,7 @@ export class DashboardNavbar extends Component {
                 || item.AlertInterval === null || item.AlertInterval === undefined
                 || item.Auto === null || item.Auto === undefined
                 || item.Manual === null || item.Manual === undefined ||
-                
+
                 item.SettingsTriggered === null || item.SettingsTriggered === undefined
             ) {
                 console.log(' Nullable ');
@@ -987,55 +984,14 @@ export class DashboardNavbar extends Component {
                             <div class="tableSettings" >
                                 <div class="vl"></div>
                                 <div class="v2"></div>
-                                <p id="table_">Columns Filter</p>
 
-                                <div class="disableColumns" >
+                                <h3 id="volumeNum">28 800</h3>
+                                <h3 id="volume_">Volume</h3>
 
-                                    {/* <p id="hideName"
-                            style={{ position: 'absolute', top: '10px', left: '575px' }}>Disable Columns </p>*/}
+                                <h3 id="marketCap">28 800</h3>
+                                <h3 id="marketCap_">Market Cap</h3>
 
-                                    <label id="stockName" >Stock <br /> Name</label>
-                                    <input class="stockName" type="checkbox" />
 
-                                    <label id="time">Time</label>
-                                    <input class="time" type="checkbox" />
-
-                                    <label id="price">Price</label>
-                                    <input class="price" type="checkbox" />
-
-                                    <label id="high">High</label>
-                                    <input class="high" type="checkbox" />
-
-                                    <label id="low">Low</label>
-                                    <input class="low" type="checkbox" />
-
-                                    <label id="profitLoss">Change</label>
-                                    <input class="profitLoss" type="checkbox" />
-
-                                    <label id="profitLossPercentage">Change %</label>
-                                    <input class="profitLossPercentage" type="checkbox" />
-
-                                    <label id="volume">Volume</label>
-                                    <input class="volume" type="checkbox" />
-                                </div>
-
-                                <div class="disableAlertColumns">
-
-                                    <label id="alertStockName" >Stock <br /> Name</label>
-                                    <input class="alertStockName" type="checkbox" />
-
-                                    <label id="alertStockTime">Alert <br /> Time</label>
-                                    <input class="alertStockTime" type="checkbox" />
-
-                                    <label id="alertPrice">Price</label>
-                                    <input class="alertPrice" type="checkbox" />
-
-                                    <label id="alertProfitLoss">Change</label>
-                                    <input class="alertProfitLoss" type="checkbox" />
-
-                                    <label id="alertProfitVolume">Volume</label>
-                                    <input class="alertProfitVolume" type="checkbox" />
-                                </div>
                             </div>
 
                             <div class="priceDetection">
@@ -1066,18 +1022,16 @@ export class DashboardNavbar extends Component {
                                     disabled={this.state.hideBearishStocksDisabled}
                                     onChange={this.setHideBearishStocks} />
                                 {/*  />*/}
-
-
-                                <Button style={{ position: 'absolute', top: '170px', left: '1325px', zIndex: '-999' }}
-                                    onClick={this.saveConfiguration}>Save Configuration</Button>
-
                             </div>
 
-                            {/* 
-                        <Button style={{ position: 'absolute', top: '135px', left: '410px' }}>Save</Button>
-                    <Button style={{ position: 'absolute', top: '135px', left: '200px' }}>
-                        Change Alert Settings</Button>*/}
+                            <button
+                                style={{ position: 'absolute', top: '166px', left: '1371px', zIndex: '-999' }}
+                                class="saveConfiguration" onClick={this.saveConfiguration}>Save Configuration
+                            </button>
+
+
                         </div>
+
                     </Box>
 
                     <StockTableTwo {...this} />
