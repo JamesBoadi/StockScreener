@@ -4,12 +4,18 @@ import {
     NumberInputField, NumberInputStepper,
     NumberIncrementStepper, NumberDecrementStepper,
 } from '@chakra-ui/react';
+
+import { Menu, Dropdown, TimePicker } from 'antd';
 import { StockTableOne } from './StockTableOne';
 import { StockTableTwo } from './StockTableTwo';
 import { DownOutlined } from '@ant-design/icons';
 import PriceSettings from './js/PriceSettings.js';
 import AlertSettings from './js/AlertSettings.js';
 import DashboardTwoCache from './js/DashboardTwoCache.js';
+
+import moment from 'moment';
+
+const date = new Date();
 
 export class DashboardTwoNavbar extends Component {
     constructor(props) {
@@ -19,9 +25,6 @@ export class DashboardTwoNavbar extends Component {
         this.getEndTime = React.createRef();
         this.alertFrequencyRef = React.createRef();
         this.dateTime = new Date();
-
-        this.called = false;
-
         this.alertInterval_ = null;
         this.saveConfiguration = this.saveConfiguration.bind(this);
         //this.setGlobalTargetPrice = this.setGlobalTargetPrice.bind(this);
@@ -29,12 +32,10 @@ export class DashboardTwoNavbar extends Component {
         // Global sets local does not set global
         this.setManualAlert = this.setManualAlert.bind(this);
         this.setAutoAlert = this.setAutoAlert.bind(this);
-        this.setAlertTrigger = this.setAlertTrigger.bind(this);
         this.parseTime = this.parseTime.bind(this);
-        this.notifications = this.notifications.bind(this);
-        this.enableNotifications = this.enableNotifications.bind(this);
-        this.enableNotificationsMenu = this.enableNotificationsMenu.bind(this);
-        this.addToNotificationsMenu = this.addToNotificationsMenu.bind(this);
+
+
+
         this.setGlobalStartPrice = this.setGlobalStartPrice.bind(this);
         this.setGlobalTargetPrice = this.setGlobalTargetPrice.bind(this);
         this.setPriceDetectionEnabled = this.setPriceDetectionEnabled.bind(this);
@@ -45,15 +46,40 @@ export class DashboardTwoNavbar extends Component {
         this.hideBullishStocksConfig = this.hideBullishStocksConfig.bind(this);
         this.hideBearishStocksConfig = this.hideBearishStocksConfig.bind(this);
 
-        this.setInitialiseTableTwo = this.setInitialiseTableTwo.bind(this);
+        this.toggleSettings = this.toggleSettings.bind(this);
+        this.setStartTime = this.setStartTime.bind(this);
+        this.setEndTime = this.setEndTime.bind(this);
+
+        // Display Stock
+        //............................................................................
+
+        this.displayStock = this.displayStock.bind(this);
+        this.setAddAlertTableRowBool = this.setAddAlertTableRowBool.bind(this);
+        this.setRemoveAlertTableRowBool = this.setRemoveAlertTableRowBool.bind(this);
+        this.selectAlertTableRow = this.selectAlertTableRow.bind(this);
+        this.setIsSelected = this.setIsSelected.bind(this);
+        this.removeStock = this.removeStock.bind(this);
+        this.idExists = this.idExists.bind(this);
+        this.addToHistorical = this.addToHistorical.bind(this);
+        this.addToHistoricalTable = this.addToHistoricalTable.bind(this);
+        this.update = this.update.bind(this);
+
+        // Settings
+        //.............................................................................
+
+        this.initialieSettings = this.initialieSettings.bind(this);
+        this.getPriceSettings = this.getPriceSettings.bind(this);
 
         this.state = {
             animationTime: 5000,
             alertEnabled: false,
             alertInterval: 1000,
             triggerAlert: false,
-            startTime: [],
-            endTime: [],
+
+            startTime: "09:00",
+            endTime: "16:59",
+            startTimeValue: "09:00",
+
             notifications_temp: [],
             notifications: [
                 /*    { <div style={{
@@ -63,8 +89,6 @@ export class DashboardTwoNavbar extends Component {
                          Notifications <br/>
                      </div> */
             ],
-            updateNotifications: false,
-            notificationsMenuVisible: false,
 
             manualNotifications: false,
             autoNotifications: false,
@@ -74,26 +98,54 @@ export class DashboardTwoNavbar extends Component {
             notificationsEnabled: 0,
             globalStartPrice: 0,
             globalTargetPrice: 0,
-
-
             manualAlert: false,
-            autoAlert: true,
-
-            manualDisabled: true,
+            autoAlert: false,
+            manualDisabled: false,
             autoDisabled: false,
 
-            hideBearishStocks: true,
+
+
+            hideBearishStocks: false,
             hideBullishStocks: false,
 
             hideBearishStocksDisabled: false,
-            hideBullishStocksDisabled: true,
+            hideBullishStocksDisabled: false,
 
-            initialiseTableTwo: false
+            disableStartTime: false,
+            disableEndTime: false,
+            disableSetPrice: true,
 
+            state: {},
+
+            startPriceInput: null,
+            targetPriceInput: null,
+
+            // Display Stock
+            stockInfoName: [],
+            stockInfoHeader: [],
+            stockInfoPrevPrice: [],
+            stockInfoCurrPrice: [],
+            stockInfoCode: [],
+            updateStockInfo: false,
+            alertMessagePopUp: "",
+
+            updateNotifications: false,
+            notificationsMenuVisible: false,
+            clickedAlertTableRowID: null,
+            addAlertTableRowBool: false,
+            removeAlertTableRowBool: false,
+            isSelected: false,
+
+            // D1
+            saveSettings: false,
+            toggleAlert: false,
+            update: false
         };
     }
 
     componentDidMount() {
+        this.initialieSettings();
+        this.initialieAlertSettings();
     }
 
     componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -101,170 +153,300 @@ export class DashboardTwoNavbar extends Component {
             this.setState({ notifications: this.state.notifications_temp });
             this.setState({ updateNotifications: false });
         }
+        if (this.state.updateStockInfo) {
+            this.setState({ stockInfoHeader: this.state.stockInfoName[0] });
+            this.setState({ stockInfoPrevPrice: this.state.stockInfoName[1] });
+            this.setState({ stockInfoCurrPrice: this.state.stockInfoName[2] });
+            this.setState({ stockInfoCode: this.state.stockInfoName[3] });
+
+            this.setState({ updateStockInfo: false });
+        }
+        if (this.state.update) {
+            this.update(false);
+        }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (
-            nextProps.initialiseTableTwo !== this.props.state.initialiseTableTwo ||
-            nextState.lock !== this.state.lock ||
+        if (nextState.lock !== this.state.lock ||
+            nextState.saveSettings !== this.state.saveSettings ||
+            nextState.startTime !== this.state.startTime ||
+            nextState.endTime !== this.state.endTime ||
+            nextState.globalTargetPrice !== this.state.globalTargetPrice ||
+            nextState.globalStartPrice !== this.state.globalStartPrice ||
+            nextState.enablePriceDetection !== this.state.enablePriceDetection ||
+            nextState.disableSetPrice !== this.state.disableSetPrice ||
+            nextState.manualAlert !== this.state.manualAlert ||
+            nextState.autoAlert !== this.state.autoAlert ||
             nextState.autoDisabled !== this.state.autoDisabled ||
             nextState.manualDisabled !== this.state.manualDisabled ||
             nextState.hideBearishStocks !== this.state.hideBearishStocks ||
             nextState.hideBullishStocks !== this.state.hideBullishStocks ||
             nextState.updateNotifications !== this.state.updateNotifications ||
             nextState.notifications_temp.length !== this.state.notifications_temp.length
-            || nextState.notificationsMenuVisible !== this.state.notificationsMenuVisible) {
+            || nextState.notificationsMenuVisible !== this.state.notificationsMenuVisible
+            || nextState.update !== this.state.update
+            || nextState.updateStockInfo !== this.state.updateStockInfo) {
             return true;
-
         }
         return false;
     }
 
-    setInitialiseTableTwo(state) {
-        this.setState({ initialiseTableTwo: state });
+    // **************************************************
+    // Save Settings 
+    // **************************************************
+    // **************************************************
+
+    update(value) {
+        this.setState({ update: value });
     }
 
-    // Enable/Disable Menu of Notifications
-    enableNotificationsMenu(e) {
-        this.setState({ notificationsMenuVisible: !this.state.notificationsMenuVisible })
+    toggleSettings(state) {
+        this.setState({ saveSettings: state });
     }
 
-    // Add notification to Menu
-    addToNotificationsMenu(stock, previousPrice, currentPrice,
-        startPrice, targetPrice, state) {
-        let notifications = this.state.notifications;
+    async saveSettingsToDatabase(alertsettings, pricesettings) {
+        await fetch('savesettings/dashboardOne/'.concat(alertsettings) + '/'.concat(pricesettings))
+            .then(response => response.json())
+            .catch(error => {
+                console.log("error " + error) // 404
+                return;
+            }
+            );
+    }
 
-        let alert;
-        switch (state) {
-            case 3:
-                alert = `${stock} has increased to a price of ${currentPrice}
-                from ${previousPrice} to ${startPrice} Bullish signal warning`
-                break;
-            case 2:
-                alert = `${stock} has increased to a price of ${currentPrice}
-                from ${previousPrice} Bullish signal`
-                break;
-            case 1:
-                alert = `${stock} has hit target price of ${targetPrice}
-                from ${previousPrice} to ${currentPrice} Bullish signal`
-                break;
-            case -1:
-                alert = `${stock} has dropped to price of ${currentPrice}
-                from ${previousPrice} Bearish signal`
-                break;
-            case -2:
-                alert = `${stock} has dropped to price of ${currentPrice}
-                from ${startPrice} Bearish signal warning`
-                break;
-            case -3:
-                alert = `${stock} has hit target price of ${targetPrice}
-                from ${previousPrice} Bearish signal`
-                break;
+    async initialieSettings() {
+        await fetch('getpricesettings/dashboardOne/')
+            .then(response => response.json())
+            .then(response => {
+                this.getPriceSettings(response)
+            }
+            )
+            .catch(error => {
+                console.log("error 5 " + error) // 404
+                return;
+            }
+            );
+    }
+
+    async initialieAlertSettings() {
+        await fetch('getalertsettings/dashboardOne/')
+            .then(response => response.json())
+            .then(response => {
+                this.getAlertSettings(response)
+            }
+            )
+            .catch(error => {
+                console.log("error 5 " + error) // 404
+                return;
+            }
+            );
+    }
+
+    getPriceSettings(response) {
+        for (var i = 0; i < response.length; i++) {
+            const item = JSON.parse(response[i]);
+
+            if (item.HideBullishStocks === null || item.HideBullishStocks === undefined
+                || item.HideBearishStocks === null || item.HideBearishStocks === undefined
+                || item.GlobalStartPrice === null || item.GlobalStartPrice === undefined
+                || item.GlobalTargetPrice === null || item.GlobalTargetPrice === undefined
+                || item.PriceDetectionEnabled === null || item.PriceDetectionEnabled === undefined) {
+                return;
+            }
+
+            if (item.HideBullishStocks) {
+                this.setState({ hideBullishStocks: true });
+                this.setState({ hideBearishStocks: false });
+                this.setState({ hideBearishStocksDisabled: true });
+            }
+            else if (item.HideBearishStocks) {
+                this.setState({ hideBearishStocks: true });
+                this.setState({ hideBullishStocks: false });
+                this.setState({ hideBullishStocksDisabled: true });
+            }
+
+            PriceSettings.setGlobalStartPrice(item.GlobalStartPrice);
+            PriceSettings.setGlobalTargetPrice(item.GlobalTargetPrice);
+
+            this.setState({ globalStartPrice: item.GlobalStartPrice });
+            this.setState({ globalTargetPrice: item.GlobalTargetPrice });
+
+            this.initialiseStartPriceInput(item.GlobalStartPrice, !item.PriceDetectionEnabled);
+            this.initialiseTargetPriceInput(item.GlobalTargetPrice, !item.PriceDetectionEnabled);
+            if (item.PriceDetectionEnabled) {
+                this.setState({ enablePriceDetection: true });
+                this.setState({ disableSetPrice: false });
+            }
+            else {
+                this.setState({ enablePriceDetection: false });
+                this.setState({ disableSetPrice: true });
+            }
+
+            // Set variables for hiding bullish and bearish stocks
+            if (item.HideBullishStocks) {
+                this.hideBullishStocksConfig();
+                PriceSettings.sethideBullishStocks(true);
+                AlertSettings.setUpdateAlertSettings(true);
+            } else {
+                PriceSettings.sethideBullishStocks(false);
+            }
+
+            if (item.HideBearishStocks) {
+                this.hideBearishStocksConfig();
+                PriceSettings.sethideBearishStocks(true);
+                AlertSettings.setUpdateAlertSettings(true);
+            } else {
+                PriceSettings.sethideBearishStocks(false);
+            }
+
+
+            AlertSettings.setUpdateAlertSettings(item.PriceDetectionEnabled);
+
         }
 
-        notifications.push(
-            <div class="record"
-                style={{ position: "relative", color: "grey", top: "10px" }}>
-                {alert}
+        this.setState({ saveSettings: true });
+    }
+
+    initialiseStartPriceInput(value, bool) {
+        var t = [];
+
+        t.push(<>
+            <p id="priceRange">Price Range</p>
+            <div class="startPrice">
+                <p id="startPriceLabel">Start Price</p>
+                <NumberInput
+                    isDisabled={bool}
+                    onChange={this.setGlobalStartPrice}
+                    style={{ top: '5px' }}
+                    size="md" min={0} maxW={70} defaultValue={value} precision={2} step={0.2}>
+                    <NumberInputField />
+                    <NumberInputStepper >
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                    </NumberInputStepper>
+                </NumberInput>
             </div>
-        );
+        </>);
 
-        this.setState({ updateNotifications: true });
-        this.setState({ notifications_temp: notifications });
+        this.setState({ startPriceInput: t })
     }
 
-    // Call notifications
-    notifications(stock, previousPrice, currentPrice, state) {
+    initialiseTargetPriceInput(value, bool) {
+        var t = [];
 
-        let targetPrice;
-        let startPrice;
+        t.push(<>
+            <div class="endPrice">
+                <p id="endPriceLabel">Target Price</p>
+                <NumberInput
+                    isDisabled={bool}
+                    onChange={this.setGlobalTargetPrice}
+                    size="md" min={0} maxW={70} defaultValue={value} precision={2} step={0.2}>
+                    <NumberInputField />
+                    <NumberInputStepper >
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                    </NumberInputStepper>
+                </NumberInput>
+            </div>
+        </>);
 
-        let globalStartPrice = this.state.globalStartPrice;
-        let globalTargetPrice = this.state.globalTargetPrice;
+        this.setState({ targetPriceInput: t })
 
-        startPrice = globalStartPrice;
-        targetPrice = globalTargetPrice;
-
-        // Override global price individually
-        /*   if (localStartPrice !== globalStartPrice)
-               startPrice = localStartPrice;
-           else
-               startPrice = globalStartPrice;
-   
-           if (localTargetPrice !== globalTargetPrice)
-               targetPrice = localTargetPrice
-           else
-               targetPrice = globalTargetPrice;*/
-
-        // User specifies a Bearish criteria
-        if (startPrice > targetPrice) {
-            if (currentPrice > startPrice) {
-                state = 3; // Override state
-            } else if (currentPrice < targetPrice) {
-                state = -3;
-            }
-        } else if (startPrice < targetPrice) {// User specifies a Bullish criteria
-            if (currentPrice < startPrice) {
-                state = -2;
-            } else if (currentPrice >= targetPrice) {
-                state = 1;
-            }
-        }
-        else // If the prices are equal
-        {
-            if (currentPrice < startPrice) {
-                state = -2;
-            } else if (currentPrice >= targetPrice) {
-                state = 1;
-            }
-
-        }
-        /*   console.log('POINTER ' + stock + ' STATE ' + state + ' current 150 ' + ' startPrice ' + localStartPrice
-               + ' targetPrice ' + localTargetPrice);*/
-
-        // Default states: 2, -1
-        this.addToNotificationsMenu(stock, previousPrice, currentPrice,
-            startPrice, targetPrice, state);
     }
 
+    getAlertSettings(response) {
+        for (var i = 0; i < response.length; i++) {
+            const item = JSON.parse(response[i]);
+
+            if (item.StartTime === null || item.StartTime === undefined
+                || item.EndTime === null || item.EndTime === undefined
+                || item.AlertInterval === null || item.AlertInterval === undefined
+                || item.Auto === null || item.Auto === undefined
+                || item.Manual === null || item.Manual === undefined ||
+
+                item.SettingsTriggered === null || item.SettingsTriggered === undefined
+            ) {
+                console.log(' Nullable ');
+                return;
+            }
+
+            this.setState({ startTime: item.StartTime });
+            this.setState({ endTime: item.EndTime });
+
+            AlertSettings.setTime(item.StartTime, item.EndTime);
+
+            AlertSettings.setAlertInterval(item.AlertInterval);
+            AlertSettings.setManual(item.Manual);
+            AlertSettings.setAuto(item.Auto);
 
 
+            if (item.Manual) {
+                this.setState({ manualAlert: true });
+                this.setState({ autoAlert: false });
+                this.setState({ disableStartTime: true });
+                this.setState({ disableEndTime: true });
+                // Disable auto alert checkbox 
+                this.setState({ manualDisabled: false });
+                this.setState({ autoDisabled: true });
+            }
+            else if (item.Auto) {
+                this.setState({ autoAlert: true });
+                this.setState({ manualAlert: false });
 
+                // Disable auto alert checkbox 
+                this.setState({ manualDisabled: true });
+                this.setState({ autoDisabled: false });
+            }
+
+            AlertSettings.setUpdateAlertSettings(true);
+        }
+    }
+
+    // ************************************************************
     // Save all settings
+    // ************************************************************
     saveConfiguration() {
-        AlertSettings.setAlertInterval(this.alertFrequencyRef.current.value);
-
-        //selectedIndex  )
-        //this.setAlertTrigger(this.state.alertEnabled);
-
-        if (this.state.setNotifications) {
-            this.setState({ notificationsEnabled: 1 })
-        }
+        // AlertSettings.setAlertInterval(this.alertFrequencyRef.current.value);
+        AlertSettings.setTime(this.state.startTime, this.state.endTime);
 
         // Set Alert Times
         // Detect Change in Alert Settings
         if (AlertSettings.getManual() !== this.state.manualAlert
             || AlertSettings.getAuto() !== this.state.autoAlert) {
-            console.log(' CHANGE IN ALERT SETTINGS ');
+
+            if (this.state.autoAlert) {
+                let ans = window.confirm("Scrolling is disabled in auto mode, proceed?")
+                if (!ans)
+                    return;
+            }
+
+            AlertSettings.setManual(this.state.manualAlert);
+            AlertSettings.setAuto(this.state.autoAlert);
+
             AlertSettings.setUpdateAlertSettings(true);
         }
 
         if (!this.state.autoAlert) {
-            console.log('scroll false')
             DashboardTwoCache.setDisableScroll(false);
         }
-        console.log(this.state.manualAlert + ' mn ' + this.state.autoAlert);
-        AlertSettings.setManual(this.state.manualAlert);
-        AlertSettings.setAuto(this.state.autoAlert);
 
         // Override all prices if enabled
         if (this.state.overrideGlobalPrices) {
+            if (PriceSettings.getStartPrice() !== this.state.globalStartPrice
+                || PriceSettings.getTargetPrice() !== this.state.globalTargetPrice) {
+                AlertSettings.setUpdateAlertSettings(true);
+            }
+
+
             PriceSettings.setGlobalStartPrice(this.state.globalStartPrice);
             PriceSettings.setGlobalTargetPrice(this.state.globalTargetPrice);
         }
 
         // Enable Price Detection
-        PriceSettings.setPriceDetectionEnabled(this.state.enablePriceDetection);
+        if (PriceSettings.getPriceDetectionEnabled() !== this.state.enablePriceDetection) {
+            AlertSettings.setUpdateAlertSettings(true);
+            PriceSettings.setPriceDetectionEnabled(this.state.enablePriceDetection);
+        }
 
         // Set variables for hiding bullish and bearish stocks
         if (this.state.hideBullishStocks && !PriceSettings.getHideBullishStocks()) {
@@ -274,6 +456,7 @@ export class DashboardTwoNavbar extends Component {
         } else if (!this.state.hideBullishStocks) {
             PriceSettings.sethideBullishStocks(false);
         }
+
         if (this.state.hideBearishStocks && !PriceSettings.getHideBearishStocks()) {
             this.hideBearishStocksConfig();
             PriceSettings.sethideBearishStocks(true);
@@ -281,7 +464,25 @@ export class DashboardTwoNavbar extends Component {
         } else if (!this.state.hideBearishStocks) {
             PriceSettings.sethideBearishStocks(false);
         }
+
+        if (AlertSettings.getUpdateAlertSettings()) {
+            var state = window.confirm("Are you sure you want to apply these changes? \n" +
+                "New settings will be applied");
+            if (!state) {
+                this.setState({ saveSettings: false });
+                AlertSettings.setUpdateAlertSettings(false);
+                return;
+            }
+
+            window.alert("New settings applied");
+            // Save to database
+            this.setState({ saveSettings: true });
+        }
+
+        this.saveSettingsToDatabase(AlertSettings.getAlertSettings(), PriceSettings.getPriceSettings());
     }
+
+    // **************************************************
 
     // hideStocksConfig
     hideBullishStocksConfig() {
@@ -318,6 +519,48 @@ export class DashboardTwoNavbar extends Component {
         }, 60000);
     }
 
+    withinAlertTime() {
+        const startTime = this.parseTime(AlertSettings.getStartTime());
+        const endTime = this.parseTime(AlertSettings.getEndTime());
+
+        const h = (date.getHours() + 8) >= 24 ? Math.abs(24 - (date.getHours() + 8))
+            : date.getHours() + 8;
+        const m = date.getMinutes();
+
+        if (h >= 17 && h <= 24 || h >= 0 && h <= 8) {
+            return false;
+        }
+
+        if (h >= startTime[0] && h <= endTime[0]) {
+            if (m >= startTime[0] && m <= endTime[0]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    setStartTime(time, timeString) {
+        const _time = this.parseTime(timeString.toString().trim());
+
+        if (_time[0] >= 17 && _time[0] <= 24 || _time[0] >= 0 && _time[0] <= 8) {
+
+            window.alert('Market hours are between 9:00 AM and 17:00 PM');
+        }
+
+        this.setState({ startTime: timeString });
+    }
+
+    setEndTime(time, timeString) {
+        const _time = this.parseTime(timeString.toString().trim());
+
+        if (_time[0] >= 17 && _time[0] <= 24 || _time[0] >= 0 && _time[0] <= 8) {
+
+            window.alert('Market hours are between 9:00 AM and 17:00 PM');
+        }
+
+        this.setState({ endTime: timeString });
+    }
+
     // Set hide Bullish Stocks
     setHideBullishStocks(e) {
         this.setState({ hideBullishStocks: e.target.checked });
@@ -345,26 +588,59 @@ export class DashboardTwoNavbar extends Component {
     // Enable Price Detection Bool
     setPriceDetectionEnabled(e) {
         this.setState({ enablePriceDetection: e.target.checked });
+
+        var t = [];
+        var t2 = [];
+        t.push(<>
+            <p id="priceRange">Price Range</p>
+            <div class="startPrice">
+                <p id="startPriceLabel">Start Price</p>
+                <NumberInput
+                    isDisabled={!this.state.disableSetPrice}
+                    onChange={this.setGlobalStartPrice}
+                    style={{ top: '5px' }}
+                    size="md" min={0} maxW={70} defaultValue={this.state.globalStartPrice} precision={2} step={0.2}>
+                    <NumberInputField />
+                    <NumberInputStepper >
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                    </NumberInputStepper>
+                </NumberInput>
+            </div>
+        </>);
+
+        t2.push(<>
+            <div class="endPrice">
+                <p id="endPriceLabel">Target Price</p>
+                <NumberInput
+                    isDisabled={!this.state.disableSetPrice}
+                    onChange={this.setGlobalTargetPrice}
+                    size="md" min={0} maxW={70} defaultValue={this.state.globalTargetPrice} precision={2} step={0.2}>
+                    <NumberInputField />
+                    <NumberInputStepper >
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                    </NumberInputStepper>
+                </NumberInput>
+            </div>
+        </>);
+        this.setState({ startPriceInput: t })
+        this.setState({ targetPriceInput: t2 })
+        this.setState({ disableSetPrice: !this.state.disableSetPrice });
     }
 
     // Override Global Prices Bool
     overrideGlobalPrices(e) {
+
         this.setState({ overrideGlobalPrices: e.target.checked });
-    }
-
-    // Enable Alert Notifications
-    enableNotifications(e) {
-        if (e.target.checked)
-            this.setState({ notificationsEnabled: 1 })
-        else
-            this.setState({ notificationsEnabled: 0 })
-
-        this.setState({ setNotifications: e.target.checked })
     }
 
     // Checkbox that enables manual alert
     setManualAlert(e) {
         this.setState({ manualAlert: e.target.checked });
+
+        this.setState({ disableStartTime: e.target.checked });
+        this.setState({ disableEndTime: e.target.checked });
 
         // Disable auto alert checkbox 
         this.setState({ autoDisabled: !this.state.autoDisabled });
@@ -376,32 +652,6 @@ export class DashboardTwoNavbar extends Component {
 
         // Disable auto alert checkbox 
         this.setState({ manualDisabled: !this.state.manualDisabled });
-    }
-
-    // Determine whether or not an alert should be triggered
-    setAlertTrigger(bool) {
-        if (bool === false)
-            return;
-
-        let alertBool = false;
-
-        let startTime = this.parseTime(this.getStartTime.current.value.toString());
-        let endTime = this.parseTime(this.getEndTime.current.value.toString());
-
-        let startTime_hours = startTime[0];
-        let startTime_minutes = startTime[1];
-
-        let endTime_hours = endTime[0];
-        let endTime_minutes = endTime[1];
-
-        /*   console.log('start time h ' + startTime_hours + ' start time m ' + startTime_minutes
-               + ' end time h  ' + endTime_hours + '  end time m ' + endTime_minutes
-               + ' DATETIME    ' + dateTime_hours);*/
-        /*
-
-    this.setState({ startTime: [startTime_hours, startTime_minutes] })
-    this.setState({ endTime: [endTime_hours, endTime_minutes] })
-    this.setState({ triggerAlert: alertBool })*/
     }
 
     parseTime(str) {
@@ -418,17 +668,189 @@ export class DashboardTwoNavbar extends Component {
         else
             minutes = parseInt(minutes.substring(0, 2));
 
-        return [hours, minutes];
+        return [parseInt(hours), parseInt(minutes)];
+    }
+
+    // **************************************************
+    // Add to Historical Table
+    // **************************************************
+
+    async idExists(target) {
+        return new Promise(resolve => {
+            if (this.state.clickedAlertTableRowID === null
+                || this.state.clickedAlertTableRowID === undefined) {
+                resolve(false);
+            }
+            resolve(true);
+        });
+    }
+
+    addToHistorical(e) {
+        this.addToHistoricalTable();
+    }
+
+
+    // Add to History Table
+    async addToHistoricalTable() {
+        const res = await this.idExists();
+        if (!res) {
+            window.alert('Please select a stock from your saved stocks table');
+            return;
+        }
+
+        const target = parseInt(this.state.clickedAlertTableRowID);
+        const json = DashboardTwoCache.get(target);
+        console.log('target ' + target);
+        let txt;
+        if (isNaN(target) || (target === null || target === undefined)) {
+            window.alert("No target is clicked ");
+        }
+        else {
+            var r = window.confirm("Add to Historical Table?");
+            if (r == true) {
+                txt = "Yes";
+            } else {
+                txt = "Cancel";
+            }
+
+            const jsonString = await this.getJSON(json);
+
+            // if (txt === "Yes") {
+            const res = await this.saveHistoricalData(jsonString);
+            console.log('Historical data added? ' + res);
+            // window.alert(returned message)             window.alert('Maximum stocks for portfolio exceeded, limit: 200 ');
+            //}
+        }
+    }
+
+    async saveHistoricalData(data) {
+        await fetch('savehistoricaldata/temp/'.concat(data))
+            .then(response => response.status)
+            .then(response => {
+                if (!response.ok) {
+                    // 404 
+                    return false;
+                }
+                else return true;
+            })
+            .catch(error => {
+                console.log("error " + error) // 404
+                return false;
+            }
+            );
+
+        return false;
+    }
+
+    async getJSON(json) {
+        const today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1;
+
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+
+        var _today = yyyy + 'a' + mm + 'a' + dd;
+
+        const obj = { Id: json.Id, Date: _today };
+        var jsonString = JSON.stringify(obj);
+
+        return jsonString;
+    }
+
+    // **************************************************
+    // **************************************************
+    // Display Stock
+    // **************************************************
+
+    // Triggered when a table row is clicked
+    displayStock(stockID) {
+
+        console.log('Clicked ' + stockID)
+
+        var info = [];
+
+        info.push(<h1 style={{ position: 'absolute', textAlign: 'center', left: '270px', color: 'white' }}>
+            {DashboardTwoCache.get(stockID).StockName}</h1>);
+
+        info.push(<h2 style={{ position: 'absolute', textAlign: 'center', top: '75px', left: '270px', color: 'white' }}>
+            Previous: {DashboardTwoCache.getPreviousPrice(stockID)}</h2>);
+
+        info.push(<h2 style={{ position: 'absolute', textAlign: 'center', top: '120px', left: '270px', color: 'white' }}>
+            Price: {DashboardTwoCache.get(stockID).CurrentPrice}</h2>);
+
+        info.push(<h1 style={{ position: 'absolute', textAlign: 'center', left: '0px', color: 'white' }}>
+            {DashboardTwoCache.get(stockID).StockCode}</h1>);
+
+
+        this.setState({ clickedAlertTableRowID: stockID });
+        this.setState({ stockInfoName: info });
+
+        this.setState({ updateStockInfo: true });
+    }
+
+    // **************************************************
+    // **************************************************
+    // Saved Stock Rows
+    // **************************************************
+
+    // Select Row Setter
+    selectAlertTableRow(e) {
+        const alertTableId = parseInt(e.target.id);
+        this.setState({ clickedAlertTableRowID: alertTableId });
+        this.setState({ isSelected: true });
+        this.update(true);
+    }
+
+    setAddAlertTableRowBool(state) {
+        this.setState({ addAlertTableRowBool: state });
+        if (state === true) {
+            this.update(true);
+        }
+    }
+
+    removeStock(e) {
+        if (this.state.clickedAlertTableRowID === null
+            || this.state.clickedAlertTableRowID === undefined) {
+            window.alert('Please select a stock from your saved stocks table');
+            return;
+        }
+        var userselection = window.confirm("Are you sure you want to delete this stock ?");
+        if (userselection == true) {
+            this.setRemoveAlertTableRowBool(true);
+            this.update(true);
+        }
+    }
+
+    setRemoveAlertTableRowBool(state) {
+        this.setState({ removeAlertTableRowBool: state });
+        if (state === true) {
+            this.update(true);
+        }
+    }
+
+    setIsSelected(state) {
+        this.setState({ isSelected: state });
+        if (state === true) {
+            this.update(true);
+        }
     }
 
     render() {
-        let selectMarket =
-            <select class="selectMarket" name="Select Market">
-                <option value="none">Bursa Malaysia</option>
+        const selectMarket =
+            <select class="selectMarket" name="Select Market" value="Bursa Malaysia">
+                <option value="Bursa Malaysia" disabled>Bursa Malaysia</option>
             </select>;
 
-        let alertFrequency =
-            <select class="alertFrequency" name="Frequency" ref={this.alertFrequencyRef}>
+        const alertFrequency =
+            <select class="alertFrequency" name="Frequency"
+                ref={this.alertFrequencyRef}
+                disabled={this.state.disableStartTime}>
                 <option value="60000">1 Minute</option>
                 <option value="300000">5 Minutes</option>
                 <option value="600000">10 Minutes</option>
@@ -438,213 +860,158 @@ export class DashboardTwoNavbar extends Component {
                 <option value="10800000">3 Hours</option>
             </select>;
 
-        let custom_alertFrequency = <input class="customalertFrequency" type="number" id="quantity"
+        const custom_alertFrequency = <input class="customalertFrequency" type="number" id="quantity"
             name="quantity" min="1" max="240" />
 
-        let startTime = <input class="startTime" type="time" name="time" ref={this.getStartTime} min="09:00" max="17:00" />;
+        const format = 'HH:mm';
 
-        let endTime = <input class="endTime" type="time" name="time" ref={this.getEndTime} />;
+        const startTime =
+            <div class="startTime">
+                <TimePicker defaultValue={moment('9:00', format)}
+                    disabled={this.state.disableStartTime}
+                    format={format}
+                    value={moment(this.state.startTime, format)}
+                    disabledHours={() => [17, 18, 19, 20, 21, 22, 23, 24, 0, 1, 2, 3, 4, 5, 6, 7, 8]}
+                    onChange={this.setStartTime} />
+            </div>;
+
+        const endTime =
+            <div class="endTime">
+                <TimePicker defaultValue={moment('16:59', format)}
+                    disabled={this.state.disableEndTime}
+                    format={format}
+                    value={moment(this.state.endTime, format)}
+                    disabledHours={() => [17, 18, 19, 20, 21, 22, 23, 24, 0, 1, 2, 3, 4, 5, 6, 7, 8]}
+                    onChange={this.setEndTime} />
+            </div>;
+
+        const state = {
+            toggleTab: false,
+            showTab: this.showTab
+        }
 
         return (
-            <div class="DashboardNavbar">
-                <Box
-                    style={{ position: 'absolute', top: '80px', left: '60px', zIndex: 888 }}
-                    bg='rgb(40,40,40)'
-                    boxShadow='sm'
-                    textAlign='center'
-                    height='14.5rem'
-                    width='115rem'
-                    rounded="lg"
-                    borderWidth="1px"
-                >
-                    <div class="grid-item">
-                        <div class="frequencyAdjust">
+            <>
+                <div class="DashboardNavbar">
+                    <Box
+                        style={{ position: 'absolute', top: '340px', left: '60px' }}
+                        bg='rgb(40,40,40)'
+                        boxShadow='sm'
+                        height='305px'
+                        width='62rem'
+                        rounded="lg"
+                        margin='auto'
+                        zIndex='0'>
 
-                            <p id="selectMarket">Select Market</p>
-                            {selectMarket}
+                        {this.state.stockInfoCode}
+                        {this.state.stockInfoHeader}
+                        {this.state.stockInfoPrevPrice}
+                        {this.state.stockInfoCurrPrice}
 
-                            <p id="alertFrequency">Alert Frequency</p>
-                            {alertFrequency}
-                        </div>
-                        {/*  <label id="customalertFrequencyLabel" for="customalertFrequency">Custom Time</label>
-                        <input id="customalertFrequency" type="checkbox" />
+                        <button
+                            style={{ position: 'absolute', bottom: '20px', left: '40px', width: '90px' }}
+                            onClick={this.addToHistorical}
+                            class="design"
+                        >
+                            Add to <br /> Historical</button>
+                    </Box>
 
-                        {custom_alertFrequency}
-                        <label class="alertFrequencyMinutes">Minutes</label>*/}
-                    </div>
 
-                    <div class="grid-item">
-                        <div class="alertTime">
-                            <p id="alertCriteria">Alert Time</p>
-                            <label id="startTime">Start Time</label>
-                            {startTime}
-                            <label id="endTime">End Time</label>
-                            {endTime}
+                    <Box
+                        style={{ position: 'absolute', top: '80px', left: '60px', zIndex: 888 }}
+                        bg='rgb(40,40,40)'
+                        boxShadow='sm'
+                        textAlign='center'
+                        height='14.5rem'
+                        width='115rem'
+                        rounded="lg"
+                        borderWidth="1px"
+                    >
+                        <div class="grid-item">
+                            <div class="frequencyAdjust">
 
-                            <label id="manualAlerts">Manual</label>
-
-                            <input class="manualAlerts" type="checkbox" checked={this.state.manualAlert}
-                                disabled={this.state.manualDisabled} onChange={this.setManualAlert} />
-
-                            <label id="autoAlerts">Auto</label>
-
-                            <input class="autoAlerts" type="checkbox" checked={this.state.autoAlert}
-                                disabled={this.state.autoDisabled} onChange={this.setAutoAlert} /> {/* {...(this.state.manualAlert == 1) ? disabled : ""} */}
-
-                            {/* 
-                              <label id="manualAlertsNotifications">Notifications</label>
-                            <input class="manualAlertsNotifications" type="checkbox" />
-                            <label id="autoAlertsNotifications">Auto <br/> Notifications</label>
-                                <input class="autoAlertsNotifications" type="checkbox" onChange={this.setManualAlert} />
-                                  <label id="enableNotifications">Manual</label>
-                                <input class="enableNotifications" type="checkbox" onChange={this.setManualAlert} />
-
-                                <label id="enableNotifications">Auto</label>
-                                <input class="enableNotifications" type="checkbox" onChange={this.setManualAlert} /> */}
-                        </div>
-
-                        <div class="tableSettings" >
-                            <div class="vl"></div>
-                            <div class="v2"></div>
-                            <p id="table_">Columns Filter</p>
-
-                            <div class="disableColumns" >
-
-                                {/* <p id="hideName"
-                            style={{ position: 'absolute', top: '10px', left: '575px' }}>Disable Columns </p>*/}
-
-                                <label id="stockName" >Stock <br /> Name</label>
-                                <input class="stockName" type="checkbox" />
-
-                                <label id="time">Time</label>
-                                <input class="time" type="checkbox" />
-
-                                <label id="price">Price</label>
-                                <input class="price" type="checkbox" />
-
-                                <label id="high">High</label>
-                                <input class="high" type="checkbox" />
-
-                                <label id="low">Low</label>
-                                <input class="low" type="checkbox" />
-
-                                <label id="profitLoss">P / L</label>
-                                <input class="profitLoss" type="checkbox" />
-
-                                <label id="profitLossPercentage">P / L %</label>
-                                <input class="profitLossPercentage" type="checkbox" />
-
-                                <label id="volume">Volume</label>
-                                <input class="volume" type="checkbox" />
-                            </div>
-
-                            <div class="disableAlertColumns">
-
-                                <label id="alertStockName" >Stock <br /> Name</label>
-                                <input class="alertStockName" type="checkbox" />
-
-                                <label id="alertStockTime">Alert <br /> Time</label>
-                                <input class="alertStockTime" type="checkbox" />
-
-                                <label id="alertPrice">Price</label>
-                                <input class="alertPrice" type="checkbox" />
-
-                                <label id="alertProfitLoss">P / L %</label>
-                                <input class="alertProfitLoss" type="checkbox" />
-
-                                <label id="alertProfitVolume">Volume</label>
-                                <input class="alertProfitVolume" type="checkbox" />
+                                <p id="selectMarket">Select Market</p>
+                                {selectMarket}
                             </div>
                         </div>
 
+                        <div class="grid-item">
+                            <div class="alertTime">
+                                <p id="alertCriteria">Alert Time</p>
+                                <label id="startTime">Start Time</label>
+                                {startTime}
+                                <label id="endTime">End Time</label>
+                                {endTime}
 
-                        <div class="priceDetection">
-                            <p id="priceRange">Price Range</p>
-                            <div class="startPrice">
-                                <p id="startPriceLabel">Start Price</p>
-                                <NumberInput
-                                    onChange={this.setGlobalStartPrice}
-                                    style={{ top: '5px' }}
-                                    size="md" min={0} maxW={70} defaultValue={1} precision={2} step={0.2}>
-                                    <NumberInputField />
-                                    <NumberInputStepper >
-                                        <NumberIncrementStepper />
-                                        <NumberDecrementStepper />
-                                    </NumberInputStepper>
-                                </NumberInput>
+                                <label id="manualAlerts">Manual</label>
+
+                                <input class="manualAlerts" type="checkbox" checked={this.state.manualAlert}
+                                    disabled={this.state.manualDisabled} onChange={this.setManualAlert} />
+
+                                <label id="autoAlerts">Auto</label>
+
+                                <input class="autoAlerts" type="checkbox" checked={this.state.autoAlert}
+                                    disabled={this.state.autoDisabled} onChange={this.setAutoAlert} />
                             </div>
 
-                            <div class="endPrice">
-                                <p id="endPriceLabel">Target Price</p>
-                                <NumberInput
-                                    onChange={this.setGlobalTargetPrice}
-                                    size="md" min={0} maxW={70} defaultValue={1} precision={2} step={0.2}>
-                                    <NumberInputField />
-                                    <NumberInputStepper >
-                                        <NumberIncrementStepper />
-                                        <NumberDecrementStepper />
-                                    </NumberInputStepper>
-                                </NumberInput>
+                            <div class="tableSettings" >
+                                <div class="vl"></div>
+                                <div class="v2"></div>
+
+                                <h3 id="volumeNum">28 800</h3>
+                                <h3 id="volume_">Volume</h3>
+
+                                <h3 id="marketCap">52 800</h3>
+                                <h3 id="marketCap_">Market Cap</h3>
+
+
                             </div>
 
-                            <label id="enablePriceCheck">Custom Price Detection</label>
-                            <input class="enablePriceCheck" type="checkbox" onChange={this.setPriceDetectionEnabled} />
+                            <div class="priceDetection">
 
-                            <label id="overridePrices">Override Custom Prices</label>
-                            <input class="overridePrices" type="checkbox" onChange={this.overrideGlobalPrices} />
+                                {this.state.startPriceInput}
 
-                            <label id="hideBullishStocks">Hide Bullish Stocks</label>
-                            <input class="hideBullishStocks" type="checkbox"
-                                checked={this.state.hideBullishStocks}
-                                disabled={this.state.hideBullishStocksDisabled}
-                                onChange={this.setHideBullishStocks} />
-                            {/*  />*/}
+                                {this.state.targetPriceInput}
 
-                            <label id="hideBearishStocks">Hide Bearish Stocks</label>
-                            <input class="hideBearishStocks" type="checkbox"
-                                checked={this.state.hideBearishStocks}
-                                disabled={this.state.hideBearishStocksDisabled}
-                                onChange={this.setHideBearishStocks} />
-                            {/*  />*/}
 
-                            <a
-                                style={{
-                                    color: 'white',
-                                    position: 'absolute', top: '-68px', left: '1130px',
-                                }} onClick={this.enableNotificationsMenu}>
-                                Notifications <DownOutlined />
-                            </a>
+                                <label id="enablePriceCheck">Custom Price Detection</label>
+                                <input class="enablePriceCheck" type="checkbox" checked={this.state.enablePriceDetection}
+                                    onChange={this.setPriceDetectionEnabled} />
 
-                            <div class="dropdown-content">
-                                <Box
-                                    style={{ position: 'absolute' }}
-                                    visibility={(this.state.notificationsMenuVisible) ? 'visible' : 'hidden'}
-                                    min-width='16.25rem'
-                                    width='16.25rem'
-                                    height='17.25rem'
-                                    overflowY='auto'
-                                    bg='#f9f9f9'
-                                    top='-35px'
-                                    left='1130px'
-                                    backgroundColor='wheat.511'
-                                    zIndex='999'
-                                >
-                                    {this.state.notifications}
-                                </Box>
+                                <label id="overridePrices">Change Prices</label>
+                                <input class="overridePrices" type="checkbox"
+                                    onChange={this.overrideGlobalPrices} />
+
+                                <label id="hideBullishStocks">Hide Bullish Stocks</label>
+                                <input class="hideBullishStocks" type="checkbox"
+                                    checked={this.state.hideBullishStocks}
+                                    disabled={this.state.hideBullishStocksDisabled}
+                                    onChange={this.setHideBullishStocks} />
+                                {/*  />*/}
+
+                                <label id="hideBearishStocks">Hide Bearish Stocks</label>
+                                <input class="hideBearishStocks" type="checkbox"
+                                    checked={this.state.hideBearishStocks}
+                                    disabled={this.state.hideBearishStocksDisabled}
+                                    onChange={this.setHideBearishStocks} />
+                                {/*  />*/}
                             </div>
 
-                            <Button style={{ position: 'absolute', top: '170px', left: '1325px', zIndex: '-999' }}
-                                onClick={this.saveConfiguration}>Save Configuration</Button>
+                            <button
+                                style={{ position: 'absolute', top: '166px', left: '1371px', zIndex: '-999' }}
+                                class="saveConfiguration" onClick={this.saveConfiguration}>Save Configuration
+                            </button>
+
 
                         </div>
 
-                    </div>
-                </Box>
+                    </Box>
 
-                <StockTableOne {...this} />
-                <StockTableTwo {...this} />
+                    <StockTableOne {...this} />
+                    <StockTableTwo {...this} />
 
-            </div>
+                </div>
+            </>
         );
     }
 }

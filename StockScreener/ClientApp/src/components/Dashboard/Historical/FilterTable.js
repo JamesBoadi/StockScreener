@@ -442,7 +442,7 @@ export class FilterTable extends Component {
         let start = 0;
         const end = this.state.maxNumberOfPortfolioRows;
         const name = this.state.name;
-      
+
         for (pointer = start; pointer < end; pointer++) {
             const item = this.filterCache.get(pointer.toString());
 
@@ -450,7 +450,6 @@ export class FilterTable extends Component {
                 <tbody key={pointer}>
                     <tr>
                         <td id={pointer}>{name[pointer]}</td>
-                        <td id={pointer}>{item.signalMessage}</td>
                         <td id={pointer}>{item.signalMessage}</td>
                         <td id={pointer}>{item.signal}</td>
                         <td id={pointer}>{item.firstMACD}</td>
@@ -499,9 +498,8 @@ export class FilterTable extends Component {
                 style={{ zIndex: '999', position: 'absolute', left: '675px' }}>
                 <thead>
                     <tr>
-                        <th>Stock <br /> Name </th>
+                        <th>Stock <br /> Code</th>
                         <th>Signal <br /> Message </th>
-                        <th>Signal <br /> Line</th>
                         <th>First <br /> MACD</th>
                         <th>Second <br /> MACD</th>
                         <th>Upper <br /> Band</th>

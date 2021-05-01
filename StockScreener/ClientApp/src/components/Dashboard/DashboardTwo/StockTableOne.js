@@ -13,7 +13,7 @@ import * as cache from 'cache-base';
 import DashboardTwoCache from './js/DashboardTwoCache.js';
 import AlertSettings from './js/AlertSettings.js';
 import HistoryCalc from '../Historical/js/HistoryCalc.js';
-import { DisplayStock } from '../../Dashboard/DisplayStock.js';
+
 
 
 // Fetch data for dash board one
@@ -236,7 +236,8 @@ export class StockTableOne extends React.Component {
 
         this.styleMap.set(this.state.target, style);
 
-        var target = new Number(e.target.id);
+        const target = new Number(e.target.id);
+        this.props.displayStock(target);
         this.setState({ target: target });
 
         let id;
@@ -459,26 +460,7 @@ export class StockTableOne extends React.Component {
     // Triggered when a table row is clicked
     selectStockTableRow(e) {
         const alertTableId = parseInt(e.target.id);
-        console.log('Clicked ' + alertTableId)
-
-        var info = [];
-
-        info.push(<h1 style={{ position: 'absolute', textAlign: 'center', left: '270px', color: 'white' }}>
-            {DashboardTwoCache.get(alertTableId).StockName}</h1>);
-
-        info.push(<h2 style={{ position: 'absolute', textAlign: 'center', top: '75px', left: '270px', color: 'white' }}>
-            Previous: {DashboardTwoCache.getPreviousPrice(alertTableId)}</h2>);
-
-        info.push(<h2 style={{ position: 'absolute', textAlign: 'center', top: '120px', left: '270px', color: 'white' }}>
-            Price: {DashboardTwoCache.get(alertTableId).CurrentPrice}</h2>);
-
-        info.push(<h1 style={{ position: 'absolute', textAlign: 'center', left: '0px', color: 'white' }}>
-            {DashboardTwoCache.get(alertTableId).StockCode}</h1>);
-
-        this.setState({ stockInfoName: info });
-
-        this.setState({ clickedAlertTableRowID: alertTableId });
-        this.updateStockInfo = true;
+        this.props.displayStock(alertTableId);
     }
 
     // **************************************************
@@ -800,9 +782,6 @@ export class StockTableOne extends React.Component {
 
         return (
             <div>
-
-                <DisplayStock {...this} />
-
 
                 <div class="stockTableOneWrap">
 

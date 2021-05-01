@@ -3,7 +3,7 @@ import * as cache from 'cache-base';
 
 /**
 * A set of mathematical 
-* functions that query a database for saved informaion
+* functions that query a database for Saved Stock informaion
 */
 export default class HistoryCalc {
     static profitLoss = 0;

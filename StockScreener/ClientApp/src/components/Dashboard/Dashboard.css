@@ -998,7 +998,7 @@
     table-layout: fixed;
     font-family: sans-serif;
     height: 30px;
-    font-size: 14px;
+    font-size: 12px;
     min-width: 48rem;
   /*  min-height: 1200px;*/
     width: 48rem;
@@ -1383,7 +1383,47 @@
     padding:4px 10px;
     text-decoration:none;
     text-shadow:0px -1px 0px #2b665e;
+  }
+
+  .DashboardNavbar .addToHistorical
+  {
+    box-shadow:inset 0px 0px 3px 0px #91b8b3;
+    background-color:rgb(40,40,40);
+    border-radius:10px;
+    border:1px solid rgb(40,40,40);
+    display:inline-block;
+    cursor:pointer;
+    color:#ffffff;
+    font-family:Times New Roman;
+    font-size:16px;
+    padding: 6px 6px;
+    text-decoration:none;
+    text-shadow:0px -1px 0px #2b665e;
+  }
+
   
+  .DashboardNavbar .removeStock
+  {
+    box-shadow:inset 0px 0px 3px 0px #91b8b3;
+    background-color:rgb(40,40,40);
+    border-radius:10px;
+    border:1px solid rgb(40,40,40);
+    display:inline-block;
+    cursor:pointer;
+    color:#ffffff;
+    font-family:Times New Roman;
+    font-size:16px;
+    padding: 6px 6px;
+    text-decoration:none;
+    text-shadow:0px -1px 0px #2b665e;
+  }
+
+  .DashboardNavbar .removeStock:hover {
+    background-color:#6c7c7c;
+  }
+
+  .DashboardNavbar .addToHistorical:hover {
+    background-color:#6c7c7c;
   }
 
   .DashboardNavbar .saveConfiguration:hover {
@@ -1393,6 +1433,24 @@
   .DashboardNavbar .frequencyAdjust{
     transform: translateY(25px)
   }
+
+  
+  .DashboardNavbar .design
+  {
+    box-shadow:inset 0px 0px 3px 0px #91b8b3;
+    background-color:rgb(40,40,40);
+    border-radius:10px;
+    border:1px solid rgb(40,40,40);
+    display:inline-block;
+    cursor:pointer;
+    color:#ffffff;
+    font-family:Times New Roman;
+    font-size:16px;
+    padding: 6px 6px;
+    text-decoration:none;
+    text-shadow:0px -1px 0px #2b665e;
+  }
+
 
   .DashboardNavbar #selectMarket{
     position: absolute;

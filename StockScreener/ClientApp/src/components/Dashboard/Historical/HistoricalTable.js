@@ -332,7 +332,7 @@ export class HistoricalTable extends Component {
             const json = HistoryCache.get(ID);
             portfolioTableStocks.push(json);
             this.map.set(i, ID);
-            name[i] = json.StockName;
+            name[i] = json.StockCode;
         }
 
         //console.log('name ' + name);
@@ -699,7 +699,6 @@ export class HistoricalTable extends Component {
         t.push(
             <tbody key={pointer}>
                 <tr>
-                    <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockName.toString()}</td>
                     <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockCode.toString()}</td>
                     <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
                     <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].TimeStamp.toString()}</td>
@@ -752,7 +751,6 @@ export class HistoricalTable extends Component {
                 new_stack[pointer] =
                     <tbody>
                         <tr>
-                            <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].StockName.toString()}</td>
                             <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].StockCode.toString()}</td>
                             <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
                             <td id={pointer} onClick={this.select.bind(this)}>{new_portfolioTableStocks[pointer].TimeStamp.toString()}</td>
@@ -1037,7 +1035,6 @@ export class HistoricalTable extends Component {
             t.push(
                 <tbody>
                     <tr style={style} >
-                        <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockName.toString()}</td>
                         <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].StockCode.toString()}</td>
                         <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].CurrentPrice.toString()}</td>
                         <td id={pointer} onClick={this.select.bind(this)}>{portfolioTableStocks[pointer].TimeStamp.toString()}</td>
@@ -1221,10 +1218,6 @@ export class HistoricalTable extends Component {
         return this.state.displayText;
     }
 
-
-
-
-
     // **************************************************
 
     render() {
@@ -1234,7 +1227,6 @@ export class HistoricalTable extends Component {
                 style={{ zIndex: '999' }}>
                 <thead>
                     <tr>
-                        <th>Stock <br /> Name</th>
                         <th>Stock <br /> Code</th>
                         <th>Current <br /> Price</th>
                         <th>Time </th>

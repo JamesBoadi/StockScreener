@@ -264,8 +264,6 @@ export class StockTableTwo extends React.Component {
         this.setState({ clickedAlertTableRowID: id });
     }
 
- 
-
     // Disable scrolling
     disableScrolling(e) {
         this.setState({ disableScrolling: e.target.checked })
@@ -481,7 +479,7 @@ export class StockTableTwo extends React.Component {
         let style = {
             backgroundColor: ""
         };
-        
+
         this.styleMap.set(this.state.target, style);
 
         var target = new Number(e.target.id);
@@ -563,10 +561,11 @@ export class StockTableTwo extends React.Component {
             }
         }
 
-        // Display stock
-        this.props.displayStock(target);
         this.setState({ tb2_stack: array });
         this.setState({ isSelected: true });
+
+        // Send Information to Display Stock
+        this.selectStockTableRow(e);
     }
 
     newTable() {
@@ -602,9 +601,7 @@ export class StockTableTwo extends React.Component {
 
         // Use shallow compare
         for (id = start; id < end; id++) {
-            if (id === null || id === undefined)
-                continue;
-            else if (id == this.state.target) {
+            if (id == this.state.target) {
                 style = { color: "green", backgroundColor: "rgb(21,100,111)" };
             }
             else
@@ -613,9 +610,7 @@ export class StockTableTwo extends React.Component {
             // Get values from cache
             let list = (!priceDetection) ? TableCache.get(id) :
                 TableCache.getOp(id);//this.state.cache.get(id.toString());
-            
-            if (list === null || list === undefined)
-                continue;
+
 
             //  console.log( 'WORK WORK ' + id);
             array.push(
@@ -663,10 +658,10 @@ export class StockTableTwo extends React.Component {
 
         start = (start <= 15 || (start === undefined || start === null)) ? 0 : start - mod;
 
-        // Set start and end variables for FetchData
-        // this.props.setStart(start);
-        //  this.props.setEnd(start + endMod);
-        // this.props.setUpdateNotifications(true);
+        /*   // Set start and end variables for FetchData
+           this.props.setStart(start);
+           this.props.setEnd(start + endMod);
+           this.props.setUpdateNotifications(true);*/
 
         // Get values from cache
         let list = (!priceDetection) ? TableCache.get(start) :
@@ -805,6 +800,17 @@ export class StockTableTwo extends React.Component {
                     </tr>
                 </tbody>)
         }
+    }
+
+
+    // **************************************************
+    // Display Stock
+    // **************************************************
+
+    // Triggered when a table row is clicked
+    selectStockTableRow(e) {
+        const alertTableId = parseInt(e.target.id);
+        this.props.displayStock(alertTableId);
     }
 
     render() {

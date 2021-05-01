@@ -103,9 +103,6 @@ export class DashboardNavbar extends Component {
             autoAlert: false,
             manualDisabled: false,
             autoDisabled: false,
-
-
-
             hideBearishStocks: false,
             hideBullishStocks: false,
 
@@ -163,7 +160,6 @@ export class DashboardNavbar extends Component {
             this.setState({ updateStockInfo: false });
         }
         if (this.state.update) {
-
             this.update(false);
         }
 
@@ -213,7 +209,7 @@ export class DashboardNavbar extends Component {
                 console.log("error " + error) // 404
                 return;
             }
-            );
+        );
     }
 
     async initialieSettings() {
@@ -894,34 +890,41 @@ export class DashboardNavbar extends Component {
 
         return (
             <>
-                <Box
-                    style={{ position: 'absolute', top: '340px', left: '60px' }}
-                    bg='rgb(40,40,40)'
-                    boxShadow='sm'
-                    height='305px'
-                    width='62rem'
-                    rounded="lg"
-                    margin='auto'
-                    zIndex='0'>
 
-                    {this.state.stockInfoCode}
-                    {this.state.stockInfoHeader}
-                    {this.state.stockInfoPrevPrice}
-                    {this.state.stockInfoCurrPrice}
-
-                    <Button onClick={() => { this.setAddAlertTableRowBool(true) }}
-                        style={{ position: 'absolute', bottom: '20px', right: '180px', width: '90px' }}>
-                        Add <br />to Table</Button>
-
-                    <Button onClick={this.removeStock}
-                        style={{ position: 'absolute', bottom: '20px', right: '50px', width: '90px' }}>
-                        Remove  <br /> from Table</Button>
-
-                    <Button onClick={this.addToHistorical}
-                        style={{ position: 'absolute', bottom: '20px', left: '40px', width: '90px' }}>
-                        Add  <br /> to Historical</Button>
-                </Box>
                 <div class="DashboardNavbar">
+                    <Box
+                        style={{ position: 'absolute', top: '340px', left: '60px' }}
+                        bg='rgb(40,40,40)'
+                        boxShadow='sm'
+                        height='305px'
+                        width='62rem'
+                        rounded="lg"
+                        margin='auto'
+                        zIndex='0'>
+
+                        {this.state.stockInfoCode}
+                        {this.state.stockInfoHeader}
+                        {this.state.stockInfoPrevPrice}
+                        {this.state.stockInfoCurrPrice}
+
+                        <button onClick={() => { this.setAddAlertTableRowBool(true) }}
+                            style={{ position: 'absolute', bottom: '20px', right: '180px', width: '90px' }}
+                            class="addToHistorical">
+                            Add <br />to Table</button>
+
+                        <button onClick={this.removeStock}
+                            style={{ position: 'absolute', bottom: '20px', right: '50px', width: '90px' }}
+                            class="addToHistorical">
+                            Remove  <br /> from Table</button>
+
+                        <button
+                            style={{ position: 'absolute', bottom: '20px', left: '40px', width: '90px' }}
+                            onClick={this.addToHistorical}
+                            class="addToHistorical"
+                        >
+                            Add to <br /> Historical</button>
+                    </Box>
+
 
                     <Box
                         style={{ position: 'absolute', top: '80px', left: '60px', zIndex: 888 }}
@@ -967,8 +970,6 @@ export class DashboardNavbar extends Component {
 
                                 <input class="autoAlerts" type="checkbox" checked={this.state.autoAlert}
                                     disabled={this.state.autoDisabled} onChange={this.setAutoAlert} /> {/* {...(this.state.manualAlert == 1) ? disabled : ""} */}
-
-
                                 {/* 
                               <label id="manualAlertsNotifications">Notifications</label>
                             <input class="manualAlertsNotifications" type="checkbox" />
@@ -988,10 +989,8 @@ export class DashboardNavbar extends Component {
                                 <h3 id="volumeNum">28 800</h3>
                                 <h3 id="volume_">Volume</h3>
 
-                                <h3 id="marketCap">28 800</h3>
+                                <h3 id="marketCap">58 800</h3>
                                 <h3 id="marketCap_">Market Cap</h3>
-
-
                             </div>
 
                             <div class="priceDetection">

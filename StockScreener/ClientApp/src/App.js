@@ -4,7 +4,6 @@ import { Button, ButtonGroup } from "@chakra-ui/react";
 import { Redirect } from "react-router-dom";
 import { DashboardOne } from './components/Dashboard/DashboardOne/DashboardOne';
 import { DashboardTwo } from './components/Dashboard/DashboardTwo/DashboardTwo';
-import { DashboardInterface } from './components/DashboardInterface';
 import { Router, Route, Switch } from 'react-router';
 import { Scanner } from './components/Dashboard/Scanner/Scanner';
 import { FilterTable } from './components/Dashboard/Historical/FilterTable';
@@ -16,8 +15,6 @@ import { DataFeed } from './components/Dashboard/DataFeed';
 import './custom.css'
 import 'antd/dist/antd.css';
 
-
-import { NotificationsContext } from './components/Dashboard/NotificationsContext';
 import { TopNavbar } from './components/Dashboard/TopNavbar';
 
 
@@ -168,7 +165,7 @@ class App extends Component {
       {this.state.sidemenu}
       <DataFeed {...this} />
       {this.state.redirect}
-      <NotificationsContext.Provider value={state}>
+   {/*   <NotificationsContext.Provider value={state}> </NotificationsContext.Provider>*/}
 
         <Switch>
           <Route exact path='/' component={() => <DashboardOne {...this} />} />
@@ -179,7 +176,7 @@ class App extends Component {
           <Route path='/Scanner' component={() => <Scanner {...this} />} />
         </Switch>
 
-      </NotificationsContext.Provider>
+   
     </div>
     );
   }

@@ -2,7 +2,10 @@ import * as cache from 'cache-base';
 
 let cache_ = new cache();
 
-export default class AlertCache {
+/**
+ * Cache for storing data to trigger alerts 
+ */
+export default class DashboardTwoAlertCache {
     
 
     static set(key, value) {

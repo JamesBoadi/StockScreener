@@ -5,6 +5,7 @@ import PortfolioCalc from './Portfolio/js/PortfolioCalc';
 import TableCache from './DashboardOne/js/TableCache.js';
 import SavedStockCache from './DashboardOne/js/SavedStockCache.js';
 import AlertCache from './DashboardOne/js/AlertCache.js';
+import DashboardTwoAlertCache from './DashboardTwo/js/DashboardTwoAlertCache.js';
 import ScannerCache from './Scanner/js/ScannerCache.js';
 import DashboardTwoCache from './DashboardTwo/js/DashboardTwoCache.js';
 import * as signalR from '@aspnet/signalr';
@@ -107,6 +108,7 @@ export class DataFeed extends Component {
 
                     // DashboardTwo 
                     DashboardTwoCache.set(key, item);
+                    DashboardTwoAlertCache.set(key, item);
 
                     PortfolioCache.set(key, item);
                    // PortfolioCalc.setGross();
@@ -166,6 +168,7 @@ export class DataFeed extends Component {
 
                     // DashboardTwo 
                     DashboardTwoCache.set(key, item);
+                    DashboardTwoAlertCache.set(key, item);
 
                     PortfolioCache.set(key, item);
                     HistoryCache.set(key, item);

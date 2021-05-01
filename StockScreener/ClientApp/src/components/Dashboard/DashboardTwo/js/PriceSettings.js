@@ -4,11 +4,11 @@ import * as HashMap from 'hashmap';
 export default class PriceSettings {
     static startPrice = 0;
     static targetPrice = 0;
-
-    static priceDetectionEnabled = false;
-    static hideBullishStocks = false;  
-    static hideBearishStocks = false;  
     
+    static priceDetectionEnabled = false;
+    static hideBullishStocks = false;
+    static hideBearishStocks = false;
+
     static map = new HashMap();
 
     // Enable local storage of states / Database 
@@ -20,7 +20,7 @@ export default class PriceSettings {
     static sethideBearishStocks(_var) {
         this.hideBearishStocks = _var;
     }
-    
+
     static setGlobalStartPrice(_startPrice) {
         this.startPrice = _startPrice;
     }
@@ -48,7 +48,7 @@ export default class PriceSettings {
     static getHideBullishStocks() {
         return this.hideBullishStocks;
     }
-    
+
     static getHideBearishStocks() {
         return this.hideBearishStocks;
     }
@@ -61,49 +61,72 @@ export default class PriceSettings {
         return this.map.get(clickedAlertTableRowID).LocalTargetPrice;
     }
 
-    // Set local prices using global prices without overriding prices already set
-    static setLocalPrices(startPrice, targetPrice, clickedAlertTableRowID) {
-        const data =
-        {
-            LocalStartPrice: startPrice,
-            LocalTargetPrice: targetPrice,
-            Override: "YES" 
+    static getPriceSettings() {
+        const h = parseInt((new Date().getHours() + 8) >= 17 ? 24 - new Date().getHours()
+            : new Date().getHours() + 8);
+        const m = new Date().getMinutes().toPrecision(2);
+        this.TimeStamp = h + ':' + m;
+
+       
+       const sp = parseFloat(this.startPrice);
+       const tp =  parseFloat(this.targetPrice);
+       console.log( sp + ' product ' + tp);
+        let json = {
+            globalStartPrice: sp,
+            globalTargetPrice: tp,
+            priceDetectionEnabled: this.priceDetectionEnabled,
+            hideBullishStocks: this.hideBullishStocks,
+            hideBearishStocks: this.hideBearishStocks,
         }
 
-        for (let key = 0; key < 897; key++) {
-            if (key === clickedAlertTableRowID) {
-                this.map.set(key, data);
-                break;
+        return JSON.stringify(json);
+    }
+
+
+    /*
+        // Set local prices using global prices without overriding prices already set
+        static setLocalPrices(startPrice, targetPrice, clickedAlertTableRowID) {
+            const data =
+            {
+                LocalStartPrice: startPrice,
+                LocalTargetPrice: targetPrice,
+                Override: "YES"
+            }
+    
+            for (let key = 0; key < 897; key++) {
+                if (key === clickedAlertTableRowID) {
+                    this.map.set(key, data);
+                    break;
+                }
             }
         }
-    }
-
-    // Override local prices using global prices
-    overrideLocalPrices(startPrice, targetPrice) {
-    /*    const data =
-        {
-            LocalStartPrice: startPrice,
-            LocalTargetPrice: targetPrice,
-            Override: "NO" // If set by user, price will be overriden
+    
+        // Override local prices using global prices
+        overrideLocalPrices(startPrice, targetPrice) {
+            /*    const data =
+                {
+                    LocalStartPrice: startPrice,
+                    LocalTargetPrice: targetPrice,
+                    Override: "NO" // If set by user, price will be overriden
+                }
+        
+                for (let key = 0; key < 897; key++) {
+                    this.map.set(key, data);
+                } 
         }
-
-        for (let key = 0; key < 897; key++) {
-            this.map.set(key, data);
-        } */
-    }
-
-    // Update stock hashmap
-    updateStockDashBoardMap() {
-      /*    const data =
-        {
-            LocalStartPrice: this.startPriceRef.current.value,
-            LocalTargetPrice: this.targetPriceRef.current.value
-        }
-
-        // Update HashMap
-      const clickedAlertTableRowID = this.state.clickedAlertTableRowID;
-        this.map.set(clickedAlertTableRowID, data);*/
-    }
+    
+        // Update stock hashmap
+        updateStockDashBoardMap() {
+            /*    const data =
+              {
+                  LocalStartPrice: this.startPriceRef.current.value,
+                  LocalTargetPrice: this.targetPriceRef.current.value
+              }
+      
+              // Update HashMap
+            const clickedAlertTableRowID = this.state.clickedAlertTableRowID;
+              this.map.set(clickedAlertTableRowID, data);*/
+    //  }
 
 
 }
