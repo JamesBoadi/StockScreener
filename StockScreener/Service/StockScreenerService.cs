@@ -144,24 +144,53 @@ namespace StockScreener
         // **************************************************
 
         public List<EndOfDayData> GetEODdata() =>
-            _eodData.Find(historical => true).ToList();
+            _eodData.Find(historical => true).ToListAsync().Result;
 
         public bool EODIdExists(string id)
         {
-            var query = _eodData.Find<EndOfDayData>(historical => historical.Id.Equals(id)).Any();
+            var query = _eodData.Find<EndOfDayData>(historical => historical.Id.Equals(id)).AnyAsync().Result;
             return query;
         }
 
-        public EndOfDayData Update(string id, EndOfDayData historical)
+        public async Task UpdateEODdata(string id, EndOfDayData data)
         {
-            var query = _eodData.FindOneAndReplace<EndOfDayData>(historical => historical.Id.Equals(id), historical);
-            return query;
+            var filter = Builders<EndOfDayData>.Filter.Eq("Id", id);
+
+            var cp = Builders<EndOfDayData>.Update.Set("CurrentPrice", data.CurrentPrice);
+            var sc = Builders<EndOfDayData>.Update.Set("StockCode", data.StockCode);
+            var sn = Builders<EndOfDayData>.Update.Set("StockName", data.StockName);
+            var ts = Builders<EndOfDayData>.Update.Set("TimeStamp", data.TimeStamp);
+            var h = Builders<EndOfDayData>.Update.Set("High", data.High);
+            var po = Builders<EndOfDayData>.Update.Set("PrevOpen", data.PrevOpen);
+            var c = Builders<EndOfDayData>.Update.Set("Close", data.Close);
+            var l = Builders<EndOfDayData>.Update.Set("Low", data.Low);
+            var cg = Builders<EndOfDayData>.Update.Set("Change", data.Change);
+            var cgp = Builders<EndOfDayData>.Update.Set("ChangeP", data.ChangeP);
+            var v = Builders<EndOfDayData>.Update.Set("Volume", data.Volume);
+            var ca = Builders<EndOfDayData>.Update.Set("ChangeArray", data.ChangeArray);
+            var s = Builders<EndOfDayData>.Update.Set("Signal", data.Signal);
+
+            _ = _eodData.UpdateOneAsync(filter, cp);
+            _ = _eodData.UpdateOneAsync(filter, sc);
+            _ = _eodData.UpdateOneAsync(filter, sn);
+            _ = _eodData.UpdateOneAsync(filter, ts);
+            _ = _eodData.UpdateOneAsync(filter, h);
+            _ = _eodData.UpdateOneAsync(filter, po);
+            _ = _eodData.UpdateOneAsync(filter, c);
+            _ = _eodData.UpdateOneAsync(filter, l);
+            _ = _eodData.UpdateOneAsync(filter, cg);
+            _ = _eodData.UpdateOneAsync(filter, cgp);
+            _ = _eodData.UpdateOneAsync(filter, v);
+            _ = _eodData.UpdateOneAsync(filter, ca);
+            _ = _eodData.UpdateOneAsync(filter, s);
+
+            await Task.Delay(100);
         }
 
         public EndOfDayData Create(EndOfDayData historical)
         {
             // Insert document in collection
-            _eodData.InsertOne(historical);
+            _eodData.InsertOneAsync(historical);
             return historical;
         }
 
@@ -216,14 +245,13 @@ namespace StockScreener
             await _dashboardOneAlertSettings.InsertOneAsync(settings);
         }
 
-
         public async Task UpdateAlertSettings(DashboardOneAlertSettings settings)
         {
             var filter = Builders<DashboardOneAlertSettings>.Filter.Eq("Id", "0");
-        
+
             var manual = Builders<DashboardOneAlertSettings>.Update.Set("Manual", settings.Manual);
             var auto = Builders<DashboardOneAlertSettings>.Update.Set("Auto", settings.Auto);
-  
+
             var updatealertsettings = Builders<DashboardOneAlertSettings>.Update.Set("UpdateAlertSettings", settings.UpdateAlertSettings);
             var alertinterval = Builders<DashboardOneAlertSettings>.Update.Set("AlertInterval", settings.AlertInterval);
             var st = Builders<DashboardOneAlertSettings>.Update.Set("StartTime", settings.StartTime);
@@ -231,10 +259,10 @@ namespace StockScreener
             var st2 = Builders<DashboardOneAlertSettings>.Update.Set("SettingsTriggered", settings.SettingsTriggered);
             var ts = Builders<DashboardOneAlertSettings>.Update.Set("TimeStamp", settings.TimeStamp);
 
-            
+
             _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, manual);
             _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, auto);
-      
+
             _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, updatealertsettings);
             _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, alertinterval);
             _ = _dashboardOneAlertSettings.UpdateOneAsync(filter, st);
@@ -298,7 +326,6 @@ namespace StockScreener
             await _dashboardOneAlertSettings.DeleteOneAsync(settings => settings.Id.Equals(id));
         }
 
-
         // **************************************************
 
         // **************************************************
@@ -344,10 +371,9 @@ namespace StockScreener
 
         public bool DashBoardOneAlertsExists(int id)
         {
-            var query = _dashboardOneAlerts.Find<DashBoardOneAlerts>(settings => settings.Id ==id).Any();
+            var query = _dashboardOneAlerts.Find<DashBoardOneAlerts>(settings => settings.Id == id).Any();
             return query;
         }
-
 
         public void UpdateDashboardOneAlerts(int id, DashBoardOneAlerts settings)
         {
@@ -357,8 +383,6 @@ namespace StockScreener
 
             _ = _dashboardOneAlerts.UpdateOne(filter, alert);
             _ = _dashboardOneAlerts.UpdateOne(filter, state);
-
-
         }
 
         public void DeleteDashboardOneAlerts(int id) =>

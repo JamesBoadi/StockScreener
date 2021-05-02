@@ -175,6 +175,20 @@ export class PortFolio extends Component {
             }
         }, 1000);
 
+       
+        const sessionEndedCalled = localStorage.getItem('sessionEndedCalled');
+        if (sessionEndedCalled === null || sessionEndedCalled === undefined) {
+            localStorage.setItem('sessionEndedCalled', false);
+        }
+        
+        const sessionEnded = localStorage.getItem('sessionEnded');
+        if (sessionEnded && !sessionEndedCalled)
+        {
+            window.alert('Session is currently out of trading hours');
+            localStorage.removeItem('sessionEndedCalled');
+            localStorage.setItem('sessionEndedCalled', true);
+        }
+
         this.initialisePortfolio();
     }
 

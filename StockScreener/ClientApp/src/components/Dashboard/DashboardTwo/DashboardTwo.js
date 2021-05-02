@@ -24,6 +24,18 @@ export class DashboardTwo extends Component {
             if (connectionEstablished && DashboardTwoCache.getFill()) {
                 this.setDashboardTwo();
                 this.setState({ lock: false });
+
+                const sessionEndedCalled = localStorage.getItem('sessionEndedCalled');
+                if (sessionEndedCalled === null || sessionEndedCalled === undefined) {
+                    localStorage.setItem('sessionEndedCalled', false);
+                }
+
+                const sessionEnded = localStorage.getItem('sessionEnded');
+                if (sessionEnded && !sessionEndedCalled) {
+                    window.alert('Session is currently out of trading hours');
+                    localStorage.removeItem('sessionEndedCalled');
+                    localStorage.setItem('sessionEndedCalled', true);
+                }
                 clearInterval(this.intervalID);
             }
         }, 1000);
