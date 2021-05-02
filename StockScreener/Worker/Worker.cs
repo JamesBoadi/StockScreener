@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Channels;
 using System.Runtime.CompilerServices;
-
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using StockScreener.Controllers;
@@ -60,17 +59,13 @@ namespace StockScreener
                 // Http Client // Do a manual call if this fails
             }
 
-
             CancellationToken newToken;
             while (!cancellationToken.IsCancellationRequested)
             {
-
                 // Put on a seperate thread
-
                 // Read Database
                 if (_init_called == false)
                 {
-                    Manager.init(); // Change to singleton
                     _ = initialise_cache();
                     _init_called = !_init_called;
                 }
@@ -78,34 +73,33 @@ namespace StockScreener
                 Time time = new Time();
 
                 // Time Check
-                /*   if (time.ReturnTime().Hours >= 17 && time.ReturnTime().Hours <= 8)
-                   {
-                       if (_cacheFull)
-                       {
-                           if (_sessionEnded == false ) // && getState sessionEnded=true
-                           {
-                               // Save last data to database
-                               for (int key = 0; key < MAX; key++)
-                               {
-                                   String JSON = Cache.Get(key).Serialize();
-                                   _ = saveEODdata(JSON);
-                               }
+                if (time.ReturnTime().Hours >= 17 && time.ReturnTime().Hours <= 8)
+                {
+                    if (_cacheFull)
+                    {
+                        if (_sessionEnded == false) // && getState sessionEnded=true
+                        {
+                            // Save last data to database
+                            for (int key = 0; key < MAX; key++)
+                            {
+                                String JSON = Cache.Get(key).Serialize();
+                                _ = saveEODdata(JSON);
+                            }
 
-                               // Stop the stream
-                               _ = serviceWorker.StopAsync(cancellationToken);
+                            // Stop the stream
+                            _ = serviceWorker.StopAsync(cancellationToken);
 
-                               newToken = new CancellationToken();
-                               cancellationToken = newToken;
+                            newToken = new CancellationToken();
+                            cancellationToken = newToken;
 
-                               Console.WriteLine("STOP STREAM  ");
+                            Console.WriteLine("STOP STREAM  ");
 
-                               _sessionEnded = true;
-                               _init_work = false;
-                           }
-                       }
-                   }
-                   else
-                   {*/
+                            _sessionEnded = true;
+                            _init_work = false;
+                        }
+                    }
+                }
+
                 if (_sessionEnded)
                     _sessionEnded = false;
 
@@ -121,12 +115,11 @@ namespace StockScreener
                 if (_cacheFull)
                 {
                     // Data is kept up to date
-                 /*   for (int key = 0; key < MAX; key++)
-                    {
-                        String JSON = Cache.Get(key).Serialize();
-                        _ = saveEODdata(JSON);
-                    }*/
-
+                    /*   for (int key = 0; key < MAX; key++)
+                       {
+                           String JSON = Cache.Get(key).Serialize();
+                           _ = saveEODdata(JSON);
+                       }*/
                     for (int key = 0; key < MAX; key++)
                     {
                         String JSON = Cache.Get(key).Serialize();
@@ -147,7 +140,7 @@ namespace StockScreener
                 bool idExists = _stockScreenerService.EODIdExists(eodData.Id);
 
                 if (idExists)
-                    _stockScreenerService.ClearEODdata(eodData.Id);
+                    await _stockScreenerService.UpdateEODdata(eodData.Id, eodData);
 
                 _stockScreenerService.Create(eodData);
 
@@ -161,6 +154,7 @@ namespace StockScreener
             }
 
             await Task.Delay(100);
+
             // Indicate lock stream
             await _stockHandler.Clients.All.lockStream(serviceWorker.API_REQUESTS, true);
         }
@@ -197,6 +191,8 @@ namespace StockScreener
         {
             int start = 0;
             int end = 19;
+
+            Manager.init();
 
             for (int pointer = 0; pointer <= Manager.MAX_CALLS; pointer++)
             {

@@ -94,7 +94,7 @@ export class DataFeed extends Component {
             );
     }
 
-    /*End Of Day Data */
+    /* End Of Day Data */
     async eodData() {
         // Fill Cache with EOD data
         await fetch('geteod/data')
@@ -103,21 +103,24 @@ export class DataFeed extends Component {
                 for (var key = 0; key < response.length; key++) {
                     const item = JSON.parse(response[key]);
 
-                    // Scanner
-                    ScannerCache.set(key, item);
+                  // Scanner
+                  ScannerCache.set(key, item);
 
-                    // DashboardTwo 
-                    DashboardTwoCache.set(key, item);
-                    DashboardTwoAlertCache.set(key, item);
+                  // DashboardTwo 
+                  DashboardTwoCache.set(key, item);
+                  DashboardTwoAlertCache.set(key, item);
 
-                    PortfolioCache.set(key, item);
-                   // PortfolioCalc.setGross();
-                    HistoryCache.set(key, item);
+                  // Portfolio
+                  PortfolioCache.set(key, item);
+                  // Set Gross
 
-                    // Dashboard One
-                    TableCache.set(key, item);
-                    AlertCache.set(key, item);
-                    SavedStockCache.set(key, item);
+                  // Historical
+                  HistoryCache.set(key, item);
+
+                  // Dashboard One
+                  TableCache.set(key, item);
+                  AlertCache.set(key, item);
+                  SavedStockCache.set(key, item);
                 }
             })
             .catch(error => {
@@ -125,7 +128,7 @@ export class DataFeed extends Component {
                 // Last successfully catched data
                 return;
             }
-            );
+        );
     }
 
     /**
@@ -156,9 +159,10 @@ export class DataFeed extends Component {
                         localStorage.setItem('sessionEnded', sessionEnded)
                     }
 
-                    this.eodData(); // EOD data
-
-                    console.log('session ENDED' + sessionEnded)
+                    if (sessionEnded) {
+                        localStorage.setItem('sessionEndedCalled', false);
+                        this.eodData(); // EOD data
+                    }
                 })
                 DataFeed.hubConnection.on('requestData', (key, data) => {
                     const item = JSON.parse(data);
@@ -170,7 +174,10 @@ export class DataFeed extends Component {
                     DashboardTwoCache.set(key, item);
                     DashboardTwoAlertCache.set(key, item);
 
+                    // Portfolio
                     PortfolioCache.set(key, item);
+
+                    // Historical
                     HistoryCache.set(key, item);
 
                     // Dashboard One

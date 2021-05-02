@@ -232,9 +232,17 @@ export class HistoricalTable extends Component {
     };
 
     componentDidMount() {
-        /*     this.interval = setInterval(() => {
-                this.updateFilterCache();
-             }, 20000);*/
+        const sessionEndedCalled = localStorage.getItem('sessionEndedCalled');
+        if (sessionEndedCalled === null || sessionEndedCalled === undefined) {
+            localStorage.setItem('sessionEndedCalled', false);
+        }
+
+        const sessionEnded = localStorage.getItem('sessionEnded');
+        if (sessionEnded && !sessionEndedCalled) {
+            window.alert('Session is currently out of trading hours');
+            localStorage.removeItem('sessionEndedCalled');
+            localStorage.setItem('sessionEndedCalled', true);
+        }
 
         this.setState({ dateString: new Date().toDateString() });
     }
@@ -690,7 +698,7 @@ export class HistoricalTable extends Component {
             return;
         }
 
-       // console.log('HISTORICAL CACHE code ' + HistoryCache.get(target).StockCode);
+        // console.log('HISTORICAL CACHE code ' + HistoryCache.get(target).StockCode);
 
         // Stocks to be displayed in the Portfolio table
         portfolioTableStocks.push(HistoryCache.get(target));

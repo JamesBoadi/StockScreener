@@ -732,7 +732,6 @@ export class StockTableOne extends React.Component {
         }
     }
 
-
     render() {
         const stockTableTwoHeader = <table class="stockTableTwoHeader" aria-labelledby="tabelLabel">
             <thead>
@@ -820,9 +819,9 @@ export class StockTableOne extends React.Component {
                             bg='rgb(30,30,30)'
                             boxShadow='sm'
                             textAlign='center'
-                            height='800px'
+                            height='1050px'
                             width='62rem'
-                            maxHeight='800px'
+                            maxHeight='1050px'
                             rounded="lg"
                             color='white'
                             zIndex='-999'>

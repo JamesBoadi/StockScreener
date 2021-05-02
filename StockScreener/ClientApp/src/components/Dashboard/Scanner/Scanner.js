@@ -123,9 +123,21 @@ export class Scanner extends React.Component {
         for (id = 0; id < 897; id++) {
             this.styleMap.set(id, {});
         }
+
+        const sessionEndedCalled = localStorage.getItem('sessionEndedCalled');
+        if (sessionEndedCalled === null || sessionEndedCalled === undefined) {
+            localStorage.setItem('sessionEndedCalled', false);
+        }
+        
+        const sessionEnded = localStorage.getItem('sessionEnded');
+        if (sessionEnded && !sessionEndedCalled)
+        {
+            window.alert('Session is currently out of trading hours');
+            localStorage.removeItem('sessionEndedCalled');
+            localStorage.setItem('sessionEndedCalled', true);
+        }
+
         this.setState({ scroll: this.scrollBy() })
-
-
         this.init(0, 50);
     }
 

@@ -9,8 +9,8 @@ export class DashboardOne extends Component {
     constructor(props) {
         super(props);
 
-      //  this.setLock = this.setLock.bind(this)
-      
+        //  this.setLock = this.setLock.bind(this)
+
         this.state = {
             lock: true,
             initialiseTableTwo: false,
@@ -20,12 +20,30 @@ export class DashboardOne extends Component {
     }
 
     componentDidMount() {
+
+
+
         const connectionEstablished = localStorage.getItem('_connectionEstablished');
         this.intervalID = setInterval(() => {
-            if (connectionEstablished &&  TableCache.getFill()) {
+            if (connectionEstablished && TableCache.getFill()) {
                 this.setDashboardTwo();
                 this.setState({ lock: false });
+
+
+                const sessionEndedCalled = localStorage.getItem('sessionEndedCalled');
+                if (sessionEndedCalled === null || sessionEndedCalled === undefined) {
+                    localStorage.setItem('sessionEndedCalled', false);
+                }
+
+                const sessionEnded = localStorage.getItem('sessionEnded');
+                if (sessionEnded && !sessionEndedCalled) {
+                    window.alert('Session is currently out of trading hours');
+                    localStorage.removeItem('sessionEndedCalled');
+                    localStorage.setItem('sessionEndedCalled', true);
+                }
+
                 clearInterval(this.intervalID);
+
             }
         }, 500);
     }
